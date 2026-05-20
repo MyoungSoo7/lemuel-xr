@@ -13,6 +13,16 @@
 | 파일 | 내용 |
 |---|---|
 | [`docs/PLAN.md`](docs/PLAN.md) | 전체 기획서 — 컨셉·아키텍처·경쟁분석·로드맵 |
+| [`docs/BUILD-PLAN.md`](docs/BUILD-PLAN.md) | XR 빌드 플랜 — 시스템 아키텍처·sprint plan·위험·비용 |
+| [`docs/MVP-JOSEPH.md`](docs/MVP-JOSEPH.md) | **MVP 요셉 XR 미션 상세 설계** (2026-05-20 결정) |
+
+## MVP 결정 (2026-05-20)
+
+기존 PLAN.md 의 V1.0(트랙 A 정적 콘텐츠) → V2.0(요셉 게임) 순서를 **뒤집어** 요셉 XR 게임을 **V1.0 MVP** 로 시작.
+
+이유: XR 의 *손·공간* 메타포가 곡식 분배 결정 인터랙션과 가장 잘 맞고, 단일 미션이 6주 안에 완성 가능. 트랙 A 정적 콘텐츠는 Phase 2 로 이동.
+
+자세한 시나리오·인터랙션·일정은 [`docs/MVP-JOSEPH.md`](docs/MVP-JOSEPH.md) 참조.
 
 ## 듀얼 트랙 구조
 

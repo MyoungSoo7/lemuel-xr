@@ -1,0 +1,23 @@
+# JVM
+backend/build/
+backend/.gradle/
+*.iml
+.idea/
+
+# Python
+tts/__pycache__/
+tts/*.egg-info/
+tts/.venv/
+
+# Unity (예정)
+unity/Library/
+unity/Temp/
+unity/Logs/
+unity/Builds/
+unity/UserSettings/
+
+# Secrets
+**/.env
+!**/.env.example
+*.pem
+*.key

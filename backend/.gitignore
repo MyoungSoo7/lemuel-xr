@@ -1,0 +1,12 @@
+build/
+.gradle/
+out/
+.idea/
+*.iml
+*.log
+HELP.md
+
+# Secrets
+.env
+.env.*
+!.env.example

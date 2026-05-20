@@ -266,18 +266,33 @@ CREATE TABLE llm_cache (
 
 ---
 
-## 9. 사전 결정 필요한 것
+## 9. 결정 사항 (2026-05-20 확정)
 
-1. **타겟 디바이스** — Quest 2 / Quest 3 / Quest Pro / WebXR 중 어느 것 우선?
-   - 추천: **Quest 2/3** (Quest Pro 는 Eye Gaze 옵션, WebXR 는 Phase 2)
-2. **LLM 호출 시점** — 미션 중 실시간 (지연 1~2초) vs 사전 캐싱 (변형 없음)
-   - 추천: **하이브리드** — 시나리오 핵심 분기는 사전 캐시, 사용자 입력 응답만 실시간
-3. **TTS 음성** — ElevenLabs (영문 자연, 한국어 약함) vs 사전 녹음 (지인 음성 활용)
-   - 추천: **사전 녹음 시작** — MVP 단계에선 단순 + 비용 0
-4. **본문 번역본** — 개역개정 / 새번역 / 공동번역?
-   - 결정: 사용자 본인 선호
-5. **사용자 데이터 익명화** — 게스트 모드만 / 회원가입 옵션 / 익명+로그인 둘 다?
-   - 추천: **게스트만 (MVP)**, Phase 2 에서 회원 시스템
+1. **타겟 디바이스** — Meta Quest 3 + Apple Vision Pro + Galaxy XR 모두 동작
+   - 구현 전략: **Unity 6 + OpenXR 코어** + 플랫폼별 빌드 분기
+     - Quest 3 → Android 빌드 + Meta XR SDK
+     - Vision Pro → visionOS 빌드 + Apple PolySpatial
+     - Galaxy XR → Android XR (Google) 빌드 + OpenXR
+   - 작업량 영향: **+50% (단일 디바이스 대비)**. 첫 3주는 Quest 3 우선, Week 4 부터 Vision Pro + Galaxy XR 포팅
+   - 공통 인터랙션은 OpenXR Input Action 으로 추상화 — 각 플랫폼 binding 만 정의
+
+2. **LLM 호출** — 하이브리드
+   - 사전 캐시: Scene 2/3 결정 분기별 요셉 독백 (3~4 분기 × 1독백 = 캐시)
+   - 실시간: Scene 4 형제 재회 시 사용자 미세 선택에 따른 대사 한 줄
+   - 캐시 hit rate 목표 80%+
+
+3. **TTS** — **자체 호스팅** (외부 유료 서비스 사용 X)
+   - 후보 모델: **Coqui TTS XTTS-v2** (한국어 + 음성 cloning) 또는 **ESPnet-TTS** 한국어 모델
+   - 인프라: 기존 K3s 의 `david` 노드 (`ai-inference=true` 라벨)
+   - 구성: TTS pod (Python + FastAPI) + 캐시 (생성 wav 를 R2 또는 PVC 에 저장)
+   - 음성 정체성: 첫 라운드 모델 기본 보이스 → Phase 2 에서 cloning 옵션
+
+4. **본문 번역** — **현대인의 성경**
+   - ⚠️ **저작권 주의** — 생명의말씀사 저작권. 짧은 인용은 fair use 가능하나, 공개 출시 전 라이선스 협의 필요
+   - 단기: MVP 데모 + 비공개 테스터 5~10명은 fair use 범위
+   - Fallback: 개역개정 (대한성서공회 비영리 사용 약관) 변경 가능하도록 본문 테이블에 translation 컬럼 분리
+
+5. **사용자** — **게스트만** (MVP). 디바이스별 UUID 자동 발급, 로컬 저장. Phase 2 OAuth.
 
 ---
 
