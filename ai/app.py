@@ -20,7 +20,9 @@ from google.genai import types
 from pydantic import BaseModel
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+# 503 UNAVAILABLE 시 사용할 fallback 모델 체인. 첫번째가 막히면 다음으로.
+FALLBACKS = os.environ.get("GEMINI_FALLBACKS", "gemini-2.5-flash-lite,gemini-2.0-flash-001").split(",")
 
 # Gemini client
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
@@ -39,8 +41,21 @@ def _generate(prompt: str, *, temperature: float = 0.5, json_mode: bool = False)
         temperature=temperature,
         response_mime_type="application/json" if json_mode else "text/plain",
     )
-    rsp = client.models.generate_content(model=MODEL, contents=prompt, config=config)
-    return (rsp.text or "").strip()
+    # 모델 alias (gemini-flash-latest 등) 가 종종 503 UNAVAILABLE 반환.
+    # 명시적 모델 + fallback 체인으로 자동 재시도.
+    models_to_try = [MODEL] + [m.strip() for m in FALLBACKS if m.strip() and m.strip() != MODEL]
+    last_err: Exception | None = None
+    from google.genai.errors import ServerError
+    for m in models_to_try:
+        try:
+            rsp = client.models.generate_content(model=m, contents=prompt, config=config)
+            return (rsp.text or "").strip()
+        except ServerError as e:
+            last_err = e
+            continue
+    if last_err:
+        raise last_err
+    return ""
 
 
 # -------------------------------------------------------------------
