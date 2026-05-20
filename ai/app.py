@@ -1,33 +1,52 @@
 """
 Lemuel XR — AI orchestration service.
 
-backend (Spring Boot) 가 호출하는 LLM 사이드카. OpenAI 직접 호출 + 향후 LangChain·LangGraph 도입.
+backend (Spring Boot) 가 호출하는 LLM 사이드카. Google Gemini 직접 호출.
+sparta-msa (chat.lemuel.co.kr) 와 같은 GOOGLE_AI_GEMINI_API_KEY 공유.
 
 엔드포인트:
   GET  /healthz
   POST /classify-emotion   { text } → { emotion, confidence }
-  POST /joseph-monologue   { decision } → { text }   # Scene 2/3 분기 독백
-  POST /joseph-reunion     { decision, distribution_pattern } → { text }   # Scene 4 실시간
+  POST /joseph-monologue   { decision } → { text }
+  POST /joseph-reunion     { decision, distribution_pattern } → { text }
 """
 import json
 import os
 from typing import Literal
 
 from fastapi import FastAPI
-from openai import OpenAI
+from google import genai
+from google.genai import types
 from pydantic import BaseModel
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+# Gemini client
+client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 app = FastAPI(title="lemuel-xr-ai")
+
+Emotion = Literal["ANXIOUS", "SAD", "ANGRY", "CONFUSED", "LONELY", "EXHAUSTED", "GRATEFUL"]
+
+
+# -------------------------------------------------------------------
+# helper
+# -------------------------------------------------------------------
+def _generate(prompt: str, *, temperature: float = 0.5, json_mode: bool = False) -> str:
+    if client is None:
+        return ""
+    config = types.GenerateContentConfig(
+        temperature=temperature,
+        response_mime_type="application/json" if json_mode else "text/plain",
+    )
+    rsp = client.models.generate_content(model=MODEL, contents=prompt, config=config)
+    return (rsp.text or "").strip()
+
 
 # -------------------------------------------------------------------
 # 1. 감정 분류
 # -------------------------------------------------------------------
-EMOTION_PROMPT = """
-너는 한국어 감정 분류기다. 다음 사용자 텍스트를 7개 감정 중 하나로 분류하라.
+EMOTION_PROMPT = """너는 한국어 감정 분류기다. 다음 사용자 텍스트를 7개 감정 중 하나로 분류하라.
 
 가능한 감정:
 ANXIOUS    - 불안, 두려움, 걱정
@@ -39,10 +58,9 @@ EXHAUSTED  - 지침, 번아웃, 무기력
 GRATEFUL   - 감사, 평안
 
 응답은 JSON 한 줄: {"emotion": "ANXIOUS", "confidence": 0.85}
-설명·여백 없이 JSON 만 출력.
-"""
 
-Emotion = Literal["ANXIOUS", "SAD", "ANGRY", "CONFUSED", "LONELY", "EXHAUSTED", "GRATEFUL"]
+사용자 텍스트: %s
+"""
 
 
 class EmotionRequest(BaseModel):
@@ -56,25 +74,14 @@ class EmotionResponse(BaseModel):
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok", "model": MODEL}
+    return {"status": "ok", "model": MODEL, "configured": client is not None}
 
 
 @app.post("/classify-emotion", response_model=EmotionResponse)
 def classify_emotion(req: EmotionRequest) -> EmotionResponse:
-    if not OPENAI_API_KEY:
-        # 키 없으면 CONFUSED fallback — 로컬 개발 편의
+    raw = _generate(EMOTION_PROMPT % req.text, temperature=0.0, json_mode=True)
+    if not raw:
         return EmotionResponse(emotion="CONFUSED", confidence=0.0)
-
-    rsp = client.chat.completions.create(
-        model=MODEL,
-        messages=[
-            {"role": "system", "content": EMOTION_PROMPT},
-            {"role": "user", "content": req.text},
-        ],
-        response_format={"type": "json_object"},
-        temperature=0.0,
-    )
-    raw = rsp.choices[0].message.content or "{}"
     try:
         data = json.loads(raw)
         return EmotionResponse(
@@ -88,8 +95,7 @@ def classify_emotion(req: EmotionRequest) -> EmotionResponse:
 # -------------------------------------------------------------------
 # 2. 요셉 Scene 2/3 분기 독백 (사전 캐시 가능)
 # -------------------------------------------------------------------
-JOSEPH_MONOLOGUE_PROMPT = """
-당신은 청년 요셉입니다. 이집트 총리로서 7년 풍년 동안 전체 곡식의 {percentage}% 를 저장하기로 결정했습니다.
+JOSEPH_MONOLOGUE_PROMPT = """당신은 청년 요셉입니다. 이집트 총리로서 7년 풍년 동안 전체 곡식의 {percentage}% 를 저장하기로 결정했습니다.
 당신의 내면 독백을 한국어 2~3 문장으로 작성하세요. 백성을 향한 책임감과 두려움이 섞여 있어야 합니다.
 """
 
@@ -108,21 +114,16 @@ _MONO_PCT = {"save_20": "20", "save_33": "33", "save_50": "50"}
 @app.post("/joseph-monologue", response_model=MonologueResponse)
 def joseph_monologue(req: MonologueRequest) -> MonologueResponse:
     pct = _MONO_PCT[req.decision]
-    if not OPENAI_API_KEY:
-        return MonologueResponse(text=f"[mock] 풍요로운 7년 동안 {pct}% 를 저장한다. 그 결정의 무게가 어깨에 얹힌다.")
-    rsp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": JOSEPH_MONOLOGUE_PROMPT.format(percentage=pct)}],
-        temperature=0.6,
-    )
-    return MonologueResponse(text=(rsp.choices[0].message.content or "").strip())
+    text = _generate(JOSEPH_MONOLOGUE_PROMPT.format(percentage=pct), temperature=0.6)
+    if not text:
+        text = f"[mock] 풍요로운 7년 동안 {pct}% 를 저장한다. 그 결정의 무게가 어깨에 얹힌다."
+    return MonologueResponse(text=text)
 
 
 # -------------------------------------------------------------------
-# 3. 요셉 Scene 4 실시간 — 형제 재회 대사 (Scene 3 분배 패턴 반영)
+# 3. 요셉 Scene 4 실시간 — 형제 재회 (Scene 3 분배 패턴 반영)
 # -------------------------------------------------------------------
-REUNION_PROMPT = """
-당신은 청년 요셉, 이집트 총리입니다.
+REUNION_PROMPT = """당신은 청년 요셉, 이집트 총리입니다.
 당신은 7년 흉년에 곡식을 우선적으로 {priority} 에게 분배했습니다.
 지금 야곱의 아들들 (당신의 형제들) 이 곡식을 구하러 와 당신 앞에 절합니다.
 당신은 그들에게 {action} 을 선택했습니다.
@@ -153,11 +154,7 @@ _ACTION = {
 def joseph_reunion(req: ReunionRequest) -> MonologueResponse:
     priority = _DISTRIBUTION[req.distribution_pattern]
     action = _ACTION[req.decision]
-    if not OPENAI_API_KEY:
-        return MonologueResponse(text=f"[mock] ({priority} 우선/{action}) 형제들이여, 가까이 오라.")
-    rsp = client.chat.completions.create(
-        model=MODEL,
-        messages=[{"role": "user", "content": REUNION_PROMPT.format(priority=priority, action=action)}],
-        temperature=0.7,
-    )
-    return MonologueResponse(text=(rsp.choices[0].message.content or "").strip())
+    text = _generate(REUNION_PROMPT.format(priority=priority, action=action), temperature=0.7)
+    if not text:
+        text = f"[mock] ({priority} 우선/{action}) 형제들이여, 가까이 오라."
+    return MonologueResponse(text=text)
