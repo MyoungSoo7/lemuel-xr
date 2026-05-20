@@ -55,13 +55,24 @@ export default function JosephPage() {
         <h1 className="text-2xl font-bold mt-1">{title}</h1>
       </header>
 
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl bg-black/40 border border-[var(--color-primary)]/20 overflow-hidden mb-4">
-        <div className="h-[420px]">
-          <Canvas camera={{ position: [3, 2, 4], fov: 50 }}>
-            <ambientLight intensity={0.4} />
-            <directionalLight position={[5, 5, 5]} intensity={1.2} />
+      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative">
+        {/* Scene 별 배경 이미지 (Imagen 4.0 생성) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: `url(/images/scenes/${scene.currentScene}.jpg)`,
+          }}
+          aria-hidden
+        />
+        {/* 가독성용 어두운 overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/60" aria-hidden />
+
+        <div className="relative h-[420px]">
+          <Canvas camera={{ position: [3, 2, 4], fov: 50 }} style={{ background: "transparent" }}>
+            <ambientLight intensity={0.5} />
+            <directionalLight position={[5, 5, 5]} intensity={1.4} castShadow />
             <SceneMesh sceneId={scene.currentScene} />
-            <OrbitControls enablePan={false} />
+            <OrbitControls enablePan={false} enableZoom={false} />
           </Canvas>
         </div>
       </section>
