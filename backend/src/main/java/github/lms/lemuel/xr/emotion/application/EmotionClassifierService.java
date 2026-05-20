@@ -4,6 +4,7 @@ import github.lms.lemuel.xr.emotion.domain.Emotion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -34,6 +35,7 @@ public class EmotionClassifierService implements ClassifyEmotionUseCase {
         try {
             AiResponse resp = ai.post()
                     .uri("/classify-emotion")
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body(new AiRequest(rawText))
                     .retrieve()
                     .body(AiResponse.class);
