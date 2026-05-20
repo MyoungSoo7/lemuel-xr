@@ -39,6 +39,17 @@
                      요셉·모세·다윗·예수
 ```
 
+## 인물별 담당
+
+| Theme | 인물 | 구원 유형 | 담당 |
+|---|---|---|---|
+| 8 | 요셉 | 경제 | [@MyoungSoo7](https://github.com/MyoungSoo7) |
+| 9 | 모세 | 정치 | [@MyoungSoo7](https://github.com/MyoungSoo7) |
+| 10 | 다윗 | 외세 | [@MyoungSoo7](https://github.com/MyoungSoo7) |
+| 11 | 예수 | 영적 | [@godjinho](https://github.com/godjinho) |
+
+각 담당자가 *설계 문서·시나리오·신학 검토* 1차 책임. 코드 구현은 별도 분담.
+
 ## 핵심 차별화
 
 - **개신교 + 한국 시장** — Hallow(가톨릭)·Pray.com(미국) 빈자리
