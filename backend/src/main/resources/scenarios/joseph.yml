@@ -1,0 +1,58 @@
+# 요셉 미션 시나리오 정적 정의.
+# Scene 별 페이로드 + 분기 매핑. LLM 으로 생성되는 부분은 별도 캐시.
+
+character: joseph
+title: 곡식 7년
+scenes:
+  - id: 1
+    title: 파라오의 꿈
+    type: cinematic
+    duration_sec: 60
+    narration_id: joseph.scene1.narration
+    next: 2
+
+  - id: 2
+    title: 풍년 — 저장 결정
+    type: interaction
+    interaction: pick_one
+    options:
+      - { id: save_20, label: "1/5 저장", weight: 20 }
+      - { id: save_33, label: "1/3 저장", weight: 33 }  # 요셉이 실제로 선택한 수준 (창 41:34)
+      - { id: save_50, label: "1/2 저장", weight: 50 }
+    monologue_cache_keys:
+      save_20: joseph.scene2.monologue.save_20
+      save_33: joseph.scene2.monologue.save_33
+      save_50: joseph.scene2.monologue.save_50
+    next: 3
+
+  - id: 3
+    title: 흉년 — 분배 결정
+    type: interaction
+    interaction: distribute
+    queues:
+      - { id: farmer,    label: 이집트 농민 }
+      - { id: immigrant, label: 이주민 가족 }
+      - { id: merchant,  label: 무역 상인 }
+    rule: distribute_all_sacks
+    outcome_cache_keys:
+      farmer_first:    joseph.scene3.outcome.farmer_first
+      immigrant_first: joseph.scene3.outcome.immigrant_first
+      merchant_first:  joseph.scene3.outcome.merchant_first
+    next: 4
+
+  - id: 4
+    title: 형제와 재회
+    type: interaction
+    interaction: pick_one
+    options:
+      - { id: reveal,  label: 정체를 즉시 밝힌다 }
+      - { id: test,    label: 잠시 시험한다 (베냐민 데려오라) }
+      - { id: silent,  label: 침묵한다 }
+    realtime_llm: true   # 사용자 선택 + Scene 3 분배 결과 조합 → 실시간 대사 1줄
+    next: 5
+
+  - id: 5
+    title: 결말
+    type: outro
+    scripture_ref: gen-45:5
+    next: null
