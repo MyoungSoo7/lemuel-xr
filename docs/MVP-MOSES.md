@@ -391,3 +391,32 @@ Scene 6: 회복 메시지 (30초)
 └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
+### 11.6 References — 학술 근거
+
+§11.3 의 각 메커니즘이 의지하는 동료 평가 논문. 전체 큐레이션은 [`docs/research/MENTAL-HEALTH-PAPERS.md`](research/MENTAL-HEALTH-PAPERS.md) 참고.
+
+**A. Self-Compassion (Kristin Neff)** — Scene 3 의 *자기 친절·공통 인간성·마음챙김* 메커니즘
+- Hansen NH, et al. "Mediators for the Effect of Compassion Cultivating Training" Front Psychiatry 2021. PMID [34950068](https://pubmed.ncbi.nlm.nih.gov/34950068/) — 정신질환자 돌봄 제공자 표본 RCT
+- Rojas B, et al. "A compassion-based program to reduce psychological distress in medical students" PLoS One 2023. PMID [37352295](https://pubmed.ncbi.nlm.nih.gov/37352295/)
+- Diez GG, et al. "Epigenetic, psychological, and EEG changes after a 1-week retreat based on mindfulness and compassion" PLoS One 2023. PMID [37976257](https://pubmed.ncbi.nlm.nih.gov/37976257/) ⭐ 생물학적 흔적까지 보고
+
+**B. Acceptance and Commitment Therapy (ACT, Hayes)** — Scene 4 *떨리는 손 햅틱* 의 *불편함 수용* 정당성
+- Kong Q, et al. "ACT for depression: systematic review and meta-analysis" Psychiatry Res 2025. PMID [40885141](https://pubmed.ncbi.nlm.nih.gov/40885141/) ⭐ 우울 메타
+- López-Pinar C, et al. "Process of change and efficacy of ACT in adolescents" J Affect Disord 2025. PMID [39303882](https://pubmed.ncbi.nlm.nih.gov/39303882/) ⭐ 청소년 표본
+- Haller H, et al. "Acceptance- and mindfulness-based interventions for DSM-5 anxiety disorders" Sci Rep 2021. PMID [34650179](https://pubmed.ncbi.nlm.nih.gov/34650179/)
+
+**C. Existential Courage (Tillich / Yalom / Frankl)** — Scene 6 *"부름은 자격을 묻지 않는다"* 의 무자격감 위로
+- Wong KSS, et al. "Meaning-focused interventions on cancer-related symptoms" J Pain Symptom Manage 2025. PMID [40850584](https://pubmed.ncbi.nlm.nih.gov/40850584/) ⭐ Frankl 직접 인용 메타
+- Ünal MU, et al. "Effect of Logotherapy on Depressive Symptoms, Psychological Pain, and Meaning of Life" J Psychosoc Nurs Ment Health Serv 2026. PMID [41848267](https://pubmed.ncbi.nlm.nih.gov/41848267/)
+- Söylev ÖF, et al. "Spiritual orientation and mental health: meaning and death attitudes as mediators in religious officials" BMC Psychol 2025. PMID [40251636](https://pubmed.ncbi.nlm.nih.gov/40251636/) ⭐ 종교인 표본
+
+**D. Behavioral Activation (BA, Lewinsohn)** — Scene 5 *손을 뻗는 단 한 번* 의 작은 행동
+- Ciharova M, et al. "Cognitive restructuring, behavioral activation and CBT for adult depression: network meta-analysis" J Consult Clin Psychol 2021. PMID [34264703](https://pubmed.ncbi.nlm.nih.gov/34264703/) ⭐ BA 단독 효과 분리
+- Simon GE, et al. "Management of Depression in Adults: A Review" JAMA 2024. PMID [38856993](https://pubmed.ncbi.nlm.nih.gov/38856993/) — JAMA 종합
+
+**§11.4 안전장치 — 정책 근거**
+- Jones TW. "Religious trauma and moral injury from LGBTQA+ conversion practices" Soc Sci Med 2022. PMID [35609469](https://pubmed.ncbi.nlm.nih.gov/35609469/) — *영웅 서사 가스라이팅* 위험의 학술 근거
+- Taubman-Ben-Ari O, et al. "Collapse and validation of terror management anxiety buffers" Death Stud 2025. PMID [40446111](https://pubmed.ncbi.nlm.nih.gov/40446111/) — *모세 서사 anchor* 가 사용자 *지친 상태* 에서 buffer 붕괴 가능성
+
+⚠️ 모든 인용은 *1차 큐레이션* 단계. 신학·임상 자문 검토 후 *§11.6 채택본* 결정.
+

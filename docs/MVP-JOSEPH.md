@@ -374,3 +374,27 @@ Scene 2·3 의 *결정 압박* — 모든 선택이 *완벽하지 않은 상태�
 
 같은 미션, 3 가지 *내레이션 톤* + Scene 강조점 변화.
 
+### 11.6 References — 학술 근거
+
+§11.3 의 각 메커니즘이 의지하는 동료 평가 논문. 전체 큐레이션은 [`docs/research/MENTAL-HEALTH-PAPERS.md`](research/MENTAL-HEALTH-PAPERS.md) 참고.
+
+**A. Narrative Reframing (Pennebaker / McAdams)** — Scene 5 의 *자기 서사 재해석* 정당성
+- Gerger H, et al. "Expressive writing treatments network meta-analysis" Psychol Med 2022. PMID [33634766](https://pubmed.ncbi.nlm.nih.gov/33634766/)
+- Lee Y, et al. "Expressive writing on Koreans: meta-analysis" Front Psychiatry 2023. PMID [38076691](https://pubmed.ncbi.nlm.nih.gov/38076691/) ⭐ 한국 표본
+- Verhagen RM, et al. "Self-esteem during expressive writing about trauma predicts decreased depression in PLWH" AIDS Care 2023. PMID [37149898](https://pubmed.ncbi.nlm.nih.gov/37149898/)
+- Dekel S, et al. "Preventing PTSD following childbirth: systematic review and meta-analysis" Am J Obstet Gynecol 2024. PMID [38122842](https://pubmed.ncbi.nlm.nih.gov/38122842/)
+
+**B. Distress Tolerance (Linehan DBT)** — Scene 2·3 의 *불완전한 결단* 정당성
+- Li Y, et al. "DBT on affective symptoms in BPD: systematic review and meta-analysis" Psychiatry Res 2026. PMID [41819776](https://pubmed.ncbi.nlm.nih.gov/41819776/)
+- Sagcan A, et al. "DBT for complex PTSD — gender-specific effectiveness" Eur J Psychotraumatol 2025. PMID [41230649](https://pubmed.ncbi.nlm.nih.gov/41230649/)
+
+**C. Future-Oriented Coping** — Scene 2 의 *현재 자원의 미래 가치* 인식
+- *기초 이론*: Aspinwall LG & Taylor SE. "Proactive coping" Psychological Bulletin 1997 (전반적 적용 — meta-analysis 형식의 직접 PubMed hit 가 적음; 향후 보강 후보)
+- 관련 보완: Wang K, et al. "Connection thinking and afterlife beliefs in Chinese context (mortality salience coping)" Front Psychol 2023. PMID [38078250](https://pubmed.ncbi.nlm.nih.gov/38078250/) — 동아시아 맥락의 *미래·내세 지향* 대처
+
+**§11.4 안전장치 — 정책 근거 (가스라이팅 방지)**
+- Jones TW. "Religious trauma and moral injury from LGBTQA+ conversion practices" Soc Sci Med 2022. PMID [35609469](https://pubmed.ncbi.nlm.nih.gov/35609469/) ⭐ *moral injury* 메커니즘 — Scene 5 결말의 *"섭리는 가해자의 정당화가 아니다"* 명시 정책
+- Nisar S, et al. "Forgiveness Therapy in battered women in Pakistan" Clin Psychol Psychother 2025. PMID [40425169](https://pubmed.ncbi.nlm.nih.gov/40425169/) — 가정폭력 피해자 표본에서도 *premature forgiveness* 위험 함께 논의
+
+⚠️ 모든 인용은 *1차 큐레이션* 단계. 신학·임상 자문 검토 후 *§11.6 채택본* 결정. PMID 는 `content_versions.references` JSONB 컬럼에 적재.
+

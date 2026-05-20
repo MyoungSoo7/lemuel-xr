@@ -438,3 +438,36 @@ Scene 5 의 *양손 sling 회전* 은 *몸 전체로 결단을 만드는* 행위
 └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
+### 12.6 References — 학술 근거
+
+§12.3 의 각 메커니즘이 의지하는 동료 평가 논문. 전체 큐레이션은 [`docs/research/MENTAL-HEALTH-PAPERS.md`](research/MENTAL-HEALTH-PAPERS.md) 참고.
+
+**A. Identity Formation in Crisis (Erikson / Marcia)** — Scene 3 사울 갑옷 거부 = 정체성 위기 해결
+- *기초 이론*: Erikson 의 *Identity vs Role Confusion* + Marcia 의 4 가지 identity status. 직접 PubMed hit 보다 발달심리학 교과서 적용. 보강 후보로 *adolescent identity development* 키워드 추가 검색 필요.
+- 관련 보완: López-Pinar C, et al. "ACT for adolescents — anxiety/depression" J Affect Disord 2025. PMID [39303882](https://pubmed.ncbi.nlm.nih.gov/39303882/) — *청소년 정체성 형성 시기* 의 가치 기반 행동 효과
+
+**B. Affect Labeling + Integration (Lieberman 2007, Hayes ACT)** — Scene 4 의 5돌 = 5감정 통합
+- Li Y, et al. "DBT on affective symptoms in BPD: meta-analysis" Psychiatry Res 2026. PMID [41819776](https://pubmed.ncbi.nlm.nih.gov/41819776/) ⭐ 정서 라벨링·통합의 최신 메타
+- Sagcan A, et al. "DBT for complex PTSD — gender-specific" Eur J Psychotraumatol 2025. PMID [41230649](https://pubmed.ncbi.nlm.nih.gov/41230649/)
+- Kong Q, et al. "ACT for depression: meta-analysis" Psychiatry Res 2025. PMID [40885141](https://pubmed.ncbi.nlm.nih.gov/40885141/) — ACT 의 *경험적 회피 → 가치 행동* 메커니즘
+
+**C. Self-Compassion in Comparison (Kristin Neff)** — Scene 2 형의 비웃음 reframing
+- Hansen NH, et al. "Compassion Cultivating Training mediators" Front Psychiatry 2021. PMID [34950068](https://pubmed.ncbi.nlm.nih.gov/34950068/)
+- Rodriguez-Moreno S, et al. "Mechanisms of change in compassion-based programs" Sci Rep 2024. PMID [39623074](https://pubmed.ncbi.nlm.nih.gov/39623074/)
+
+**D. Embodied Cognition (Lakoff & Johnson)** — Scene 5 *양손 sling 회전* 의 몸 결단
+- 본 큐레이션 §16 VR 부분이 가장 가까움 — *몰입·신체 인터랙션* 의 우울·불안 효과:
+- Wiebe A, et al. "Virtual reality in the diagnostic and therapy for mental disorders" Clin Psychol Rev 2022. PMID [36356351](https://pubmed.ncbi.nlm.nih.gov/36356351/) ⭐ VR SR
+- Liu N, et al. "VR enhanced mindfulness and yoga for postpartum depression" Sci Rep 2025. PMID [40189695](https://pubmed.ncbi.nlm.nih.gov/40189695/) — *몸 + 명상* 결합 RCT
+
+**E. Religious Coping + 시편 23편 임상 효과 (Pargament)** — Scene 1 수금·시편
+- Aggarwal S, et al. "Religiosity and spirituality in depression/anxiety in young people: systematic review and meta-analysis" BMC Psychiatry 2023. PMID [37817143](https://pubmed.ncbi.nlm.nih.gov/37817143/) ⭐ 청년 표본 메타
+- Cho G, et al. "Pre-pandemic mental health and coping (Southern Cities Study)" BMC Psychiatry 2023. PMID [37480034](https://pubmed.ncbi.nlm.nih.gov/37480034/) ⭐ 한국 표본
+- de Diego-Cordero R, et al. "Religious/spiritual interventions in nursing care: SR and meta-analysis" Appl Nurs Res 2022. PMID [36116867](https://pubmed.ncbi.nlm.nih.gov/36116867/)
+
+**§12.4 안전장치 — 정책 근거**
+- Jones TW. "Religious trauma and moral injury" Soc Sci Med 2022. PMID [35609469](https://pubmed.ncbi.nlm.nih.gov/35609469/) — *영웅 성공 서사 → 사용자 자기비교 압박* 위험의 학술 명명
+- Pirutinsky S. "Shame and sexual abuse among Orthodox Jews" Psychol Trauma 2025. PMID [38546594](https://pubmed.ncbi.nlm.nih.gov/38546594/) — 종교 공동체 내 *가족 비교 트라우마* 의 shame 매개 분석
+
+⚠️ 모든 인용은 *1차 큐레이션* 단계. 신학·임상 자문 검토 후 *§12.6 채택본* 결정.
+
