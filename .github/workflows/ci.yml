@@ -40,7 +40,11 @@ jobs:
 
       - name: Build + test
         working-directory: backend
-        run: ./gradlew --no-daemon bootJar -x test
+        run: gradle --no-daemon bootJar -x test
+
+      - name: Set up Docker Buildx
+        if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
         if: github.ref == 'refs/heads/main'
@@ -71,6 +75,9 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
         if: github.ref == 'refs/heads/main'
