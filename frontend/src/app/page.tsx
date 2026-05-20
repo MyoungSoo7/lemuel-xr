@@ -1,0 +1,160 @@
+"use client";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { classifyEmotion, type ClassifyResponse } from "@/lib/api/emotion";
+import Link from "next/link";
+
+const EMOTION_LABEL: Record<string, string> = {
+  ANXIOUS: "불안",
+  SAD: "슬픔",
+  ANGRY: "분노",
+  CONFUSED: "혼란",
+  LONELY: "외로움",
+  EXHAUSTED: "지침",
+  GRATEFUL: "감사",
+};
+
+const SAMPLE_PROMPTS = [
+  "오늘 너무 외롭고 지쳐있어",
+  "내일이 두려워 잠이 안 와",
+  "왜 이렇게 답답할까",
+  "감사한 하루였어",
+];
+
+export default function HomePage() {
+  const [text, setText] = useState("");
+  const [result, setResult] = useState<ClassifyResponse | null>(null);
+
+  const mutation = useMutation({
+    mutationFn: (t: string) => classifyEmotion(t),
+    onSuccess: (data) => setResult(data),
+  });
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (text.trim().length === 0) return;
+    mutation.mutate(text);
+  };
+
+  return (
+    <main className="min-h-screen flex flex-col items-center px-6 py-12">
+      <div className="w-full max-w-2xl">
+        <header className="mb-12 text-center">
+          <h1 className="text-3xl font-bold mb-2">Lemuel XR</h1>
+          <p className="text-[var(--color-warm)]/70 text-sm">
+            지금 마음에 떠오르는 한 줄을 적어 주세요. AI 가 분류해 가장 어울리는
+            본문과 인물 미션을 안내합니다.
+          </p>
+        </header>
+
+        <form onSubmit={onSubmit} className="space-y-4">
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="예: 오늘 너무 외롭고 지쳐있어"
+            maxLength={1000}
+            rows={3}
+            className="w-full px-4 py-3 rounded-lg bg-black/30 border border-[var(--color-primary)]/30 placeholder:text-[var(--color-warm)]/30 focus:outline-none focus:border-[var(--color-primary)]"
+          />
+
+          <div className="flex flex-wrap gap-2">
+            {SAMPLE_PROMPTS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setText(p)}
+                className="text-xs px-3 py-1 rounded-full border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="submit"
+            disabled={mutation.isPending || text.trim().length === 0}
+            className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40 hover:bg-[var(--color-primary)]/90 transition"
+          >
+            {mutation.isPending ? "분류 중..." : "감정 분석 + 본문 추천"}
+          </button>
+        </form>
+
+        {mutation.isError && (
+          <p className="mt-4 text-red-400 text-sm">
+            오류: {(mutation.error as Error).message}
+          </p>
+        )}
+
+        {result && (
+          <section className="mt-10 space-y-6">
+            <div className="rounded-lg border border-[var(--color-primary)]/30 px-5 py-4">
+              <p className="text-xs text-[var(--color-warm)]/60 mb-1">분류 결과</p>
+              <p className="text-2xl font-bold">
+                {EMOTION_LABEL[result.primary.emotion] ?? result.primary.emotion}
+                <span className="ml-2 text-sm text-[var(--color-warm)]/60">
+                  ({Math.round(result.primary.confidence * 100)}% 신뢰도)
+                </span>
+              </p>
+            </div>
+
+            {(result.recommendations.trackB?.length ?? 0) > 0 && (
+              <div>
+                <h2 className="text-sm uppercase tracking-wider text-[var(--color-warm)]/60 mb-3">
+                  Track B — 인물 서사
+                </h2>
+                <div className="grid grid-cols-2 gap-3">
+                  {result.recommendations.trackB.map((c) => (
+                    <Link
+                      key={c.character}
+                      href={c.character === "joseph" ? "/joseph" : "#"}
+                      className="block px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition"
+                    >
+                      <p className="font-semibold">{c.character}</p>
+                      {c.rationale && (
+                        <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                          {c.rationale}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(result.recommendations.trackA?.length ?? 0) > 0 && (
+              <div>
+                <h2 className="text-sm uppercase tracking-wider text-[var(--color-warm)]/60 mb-3">
+                  Track A — 정적 회복 콘텐츠
+                </h2>
+                <ul className="space-y-2">
+                  {result.recommendations.trackA.map((t) => (
+                    <li
+                      key={t.topicId}
+                      className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/20"
+                    >
+                      <p className="font-medium">{t.title}</p>
+                      {t.rationale && (
+                        <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                          {t.rationale}
+                        </p>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="pt-4 border-t border-[var(--color-primary)]/20">
+              <Link
+                href="/joseph"
+                className="inline-block px-5 py-2 rounded-lg bg-[var(--color-primary)] text-black font-semibold hover:bg-[var(--color-primary)]/90"
+              >
+                요셉 미션 바로 시작 →
+              </Link>
+            </div>
+          </section>
+        )}
+      </div>
+    </main>
+  );
+}

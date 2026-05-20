@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #c2a878;
+  --color-deep: #1a1d24;
+  --color-warm: #f6f1e8;
+}
+
+html, body { height: 100%; }
+body {
+  background: var(--color-deep);
+  color: var(--color-warm);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
