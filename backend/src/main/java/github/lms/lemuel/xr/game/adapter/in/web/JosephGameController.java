@@ -2,6 +2,8 @@ package github.lms.lemuel.xr.game.adapter.in.web;
 
 import github.lms.lemuel.xr.game.adapter.out.persistence.GameSessionJpaEntity;
 import github.lms.lemuel.xr.game.adapter.out.persistence.GameSessionRepository;
+import github.lms.lemuel.xr.user.adapter.out.persistence.UserJpaEntity;
+import github.lms.lemuel.xr.user.adapter.out.persistence.UserRepository;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,21 +30,35 @@ import org.springframework.web.bind.annotation.*;
 public class JosephGameController {
 
     private final GameSessionRepository repo;
+    private final UserRepository userRepo;
 
     record StartRequest(UUID userId, String deviceType) {}
 
-    record SessionResponse(UUID sessionId, int currentScene, Map<String, Object> scenePayload) {}
+    record SessionResponse(UUID sessionId, UUID userId, int currentScene, Map<String, Object> scenePayload) {}
 
     @PostMapping("/start")
     public ResponseEntity<SessionResponse> start(@RequestBody StartRequest req) {
-        UUID uid = req.userId() == null ? UUID.randomUUID() : req.userId();
+        UUID uid;
+        if (req.userId() != null && userRepo.existsById(req.userId())) {
+            uid = req.userId();
+        } else {
+            // 게스트 사용자 자동 생성
+            UserJpaEntity user = new UserJpaEntity();
+            uid = UUID.randomUUID();
+            user.setId(uid);
+            user.setDeviceType(req.deviceType());
+            user.setGuest(true);
+            user.setCreatedAt(LocalDateTime.now());
+            user.setLastSeenAt(LocalDateTime.now());
+            userRepo.save(user);
+        }
         GameSessionJpaEntity e = new GameSessionJpaEntity();
         e.setId(UUID.randomUUID());
         e.setUserId(uid);
         e.setCharacter("joseph");
         e.setStartedAt(LocalDateTime.now());
         repo.save(e);
-        return ResponseEntity.ok(new SessionResponse(e.getId(), 1, scenePayload(1, null)));
+        return ResponseEntity.ok(new SessionResponse(e.getId(), uid, 1, scenePayload(1, null)));
     }
 
     record DecideRequest(int sceneId, Object decision) {}
