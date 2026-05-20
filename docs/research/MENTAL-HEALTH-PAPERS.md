@@ -230,19 +230,143 @@ lemuel-xr 의 1차 타겟이 한국 시장이므로 *문화적 적용성* 검증
 3. **lemuel-mental-health-safety agent** 가 모든 MVP-{NAME}.md §7 (3차원 + 정신건강 효과) 에 *위 표 1~6 의 채택 논문이 인용됐는지* 자동 검사
 4. **content_versions.references** JSONB 에 PMID 배열로 저장 — `lemuel-theology-reviewer` 가 검토 시 reference 트레이스 가능
 
-## 11. 보강 후보 (이번 큐레이션에서 빠진 주제)
+## 11. Cognitive Reframing / CBT — Theme 2 (잠언과 지혜)
 
-이번 1차 큐레이션에서 다루지 않은 추가 주제 — 향후 보강:
+> **이론적 배경**: Beck 의 *Cognitive Therapy* + Ellis 의 *Rational Emotive Behavior Therapy* 가 결합된 표준. *역기능적 인지를 reframing* — 잠언의 *"마음을 지켜라"* 와 직접 connect. 한국에서는 챗봇·VR 형식의 *디지털 CBT* 가 최근 활발.
 
-| 주제 | 검색 키워드 후보 |
-|---|---|
-| Cognitive Reframing / CBT for depression Korea | "cognitive reframing CBT depression Korea" |
-| Mortality Salience / Terror Management | "mortality salience existential therapy" |
-| Emotion Validation / DBT | "emotion validation DBT depression" |
-| **종교적 학대 (spiritual abuse) 회복** | "spiritual abuse recovery psychology" — *gaslighting 방지* 정책 직접 근거 |
-| **트라우마-focused CBT (TF-CBT)** | "trauma-focused CBT children adolescents" |
-| **소셜 미디어 / XR 의 정신건강 영향** | "XR virtual reality mental health intervention" |
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | Cognitive restructuring, behavioral activation and cognitive-behavioral therapy in treatment of adult depression: network meta-analysis | Ciharova M, et al. | J Consult Clin Psychol, 2021 | [34264703](https://pubmed.ncbi.nlm.nih.gov/34264703/) ⭐ network meta — cognitive restructuring 의 *고유 효과* 분리 |
+| 2 | Management of Depression in Adults: A Review | Simon GE, et al. | JAMA, 2024 | [38856993](https://pubmed.ncbi.nlm.nih.gov/38856993/) ⭐ JAMA 종합 review |
+| 3 | Efficacy of Cognitive Behavioral Therapy for Anxiety-Related Disorders: A Meta-Analysis | Bhattacharya S, et al. | Curr Psychiatry Rep, 2023 | [36534317](https://pubmed.ncbi.nlm.nih.gov/36534317/) |
+| 4 | Clinical Efficacy, Therapeutic Mechanisms, and Implementation Features of Cognitive Behavioral Therapy-Based Chatbots for Depression and Anxiety: Narrative Review | Im CH, et al. | JMIR Ment Health, 2025 | [41328452](https://pubmed.ncbi.nlm.nih.gov/41328452/) ⭐ 한국 — CBT 챗봇 |
+| 5 | The Potential and Challenges of Virtual Reality as an Adjunctive Treatment of Depression Patients | Kim J, et al. | Adv Exp Med Biol, 2024 | [39261435](https://pubmed.ncbi.nlm.nih.gov/39261435/) ⭐ 한국 — VR + 우울 |
+| 6 | Effectiveness of cognitive behavioral therapy for perinatal maternal depression, anxiety and stress | Li X, et al. | Clin Psychol Rev, 2022 | [35123346](https://pubmed.ncbi.nlm.nih.gov/35123346/) |
+| 7 | A gamified cognitive behavioral therapy for Arabs to reduce symptoms of depression and anxiety: A case study research | Amer NA, et al. | Digit Health, 2024 | [38882250](https://pubmed.ncbi.nlm.nih.gov/38882250/) ⭐ gamification 적용 |
+| 8 | Cognitive behavioral therapy for insomnia to treat major depressive disorder with comorbid insomnia | Furukawa Y, et al. | J Affect Disord, 2024 | [39242039](https://pubmed.ncbi.nlm.nih.gov/39242039/) |
+| 9 | Mindfulness-based therapy versus cognitive behavioral therapy for people with anxiety symptoms | Li J, et al. | Ann Palliat Med, 2021 | [34353047](https://pubmed.ncbi.nlm.nih.gov/34353047/) |
+| 10 | Long-term outcomes of cognitive behavioural therapy for social anxiety disorder: meta-analysis | Kindred R, et al. | J Anxiety Disord, 2022 | [36265270](https://pubmed.ncbi.nlm.nih.gov/36265270/) |
+
+🎯 **핵심 채택 후보**:
+- #1 Ciharova 2021 — *cognitive restructuring 의 단독 효과* 가 BA·CBT 와 비등하다는 network meta. Theme 2 (잠언이 *인지 reframing 도구* 라는 설계 의도) 의 직접 근거.
+- #4 Im 2025 (한국 CBT 챗봇) + #5 Kim 2024 (한국 VR + 우울) — *디지털·몰입형* 형식이 한국에서 효과 검증되고 있다는 직접 근거 — lemuel-xr 의 XR 매체 선택 정당성.
 
 ---
 
-> *이 큐레이션은 1차 자료 수집 단계. 채택·제외·인용 결정은 신학·임상 자문 검토 후. 자동 게시 금지 — `lemuel-theology-reviewer` + `lemuel-mental-health-safety` agent 의 통과가 필요.*
+## 12. Mortality Salience / Existential Therapy — Theme 3 (전도서와 인생)
+
+> **이론적 배경**: Terror Management Theory (Greenberg, Pyszczynski, Solomon). 죽음 인식 (*mortality salience*) → 의미·신앙·연결의 anchor 강화. 전도서의 *"헛되고 헛되니"* 가 정확히 이 영역. 노년 / 만성질환자에서 효과 검증.
+
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | Coping with mortality salience: the role of connection thinking and afterlife beliefs in Chinese context | Wang K, et al. | Front Psychol, 2023 | [38078250](https://pubmed.ncbi.nlm.nih.gov/38078250/) ⭐ 동아시아 표본 — connection thinking + afterlife 신앙 |
+| 2 | Existential ageing and dying: A scoping review | Kellehear A, et al. | Arch Gerontol Geriatr, 2023 | [36081230](https://pubmed.ncbi.nlm.nih.gov/36081230/) |
+| 3 | Psychological and behavioural responses to death anxiety in older adults with chronic illnesses: a systematic integrative review | Alcântara L, et al. | Front Psychol, 2025 | [41450698](https://pubmed.ncbi.nlm.nih.gov/41450698/) |
+| 4 | Turning toward mortality: yoga's savasana as a salutogenic practice for engaging with death anxiety | Rubenstein Fazzio L, et al. | Front Public Health, 2026 | [41859253](https://pubmed.ncbi.nlm.nih.gov/41859253/) ⭐ 몸·죽음 통합 실천 |
+| 5 | Collapse and validation of terror management anxiety buffers — therapists' reactions to war | Taubman-Ben-Ari O, et al. | Death Stud, 2025 | [40446111](https://pubmed.ncbi.nlm.nih.gov/40446111/) ⭐ TMT 의 *buffer 붕괴* 패턴 |
+| 6 | Measuring American adults' perceptions about human existence: A cross-sectional study | Carr LaPorte MR, et al. | Palliat Support Care, 2025 | [40842354](https://pubmed.ncbi.nlm.nih.gov/40842354/) |
+| 7 | Death and beauty: mortality salience and creatureliness increase self-objectification not only in females but also in males | Gao Y, et al. | Front Psychol, 2025 | [40051403](https://pubmed.ncbi.nlm.nih.gov/40051403/) |
+
+🎯 **핵심 채택 후보**:
+- #1 Wang 2023 (중국 표본 — *connection thinking + afterlife*) — 동아시아 맥락에서 mortality salience 가 *연결성 + 내세 신앙* 으로 대처된다는 직접 근거. Theme 3 (전도서) + Theme 11 (예수 부활 소망) 양쪽 적용 가능.
+- #5 Taubman 2025 — terror management *buffer 의 붕괴* 메커니즘. 전쟁·트라우마 상황에서 *기존 신앙 anchor 가 일시 작동 멈추는* 패턴. R2 (고난 정당화 가스라이팅 방지) 의 *피해자가 신앙으로 더 큰 부담* 받는 위험에 대한 학술적 보완.
+
+⚠️ 주의: mortality salience 노출 자체가 *불안 유발 자극* — 사용자의 *현재 상태* 고려 없이 죽음 주제 다루면 역효과. F-6.4 trigger_warning consent_card 의 직접 근거.
+
+---
+
+## 13. Emotion Validation / DBT — Theme 4 (시편과 감정)
+
+> **이론적 배경**: Marsha Linehan 의 *Dialectical Behavior Therapy*. 핵심 기술: *radical acceptance* + *emotion regulation*. 시편의 *분노·슬픔·절망의 직설적 표현 + 결국 신뢰의 회복* 흐름과 구조적으로 일치.
+
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | Effect of dialectical behavior therapy on affective symptoms in borderline personality disorder: A systematic review and meta-analysis | Li Y, et al. | Psychiatry Res, 2026 | [41819776](https://pubmed.ncbi.nlm.nih.gov/41819776/) ⭐ 2026 최신 정서 메타 |
+| 2 | The Building Regulation in Dual-Generations Program (BRIDGE): A Mixed-Methods Feasibility Pilot of a Parenting Program for Depressed Mothers | Roos LE, et al. | Child Psychiatry Hum Dev, 2023 | [34347227](https://pubmed.ncbi.nlm.nih.gov/34347227/) ⭐ 우울증 모친 + 양육 |
+| 3 | Gender-specific effectiveness of dialectic-behavioral therapy for patients with complex post-traumatic stress disorder | Sagcan A, et al. | Eur J Psychotraumatol, 2025 | [41230649](https://pubmed.ncbi.nlm.nih.gov/41230649/) ⭐ 복합 PTSD 표본 |
+| 4 | The predictive validity of the DSM-5 alternative model for borderline personality disorder | Chauhan K, et al. | Personal Ment Health, 2023 | [36919337](https://pubmed.ncbi.nlm.nih.gov/36919337/) |
+| 5 | The business of recovery: A novel pilot study psychosocial intervention to build self-efficacy and reduce relapse risk in adolescent substance use treatment | McKay IT, et al. | Addict Behav, 2025 | [40914052](https://pubmed.ncbi.nlm.nih.gov/40914052/) |
+| 6 | Treatment-refractory Addictions: Clinical Characterization and an Operational Model for Integrated Management | Torales J, et al. | Curr Drug Res Rev, 2026 | [41941316](https://pubmed.ncbi.nlm.nih.gov/41941316/) |
+
+🎯 **핵심 채택 후보**:
+- #1 Li 2026 — *정서 증상* 에 대한 DBT 의 최신 메타. Theme 4 (시편 → 정서 라벨링 + 강도 슬라이더) 의 직접 근거.
+- #3 Sagcan 2025 — *복합 PTSD* 표본에서 *성별별 효과 차이*. lemuel-xr 사용자에 성별 분포가 있을 텐데, 일률적 emotion validation 이 모든 성별에 동등하게 효과인지 검증 자료.
+
+⚠️ 주의: DBT 는 *경계성 인격장애* 등 임상 진단 표본에서 효과 검증이 강함. 일반 우울·불안 사용자에 대한 *간접 적용* 시 효과 크기 감소 가능. lemuel-xr 은 *치료가 아닌 정서 자기조절 지원* 위치 — 임상 효과를 *과대 인용* 하지 않는 게 R2 정책.
+
+---
+
+## 14. 종교적 학대 / 영적 트라우마 회복 — R2 (가스라이팅 방지) 직접 근거
+
+> **이론적 배경**: spiritual abuse / religious trauma 의 임상적 인지가 최근 10년 사이 학계에 정착. *forced forgiveness*, *prosperity gospel pressure*, *purity culture shame* 이 PTSD·shame·복합 트라우마와 양적 관계. lemuel-xr 의 R2 (고난 정당화 가스라이팅 방지) / R3 (부활 회복 압박 방지) 가 *마케팅 문구가 아닌 임상 정책* 임을 뒷받침.
+
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | Religious trauma and moral injury from LGBTQA+ conversion practices | Jones TW | Soc Sci Med, 2022 | [35609469](https://pubmed.ncbi.nlm.nih.gov/35609469/) ⭐ LGBTQA+ 전환치료의 *종교 트라우마* + *moral injury* 직접 명명 |
+| 2 | A National Study of Adult Women Sexually Abused by Clergy: Insights for Social Workers | Pooler DK | Soc Work, 2022 | [35079841](https://pubmed.ncbi.nlm.nih.gov/35079841/) ⭐ 성직자 성적 학대 피해 여성 전국 표본 |
+| 3 | "G-d, in you I trusted, let me never be ashamed": Shame and sexual abuse among Orthodox Jews | Pirutinsky S | Psychol Trauma, 2025 | [38546594](https://pubmed.ncbi.nlm.nih.gov/38546594/) ⭐ 종교 공동체 내 성 학대 + shame 매개 분석 |
+| 4 | 'I just want the pain to go away': religious coping and sexual trauma recovery in South African, marginalised contexts | Morgan L | Cult Health Sex, 2026 | [40801790](https://pubmed.ncbi.nlm.nih.gov/40801790/) |
+| 5 | COPE: Community Outreach & Professional Engagement — a framework to bridge public mental health services with religious organizations | Milstein G | Front Psychiatry, 2025 | [40859941](https://pubmed.ncbi.nlm.nih.gov/40859941/) ⭐ 정신건강 ↔ 종교조직 *프레임워크* |
+
+🎯 **핵심 채택 후보 (R2·R3 정책 정당성)**:
+- #1 Jones 2022 — *moral injury* 가 종교적 학대 트라우마의 핵심 메커니즘이라는 명명. lemuel-xr 의 *고난 정당화 + 회복 압박이 moral injury 를 키울 위험* 정책의 직접 인용.
+- #2 Pooler 2022 — *성직자 / 종교 권위* 가 학대 가해자였던 표본. lemuel-xr 의 AI 가 *권위적 영적 어조* 를 띨 때 같은 패턴 재현 위험 — UX 설계 시 *권위적 톤 자제 (faith_tone="soft")* 정당성.
+- #5 Milstein 2025 (COPE) — *정신건강 서비스와 종교조직의 협업* 프레임워크. lemuel-xr 이 *교회 / 신학자문 + 임상자문* 양쪽을 함께 두는 거버넌스의 학술 모델.
+
+⚠️ 이 영역의 논문은 모두 *피해자 보호* 가 1차 — *종교가 무조건 위험* 이 아니라 *권력 관계 + 부정확한 신학* 이 위험을 만든다는 입장. lemuel-xr 의 *정통 신학 + 임상 안전망 + 익명성 + AI opt-out* 의 4-축 정책이 정확히 이 위험 완화에 대응.
+
+---
+
+## 15. Trauma-Focused CBT (TF-CBT) — Theme 5 (고통과 진리)
+
+> **이론적 배경**: Cohen, Mannarino, Deblinger 가 정립. 트라우마 narrative 형성 + 인지 reframing + 정서 조절 + 점진적 노출. 아동·청소년 표본에서 효과 강함. 시편의 *트라우마 narrative + 의미 부여* 흐름과 구조 일치.
+
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | A systematic review and meta-analysis of trauma-focused cognitive behavioral therapy for children and adolescents | Thielemann JFB, et al. | Child Abuse Negl, 2022 | [36155943](https://pubmed.ncbi.nlm.nih.gov/36155943/) ⭐ 아동·청소년 메타 |
+| 2 | Attrition from pediatric trauma-focused cognitive behavioral therapy: A meta-analysis | Wamser-Nanney R, et al. | J Trauma Stress, 2023 | [36320164](https://pubmed.ncbi.nlm.nih.gov/36320164/) ⭐ 중도이탈 메타 — *접근성* 의 중요성 |
+| 3 | Implementing trauma-focused cognitive behavioral therapy in Philadelphia: A 10-year evaluation | Last BS, et al. | Implement Res Pract, 2023 | [37790185](https://pubmed.ncbi.nlm.nih.gov/37790185/) ⭐ 10년 실증 |
+| 4 | Trauma-Focused Cognitive-Behavioral Therapy for Adolescents Bullied Because of Weight | Lydecker JA, et al. | Int J Eat Disord, 2024 | [39007703](https://pubmed.ncbi.nlm.nih.gov/39007703/) |
+| 5 | Is Trauma Focused-CBT Effective in Reducing Trauma Symptoms among Traumatized Refugee Children? | Chipalo E | J Child Adolesc Trauma, 2021 | [34790283](https://pubmed.ncbi.nlm.nih.gov/34790283/) ⭐ 난민 아동 |
+| 6 | Trauma-focused cognitive behavioral therapy for children and youth in low and middle-income countries | Thomas FC, et al. | Child Adolesc Ment Health, 2022 | [33216426](https://pubmed.ncbi.nlm.nih.gov/33216426/) |
+| 7 | Caregiver Behaviors and Child Distress in Trauma Narration and Processing Sessions of TF-CBT | Canale CA, et al. | Behav Ther, 2022 | [35027159](https://pubmed.ncbi.nlm.nih.gov/35027159/) |
+| 8 | Application of trauma-focused cognitive behavioral therapy among children and adolescents with childhood household dysfunction | Hou X, et al. | Zhong Nan Da Xue Xue Bao Yi Xue Ban, 2024 | [38615176](https://pubmed.ncbi.nlm.nih.gov/38615176/) |
+| 9 | Measuring clinician stuck points about trauma-focused cognitive behavior therapy | Patel ZS, et al. | J Trauma Stress, 2022 | [35502148](https://pubmed.ncbi.nlm.nih.gov/35502148/) |
+| 10 | Vom Pflaster bis zur Herz-OP — psychosocial care of children exposed to technology-assisted sexual violence | Stellermann-Strehlow K, et al. | Prax Kinderpsychol Kinderpsychiatr, 2025 | [41527753](https://pubmed.ncbi.nlm.nih.gov/41527753/) |
+
+🎯 **핵심 채택 후보**:
+- #1 Thielemann 2022 — TF-CBT 의 아동·청소년 메타 (lemuel-xr 의 향후 V3 타겟이 청소년 포함 가능성).
+- #2 Wamser-Nanney 2023 — *중도이탈* 메타. 디지털 형식의 *낮은 진입장벽* 이 attrition 완화에 기여 가능하다는 lemuel-xr 의 가치 제안의 학술 보강.
+- #5 Chipalo 2021 — *난민 아동* 표본. lemuel-xr 의 *다국어 / 글로벌* 확장 phase (V3+) 의 직접 근거.
+
+⚠️ 주의: TF-CBT 는 *트라우마 narration 노출* 을 포함. lemuel-xr 의 *trauma_warning level=high* Scene 이 이와 유사한 자극이지만, *임상 가이드 없이 self-administered* 라는 차이. 효과 직접 인용은 *맥락 명시 필수*.
+
+---
+
+## 16. VR / 몰입형 정신건강 개입 — XR 매체 선택의 직접 근거
+
+> **이론적 배경**: 2010년대 중반부터 *VR exposure therapy* 가 PTSD·공포증·불안에서 효과 검증. 최근 5년 우울·산후우울·임신우울 RCT 다수. lemuel-xr 의 *XR 매체* 선택이 *유행이 아닌 임상 효과 검증* 기반임을 보강.
+
+| # | 제목 | 저자 | 저널 / 연도 | PMID |
+|---|---|---|---|---|
+| 1 | Virtual reality in the diagnostic and therapy for mental disorders: A systematic review | Wiebe A, et al. | Clin Psychol Rev, 2022 | [36356351](https://pubmed.ncbi.nlm.nih.gov/36356351/) ⭐ Clin Psychol Rev 종합 SR |
+| 2 | Virtual Reality for Supporting the Treatment of Depression and Anxiety: Scoping Review | Baghaei N, et al. | JMIR Ment Health, 2021 | [34554097](https://pubmed.ncbi.nlm.nih.gov/34554097/) ⭐ 우울·불안 VR scoping |
+| 3 | Immersive Virtual Reality eHealth Intervention to Reduce Anxiety and Depression in Pregnant Women: Randomized Controlled Trial | Jimenez-Barragan M, et al. | JMIR Hum Factors, 2025 | [40306641](https://pubmed.ncbi.nlm.nih.gov/40306641/) ⭐ 임신 여성 RCT |
+| 4 | Virtual reality enhanced mindfulness and yoga intervention for postpartum depression and anxiety in the post COVID era | Liu N, et al. | Sci Rep, 2025 | [40189695](https://pubmed.ncbi.nlm.nih.gov/40189695/) ⭐ 산후 우울 + VR mindfulness |
+| 5 | Evaluating virtual reality technology in psychotherapy: impacts on anxiety, depression, and ADHD | Wang P, et al. | Front Psychiatry, 2024 | [39744548](https://pubmed.ncbi.nlm.nih.gov/39744548/) |
+| 6 | Virtual Reality for Addressing Depression and Anxiety: A Bibliometric Analysis | Jingili N, et al. | Int J Environ Res Public Health, 2023 | [37174141](https://pubmed.ncbi.nlm.nih.gov/37174141/) ⭐ 연구 동향 bibliometric |
+| 7 | Impact of virtual reality exercises on anxiety and depression in hemodialysis | Turoń-Skrzypińska A, et al. | Sci Rep, 2023 | [37528161](https://pubmed.ncbi.nlm.nih.gov/37528161/) |
+| 8 | Effects of breathing exercises performed with virtual reality on dyspnea, anxiety and quality of life in COPD patients | Şimşekli D, et al. | Heart Lung, 2025 | [39914178](https://pubmed.ncbi.nlm.nih.gov/39914178/) |
+| 9 | Virtual reality for COPD exacerbation: A randomized controlled trial | Kizmaz E, et al. | Respir Med, 2024 | [38857811](https://pubmed.ncbi.nlm.nih.gov/38857811/) |
+| 10 | Effectiveness of conventional versus virtual reality-based vestibular rehabilitation exercises in elderly patients with dizziness | Kanyılmaz T, et al. | Braz J Otorhinolaryngol, 2022 | [34799265](https://pubmed.ncbi.nlm.nih.gov/34799265/) |
+
+🎯 **핵심 채택 후보**:
+- #1 Wiebe 2022 (Clin Psychol Rev SR) — 정신질환 VR 의 *종합 임상 검토*. lemuel-xr 의 매체 선택이 *학술 권고 범위 안* 임을 직접 인용.
+- #2 Baghaei 2021 (JMIR scoping) — 우울·불안 VR 의 *효과 + 한계* 정리. lemuel-xr 이 *치료가 아닌 보조* 위치인 근거.
+- #3 Jimenez-Barragan 2025 + #4 Liu 2025 — *VR + mindfulness/요가* 가 임신/산후 우울 RCT 에서 효과. lemuel-xr 의 *XR + 묵상* 결합의 가장 가까운 학술 선례.
+
+⚠️ 한계: 현재까지의 VR mental-health 연구는 *세션당 짧음 (15~30분), 임상 환경, 전문 가이드 동반* 이 대다수. lemuel-xr 의 *자가 사용 / 매일 / 사회적 환경* 은 검증된 매개변수 밖. *효과 일반화 신중* 정책 필요.
+
+---
+
+> *이 큐레이션은 1차 + 2차 자료 수집 단계 (총 16 영역, ~100편 PMID). 채택·제외·인용 결정은 신학·임상 자문 검토 후. 자동 게시 금지 — `lemuel-theology-reviewer` + `lemuel-mental-health-safety` agent 의 통과가 필요.*
