@@ -70,7 +70,7 @@ public class JosephGameController {
         e.getDecisions().put("scene" + req.sceneId(), req.decision());
         repo.save(e);
         int next = req.sceneId() + 1;
-        return ResponseEntity.ok(new SessionResponse(sid, next, scenePayload(next, e)));
+        return ResponseEntity.ok(new SessionResponse(sid, e.getUserId(), next, scenePayload(next, e)));
     }
 
     record CompleteRequest(String finalOutcome) {}
