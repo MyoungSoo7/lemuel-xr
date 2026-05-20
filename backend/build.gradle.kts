@@ -1,6 +1,8 @@
 plugins {
     java
-    id("org.springframework.boot") version "4.0.4"
+    // Spring AI 1.0 GA 가 아직 Spring Boot 4 와 호환 안 됨 (RestClientAutoConfiguration 경로 변경)
+    // SB 3.5 LTS 로 시작, AI 가 SB4 지원하면 그때 업그레이드.
+    id("org.springframework.boot") version "3.5.4"
     id("io.spring.dependency-management") version "1.1.6"
 }
 
@@ -9,7 +11,7 @@ version = "0.1.0-SNAPSHOT"
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(25)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }
 

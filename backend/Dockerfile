@@ -1,7 +1,7 @@
 ###########################
 # Stage 1: Build
 ###########################
-FROM gradle:9.1.0-jdk25 AS builder
+FROM gradle:8.10-jdk21 AS builder
 WORKDIR /workspace
 
 COPY settings.gradle.kts build.gradle.kts ./
@@ -15,7 +15,7 @@ RUN find /workspace/build/libs -maxdepth 1 -name '*.jar' ! -name '*-plain.jar' -
 ###########################
 # Stage 2: Runtime
 ###########################
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 RUN apk add --no-cache curl tini && \
     addgroup -S spring && adduser -S spring -G spring
