@@ -5,9 +5,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import {
   fetchReviewQueue,
+  fetchReviewHistory,
   submitTheologyReview,
   submitClinicalReview,
   type QueueItem,
+  type HistoryItem,
+  type TimelineEntry,
 } from "@/lib/api/reviews";
 
 /**
@@ -21,6 +24,7 @@ export default function ReviewsPage() {
   const queryClient = useQueryClient();
   const [activeRole, setActiveRole] = useState<"theology" | "clinical">("theology");
   const [selected, setSelected] = useState<QueueItem | null>(null);
+  const [tab, setTab] = useState<"queue" | "history">("queue");
 
   const { data: queue = [], isLoading } = useQuery({
     queryKey: ["review-queue"],
@@ -41,7 +45,30 @@ export default function ReviewsPage() {
           신학·임상 자문가가 *in_review* 상태 콘텐츠를 검토 + verdict 등록.
           전체 거버넌스: <span className="font-mono">docs/governance/CLINICAL-REVIEW.md</span>
         </p>
+
+        <nav className="flex gap-2 mt-4 border-b border-[var(--color-primary)]/20">
+          {([
+            { id: "queue", label: `Pending (${queue.length})` },
+            { id: "history", label: "검토 이력" },
+          ] as const).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`px-4 py-2 text-sm ${
+                tab === t.id
+                  ? "border-b-2 border-[var(--color-primary)] text-[var(--color-primary)]"
+                  : "text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </nav>
       </header>
+
+      {tab === "history" ? (
+        <HistoryView />
+      ) : (
 
       <div className="max-w-5xl mx-auto w-full grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
         {/* Queue list */}
@@ -98,7 +125,7 @@ export default function ReviewsPage() {
         </section>
 
         {/* Review form */}
-        <section>
+        <section className={tab === "queue" ? "" : "hidden"}>
           {!selected ? (
             <p className="text-[var(--color-warm)]/40 text-sm italic">← 큐에서 항목을 선택하세요</p>
           ) : (
@@ -150,7 +177,108 @@ export default function ReviewsPage() {
           )}
         </section>
       </div>
+      )}
     </main>
+  );
+}
+
+// ============= History view =============
+function HistoryView() {
+  const { data: items = [], isLoading } = useQuery({
+    queryKey: ["review-history"],
+    queryFn: () => fetchReviewHistory(30),
+  });
+
+  return (
+    <div className="max-w-5xl mx-auto w-full">
+      <h2 className="text-sm uppercase tracking-wider text-[var(--color-warm)]/60 mb-3">
+        최근 결정 ({items.length})
+      </h2>
+      {isLoading && <p className="text-[var(--color-warm)]/40 text-sm">로드 중...</p>}
+      {!isLoading && items.length === 0 && (
+        <p className="text-[var(--color-warm)]/40 text-sm italic">
+          결정 완료된 콘텐츠가 아직 없습니다.
+        </p>
+      )}
+      <div className="space-y-3">
+        {items.map((it) => (
+          <HistoryCard key={it.contentVersionId} item={it} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HistoryCard({ item }: { item: HistoryItem }) {
+  const [open, setOpen] = useState(false);
+  const statusStyle: Record<string, string> = {
+    published: "text-green-400 border-green-500/30 bg-green-500/5",
+    rejected: "text-red-400 border-red-500/30 bg-red-500/5",
+    changes_requested: "text-yellow-400 border-yellow-500/30 bg-yellow-500/5",
+  };
+  const cls = statusStyle[item.status] ?? "text-[var(--color-warm)]/60 border-[var(--color-primary)]/20";
+  const merged: TimelineEntry[] = [...item.theology, ...item.clinical].sort(
+    (a, b) => new Date(a.reviewedAt).getTime() - new Date(b.reviewedAt).getTime(),
+  );
+
+  return (
+    <article className={`rounded-lg border ${cls.split(" ").slice(1).join(" ")}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full text-left px-4 py-3 flex items-center justify-between"
+      >
+        <div>
+          <p className="text-xs text-[var(--color-warm)]/40">
+            {item.contentKind} · {item.version} · {new Date(item.createdAt).toLocaleString()}
+          </p>
+          <p className="font-mono text-sm mt-1">{item.contentRef}</p>
+        </div>
+        <span className={`text-xs px-2 py-1 rounded font-semibold ${cls}`}>
+          {item.status}
+        </span>
+      </button>
+      {open && (
+        <div className="border-t border-[var(--color-primary)]/10 px-4 py-3 space-y-2">
+          {merged.length === 0 ? (
+            <p className="text-[var(--color-warm)]/40 text-xs italic">
+              검토 row 없음 (수동 조정).
+            </p>
+          ) : (
+            merged.map((t, i) => (
+              <TimelineRow key={`${t.side}-${i}`} entry={t} />
+            ))
+          )}
+        </div>
+      )}
+    </article>
+  );
+}
+
+function TimelineRow({ entry }: { entry: TimelineEntry }) {
+  const sideColor = entry.side === "theology" ? "text-blue-300" : "text-purple-300";
+  const verdictColor =
+    entry.verdict === "approve"
+      ? "text-green-400"
+      : entry.verdict === "reject"
+        ? "text-red-400"
+        : "text-yellow-400";
+  return (
+    <div className="text-xs flex gap-3 items-start py-1.5 border-b border-[var(--color-primary)]/5 last:border-b-0">
+      <span className="text-[var(--color-warm)]/40 font-mono whitespace-nowrap">
+        {new Date(entry.reviewedAt).toLocaleString()}
+      </span>
+      <span className={`${sideColor} font-semibold w-14`}>
+        {entry.side === "theology" ? "신학" : "임상"}
+      </span>
+      <span className={`${verdictColor} w-24 font-mono`}>
+        {entry.verdict}
+        {entry.vetoUsed ? " ⚠VETO" : ""}
+      </span>
+      <span className="text-[var(--color-warm)]/60 flex-1 whitespace-pre-line">
+        {entry.notes || <em className="text-[var(--color-warm)]/30">(no notes)</em>}
+      </span>
+    </div>
   );
 }
 

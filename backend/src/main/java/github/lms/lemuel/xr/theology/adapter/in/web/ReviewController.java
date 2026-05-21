@@ -49,6 +49,37 @@ public class ReviewController {
     private final ClinicalReviewRepository clinicalReviews;
     private final EvaluateContentStatusUseCase evaluator;
 
+    @GetMapping("/api/reviews/history")
+    public ResponseEntity<List<HistoryItem>> history(
+            @RequestParam(value = "limit", defaultValue = "30") int limit) {
+        // 최근 *결정난* 콘텐츠 — published / rejected / changes_requested (in_review 제외)
+        List<ContentVersionJpaEntity> all = versions.findAll();
+        List<HistoryItem> items = all.stream()
+                .filter(v -> v.getStatus() != null && !"in_review".equals(v.getStatus())
+                        && !"draft".equals(v.getStatus()))
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .limit(limit)
+                .map(v -> new HistoryItem(
+                        v.getId(), v.getContentKind(), v.getContentRef(), v.getVersion(),
+                        v.getStatus(), v.getCreatedAt(), v.getPublishedAt(),
+                        theologyReviews.findByContentVersionIdOrderByReviewedAtDesc(v.getId())
+                                .stream().limit(3).map(this::toTimelineEntry).toList(),
+                        clinicalReviews.findByContentVersionId(v.getId())
+                                .stream().limit(3).map(this::toClinicalTimelineEntry).toList()))
+                .toList();
+        return ResponseEntity.ok(items);
+    }
+
+    private TimelineEntry toTimelineEntry(TheologyReviewJpaEntity r) {
+        return new TimelineEntry("theology", r.getVerdict(), r.getReviewedAt(),
+                r.getReviewerId(), r.getNotes(), Boolean.FALSE);
+    }
+
+    private TimelineEntry toClinicalTimelineEntry(ClinicalReviewJpaEntity r) {
+        return new TimelineEntry("clinical", r.getVerdict(), r.getReviewedAt(),
+                r.getReviewerId(), r.getNotes(), Boolean.TRUE.equals(r.getVetoUsed()));
+    }
+
     @GetMapping("/api/reviews/queue")
     public ResponseEntity<List<QueueItem>> queue() {
         List<ContentVersionJpaEntity> pending = versions.findByStatusOrderByCreatedAtAsc("in_review");
@@ -184,5 +215,27 @@ public class ReviewController {
             Long reviewId, UUID contentVersionId, LocalDateTime reviewedAt,
             /** 자동 status 전환 결과 (EvaluateContentStatusUseCase). null 가능 — 콘텐츠 미발견 시. */
             String previousStatus, String currentStatus, String statusReason
+    ) {}
+
+    /** /api/reviews/history — 결정난 콘텐츠 + 최근 검토 3건씩. */
+    public record HistoryItem(
+            UUID contentVersionId,
+            String contentKind,
+            String contentRef,
+            String version,
+            String status,            // published | rejected | changes_requested
+            LocalDateTime createdAt,
+            LocalDateTime publishedAt,
+            List<TimelineEntry> theology,
+            List<TimelineEntry> clinical
+    ) {}
+
+    public record TimelineEntry(
+            String side,              // theology | clinical
+            String verdict,
+            LocalDateTime reviewedAt,
+            UUID reviewerId,
+            String notes,
+            Boolean vetoUsed          // clinical 전용
     ) {}
 }

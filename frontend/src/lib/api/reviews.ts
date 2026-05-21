@@ -50,6 +50,34 @@ export interface ReviewSubmitted {
   statusReason?: string | null;
 }
 
+export interface TimelineEntry {
+  side: "theology" | "clinical";
+  verdict: "approve" | "request_changes" | "reject" | string;
+  reviewedAt: string;
+  reviewerId: string;
+  notes?: string | null;
+  /** clinical 전용 — theology row 는 항상 false. */
+  vetoUsed?: boolean | null;
+}
+
+export interface HistoryItem {
+  contentVersionId: string;
+  contentKind: string;
+  contentRef: string;
+  version: string;
+  /** published | rejected | changes_requested */
+  status: string;
+  createdAt: string;
+  publishedAt?: string | null;
+  theology: TimelineEntry[];
+  clinical: TimelineEntry[];
+}
+
+export async function fetchReviewHistory(limit = 30): Promise<HistoryItem[]> {
+  const res = await api.get<HistoryItem[]>("/api/reviews/history", { params: { limit } });
+  return res.data;
+}
+
 export async function fetchReviewQueue(): Promise<QueueItem[]> {
   const res = await api.get<QueueItem[]>("/api/reviews/queue");
   return res.data;
