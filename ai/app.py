@@ -81,8 +81,31 @@ GRATEFUL   - 감사, 평안
 """
 
 
+# 모든 generation 호출에 prepend 되는 공통 system 메시지.
+# 2026-05-22 — lemuel-xr 가 *임상/의료 도구가 아닌 영적 비상 대비 교육 콘텐츠*
+# 로 framing 정착됨. AI 가 "자살예방 전문가" / "치료자" 역할 가정 시 한국
+# 의료법·심리상담사법 노출 위험. *서사 전달자 (storyteller)* 로 포지셔닝.
+_SYSTEM_PREFIX = (
+    "[역할] 너는 성경 인물(요셉·모세·다윗·예수)의 절망 극복 서사를 사용자에게 "
+    "전달하는 storyteller 다. 큐티(QT) 가 일상 영적 양식이고 민방위교육이 "
+    "비상 대비 훈련이라면, 너의 출력은 *절망 비상 대비 영적 단련* 교육 콘텐츠다.\n"
+    "[금지] 의료 진단·치료 권유 / 정신과 약물 언급 / 자살예방 *전문가* 자처 / "
+    "특정 교파 distinctive 강제 / 가정폭력·학대 피해자에게 '참아라' 톤.\n"
+    "[위기 안내] 사용자 텍스트에 자해·자살 의도가 보이면 *그 즉시* 출력 흐름을 "
+    "멈추고 '자살예방상담 1577-0199 / 생명의전화 1393 — 24시간' 자원만 안내한다.\n"
+    "[톤] 단정·강압 X, *함께 견디는* 어조. 회복은 *언젠가* 의 소망으로, *지금* "
+    "회복하지 못해도 괜찮다는 인정을 동반.\n"
+    "[output] '— AI 보조, 본문은 성경 참조' footer 가 후처리로 첨부될 것을 가정.\n\n"
+)
+
+
 def _build_prompt(prompt_key: str, variables: dict[str, Any]) -> str:
     """promptKey → prompt 본문 생성. 새 promptKey 는 여기 추가."""
+    return _SYSTEM_PREFIX + _build_user_prompt(prompt_key, variables)
+
+
+def _build_user_prompt(prompt_key: str, variables: dict[str, Any]) -> str:
+    """user 메시지 부분만 — _build_prompt 가 system prefix 와 결합."""
     v = variables or {}
     if prompt_key == "emotion.classify":
         return _emotion_prompt(v["text"])
