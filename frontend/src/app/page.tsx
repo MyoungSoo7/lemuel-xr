@@ -73,8 +73,13 @@ export default function HomePage() {
         <header className="mb-12 text-center">
           <h1 className="text-3xl font-bold mb-2">Lemuel XR</h1>
           <p className="text-[var(--color-warm)]/70 text-sm">
-            지금 마음에 떠오르는 한 줄을 적어 주세요. AI 가 분류해 가장 어울리는
-            본문과 인물 미션을 안내합니다.
+            지금 마음에 떠오르는 한 줄을 적어 주세요. 성경 인물의 절망 극복
+            서사로 *비상 대비 영적 단련* 을 시작합니다.
+          </p>
+          <p className="mt-3 text-[var(--color-warm)]/40 text-xs">
+            큐티가 일상 영적 양식, 민방위교육이 비상 대비 훈련이라면 — Lemuel XR
+            은 *절망 비상* 에 대비하는 영적 단련 프로그램입니다.<br />
+            의료·임상 도구가 아닙니다. 위기 신호 시 1577-0199 · 1393 (24시간).
           </p>
         </header>
 
