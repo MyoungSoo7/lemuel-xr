@@ -2,6 +2,8 @@ package github.lms.lemuel.xr.theology.application;
 
 import github.lms.lemuel.xr.theology.adapter.out.persistence.ClinicalReviewJpaEntity;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.ClinicalReviewRepository;
+import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentQuarantineJpaEntity;
+import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentQuarantineRepository;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentVersionJpaEntity;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentVersionRepository;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.TheologyReviewJpaEntity;
@@ -42,6 +44,7 @@ public class EvaluateContentStatusUseCase {
     private final ContentVersionRepository versions;
     private final TheologyReviewRepository theologyReviews;
     private final ClinicalReviewRepository clinicalReviews;
+    private final ContentQuarantineRepository quarantines;
 
     @Transactional
     public Decision execute(UUID contentVersionId) {
@@ -69,8 +72,69 @@ public class EvaluateContentStatusUseCase {
                     contentVersionId, previous, next,
                     theology.map(TheologyReviewJpaEntity::getVerdict).orElse("none"),
                     clinical.map(ClinicalReviewJpaEntity::getVerdict).orElse("none"));
+
+            // B — rejected 전환 시 content_quarantine 자동 적재
+            if ("rejected".equals(next)) {
+                quarantineRejected(contentVersionId, theology, clinical);
+            }
         }
         return new Decision(contentVersionId, previous, v.getStatus(), reasonOf(theology, clinical, next));
+    }
+
+    /** Veto / reject 시 content_quarantine 자동 적재 (idempotent — 같은 veto_by 두 번 안 만듦). */
+    private void quarantineRejected(UUID contentVersionId,
+                                     Optional<TheologyReviewJpaEntity> t,
+                                     Optional<ClinicalReviewJpaEntity> c) {
+        String vetoBy;
+        String reason;
+        Long theologyReviewId = null;
+        Long clinicalReviewId = null;
+
+        if (c.isPresent() && Boolean.TRUE.equals(c.get().getVetoUsed())) {
+            vetoBy = "clinical_veto";
+            reason = c.get().getVetoReason() != null ? c.get().getVetoReason() : "(no reason)";
+            clinicalReviewId = c.get().getId();
+        } else if (t.isPresent() && "reject".equals(t.get().getVerdict())
+                && c.isPresent() && "reject".equals(c.get().getVerdict())) {
+            vetoBy = "both_reject";
+            reason = String.format("theology: %s | clinical: %s",
+                    safeNotes(t.get().getNotes()), safeNotes(c.get().getNotes()));
+            theologyReviewId = t.get().getId();
+            clinicalReviewId = c.get().getId();
+        } else if (t.isPresent() && "reject".equals(t.get().getVerdict())) {
+            vetoBy = "theology_reject";
+            reason = safeNotes(t.get().getNotes());
+            theologyReviewId = t.get().getId();
+        } else if (c.isPresent() && "reject".equals(c.get().getVerdict())) {
+            vetoBy = "clinical_reject";
+            reason = safeNotes(c.get().getNotes());
+            clinicalReviewId = c.get().getId();
+        } else {
+            return; // 이 분기 도달 X — defensive
+        }
+
+        // Idempotent — 같은 (content_version_id, veto_by) 가 이미 있으면 skip
+        if (quarantines.existsByContentVersionIdAndVetoBy(contentVersionId, vetoBy)) {
+            log.info("content_quarantine 이미 적재됨 — skip. version={} veto_by={}",
+                    contentVersionId, vetoBy);
+            return;
+        }
+
+        ContentQuarantineJpaEntity q = new ContentQuarantineJpaEntity();
+        q.setContentVersionId(contentVersionId);
+        q.setVetoBy(vetoBy);
+        q.setReason(reason);
+        q.setBlockedKeywords(List.of());     // 자동 키워드 필터 통합 시 채워질 자리
+        q.setTriggeredByTheologyReviewId(theologyReviewId);
+        q.setTriggeredByClinicalReviewId(clinicalReviewId);
+        q.setQuarantinedAt(LocalDateTime.now());
+        quarantines.save(q);
+
+        log.warn("content_quarantine 적재 — version={} veto_by={}", contentVersionId, vetoBy);
+    }
+
+    private static String safeNotes(String notes) {
+        return notes == null || notes.isBlank() ? "(no notes)" : notes;
     }
 
     private String decideNext(Optional<TheologyReviewJpaEntity> t, Optional<ClinicalReviewJpaEntity> c) {
