@@ -114,6 +114,21 @@ management:
         enabled: true
     info:
       enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  metrics:
+    distribution:
+      # endpoint별 latency histogram (Grafana p50/p95/p99 차트용)
+      percentiles-histogram:
+        http.server.requests: true
+        emotion.classify: true
+        game.decide: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+    tags:
+      application: lemuel-xr-backend
 
 # === Server ===
 server:

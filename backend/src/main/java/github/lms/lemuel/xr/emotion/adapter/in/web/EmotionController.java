@@ -3,6 +3,7 @@ package github.lms.lemuel.xr.emotion.adapter.in.web;
 import github.lms.lemuel.xr.common.web.RequestContext;
 import github.lms.lemuel.xr.emotion.application.ClassifyAndRecommendUseCase;
 import github.lms.lemuel.xr.emotion.application.EmotionRecommender;
+import io.micrometer.core.annotation.Timed;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.List;
@@ -21,6 +22,8 @@ public class EmotionController {
     private final ClassifyAndRecommendUseCase classifyAndRecommend;
 
     @PostMapping("/classify")
+    @Timed(value = "emotion.classify", percentiles = {0.5, 0.95, 0.99},
+           description = "사용자 텍스트 감정 분류 latency — AI 사이드카 호출 + 추천 매핑 포함")
     public ResponseEntity<ClassifyResponse> classify(@RequestBody ClassifyRequest req) {
         var r = classifyAndRecommend.execute(
                 RequestContext.currentUserId(),

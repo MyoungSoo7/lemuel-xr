@@ -5,6 +5,9 @@ import github.lms.lemuel.xr.game.application.CompleteGameSessionUseCase;
 import github.lms.lemuel.xr.game.application.DecideSceneUseCase;
 import github.lms.lemuel.xr.game.application.StartGameSessionUseCase;
 import github.lms.lemuel.xr.game.domain.Character;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -25,8 +28,10 @@ public class GameController {
     private final StartGameSessionUseCase startUc;
     private final DecideSceneUseCase decideUc;
     private final CompleteGameSessionUseCase completeUc;
+    private final MeterRegistry meter;
 
     @PostMapping("/start")
+    @Timed(value = "game.start", extraTags = {"endpoint", "start"}, percentiles = {0.5, 0.95, 0.99})
     public ResponseEntity<StartResponse> start(@PathVariable String character,
                                                 @RequestBody StartRequest req) {
         var c = Character.from(character);
@@ -39,12 +44,18 @@ public class GameController {
                         req.client() == null ? null : req.client().capabilities(),
                         req.linkedEmotionLogId())
         );
+        Counter.builder("game.session.started")
+                .tag("character", c.dbValue())
+                .tag("mode", req.mode() == null ? "unspecified" : req.mode())
+                .register(meter).increment();
         return ResponseEntity.ok(new StartResponse(
                 r.sessionId(), c.dbValue(), r.currentScene(), r.totalScenes(),
                 r.appliedMode(), r.scenePayload()));
     }
 
     @PostMapping("/{sid}/decide")
+    @Timed(value = "game.decide", percentiles = {0.5, 0.95, 0.99},
+           description = "Scene 결정 처리 latency — LLM 실시간 호출 시 길어짐")
     public ResponseEntity<DecideResponse> decide(@PathVariable String character,
                                                   @PathVariable("sid") UUID sid,
                                                   @RequestBody DecideRequest req) {
@@ -61,8 +72,11 @@ public class GameController {
     public ResponseEntity<CompleteResponse> complete(@PathVariable String character,
                                                       @PathVariable("sid") UUID sid,
                                                       @RequestBody CompleteRequest req) {
-        Character.from(character);  // 검증만
+        var c = Character.from(character);  // 검증
         var r = completeUc.execute(sid, req.finalOutcome(), req.closingMessage());
+        Counter.builder("game.session.completed")
+                .tag("character", c.dbValue())
+                .register(meter).increment();
         return ResponseEntity.ok(new CompleteResponse(
                 r.sessionId(), r.completedAt(), r.durationSeconds()));
     }

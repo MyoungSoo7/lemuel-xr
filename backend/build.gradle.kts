@@ -44,6 +44,9 @@ dependencies {
     // Caffeine cache (LLM 응답 in-memory 1차 캐시; 2차는 llm_cache 테이블)
     implementation("com.github.ben-manes.caffeine:caffeine")
 
+    // Micrometer Prometheus — /actuator/prometheus endpoint (Grafana 대시보드용)
+    runtimeOnly("io.micrometer:micrometer-registry-prometheus")
+
     // YAML 시나리오 로더
     implementation("org.yaml:snakeyaml")
 

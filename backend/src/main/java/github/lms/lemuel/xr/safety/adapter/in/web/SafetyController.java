@@ -1,9 +1,10 @@
 package github.lms.lemuel.xr.safety.adapter.in.web;
 
-import github.lms.lemuel.xr.common.web.RequestContext;
 import github.lms.lemuel.xr.game.application.ExitSessionUseCase;
 import github.lms.lemuel.xr.safety.adapter.out.persistence.CrisisResourceJpaEntity;
 import github.lms.lemuel.xr.safety.adapter.out.persistence.CrisisResourceRepository;
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -23,6 +24,7 @@ public class SafetyController {
 
     private final CrisisResourceRepository resources;
     private final ExitSessionUseCase exitUc;
+    private final MeterRegistry meter;
 
     @GetMapping("/api/safety/crisis-resources")
     public ResponseEntity<CrisisResponse> resources(
@@ -38,6 +40,10 @@ public class SafetyController {
     public ResponseEntity<ExitResponse> exit(@PathVariable("sid") UUID sid,
                                               @RequestBody ExitRequest req) {
         var r = exitUc.execute(sid, req.reason(), req.atSceneId());
+        // emergency exit 사유별 메트릭 — Grafana 안전 row 에서 추세 추적.
+        Counter.builder("safety.session.exit")
+                .tag("reason", req.reason() == null ? "user_choice" : req.reason())
+                .register(meter).increment();
         return ResponseEntity.ok(new ExitResponse(
                 r.sessionId(), r.exitedAt(),
                 "잠시 멈추셨네요. 다음에 다시 만나요. 시편 23편 음성을 함께 두고 갈게요.",
