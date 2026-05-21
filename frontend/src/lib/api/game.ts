@@ -46,3 +46,40 @@ export async function decideJoseph(
 export async function completeJoseph(sessionId: string, finalOutcome: string) {
   await api.post(`/api/game/joseph/${sessionId}/complete`, { finalOutcome });
 }
+
+/** B — Joseph 외 인물 ({moses,david,jesus}) 의 동일 흐름 generic helper. */
+export type MissionCharacter = "joseph" | "moses" | "david" | "jesus";
+
+export async function startMission(
+  character: MissionCharacter,
+  deviceType = "web",
+): Promise<JosephStartResponse> {
+  const res = await api.post<JosephStartResponse>(`/api/game/${character}/start`, {
+    userId: null,
+    deviceType,
+  });
+  return res.data;
+}
+
+export async function decideMission(
+  character: MissionCharacter,
+  sessionId: string,
+  sceneId: number,
+  decision: unknown,
+): Promise<JosephStartResponse> {
+  const wrapped =
+    typeof decision === "string" ? { value: decision } : (decision as Record<string, unknown>);
+  const res = await api.post<JosephStartResponse>(
+    `/api/game/${character}/${sessionId}/decide`,
+    { sceneId, decision: wrapped },
+  );
+  return res.data;
+}
+
+export async function completeMission(
+  character: MissionCharacter,
+  sessionId: string,
+  finalOutcome: string,
+) {
+  await api.post(`/api/game/${character}/${sessionId}/complete`, { finalOutcome });
+}

@@ -1,88 +1,138 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import {
+  startMission,
+  decideMission,
+  completeMission,
+  type JosephStartResponse,
+} from "@/lib/api/game";
 
 /**
- * Moses 미션 — Phase 2 안내 페이지.
+ * Moses 미션 — B 활성화 단계.
  *
- * Joseph 미션이 자문 (CLINICAL-REVIEW.md / REVIEW-REQUEST-PACKAGE.md) 1차 통과 후
- * 같은 패턴으로 모세 6 Scene 활성화 예정.
+ * Scene 1 (광야의 침묵 cinematic) 까지만 실제 backend 호출 + UI 인터랙션.
+ * Scene 2~6 의 *interaction* (gesture_sequence / distribute / pick_one) 은
+ * 자문 검토 통과 (REVIEW-REQUEST-PACKAGE.md 의 모세 패키지) 후 활성.
  *
- * 현재는 *MVP-MOSES.md §11 의 6 Scene 구조 + 감정 anchor + 진입 모드* 를
- * 사용자에게 *예고* 하는 정적 페이지. 자문 통과 전 demo 한정.
+ * 현재는 Scene 2 진입 시 *"Phase 2 안내 + 미션 완료"* 흐름 — 사용자가 *Scene 1 의*
+ * 광야 침묵을 *체험* 만 하고 완료. Joseph 미션과 같은 골격으로 향후 동일 패턴 확장.
  */
+type Scene = JosephStartResponse;
+
 const SCENE_PREVIEW = [
-  { id: 1, title: "광야의 침묵", anchor: "자기부정 · 체념" },
-  { id: 2, title: "떨기나무 앞에서", anchor: "경외 → 두려움 → 거부" },
-  { id: 3, title: "다섯 번의 변명", anchor: "자기방어 → 한 발 양보" },
-  { id: 4, title: "파라오 앞에서", anchor: "공포 → 동행 인식" },
-  { id: 5, title: "홍해 앞에서", anchor: "책임의 무게 → 신뢰" },
-  { id: 6, title: "회복 메시지", anchor: "안식" },
+  { id: 1, title: "광야의 침묵", anchor: "자기부정 · 체념", active: true },
+  { id: 2, title: "떨기나무 앞에서", anchor: "경외 → 두려움 → 거부", active: false },
+  { id: 3, title: "다섯 변명의 카드", anchor: "자기방어 → 한 발 양보", active: false },
+  { id: 4, title: "파라오 앞에서", anchor: "공포 → 동행 인식", active: false },
+  { id: 5, title: "홍해 앞에서", anchor: "책임의 무게 → 신뢰", active: false },
+  { id: 6, title: "회복 메시지", anchor: "안식", active: false },
 ];
 
 export default function MosesPage() {
+  const [scene, setScene] = useState<Scene | null>(null);
+
+  const start = useMutation({
+    mutationFn: () => startMission("moses", "web"),
+    onSuccess: (d) => setScene(d),
+  });
+  const decide = useMutation({
+    mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
+      decideMission("moses", scene!.sessionId, sceneId, decision),
+    onSuccess: (d) => setScene(d),
+  });
+
+  useEffect(() => {
+    if (!scene && !start.isPending && !start.isError) start.mutate();
+  }, [scene, start]);
+
+  if (!scene) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-6">
+        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
+      </main>
+    );
+  }
+
+  const payload = scene.scenePayload as Record<string, unknown>;
+  const title = (payload.title as string) ?? "Scene";
+  const sceneType = (payload.type as string) ?? "";
+
+  // Scene 1 cinematic 만 활성, 다음 Scene 진입 시 Phase 2 안내
+  const isActiveCinematic = scene.currentScene === 1 && sceneType === "cinematic";
+
   return (
-    <main className="min-h-screen flex flex-col items-center px-6 py-12">
-      <div className="w-full max-w-2xl">
-        <header className="mb-10 text-center">
-          <p className="text-xs text-[var(--color-warm)]/40 uppercase tracking-wider">
-            Phase 2 — 자문 통과 후 활성
-          </p>
-          <h1 className="text-3xl font-bold mt-2">Moses — 떨기나무 앞에서</h1>
-          <p className="text-sm text-[var(--color-warm)]/70 mt-3 italic max-w-prose mx-auto">
-            *두려움이 사라진 후가 아니라 두려운 채로 가는 것이 용기.*
-            <br />
-            <span className="text-xs not-italic text-[var(--color-warm)]/40">
-              — ACT (Acceptance and Commitment Therapy) 기반
-            </span>
-          </p>
-        </header>
+    <main className="min-h-screen flex flex-col p-4 sm:p-6">
+      <header className="max-w-3xl mx-auto w-full mb-4">
+        <p className="text-xs text-[var(--color-warm)]/40 uppercase tracking-wider">
+          Moses — Scene {scene.currentScene}/6 · Phase {scene.currentScene === 1 ? "1" : "2 (안내)"}
+        </p>
+        <h1 className="text-2xl font-bold mt-1">{title}</h1>
+      </header>
 
-        <section className="space-y-3 mb-10">
-          <h2 className="text-sm uppercase tracking-wider text-[var(--color-warm)]/60 mb-2">
-            6 Scene 구조 — 6~8 분
-          </h2>
-          {SCENE_PREVIEW.map((s) => (
-            <div
-              key={s.id}
-              className="px-5 py-3 rounded-lg border border-[var(--color-primary)]/20 flex items-baseline justify-between gap-3"
+      {/* 배경 이미지 — moses scene 별 별도 자산 없으면 placeholder */}
+      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950">
+        <div className="absolute inset-0 flex items-end p-5">
+          <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
+            {scene.currentScene === 1 && "광야의 40년. 양 떼와 침묵 — 부름 받기 전의 시간."}
+            {scene.currentScene > 1 && "Phase 2 — 자문 통과 후 본 Scene 의 인터랙션이 활성됩니다."}
+          </p>
+        </div>
+      </section>
+
+      <section className="max-w-3xl mx-auto w-full space-y-3">
+        {isActiveCinematic && (
+          <button
+            onClick={() => decide.mutate({ sceneId: scene.currentScene, decision: "next" })}
+            className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+            disabled={decide.isPending}
+          >
+            {decide.isPending ? "..." : "계속 →"}
+          </button>
+        )}
+
+        {!isActiveCinematic && (
+          <div className="rounded-lg border border-[var(--color-primary)]/30 bg-black/30 px-5 py-4 space-y-3">
+            <p className="text-sm text-[var(--color-warm)]/80">
+              <strong className="text-[var(--color-primary)]">Phase 2 — 자문 통과 후 활성</strong>
+              <br />
+              본 미션의 Scene 2~6 인터랙션은 신학·임상 자문 검토 후 활성됩니다.
+            </p>
+            <p className="text-xs text-[var(--color-warm)]/60 italic whitespace-pre-line">
+              {SCENE_PREVIEW.slice(1)
+                .map((s) => `Scene ${s.id} — ${s.title} (${s.anchor})`)
+                .join("\n")}
+            </p>
+            <button
+              onClick={() =>
+                completeMission("moses", scene.sessionId, "phase1_only").then(
+                  () => (location.href = "/"),
+                )
+              }
+              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold mt-2"
             >
-              <div>
-                <p className="text-xs text-[var(--color-warm)]/40">Scene {s.id}</p>
-                <p className="font-semibold">{s.title}</p>
-              </div>
-              <p className="text-xs text-[var(--color-warm)]/60 italic text-right shrink-0">
-                {s.anchor}
-              </p>
-            </div>
-          ))}
-        </section>
+              미션 종료 (Phase 1 완료)
+            </button>
+          </div>
+        )}
 
-        <section className="rounded-lg border border-[var(--color-primary)]/30 bg-black/30 px-5 py-4 mb-8">
-          <p className="text-sm text-[var(--color-warm)]/80">
-            본 미션은 신학·임상 자문 검토 후 활성됩니다. Joseph 미션을 먼저
-            체험해 보세요.
-          </p>
-          <p className="text-[10px] text-[var(--color-warm)]/40 mt-2">
-            * 설계 — MVP-MOSES.md §11 (영성·감성·이성 3차원 + 정신건강 효과 4 메커니즘) *
-          </p>
-        </section>
-
-        <div className="flex gap-3">
+        <div className="pt-2 flex gap-3">
           <Link
             href="/"
-            className="flex-1 text-center px-5 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)]"
+            className="flex-1 text-center px-4 py-2 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm"
           >
             ← 홈
           </Link>
           <Link
             href="/joseph"
-            className="flex-1 text-center px-5 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold hover:bg-[var(--color-primary)]/90"
+            className="flex-1 text-center px-4 py-2 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm"
           >
             Joseph 미션 →
           </Link>
         </div>
-      </div>
+      </section>
     </main>
   );
 }
