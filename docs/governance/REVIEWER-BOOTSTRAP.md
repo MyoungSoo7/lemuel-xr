@@ -154,51 +154,84 @@ WHERE deactivated_at < NOW() - INTERVAL '30 days'
 
 ---
 
-## 5. Spring Boot CommandLineRunner — 자동화 옵션 (추천 — V2)
+## 5. Spring Boot CommandLineRunner — 자동화 옵션 (구현됨 — *추천*)
 
-수동 SQL 의 대안. 환경변수로 자문가 user_id 받아서 startup 시 idempotent 시드.
+수동 SQL 의 대안. *구현 완료* — `theology.application.ReviewerBootstrap` (`@PostConstruct` + `@Transactional`). 환경변수로 자문가 목록 받아서 startup 시 idempotent 시드.
 
-```kotlin
-// backend/src/main/kotlin/.../bootstrap/ReviewerBootstrap.kt (예시 — 미구현)
-@Component
-@ConditionalOnProperty("lemuel.bootstrap.reviewers.enabled", havingValue = "true")
-class ReviewerBootstrap(
-    private val reviewerProfileRepo: ReviewerProfileRepository,
-    @Value("\${lemuel.bootstrap.reviewers.config}") private val configPath: String,
-) : CommandLineRunner {
-    override fun run(vararg args: String?) {
-        // application-bootstrap.yml 또는 외부 파일에서 자문가 목록 로드
-        // ON CONFLICT DO UPDATE 패턴으로 idempotent 시드
-    }
-}
+### 5.1 구현 위치
+
+- 코드: [`backend/src/main/java/github/lms/lemuel/xr/theology/application/ReviewerBootstrap.java`](../../backend/src/main/java/github/lms/lemuel/xr/theology/application/ReviewerBootstrap.java)
+- 설정 예시: [`backend/src/main/resources/application-bootstrap.yml.example`](../../backend/src/main/resources/application-bootstrap.yml.example)
+
+### 5.2 활성화
+
+`SPRING_PROFILES_ACTIVE` 에 `bootstrap` 추가 + `application-bootstrap.yml` 마운트 (K8s Secret 또는 외부 파일):
+
+```bash
+# 로컬
+SPRING_PROFILES_ACTIVE=docker,bootstrap \
+SPRING_CONFIG_ADDITIONAL_LOCATION=file:/etc/lemuel-xr/ \
+  ./gradlew bootRun
+
+# K8s
+# Deployment env:
+#   - name: SPRING_PROFILES_ACTIVE
+#     value: "k8s,bootstrap"
+# Volume mount:
+#   - secretName: lemuel-xr-reviewers
+#     mountPath: /etc/lemuel-xr/application-bootstrap.yml
 ```
 
-`application-bootstrap.yml` 예시 (gitignored):
+### 5.3 application-bootstrap.yml 구조
 
 ```yaml
 lemuel:
   bootstrap:
     reviewers:
-      enabled: true
-      config: /etc/lemuel-xr/reviewers.yml
+      enabled: true                                # toggle — false 면 ReviewerBootstrap bean 미생성
+      reviewers:
+        - external-id: "oauth-google|myoungsoo7@..."   # users.external_id (OAuth 가입 후 결정)
+          role: theology                               # theology | clinical | ethics | editorial
+          credential: "운영 책임자 / 신학 자문 코디네이터"
+          organization: "MyoungSoo7 / lemuel ecosystem"
+          bio: "운영 책임자."
+          can-veto: false                              # 임상 default TRUE, 신학 default FALSE
+          review-scopes: [theme_1, theme_2, ..., theme_10]
+
+        - external-id: "oauth-google|godjinho@..."
+          role: theology
+          credential: "신학 협업자"
+          bio: "Theme 11 (예수 서사) 담당."
+          can-veto: false
+          review-scopes: [theme_11]
+
+        # 임상 자문은 영입 후 entry 추가
+        - external-id: "oauth-google|clinician-a@..."
+          role: clinical
+          credential: "정신과 의사 (대한신경정신의학회 회원 #...)"
+          can-veto: true
+          review-scopes: [theme_5, theme_11, trigger_high, f6_safety, llm_system_prompt]
 ```
 
-`/etc/lemuel-xr/reviewers.yml` (K8s Secret 또는 ConfigMap 으로 마운트):
+### 5.4 동작 보장
 
-```yaml
-reviewers:
-  - external_id: oauth-google|myoungsoo7@...
-    role: theology
-    credential: 운영 책임자
-    can_veto: false
-    review_scopes: [theme_1, theme_2, ..., theme_10]
-  - external_id: oauth-google|godjinho@...
-    role: theology
-    credential: 신학 협업자
-    review_scopes: [theme_11]
-```
+| 동작 | 보장 |
+|---|---|
+| **Idempotent** | `ON CONFLICT (user_id, role) DO UPDATE` — 재배포 안전 |
+| **`external_id` → `user_id` 매칭** | 가입 안 한 자문가는 skip + WARN 로그 |
+| **재활성화** | 비활성된 자문가를 yml 에 다시 넣으면 `is_active=TRUE`, `deactivated_at=NULL` (의도적) |
+| **JSON scopes** | List&lt;String&gt; → JSON array 직렬화 (ObjectMapper 의존 X — 단순) |
+| **트랜잭션** | 전체 시드가 단일 `@Transactional` — 부분 성공 없음 |
 
-이렇게 두면 *K8s Secret 만 업데이트* 하면 새 자문가 자동 등록. 파일이 *git 밖에* 있어 PII 보호.
+### 5.5 disable / 시드 안 함
+
+`lemuel.bootstrap.reviewers.enabled=false` (또는 미설정) — `@ConditionalOnProperty` 로 bean 자체 미생성. 로컬 개발 / 테스트 환경 기본값.
+
+### 5.6 PII 보호
+
+- `application-bootstrap.yml` 은 **git 에 체크인되지 않음** (`.gitignore` 또는 K8s Secret)
+- `application-bootstrap.yml.example` 은 *템플릿* 으로 git 에 있음 — 실제 값 placeholder
+- yml 의 `credential` / `organization` / `bio` 는 자문가 *명시 동의 범위* 만
 
 ---
 
