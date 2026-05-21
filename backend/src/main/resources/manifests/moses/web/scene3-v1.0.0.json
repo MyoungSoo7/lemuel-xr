@@ -1,0 +1,201 @@
+{
+  "mission_id": "moses",
+  "scene_number": 3,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "card_distance_meters": 1.5,
+    "anchor_size_meters": 0.4,
+    "min_cards_required": 1
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_midian_wilderness_dusk_dark_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/360/env_midian_wilderness_dusk_dark_360.jpg",
+        "size_bytes": 3750000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_burning_bush_continuing_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/billboards/burning_bush_continuing_billboard.webp",
+        "size_bytes": 800000,
+        "lod": "billboard_sprite_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_excuse_card_pack_5x",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/excuse_card_pack_5x.glb",
+        "size_bytes": 750000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      },
+      {
+        "id": "model_ground_anchor_zone",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/ground_anchor_zone.glb",
+        "size_bytes": 150000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      },
+      {
+        "id": "model_moses_self_barefoot_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/billboards/moses_self_barefoot_billboard.webp",
+        "size_bytes": 1100000,
+        "lod": "billboard_sprite_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_instruction_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_instruction_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_bush_card_1_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_bush_card_1_ko.mp3",
+        "size_bytes": 310000,
+        "voice_id": "bush_v1",
+        "duration_ms": 6000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_bush_card_2_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_bush_card_2_ko.mp3",
+        "size_bytes": 525000,
+        "voice_id": "bush_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_bush_card_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_bush_card_3_ko.mp3",
+        "size_bytes": 360000,
+        "voice_id": "bush_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_bush_card_4_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_bush_card_4_ko.mp3",
+        "size_bytes": 475000,
+        "voice_id": "bush_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_bush_card_5_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_bush_card_5_ko.mp3",
+        "size_bytes": 540000,
+        "voice_id": "bush_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_comfort_card_1_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_comfort_card_1_balanced_ko.mp3",
+        "size_bytes": 460000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_comfort_card_2_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_comfort_card_2_balanced_ko.mp3",
+        "size_bytes": 460000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_comfort_card_3_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_comfort_card_3_balanced_ko.mp3",
+        "size_bytes": 460000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_comfort_card_4_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_comfort_card_4_balanced_ko.mp3",
+        "size_bytes": 460000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_comfort_card_5_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s3_comfort_card_5_balanced_ko.mp3",
+        "size_bytes": 460000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_bush_flame_crackle_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_bush_flame_crackle_low.mp3",
+        "size_bytes": 350000,
+        "voice_id": null,
+        "duration_ms": 180000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_wind_chime_thin",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_wind_chime_thin.mp3",
+        "size_bytes": 180000,
+        "voice_id": null,
+        "duration_ms": 12000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_parchment_card_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/parchment_card_atlas_1k.webp",
+        "size_bytes": 1400000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_anchor_zone_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/anchor_zone_light_1k.webp",
+        "size_bytes": 200000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_wilderness_dusk_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/wilderness_dusk_atlas_1k.webp",
+        "size_bytes": 1600000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_excuse_cards_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/scripts/Scene3ExcuseCardsWebClickDrag.js",
+        "size_bytes": 32000,
+        "entry_class": "Scene3ExcuseCardsWebClickDrag"
+      },
+      {
+        "id": "script_card_pattern_classifier_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/scripts/CardPatternClassifierWeb.js",
+        "size_bytes": 13000,
+        "entry_class": "CardPatternClassifierWeb"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 15435000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

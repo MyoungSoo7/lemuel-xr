@@ -1,0 +1,51 @@
+{
+  "mission_id": "david",
+  "scene_number": 5,
+  "device_type": "quest3",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "throw_distance_meters": 3.0,
+    "two_handed_supported": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_elah_plain_3m_closer", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/env_elah_plain_3m_closer.glb", "size_bytes": 5200000, "lod": "lod3_pbr"},
+      {"id": "model_goliath_imposter_reused", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/goliath_imposter_for_scene5.glb", "size_bytes": 1800000, "lod": "imposter_with_fall_animation", "note": "Scene 3 의 25MB 골리앗 미사용 — imposter 로 대체 (거리 12m 에서 충분)"},
+      {"id": "model_sling_two_handed", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/sling.glb", "size_bytes": 380000, "lod": "lod3_pbr"},
+      {"id": "model_israelite_army_40_back", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/israelite_army_40_back_imposter.glb", "size_bytes": 2400000, "lod": "lod4_imposter"}
+    ],
+    "audio": [
+      {"id": "aud_s5_goliath_third_shout_ko_strong", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_goliath_third_shout_ko_strong.wav", "size_bytes": 1700000, "voice_id": "goliath_v1", "duration_ms": 15000, "intensity": "high"},
+      {"id": "aud_s5_goliath_third_shout_ko_low", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_goliath_third_shout_ko_low.wav", "size_bytes": 1500000, "voice_id": "goliath_v1_low", "duration_ms": 15000, "intensity": "low"},
+      {"id": "aud_s5_inner_first_fear_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_fear_ko.wav", "size_bytes": 920000, "voice_id": "david_v1", "duration_ms": 9000},
+      {"id": "aud_s5_inner_first_anger_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_anger_ko.wav", "size_bytes": 1020000, "voice_id": "david_v1", "duration_ms": 10000},
+      {"id": "aud_s5_inner_first_sadness_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_sadness_ko.wav", "size_bytes": 920000, "voice_id": "david_v1", "duration_ms": 9000},
+      {"id": "aud_s5_inner_first_loneliness_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_loneliness_ko.wav", "size_bytes": 1020000, "voice_id": "david_v1", "duration_ms": 10000},
+      {"id": "aud_s5_inner_first_hope_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_hope_ko.wav", "size_bytes": 1020000, "voice_id": "david_v1", "duration_ms": 10000},
+      {"id": "aud_s5_inner_first_unmapped_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_inner_first_unmapped_ko.wav", "size_bytes": 1020000, "voice_id": "david_v1", "duration_ms": 10000},
+      {"id": "aud_s5_scripture_caption_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_scripture_caption_ko.wav", "size_bytes": 1020000, "voice_id": "narrator_v1", "duration_ms": 10000},
+      {"id": "aud_s5_assist_prompt_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s5_assist_prompt_ko.wav", "size_bytes": 520000, "voice_id": "narrator_v1", "duration_ms": 5000},
+      {"id": "amb_both_armies_silence_pressure", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/amb_both_armies_silence_pressure.ogg", "size_bytes": 300000, "voice_id": null, "duration_ms": 60000},
+      {"id": "amb_heartbeat_75bpm", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/amb_heartbeat_75bpm.ogg", "size_bytes": 460000, "voice_id": null, "duration_ms": 90000},
+      {"id": "sfx_stone_hit_then_giant_fall", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/sfx_stone_hit_then_fall.ogg", "size_bytes": 620000, "voice_id": null, "duration_ms": 5000}
+    ],
+    "textures": [
+      {"id": "tex_elah_plain_atlas", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/elah_plain_2k.ktx2", "size_bytes": 2400000, "format": "ktx2", "resolution": "2048x2048"},
+      {"id": "tex_sling_leather_pbr", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/sling_leather_1k.ktx2", "size_bytes": 380000, "format": "ktx2", "resolution": "1024x1024"},
+      {"id": "tex_goliath_imposter_billboard", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/goliath_imposter_1k.ktx2", "size_bytes": 620000, "format": "ktx2", "resolution": "1024x1024"}
+    ],
+    "scripts": [
+      {"id": "script_scene5_sling_two_handed", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/scripts/Scene5SlingTwoHanded.cs.bundle", "size_bytes": 46000, "entry_class": "Scene5SlingTwoHanded"},
+      {"id": "script_assist_after_5_attempts", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/scripts/AssistAfter5Attempts.cs.bundle", "size_bytes": 18000, "entry_class": "AssistAfter5Attempts"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 23306000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

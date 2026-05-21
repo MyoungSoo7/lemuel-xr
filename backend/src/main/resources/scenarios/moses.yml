@@ -1,0 +1,96 @@
+# 모세 미션 시나리오 — 떨기나무 앞에서. MVP-MOSES.md 설계 기반.
+# 핵심 감정 anchor: 두려움 · 부름 · 떨림 · 책임 · 신뢰.
+# 6 Scene · 6~8분.
+
+character: moses
+title: 떨기나무 앞에서
+scenes:
+  - id: 1
+    title: 광야의 침묵
+    type: cinematic
+    duration_sec: 40
+    narration_id: moses.scene1.narration
+    extras:
+      anchor: 자기부정·체념
+      skippable_after_sec: 3   # safety — skip 옵션 (users.skip_intro_silence)
+    next: 2
+
+  - id: 2
+    title: 떨기나무 앞에서
+    type: interaction
+    interaction: gesture_sequence
+    duration_sec: 120
+    narration_id: moses.scene2.narration
+    scripture_ref: ex-3:5
+    extras:
+      anchor: 경외·두려움·거부
+      steps:
+        - { id: approach,     label: "다가가기"   }
+        - { id: remove_shoes, label: "신을 벗기"  }
+        - { id: look_up,      label: "고개 들기"  }
+      hapticHint: { intensity: 0.4, pattern: PULSE_SOFT, fallback: { audioCueId: bush-soft } }
+    next: 3
+
+  - id: 3
+    title: 다섯 변명의 카드
+    type: interaction
+    interaction: distribute
+    duration_sec: 120
+    narration_id: moses.scene3.narration
+    extras:
+      anchor: 자기방어·고백
+      cards:
+        - { id: who_am_i,     label: "제가 누구이기에",      scripture: ex-3:11 }
+        - { id: who_sent_me,  label: "이름이 무엇이냐 물으면", scripture: ex-3:13 }
+        - { id: trust_me,     label: "믿지 않으면",          scripture: ex-4:1 }
+        - { id: cant_speak,   label: "말이 둔하니",          scripture: ex-4:10 }
+        - { id: send_other,   label: "보낼 만한 자를 보내소서", scripture: ex-4:13 }
+      slots: ["throw", "heart"]   # 던지기 vs 가슴에 가져가기
+      monologue_cache_keys:
+        all_throw:  moses.s3.outcome.all_throw
+        all_heart:  moses.s3.outcome.all_heart
+        mixed:      moses.s3.outcome.mixed
+    next: 4
+
+  - id: 4
+    title: 파라오 앞에서
+    type: interaction
+    interaction: pick_one
+    duration_sec: 90
+    scripture_ref: ex-7:10
+    extras:
+      anchor: 공포·동행 인식
+      options:
+        - { id: cast_now,       label: "지팡이를 던진다 (즉시)" }
+        - { id: hesitate,       label: "망설인다 (5초)" }
+        - { id: with_aaron,     label: "아론을 본다 (동행)" }
+      realtime_llm: true
+      hapticHint: { intensity: 0.7, pattern: PULSE_HARD, channel: BOTH, fallback: { audioCueId: tremor-deep } }
+    next: 5
+
+  - id: 5
+    title: 홍해 앞에서
+    type: interaction
+    interaction: gesture_sequence
+    duration_sec: 60
+    scripture_ref: ex-14:13
+    extras:
+      anchor: 책임의 무게·신뢰
+      steps:
+        - { id: lift_staff, label: "지팡이를 들고 손을 뻗는다" }
+      one_action_only: true
+    next: 6
+
+  - id: 6
+    title: 회복
+    type: outro
+    duration_sec: 30
+    scripture_ref: ex-3:12
+    extras:
+      anchor: 안식·동반
+      recovery_keys:
+        ANXIOUS: moses.recovery.fear
+        LONELY:  moses.recovery.aloneness
+        EXHAUSTED: moses.recovery.wilderness40
+        SAD: moses.recovery.companion
+    next: null

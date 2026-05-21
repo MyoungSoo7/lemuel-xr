@@ -1,0 +1,149 @@
+# Scene 2 — 풍년기, 저장 결정
+# 사용자는 자루를 손으로 잡고 멀리 창고로 던져 결정. throw 거리 3m (작은 방은 2m 자동 축소).
+
+scene_id: joseph_scene2
+scene_name: storage_decision
+mission_id: joseph
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: golden_barley_field_day
+  background_model: env_barley_field_horizon
+  lighting:
+    type: warm_golden_hour
+    color_temperature_kelvin: 4500
+    sun_angle_degrees: 35
+  ambient_sound:
+    - id: wind_through_barley_loop
+      gain_db: -14
+      spatial: true
+    - id: distant_farmer_song_5s_loop
+      gain_db: -22
+      spatial: true
+    - id: low_ambient_pad
+      gain_db: -26
+      spatial: false
+  shader_features:
+    - gpu_instanced_barley_wind
+    - horizon_granary_translucent_buildup
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: progress_bar_year_1_to_7
+      position: top_left
+      style: thin_gold_line
+
+npcs:
+  - id: joseph_inner
+    voice_id: joseph_v1
+    position: null
+    initial_animation: null
+    note: "inner monologue only — no avatar"
+
+narration_blocks:
+  - id: nb_s2_intro
+    speaker: joseph_inner
+    text_ko: "풍년이 시작되었다. 곡식이 차고 넘친다. 얼마나 저장할 것인가… 백성의 오늘과 내일 사이에서 선택해야 한다."
+    audio_clip_id: aud_s2_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+  - id: nb_s2_bags_appear
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 15.0
+    duration_seconds: 1.5
+    hidden_until_event: null
+  - id: nb_s2_post_choice_A
+    speaker: joseph_inner
+    text_ko: "가볍게 저장했다. 흉년이 약하기를. 지금의 풍요를 누리는 것도 하나님이 주신 선물이다."
+    audio_clip_id: aud_s2_post_A_ko
+    start_at_seconds: 60.0
+    duration_seconds: 9.0
+    hidden_until_event: choice_made_A
+  - id: nb_s2_post_choice_B
+    speaker: joseph_inner
+    text_ko: "중간을 택했다. 지나친 두려움도 지나친 안일도 아닌 자리. 흉년이 오면 이 저장이 백성의 반을 살릴 것이다."
+    audio_clip_id: aud_s2_post_B_ko
+    start_at_seconds: 60.0
+    duration_seconds: 11.0
+    hidden_until_event: choice_made_B
+  - id: nb_s2_post_choice_C
+    speaker: joseph_inner
+    text_ko: "무겁게 저장했다. 오늘 백성이 조금 더 배고프겠지만 흉년 7년을 버틸 양식이다. 미안하다, 오늘의 백성이여."
+    audio_clip_id: aud_s2_post_C_ko
+    start_at_seconds: 60.0
+    duration_seconds: 12.0
+    hidden_until_event: choice_made_C
+
+interactions:
+  - id: ix_s2_pick_and_throw_bag
+    type: throw
+    target_assets: [model_grain_bag_A, model_grain_bag_B, model_grain_bag_C, model_granary_far]
+    gesture: grip_then_throw
+    throw_distance_meters: 3.0
+    throw_distance_meters_small_room: 2.0
+    haptic:
+      intensity: 0.4
+      duration_ms: 80
+      on_grip_hover_pulse: true
+    validation_rules:
+      - rule: one_bag_one_decision
+        emits_event_on_landed_in_granary: choice_made_{bag_label}
+      - rule: hesitation_track
+        records: [hesitation_seconds, bag_pickup_count, gaze_distribution]
+    bag_payloads:
+      A:
+        label_ko: "1/5 — 가볍게 저장. 백성은 오늘을 풍성히 먹는다."
+        save_ratio: 0.20
+      B:
+        label_ko: "1/3 — 균형. 요셉이 실제 한 비율에 가깝다."
+        save_ratio: 0.33
+        scripture_note_ko: "창 41:34 '5분의 1을 거두라' 해석 학자별 차이 있음 (J3 김도형)"
+      C:
+        label_ko: "1/2 — 무겁게 저장. 백성은 오늘이 빠듯하다."
+        save_ratio: 0.50
+
+branches:
+  - id: br_s2_save_ratio
+    triggered_by_event: [choice_made_A, choice_made_B, choice_made_C]
+    decision_key: save_ratio
+    backend_endpoint: "POST /api/game/joseph/scene/2/decide"
+    body_template:
+      save_ratio: "{{value}}"
+      bag_label: "{{label}}"
+    routes:
+      - when: { save_ratio: 0.20 }
+        narration_block: nb_s2_post_choice_A
+        carry_to_next_scene:
+          bags_remaining_for_scene3: 6
+      - when: { save_ratio: 0.33 }
+        narration_block: nb_s2_post_choice_B
+        carry_to_next_scene:
+          bags_remaining_for_scene3: 10
+      - when: { save_ratio: 0.50 }
+        narration_block: nb_s2_post_choice_C
+        carry_to_next_scene:
+          bags_remaining_for_scene3: 14
+
+safety_gates:
+  - id: R3_no_wrong_answer_tone
+    enforced_at: scene_complete_narration
+    description: "선택 C 의 '오늘 백성이 조금 더 배고프겠지만' 은 자기비난 톤 차단 — 책임 인식 톤"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: joseph_scene3
+transition:
+  type: time_lapse_field_to_desert
+  fade_out_seconds: 7.0
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J3
+    source: "김도형, 창 41:34 해석 — 5분의 1 비율의 학자별 견해"
+    anchor_block: nb_s2_bags_appear

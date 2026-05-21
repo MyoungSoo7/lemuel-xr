@@ -1,9 +1,24 @@
 # Backend 전체 아키텍처 — lemuel-xr
 
-> **상태**: 설계 (구현 전)
-> **최종 갱신**: 2026-05-21
+> **상태**: 설계 (DB V1~V12 구현됨, 코드 layer 진행 중)
+> **최종 갱신**: 2026-05-21 (DB 구현 확인 후 보강 — §16 참조)
 > **범위**: 사업계획서 기준 11개 주제 (Track A 1~7 + Track B 8~11) + 생성형 AI **전방위** 활용
-> **부속 문서**: API 표면은 [`BACKEND-API-DESIGN.md`](./BACKEND-API-DESIGN.md) 참조 (이 문서는 그 상위 아키텍처)
+> **상위 단일 진실 원천 (SOT) 분담**:
+>   - 본 문서 — **전체 아키텍처·결정·로드맵**
+>   - [`DB-SCHEMA.md`](./DB-SCHEMA.md) — DB 도메인 + V1~V12 마이그레이션 계획
+>   - [`AI-ARCHITECTURE.md`](./AI-ARCHITECTURE.md) — AI 16 use case + multi-provider + LangChain
+>   - [`XR-INTEGRATION.md`](./XR-INTEGRATION.md) — Backend ↔ XR 클라이언트 통합 규약
+>   - [`BACKEND-API-DESIGN.md`](./BACKEND-API-DESIGN.md) — API 표면 (endpoint 27 개)
+>   - [`ETHICS-LEGAL.md`](./ETHICS-LEGAL.md) — 윤리·법적 가이드
+>   - [`CONTENT-WORKFLOW.md`](./CONTENT-WORKFLOW.md) — AI 생성 → 신학 검토 → 공개
+>   - [`SEQUENCE-DIAGRAMS.md`](./SEQUENCE-DIAGRAMS.md) — Mermaid 시퀀스 7종
+>   - [`USER-FLOW.md`](./USER-FLOW.md) — 사용자 여정 wireframe
+>   - [`EMOTION-CLASSIFIER.md`](./EMOTION-CLASSIFIER.md) — 감정 분류 알고리즘
+>   - [`FUNCTIONAL-SPEC.md`](./FUNCTIONAL-SPEC.md) — 기능 명세
+>   - 인물 MVP — [`MVP-JOSEPH.md`](./MVP-JOSEPH.md) / [`MVP-MOSES.md`](./MVP-MOSES.md) / [`MVP-DAVID.md`](./MVP-DAVID.md)
+>   - 트랙 A 상세 — [`TRACK-A-1-4-WISDOM-EMOTION.md`](./TRACK-A-1-4-WISDOM-EMOTION.md) / [`TRACK-A-5-7-ACTION-GUIDANCE.md`](./TRACK-A-5-7-ACTION-GUIDANCE.md)
+
+본 문서와 다른 SOT 문서가 충돌하면 **도메인별 SOT 가 우선** — 본 문서는 상위 결정/연결만 다룬다.
 
 본 문서는 사업계획서의 *프로젝트 개발계획* 11개 주제와 *기본 FLOW* + *생성형 AI 전방위 활용* 조건을 충족하는 **백엔드 전체 설계** 다. 시스템 컨텍스트 → 도메인 → 컨테이너 → 모듈 → 데이터 흐름 → 비기능 → 로드맵 순으로 정리.
 
@@ -26,6 +41,11 @@
 | 5 | **모든 LLM 호출은 Spring 통과** | 클라이언트 → 직접 LLM X. 캐시 hit rate 80%+ 목표. 키 보호. |
 | 6 | **저장소 다층** | Postgres (관계+pgvector) / Redis (세션·캐시·rate limit) / R2 (wav·이미지) / 로컬 PVC (Postgres 데이터) |
 | 7 | **GitOps 배포 — 기존 인프라 재사용** | helm-deploy 레포에 `charts/lemuel-xr` 추가, ArgoCD application 등록. K3s 클러스터 추가 비용 0. |
+| 8 | **Outbox + Triple Idempotency 패턴 채택** | settlement 프로젝트 검증 패턴 차용. V11 `outbox_events` + `processed_events` 구현됨. Scene decide → 분석 이벤트 → ELK ship 의 트랜잭션 일관성 보장. |
+| 9 | **AI 는 Multi-Provider + LangChain RAG** | OpenAI `gpt-4o-mini` (분류·NPC·게임 분기) + Anthropic `claude-3.5-sonnet` (묵상·시편·챗봇·신학 보조) + 자체 호스팅 (Coqui XTTS-v2·SDXL). PROVIDER_PRIORITY fallback. RAG 는 별도 Python 서비스. AI-ARCHITECTURE.md §1~2 참조. |
+| 10 | **API 는 device-agnostic + 자산은 device-variant** | XR-INTEGRATION.md §1 — 백엔드는 디바이스 모름. asset_manifests(V10) 가 device·quality tier 별 URL 묶음 반환. |
+| 11 | **pgcrypto row-level 암호화** | V5 / V12 에서 `diary_entries.body`, `user_psalms.raw_text`, `emotion_logs.raw_text`, `safety_alerts.snippet` 암호화. ETHICS-LEGAL.md §2.2 충족. |
+| 12 | **콘텐츠 신학 검수 워크플로우** | V8 `content_versions` (draft → review → approved → published → archived) + `theology_reviews`. AI 생성 콘텐츠는 *반드시* approved 상태에서만 사용자 노출. CONTENT-WORKFLOW.md 참조. |
 
 ### 0.3 비용 예상 (MVP, 사용자 100명/월)
 
@@ -1165,7 +1185,204 @@ ELK Kibana 대시보드에 *디바이스별 SLO·CTR·완주율* 비교 패널 �
 
 ---
 
-## 15. 참고
+## 15. 2026-05-21 — DB 구현 현황 기준 보강
+
+> 본 섹션은 *DB V1~V12 + 17 docs 확인 후* (2026-05-21) 위 §0~§14 의 가정과 *실제 구현*을 정렬한 보강 메모. §0~§14 에 모순되는 항목은 본 섹션이 우선한다.
+
+### 15.1 DB 구현 현황 (V1~V12)
+
+```
+V1  init_schema                   → users, emotion_logs, game_sessions, scripture_passages,
+                                     llm_cache, tts_cache (5 base tables)
+V2  seed_scripture_genesis_41_45  → 창세기 41~45 본문 시드 (현대인의 성경, fair use)
+V3  expand_identity_emotion       → users 컬럼 보강 (user_type, faith_tone, preferred_mode,
+                                     haptic_intensity, skip_intro_silence, data_retention_days,
+                                     deleted_at), devices, app_sessions, emotion_logs 컬럼 보강
+                                     (intensity, chosen_dimension, recommended_*),
+                                     recovery_metrics
+V4  expand_game_domain             → game_sessions 컬럼 보강 (chosen_dimension,
+                                     triggered_by_emotion_log_id, closing_message,
+                                     scene_count_completed, duration_seconds),
+                                     game_decisions, scene_views
+V5  content_tracks_a               → pgcrypto + diary_entries, user_psalms,
+                                     proverbs_interactions, ecclesiastes_views
+V6  scripture_embeddings           → pgvector + scripture_embeddings (HNSW 인덱스),
+                                     scripture_passages.theme_tags / character_tags
+V7  safety_domain                  → safety_alerts (위기 키워드 매칭), crisis_resources
+                                     (자살예방상담전화 1393, 정신건강상담 1577-0199,
+                                     청소년 1388, 생명의전화 1588-9191 시드됨)
+V8  theology_domain                → content_versions (draft/review/approved/published/archived),
+                                     theology_reviews (reviewer · decision · concern_tags)
+V9  ai_domain                      → llm_cache 컬럼 보강 (prompt_template_version, hit_count,
+                                     expires_at), tts_cache 보강, llm_usage (비용 추적),
+                                     llm_usage_daily MATERIALIZED VIEW
+V10 asset_manifests                → asset_manifests (미션·씬·디바이스·quality_tier 별 묶음),
+                                     asset_downloads (다운로드 추적·실패 재시도)
+V11 events_outbox                  → outbox_events (트랜잭션 보장 큐), processed_events
+                                     (Triple Idempotency L1 — settlement 패턴)
+V12 analytic_views                 → v_user_30d_summary 외 분석 뷰 + 인덱스
+```
+
+→ **§0.2 의 V3~V7 *제안* 은 모두 *실제 V3~V12 로 구현됨*** + 4개 도메인 추가 (recovery, safety, theology, outbox, asset). §0.4 비용 추정도 V9 `llm_usage` 가 실측 데이터로 대체 가능해짐.
+
+### 15.2 §0~§14 에서 보강·정정 필요한 항목
+
+| § | 본 문서 가정 | 실제 구현 (V1~V12) | 정정 |
+|---|---|---|---|
+| §0.2 #5 | LLM 호출 backend 통과 + Gemini Flash | **OpenAI gpt-4o-mini + Anthropic claude-3.5-sonnet 멀티 프로바이더 + LangChain RAG** | §0.2 #9 로 업데이트 완료. AI-ARCHITECTURE.md §1 가 SOT. |
+| §0.4 | $50/월 (Gemini 기준) | gpt-4o-mini + claude-3.5-sonnet 혼합 (use case별 라우팅) — 실측 비용은 `llm_usage_daily` view 로 추적 | $50~150/월 추정 폭으로 보정. AI-ARCHITECTURE.md §0 의 cost/콜 표 참조. |
+| §2.2 표 | 인물 4명 도메인 공통 구조 (Decision Schema 통일) | game_decisions.decision JSONB 가 캐릭터별 자유 schema (DB-SCHEMA.md §13 의 예시 매핑) | 호환. 단 *분석 편의* 를 위해 캐릭터별 권장 schema 합의 필요 (DB-SCHEMA §13 의 4종 예시가 기준). |
+| §2.3 | User, EmotionLog, GameSession, ... 8 도메인 | + **devices, app_sessions, recovery_metrics, user_psalms, ecclesiastes_views, safety_alerts, crisis_resources, content_versions, theology_reviews, llm_usage, asset_manifests, outbox_events, processed_events** — 13 표 추가됨 | §2 에 누락된 도메인 7종 (recovery, safety, theology, asset, outbox) 보강 — §15.3 참조. |
+| §3 Bounded Context | 8 contexts | **+ recovery (회복 지표), safety (위기 자원), theology (콘텐츠 검수), asset (자산 카탈로그)** — 12 contexts | §15.3 의 매핑 도식으로 갱신. |
+| §5 패키지 layout | 9 패키지 (auth/emotion/content/game/scripture/ai/tts/safety/analytics/common) | + **recovery, theology, asset, outbox** 4 패키지 추가 필요 | §15.4 의 보강된 layout 참조. |
+| §7 AI 8 시나리오 | 8가지 | **AI-ARCHITECTURE.md 가 16가지** (감정·추천 rerank·일기 묵상·위기 키워드·잠언·시편·시편 다듬기·게임 분기·NPC 대화·TTS·이미지·주간 리포트·키워드 추출·신학 보조·챗봇·번역) | AI-ARCHITECTURE.md 가 SOT. 본 §7 표는 발췌 요약. |
+| §9 DDL 제안 (V3~V6) | 제안 단계 | **V1~V12 전부 작성됨** (rollback 노트 포함) | §9 는 *역사 메모* 로 보존, 신규 변경은 DB-SCHEMA.md + lemuel-xr-flyway-migration skill 가이드. |
+| §10 로드맵 Week 1 | helm-deploy + ArgoCD + auth 모듈 | **DB 12 마이그레이션 + scripture 시드 + JosephGameController + EmotionController 골격 완성** | 로드맵은 *현재 단계* 기준 재산정: "JPA Entity + Use Case + Adapter 구현" 단계로 진입. §15.5 참조. |
+| §11 위험 #2 hallucination | RAG + 본문 DB only + 후처리 검증 | + **CONTENT-WORKFLOW.md 의 신학 검수 단계 (V8 content_versions)** 가 추가 가드 | 위험 #2 완화 ↑. content_versions.status='approved' 만 사용자 노출. |
+| §11 위험 #3 가스라이팅 | forbidden token list | + **lemuel-xr-mental-health-safety skill 의 5개 안전선 (R1~R5)** + safety_alerts (V7) 자동 매칭 + crisis_resources 시드 | 위험 #3 완화 ↑↑. ETHICS-LEGAL.md §3 가 SOT. |
+| §13 Multi-XR | 본 문서 §13 신규 작성 | **XR-INTEGRATION.md (560줄)** 가 더 상세한 SOT | XR-INTEGRATION.md 가 우선. 본 §13 은 *발췌 요약*. 충돌 시 XR-INTEGRATION 따름. |
+
+### 15.3 Bounded Context 갱신 (12 contexts)
+
+§3 의 8 contexts → 12 contexts 로 확장:
+
+```
+┌──────────────────────────────────────────────────┐
+│   [Identity & Auth]                                 │
+│   users, devices, app_sessions                       │
+└──────┬─────────────────────────────────────────────┘
+       │
+       ├─► [Emotion]           emotion_logs (+intensity, chosen_dimension)
+       ├─► [Recovery] ★신규     recovery_metrics (PHQ-9 류 자체 지표)
+       │
+       ├─► [Content — Track A]
+       │     diary_entries, user_psalms, proverbs_interactions, ecclesiastes_views
+       │
+       ├─► [Game — Track B]
+       │     game_sessions, game_decisions, scene_views
+       │
+       ├─► [Scripture]
+       │     scripture_passages, scripture_embeddings (pgvector)
+       │
+       ├─► [Safety] ★신규
+       │     safety_alerts, crisis_resources
+       │
+       ├─► [Theology] ★신규
+       │     content_versions, theology_reviews (AI 생성 → 승인 워크플로우)
+       │
+       ├─► [AI Orchestration]
+       │     llm_cache, llm_usage, tts_cache (멀티 프로바이더 라우팅)
+       │
+       ├─► [Asset] ★신규
+       │     asset_manifests, asset_downloads (XR 디바이스·quality_tier 별)
+       │
+       ├─► [Outbox] ★신규
+       │     outbox_events, processed_events (Triple Idempotency)
+       │
+       └─► [Analytics]
+             interaction events (analytic views V12)
+```
+
+### 15.4 패키지 layout 보강 (§5 갱신)
+
+§5 의 9 패키지에 4 추가:
+
+```
+github.lms.lemuel.xr/
+├── auth/             ← §5 그대로
+├── emotion/          ← §5 그대로
+├── recovery/         ★신규 — RecoveryMetricsScheduler + GetRecoveryTrendUseCase
+│   ├── adapter/out/persistence/RecoveryMetric{Entity,Repository}.java
+│   ├── application/{ComputeDailyMetrics, GetTrendOver30Days}UseCase.java
+│   └── domain/{RecoveryMetric, Trend, RiskSignal}.java
+├── content/          ← §5 + theme별 도메인 추가 (diary, psalm, proverbs, ecclesiastes)
+├── game/             ← §5 그대로
+├── scripture/        ← §5 그대로 (V6 embedding HNSW 인덱스 활용)
+├── safety/           ★확장 — V7 safety_alerts 자동 매칭
+│   ├── adapter/in/web/{SafetyController,CrisisResourceController}.java
+│   ├── adapter/in/scheduler/SafetyAlertScannerJob.java
+│   ├── application/{DetectCrisisKeyword, SuggestResource, AcknowledgeAlert}UseCase.java
+│   └── domain/{SafetyAlert, CrisisResource, Severity}.java
+├── theology/         ★신규 — V8 content_versions 워크플로우
+│   ├── adapter/in/web/ContentVersionController.java  (admin only)
+│   ├── application/{SubmitForReview, ApproveContent, PublishContent}UseCase.java
+│   └── domain/{ContentVersion, TheologyReview, Status: DRAFT/REVIEW/APPROVED/PUBLISHED/ARCHIVED}.java
+├── ai/               ← §5 그대로 (multi-provider routing 적용)
+├── tts/              ← §5 그대로
+├── asset/            ★신규 — V10 asset_manifests
+│   ├── adapter/in/web/AssetManifestController.java
+│   ├── adapter/out/persistence/{AssetManifest,AssetDownload}{Entity,Repository}.java
+│   ├── application/{GetManifestForDeviceQuality, RecordDownload}UseCase.java
+│   └── domain/{AssetManifest, DeviceType, QualityTier}.java
+├── outbox/           ★신규 — V11 outbox_events + Triple Idempotency
+│   ├── adapter/in/scheduler/OutboxRelayJob.java
+│   ├── adapter/out/persistence/{OutboxEvent,ProcessedEvent}{Entity,Repository}.java
+│   ├── application/{PublishEventTx, MarkProcessed, DeduplicateByIdempotencyKey}UseCase.java
+│   └── domain/{OutboxEvent, IdempotencyKey, EventStatus}.java
+├── analytics/        ← §5 + V12 views 활용
+└── common/           ← §5 그대로
+```
+
+→ 총 **13 패키지** (auth, emotion, recovery, content, game, scripture, safety, theology, ai, tts, asset, outbox, analytics, +common).
+
+### 15.5 로드맵 재산정 (§10 갱신)
+
+**현재 도달 단계**: DB 12 마이그레이션 완성 + Joseph/Emotion 컨트롤러 골격 + AI/TTS Python 사이드카 골격.
+
+**다음 6 sprint 우선순위** (각 sprint = 1주):
+
+| Sprint | 목표 | 산출물 |
+|---|---|---|
+| 1 | Identity + Outbox 골격 | auth 패키지 (게스트 JWT + RateLimit + InternalToken), outbox 패키지 + OutboxRelayJob @Scheduled |
+| 2 | Game 도메인 일반화 | `/api/game/{character}/*` GameController + ScenarioYamlLoader. Joseph 호환 유지 |
+| 3 | Emotion 확장 + Safety scanner | classify 응답에 recommendations · safety scanner 가 위기 키워드 매칭 시 crisis_resource 추천 |
+| 4 | Content Track A — Theme 1·4 | diary entries + user psalms + AI 묵상 변환 (claude-3.5-sonnet) + TTS 시편 23 사전 생성 |
+| 5 | Theology workflow + AI 생성 콘텐츠 게이트 | content_versions DRAFT → REVIEW 자동 + reviewer admin UI · approved 만 user 노출 |
+| 6 | Asset manifest + Multi-XR | `/api/config/asset-manifest` 구현, Quest 3 빌드용 변종 우선 + Vision Pro USDZ 변종 추가 |
+
+→ **6주 만에 Phase 1 MVP** (요셉 + Theme 1·4 + 안전·신학 검수 가드) 가능 추정.
+
+### 15.6 추가 보강 — DB 가 강제하는 설계 결정
+
+V1~V12 가 *암묵적으로 강제* 하는 결정들 (본 문서 §0~§14 에 명시 안 됐던 것):
+
+1. **3차원 모드는 *세션 단위*, 사용자 default 는 *faith_tone*** — `users.faith_tone` (strong/balanced/soft) 와 `users.preferred_mode` (spiritual/emotional/rational/null) 가 분리됨. faith_tone 은 *신앙 톤 강도*, preferred_mode 는 *3차원 진입 모드*. 두 dimension 이 직교.
+
+2. **`abandoned_at` 이 `completed_at` 과 분리** — game_sessions 가 *완료* / *중단(emergency exit)* / *진행 중* 의 3-상태 모델. 안전 exit 후 final_outcome 이 'safe_exit' 인 게 §6.3 흐름과 일치.
+
+3. **recovery_metrics 는 일별 cron 으로 채움** — *실시간 계산 X*. `RecoveryMetricsScheduler` @Scheduled(cron="0 0 4 * * *") 자정 4시 작업 필요.
+
+4. **safety_alerts.severity** 4단계 — `low / medium / high / critical`. crisis_resource 표시 임계값은 medium 이상.
+
+5. **content_versions 5-상태** — `draft → review → approved → published → archived`. AI 생성 후 자동 *draft*, 신학 자문 승인 시 *approved*, 공개 시 *published*. 사용자 노출 시점은 **published 만**.
+
+6. **scripture_passages.translation 다중성** — `modern` (현대인의 성경) / `rev` (개역개정) / `niv` / `esv`. 같은 reference 가 multiple translation 으로 저장. **번역별 사용자 선택 가능** (사용자 메타에 preferred_translation 추가 권장).
+
+7. **scripture_embeddings 차원 1536** — text-embedding-3-small. §13.4 의 *3072* 차원 가정은 정정 필요. embedding model 은 `embed_model` 컬럼으로 추적.
+
+8. **outbox + idempotency_key 패턴** — settlement Triple Idempotency 의 L1 (event-level 중복 차단) 가 V11 에 구현됨. Scene decide 등 *멱등성 보장 필수* 작업은 client 에 idempotency_key 받아 processed_events 에 INSERT … ON CONFLICT 패턴 사용.
+
+### 15.7 인스턴스 검수 — 본 문서 vs 실제 상태 충돌 항목
+
+| 본 문서 | 실제 (DB/문서) | 처리 |
+|---|---|---|
+| §6.2 시나리오 B의 `LlmCacheRepository.findByKey("moses.s3.mixed:EMOTIONAL")` | V9 llm_cache.cache_key 패턴은 `"moses:scene3:cards:TTHTH"` 식 (DB-SCHEMA §9) | 본 §6.2 의 키 예시를 *concept only* 로 보고, 실제 키 패턴은 AI-ARCHITECTURE.md + DB-SCHEMA.md 따름. |
+| §8 TTS endpoint 응답에 `cacheKey: sha256(text+voiceId+rate)` | V1 tts_cache.text_hash + voice_id (sha256 의 text_hash 만) — voiceId 와 rate 는 별도 컬럼 | 키 생성 알고리즘만 합의: `sha256(text)` + `voice_id` + `speaking_rate` 의 composite key. |
+| §13.4.3 quality tier 결정 식 (memoryClassMb 기반) | V10 asset_manifests.quality_tier 는 LOW/MID/HIGH — 매핑 정책은 백엔드 책임 | 매핑 정책 함수 명세화 필요 (asset/application/SelectQualityTierByCapability) — sprint 6 작업. |
+
+### 15.8 다음 PR 단위 (구현 진입)
+
+본 §15 보강 후 첫 PR:
+
+1. **package skeleton PR** — §15.4 의 13 패키지 디렉토리 + 기본 Application/Domain 인터페이스 생성 (코드 없이 파일 구조만). lemuel-xr-flyway-migration / lemuel-xr-theology-tone skill 가이드 준수.
+2. **auth + outbox PR** — Sprint 1 산출물.
+3. **Game generalization PR** — Sprint 2.
+
+PR 마다 SEQUENCE-DIAGRAMS.md 갱신 (lemuel-xr-mermaid-sequence skill) + STATUS 갱신 (별도 STATUS.md 신규 추가 권장).
+
+---
+
+## 16. 참고
 
 - 본 문서는 **사업계획서 + PLAN.md + BUILD-PLAN.md + MVP-JOSEPH/MOSES/DAVID + TRACK-A-1-4** 의 *단일 진실 원천*
 - API 표면 상세는 [`BACKEND-API-DESIGN.md`](./BACKEND-API-DESIGN.md)

@@ -1,0 +1,188 @@
+# Scene 5 — 첫 걸음 (60초, 애굽 향해 돌아섬)
+# 떨기나무는 뒤로 fade out. 사용자 앞에 광야 길 (동쪽 = 애굽 방향) 펼쳐짐.
+# 한 손 anchor 내밀기 (또는 시선 1초) → 시점 자동 한 걸음 전진 (0.5m). 최대 3걸음. 0걸음도 OK.
+
+scene_id: moses_scene5
+scene_name: first_step_toward_egypt
+mission_id: moses
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: midian_wilderness_path_eastward
+  background_model: env_midian_path_east_sunrise
+  lighting:
+    type: pre_dawn_first_light_horizon
+    color_temperature_kelvin: 4200
+    sun_angle_degrees: -2
+    fade_in_first_light_seconds: 5.0
+  ambient_sound:
+    - id: low_freq_wilderness_wind_only
+      gain_db: -14
+      spatial: true
+    - id: footstep_sand_pebbles_per_step
+      gain_db: -12
+      spatial: true
+      trigger: per_step_locomotion
+    - id: bush_crackle_fade_to_silence
+      gain_db: -28
+      spatial: true
+      fade_to_silence_at_seconds: 3.0
+  shader_features:
+    - pbr_sand_pebbles_path
+    - horizon_first_light_gradient
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  user_posture: standing
+  camera_locomotion: anchor_step_only
+  ui_overlays:
+    - id: scene5_step_anchor
+      position: front_floor_user_view
+      style: soft_glowing_circle
+      anchor_position: [0.0, 0.05, 1.0]
+      anchor_size_meters: 0.5
+    - id: scene5_skip_button
+      position: bottom_right
+      style: small_persistent
+      text_ko: "건너뛰기 (Scene 6 로)"
+      action: jump_to_scene6
+    - id: scene5_footer_persistent
+      position: bottom_left
+      style: small_persistent
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+npcs:
+  - id: moses_self
+    voice_id: silent
+    position: [0.0, 1.65, 0.0]
+    initial_animation: standing_facing_east
+    visual_traits: [shepherd_garment_worn, sandals_on_again, long_round_staff_in_hand]
+  - id: burning_bush_distant_behind
+    voice_id: bush_v1
+    position: [0.0, 1.60, -8.0]
+    initial_animation: fading_out_3s
+    voice_tone: restrained_narrator_distant
+    note: "사용자 뒤 멀리. 마지막 음성만 발화"
+
+narration_blocks:
+  - id: nb_s5_auto_rotate_silent
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 0.0
+    duration_seconds: 5.0
+    hidden_until_event: null
+    note: "시점 자동 회전 — 떨기나무에서 광야 길 쪽으로 180도, 5초"
+  - id: nb_s5_subtitle_one_step
+    speaker: subtitle_only
+    text_ko: "한 걸음."
+    audio_clip_id: null
+    start_at_seconds: 8.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s5_ui_anchor_instruction
+    speaker: ui_caption
+    text_ko: "한 손을 발자국으로 내밀거나, 시선을 1초 유지하면 한 걸음 디딥니다."
+    audio_clip_id: aud_s5_anchor_instruction_ko
+    start_at_seconds: 18.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+  - id: nb_s5_subtitle_fear_remains
+    speaker: subtitle_only
+    text_ko: "두려움은 사라지지 않았다.\n그러나 한 걸음을 디뎠다."
+    audio_clip_id: null
+    start_at_seconds: 30.0
+    duration_seconds: 10.0
+    hidden_until_event: at_least_one_step_taken
+  - id: nb_s5_bush_promise_from_behind
+    speaker: burning_bush_distant_behind
+    text_ko: "내가 반드시 너와 함께 있으리라 (출 3:12)"
+    audio_clip_id: aud_s5_bush_promise_ko
+    start_at_seconds: 45.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    spatial_3d_panning: behind_user_distant
+
+interactions:
+  - id: ix_s5_first_step
+    type: anchor_step
+    target_assets: [scene5_step_anchor]
+    gesture: hand_extend_to_anchor_or_gaze_dwell_1000ms
+    fallback_gesture_web: click_anchor_button
+    haptic:
+      intensity: 0.15
+      duration_ms: 60
+      trigger: per_step_complete
+    validation_rules:
+      - rule: per_step_locomotion
+        step_distance_meters: 0.5
+        fade_per_step_seconds: 0.4
+        emit_event_per_step: step_taken
+        max_steps: 3
+        min_steps: 0
+        cooldown_between_steps_seconds: 5
+      - rule: track_step_count
+        records: [step_count, step_intervals_seconds, time_between_anchor_appear_and_first_step]
+  - id: ix_s5_skip_to_scene6
+    type: pinch
+    target_assets: [scene5_skip_button]
+    gesture: pinch_or_click
+    validation_rules:
+      - rule: skip_anytime_allowed
+        on_success: jump_to_scene6
+        design_intent: "0걸음 도 정당 — '걸음 수는 결정의 깊이가 아니라 사용자 리듬' (R3)"
+
+branches:
+  - id: br_s5_step_decision
+    triggered_by_event: [step_taken, max_steps_reached, scene5_complete]
+    decision_key: step_count
+    backend_endpoint: "POST /api/game/moses/scene/5/step"
+    body_template:
+      step_count: "{{step_count}}"
+      step_intervals_seconds: "{{step_intervals_seconds}}"
+    routes:
+      - when: { step_count: 0 }
+        label_ko: "오늘은 머무를 시간이었다 — 0걸음도 정당"
+        carry_to_scene6: { step_pattern: stayed }
+      - when: { step_count: 1 }
+        label_ko: "한 걸음을 디뎠다 — '두려운 채로 가는 것이 용기'"
+        carry_to_scene6: { step_pattern: one_step }
+      - when: { step_count: 2 }
+        label_ko: "두 걸음 — 자기 리듬으로 더 디뎠다"
+        carry_to_scene6: { step_pattern: two_steps }
+      - when: { step_count: 3 }
+        label_ko: "최대 세 걸음 — 자기 리듬의 끝까지"
+        carry_to_scene6: { step_pattern: max_steps }
+
+safety_gates:
+  - id: R3_zero_step_skip_allowed
+    enforced_at: ix_s5_skip_to_scene6
+    description: "0걸음 건너뛰기 허용 — '걸음 수는 사용자 리듬'. 후퇴 라벨 0건"
+  - id: R3_no_fear_must_disappear_push
+    enforced_at: nb_s5_subtitle_fear_remains
+    description: "'두려움은 사라지지 않았다' — ACT 경험적 회피 대신 가치 기반 행동. '두려움 없이 가라' push 차단"
+  - id: R5_ai_optout_respected
+    enforced_at: nb_s5_bush_promise_from_behind
+    description: "AI 음성 opt-out 사용자도 텍스트 자막은 동일. 환경 사운드는 AI 아님 (3D 오디오 공간감 유지)"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: moses_scene6
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.5
+
+theology_footer_refs:
+  - citation_id: M2
+    source: "신앙과 학문 2021 Vol.26 No.1 — 소명의식과 직업만족 (drill-down 후보)"
+    note: "동행 약속이 결단보다 앞선 마지막 메시지"
+    anchor_block: nb_s5_bush_promise_from_behind
+  - disputed_points:
+      - "출애굽기는 떨기나무 → 이드로 귀환 → 미디안 출발 의 시간차를 보이나 본 Scene 은 순간의 결단으로 압축"
+    handling: "footer 에 '본 Scene 은 시간 압축' 명시"
+  - scripture_refs:
+      - ref: "출애굽기 3:12"
+        translation: krv
+        anchor_block: nb_s5_bush_promise_from_behind

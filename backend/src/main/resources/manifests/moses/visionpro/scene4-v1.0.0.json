@@ -1,0 +1,164 @@
+{
+  "mission_id": "moses",
+  "scene_number": 4,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "consent_card_required": true,
+    "visual_intensity_max": 0.6,
+    "haptics_disabled": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_midian_wilderness_dusk_dark",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/env_midian_wilderness_dusk_dark.glb",
+        "size_bytes": 8640000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_burning_bush_reduced",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/burning_bush_reduced.glb",
+        "size_bytes": 1680000,
+        "lod": "lod3_pbr_upscale_4k",
+        "eye_tracking_enhanced": true
+      },
+      {
+        "id": "model_abstract_snake_sign",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/abstract_snake_sign.glb",
+        "size_bytes": 960000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_user_staff_held",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/user_staff_held.glb",
+        "size_bytes": 480000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_hand_overlay_layer",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/hand_overlay_layer.glb",
+        "size_bytes": 360000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_moses_self_barefoot",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/models/moses_self_barefoot.glb",
+        "size_bytes": 2640000,
+        "lod": "lod3_pbr_upscale_4k",
+        "eye_tracking_enhanced": true
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_bush_q_staff_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_q_staff_ko.wav",
+        "size_bytes": 504000,
+        "voice_id": "bush_v1",
+        "duration_ms": 4000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_bush_throw_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_throw_ko.wav",
+        "size_bytes": 504000,
+        "voice_id": "bush_v1",
+        "duration_ms": 4000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_bush_grab_tail_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_grab_tail_ko.wav",
+        "size_bytes": 624000,
+        "voice_id": "bush_v1",
+        "duration_ms": 5000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_bush_hand_in_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_hand_in_ko.wav",
+        "size_bytes": 504000,
+        "voice_id": "bush_v1",
+        "duration_ms": 4000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_bush_hand_in_again_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_hand_in_again_ko.wav",
+        "size_bytes": 504000,
+        "voice_id": "bush_v1",
+        "duration_ms": 4000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_bush_closing_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/s4_bush_closing_ko.wav",
+        "size_bytes": 1020000,
+        "voice_id": "bush_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_bush_flame_crackle_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/amb_bush_flame_crackle_dim.wav",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 90000
+      },
+      {
+        "id": "amb_air_stilled_silence",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/audio/amb_air_stilled_silence.wav",
+        "size_bytes": 600000,
+        "voice_id": null,
+        "duration_ms": 90000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_abstract_white_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/textures/abstract_white_light_2k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_hand_overlay_white",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/textures/hand_overlay_white_2k.ktx2",
+        "size_bytes": 600000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_wilderness_dusk_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/textures/wilderness_dusk_atlas_4k.ktx2",
+        "size_bytes": 3840000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_signs_morph",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/scripts/Scene4SignsMorphPolySpatial.cs.bundle",
+        "size_bytes": 62000,
+        "entry_class": "Scene4SignsMorphPolySpatial"
+      },
+      {
+        "id": "script_r4_consent_card_2nd",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/v1.0.0/scripts/R4ConsentCard2nd.cs.bundle",
+        "size_bytes": 22000,
+        "entry_class": "R4ConsentCard2nd"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 25224000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

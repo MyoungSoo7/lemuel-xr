@@ -1,0 +1,302 @@
+# Scene 4 — 시냇가에서 5 개 돌 선택 (180초, 게임의 중심) ★
+# 5 색 돌 = 5 감정 매핑. 사용자가 어떤 5 개를 주머니에 넣는가 → interaction_meta 의 정서 다양성 지표.
+# Day 30 리포트 (v_user_30d_summary) 의 '감정 다양성' 지표에 직접 매핑. 잠 4:23 TRACK-A-6 경계 형성.
+
+scene_id: david_scene4
+scene_name: five_stones
+mission_id: david
+version: 1.0.0
+duration_seconds_target: 180
+
+environment:
+  space_id: elah_valley_stream_kneeling
+  background_model: env_elah_stream_kneeling_view
+  lighting:
+    type: dappled_late_afternoon
+    color_temperature_kelvin: 4800
+    sun_angle_degrees: 25
+  ambient_sound:
+    - id: stream_running_water_loop
+      gain_db: -14
+      spatial: true
+    - id: goliath_faint_shout_distant_bass
+      gain_db: -28
+      spatial: true
+      panning: front_distant
+    - id: heartbeat_60_to_70bpm_progressive
+      gain_db: -22
+      spatial: false
+      design_intent: "사용자 자신의 심장 — 60BPM 시작, 점진적 65~70 상승"
+    - id: stones_underwater_subtle_clack
+      gain_db: -26
+      spatial: true
+  shader_features:
+    - water_caustics_on_stones
+    - stone_color_individual_per_mesh
+  user_position: [0.0, 0.55, 0.0]
+  user_facing: [0.0, -0.3, 1.0]
+  camera_locomotion: disabled
+  user_kneeling: true
+  ui_overlays:
+    - id: scene4_pocket_visual
+      position: waist_left
+      style: leather_pouch_outline_fade
+      reveal_after_first_stone_grabbed: true
+
+npcs:
+  - id: david_self
+    voice_id: david_v1
+    position: [0.0, 0.55, 0.0]
+    note: "사용자가 다윗 — first-person, 내면 독백만"
+
+narration_blocks:
+  - id: nb_s4_scripture_caption
+    speaker: scripture_caption
+    text_ko: "시냇가에서 매끄러운 돌 다섯을 골라 자기 목자의 제구 곧 주머니에 넣고… (삼상 17:40)"
+    audio_clip_id: aud_s4_scripture_caption_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s4_instruction
+    speaker: ui_caption
+    text_ko: "물속에 매끄러운 돌이 보입니다. 손으로 만져보세요. 다섯 개를 주머니에 넣으면 다음으로 갑니다."
+    audio_clip_id: aud_s4_instruction_ko
+    start_at_seconds: 12.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s4_no_pressure_reminder
+    speaker: ui_caption
+    text_ko: "오늘 한 돌만 주머니에 넣어도 충분합니다. 5 개가 너무 무거우면 4 개로 진행할 수도 있어요."
+    audio_clip_id: aud_s4_no_pressure_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: stone_count_4_after_40s
+  - id: nb_s4_stone_red_label
+    speaker: stone_text
+    text_ko: "사울의 두려움 · 형들의 멸시 — 나는 이 분노도 가지고 간다."
+    audio_clip_id: aud_s4_stone_red_ko_soft
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: stone_touched_red
+    presentation: floating_above_stone_0_5s_fade
+  - id: nb_s4_stone_blue_label
+    speaker: stone_text
+    text_ko: "홀로 광야의 시간 — 누구도 보지 못한 밤들도 가지고 간다."
+    audio_clip_id: aud_s4_stone_blue_ko_soft
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: stone_touched_blue
+    presentation: floating_above_stone_0_5s_fade
+  - id: nb_s4_stone_gray_label
+    speaker: stone_text
+    text_ko: "8 형제 중 막내 · 잊혀진 자리도 가지고 간다."
+    audio_clip_id: aud_s4_stone_gray_ko_soft
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: stone_touched_gray
+    presentation: floating_above_stone_0_5s_fade
+  - id: nb_s4_stone_yellow_label
+    speaker: stone_text
+    text_ko: "수금과 시편의 노래 — 들이 나에게 가르친 평온도 가지고 간다."
+    audio_clip_id: aud_s4_stone_yellow_ko_soft
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: stone_touched_yellow
+    presentation: floating_above_stone_0_5s_fade
+  - id: nb_s4_stone_black_label
+    speaker: stone_text
+    text_ko: "골리앗의 거대함 앞 떨림 — 두려움을 거부하지 않고 가지고 간다."
+    audio_clip_id: aud_s4_stone_black_ko_soft
+    start_at_seconds: 0.0
+    duration_seconds: 7.0
+    hidden_until_event: stone_touched_black
+    presentation: floating_above_stone_0_5s_fade
+  - id: nb_s4_complete_inner
+    speaker: david_inner
+    text_ko: "다섯 개의 돌이 주머니 안에 있다. 어떤 감정도 버려진 것이 아니다."
+    audio_clip_id: aud_s4_complete_inner_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: pocket_count_reached
+
+interactions:
+  - id: ix_s4_pick_and_pocket_stones
+    type: pocket_socket
+    target_assets:
+      - model_stone_red
+      - model_stone_blue
+      - model_stone_gray
+      - model_stone_yellow
+      - model_stone_black
+      - model_stone_neutral_a
+      - model_stone_neutral_b
+      - socket_pocket_waist_left
+    gesture: grab_then_place_in_pocket
+    stone_to_emotion_map:
+      red:
+        emotion: anger
+        dimension: [reason, emotion]
+        haptic_profile: { intensity: 0.6, duration_ms: 80, pattern: short_strong_double }
+        mechanism_note: "Lieberman 2007 — 분노 라벨링이 편도체 활성 감소"
+      blue:
+        emotion: sadness
+        dimension: [emotion]
+        haptic_profile: { intensity: 0.35, duration_ms: 400, pattern: long_soft_single }
+        mechanism_note: "DBT emotion validation"
+      gray:
+        emotion: loneliness
+        dimension: [emotion, spirit]
+        haptic_profile: { intensity: 0.45, duration_ms: 200, pattern: heavy_single }
+        mechanism_note: "Pargament religious coping — 관계 인식 + 누군가 앞에서"
+      yellow:
+        emotion: hope
+        dimension: [spirit]
+        haptic_profile: { intensity: 0.25, duration_ms: 250, pattern: soft_tremor }
+        mechanism_note: "다윗의 '여전히 부르신 분' 인식 — 시편 작가"
+      black:
+        emotion: fear
+        dimension: [reason, spirit]
+        haptic_profile: { intensity: 0.30, duration_ms: 120, pattern: faint_then_silence }
+        mechanism_note: "Clark&Wells 사회불안 모델 + 잠 29:25"
+      neutral_a:
+        emotion: null
+        dimension: []
+        haptic_profile: { intensity: 0.20, duration_ms: 60, pattern: minimal }
+        note: "단순 '매끄러운 돌'의 평범함 — 감정 매핑 없음"
+      neutral_b:
+        emotion: null
+        dimension: []
+        haptic_profile: { intensity: 0.20, duration_ms: 60, pattern: minimal }
+        note: "단순 '매끄러운 돌'의 평범함 — 감정 매핑 없음"
+    validation_rules:
+      - rule: pocket_count_target_5_min_4
+        target: 5
+        min_to_advance: 4
+        on_target_reached: emit_event_pocket_count_reached
+        on_min_reached: enable_continue_button_after_40s
+        note: "5/5 안전한 결정, 4/5 도 진행 가능 (R3)"
+      - rule: same_color_repeat_allowed
+        description: "같은 색을 2개 골라도 됨 — 감정 다양성은 사용자 자율"
+      - rule: replace_freely
+        description: "돌을 주머니에서 꺼내 다시 시냇가에 놓는 행위 자유 — 번복 압박 차단"
+        records: [stone_replace_count]
+      - rule: no_failure_counter_shown
+        description: "선택 카운트·실패 카운트 모두 비노출 (R3)"
+      - rule: track_micro_signals
+        records:
+          - stone_selection_order
+          - color_distribution
+          - hesitation_seconds
+          - stone_pickup_count
+          - stone_replace_count
+          - first_stone_color
+          - last_stone_color
+
+branches:
+  - id: br_s4_five_stones_pattern
+    triggered_by_event: pocket_count_reached
+    decision_key: stones
+    backend_endpoint: "POST /api/game/david/scene/4/stones"
+    body_template:
+      stones: "{{ordered_emotion_array}}"
+      stone_order: "{{order_array}}"
+      color_distribution:
+        red: "{{count_red}}"
+        blue: "{{count_blue}}"
+        gray: "{{count_gray}}"
+        yellow: "{{count_yellow}}"
+        black: "{{count_black}}"
+        neutral: "{{count_neutral}}"
+      interaction_meta:
+        hesitation_seconds: "{{hesitation}}"
+        stone_pickup_count: "{{pickups}}"
+        stone_replace_count: "{{replaces}}"
+        first_stone_color: "{{first}}"
+        last_stone_color: "{{last}}"
+    pattern_classifier:
+      - id: pattern_full_spectrum
+        when: "count(distinct color in [red,blue,gray,yellow,black]) >= 5"
+        diversity_label_ko: "다섯 감정을 모두 가지고 간다"
+        carry_to_scene5: { first_stone_emotion: "{{first_emotion}}" }
+        carry_to_scene6: { stone_diversity: full }
+      - id: pattern_high_diversity
+        when: "count(distinct color in [red,blue,gray,yellow,black]) == 4"
+        diversity_label_ko: "네 감정과 함께 간다"
+        carry_to_scene5: { first_stone_emotion: "{{first_emotion}}" }
+        carry_to_scene6: { stone_diversity: high }
+      - id: pattern_focused_emotion
+        when: "max(color_count) >= 3"
+        diversity_label_ko: "한 감정이 무겁다 — 그것도 다윗의 자리"
+        carry_to_scene5: { first_stone_emotion: "{{first_emotion}}" }
+        carry_to_scene6: { stone_diversity: focused }
+        safety_note: "R3 — '집중'을 '편향'으로 비난하지 않음"
+      - id: pattern_neutral_heavy
+        when: "count(color == neutral) >= 3"
+        diversity_label_ko: "감정에 이름을 붙이지 않는 것도 자유"
+        carry_to_scene5: { first_stone_emotion: null }
+        carry_to_scene6: { stone_diversity: unmapped }
+        safety_note: "R3·R5 — 감정 라벨링 강제 금지"
+      - id: pattern_balanced
+        when: "max(color_count) <= 2 AND count(distinct color) >= 3"
+        diversity_label_ko: "여러 감정이 함께 있다"
+        carry_to_scene5: { first_stone_emotion: "{{first_emotion}}" }
+        carry_to_scene6: { stone_diversity: balanced }
+
+safety_gates:
+  - id: R3_no_diversity_pressure
+    enforced_at: br_s4_five_stones_pattern
+    description: "5 색을 다 골라야 한다는 압박 없음 — 같은 색 반복도, 중립 회색만 5 개도 정당"
+  - id: R3_four_of_five_acceptable
+    enforced_at: ix_s4_pick_and_pocket_stones
+    description: "오늘 한 돌만 주머니에 넣어도 충분합니다 — 4/5 도 진행 가능, 40초 후 안내 노출"
+  - id: R3_replace_freely_no_count_penalty
+    enforced_at: ix_s4_pick_and_pocket_stones
+    description: "돌 번복 횟수 사용자에게 비노출 — 결정의 무게가 압박으로 변하지 않게"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    keyword_mapping:
+      - keyword_ko: "내가 사라지면"
+        severity: HIGH
+        match_type: intent_semantic
+      - keyword_ko: "나는 너무 작다"
+        severity: MEDIUM
+        match_type: literal_with_reframe
+    reframe_on_medium_ko: "이 게임은 작은 자를 위한 이야기입니다."
+    note_ko: "Scene 4 의 돌 선택 단계에서 음성 입력 기능 활성 시 적용"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: david_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D3
+    source: "Affect Labeling — Lieberman M.D. et al. 2007, Psychological Science"
+    note: "돌에 감정 이름을 붙이는 행위 자체가 fMRI 상 amygdala 활성 ↓ 으로 확인된 치료 메커니즘. '감정을 부르는 것이 감정을 다스리는 시작'"
+    anchor_block: nb_s4_stone_red_label
+  - scripture_refs:
+      - ref: "사무엘상 17:40"
+        translation: krv
+        anchor_block: nb_s4_scripture_caption
+      - ref: "잠언 4:23"
+        translation: krv
+        note_ko: "마음을 지키라 — TRACK-A-6 연결. 5 감정을 주머니에 넣는다 = 경계 형성. 감정에 휘둘림 vs 감정을 가짐의 분별"
+        anchor_block: nb_s4_complete_inner
+      - ref: "잠언 29:25"
+        translation: krv
+        note_ko: "두려움 돌 (검정) 메커니즘 보조 — 사람을 두려워하면 올무에 걸리게 되거니와"
+        anchor_block: nb_s4_stone_black_label
+  - disputed_points:
+      - "5 라는 숫자의 의미 — 완전수 해석 vs 단순 실용적 비축 해석"
+    handling: "후자 (실용) 톤이 기본 — 과도한 상징주의 차단"
+  - day30_report_mapping:
+      table: v_user_30d_summary
+      metric: emotion_diversity_index
+      derived_from: color_distribution + stone_selection_order
+      doc_ref: "MVP-DAVID-CONTENT.md §4.4, §10 (R1 시뮬레이션)"

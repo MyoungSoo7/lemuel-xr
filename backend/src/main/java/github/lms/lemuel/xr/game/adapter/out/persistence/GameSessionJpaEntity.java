@@ -24,8 +24,14 @@ public class GameSessionJpaEntity {
     @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "app_session_id")
+    private UUID appSessionId;
+
     @Column(nullable = false, length = 20)
     private String character;
+
+    @Column(name = "chosen_dimension", length = 20)
+    private String chosenDimension;
 
     @Column(name = "started_at", nullable = false)
     private LocalDateTime startedAt;
@@ -33,10 +39,35 @@ public class GameSessionJpaEntity {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Column(name = "abandoned_at")
+    private LocalDateTime abandonedAt;
+
+    @Column(name = "triggered_by_emotion_log_id")
+    private Long triggeredByEmotionLogId;
+
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "decisions", columnDefinition = "jsonb")
     private Map<String, Object> decisions = new HashMap<>();
 
     @Column(name = "final_outcome", length = 50)
     private String finalOutcome;
+
+    @Column(name = "closing_message", columnDefinition = "text")
+    private String closingMessage;
+
+    @Column(name = "scene_count_completed")
+    private Short sceneCountCompleted = 0;
+
+    @Column(name = "duration_seconds")
+    private Integer durationSeconds;
+
+    @Column(name = "device_type", length = 30)
+    private String deviceType;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "capabilities", columnDefinition = "jsonb")
+    private Map<String, Object> capabilities;
+
+    @Column(name = "assets_manifest_version", length = 20)
+    private String assetsManifestVersion;
 }

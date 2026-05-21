@@ -1,36 +1,134 @@
 spring:
   application:
     name: lemuel-xr-backend
+
+  # === UTF-8 일관성 강제 (Spring HTTP) ===
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/lemuel_xr}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/lemuel_xr?charSet=UTF8&characterEncoding=UTF-8}
     username: ${SPRING_DATASOURCE_USERNAME:xr}
     password: ${SPRING_DATASOURCE_PASSWORD:xr1234}
+    hikari:
+      connection-init-sql: "SET client_encoding = 'UTF8'"
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: validate    # Flyway 가 진실. JPA 는 검증만.
     properties:
       hibernate:
         default_schema: public
         format_sql: false
+        connection:
+          characterEncoding: UTF-8
+          useUnicode: true
+        jdbc:
+          time_zone: UTC
+
   flyway:
     enabled: true
     locations: classpath:db/migration
+    encoding: UTF-8
+    # 기존 DB에 schema history 가 없으면 baseline 으로 시작 (initial 마이그레이션 X 처리)
+    baseline-on-migrate: true
+    baseline-version: 0
+    # 운영 환경에서 실수 방지 — out-of-order 차단
+    out-of-order: false
+
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: UTC
+
+# === AI 사이드카 (Python FastAPI + LangChain) ===
 ai:
   base-url: ${AI_BASE_URL:http://localhost:8000}
+  timeout-ms: 30000
+  internal-token: ${AI_INTERNAL_TOKEN:dev-internal-token-rotate-in-prod}
+  provider-priority:
+    classify_emotion: [openai_gpt4o_mini, anthropic_claude3_haiku]
+    polish_psalm: [anthropic_claude35_sonnet, openai_gpt4o]
+    game_branch: [openai_gpt4o_mini, anthropic_claude3_haiku]
+    weekly_report: [anthropic_claude35_sonnet, openai_gpt4o]
+    diary_meditation: [anthropic_claude35_sonnet, openai_gpt4o]
 
+# === TTS 사이드카 (Coqui XTTS-v2, self-hosted) ===
 tts:
   base-url: ${TTS_BASE_URL:http://localhost:5002}
   cache-ttl-seconds: 86400
+  storage:
+    bucket: ${TTS_BUCKET:lemuel-xr-tts}
+    public-base-url: ${TTS_PUBLIC_URL:https://r2.lemuel.co.kr/tts}
 
+# === 인증 (게스트 JWT) ===
+security:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-min-32-chars-rotate-in-prod-please-use-sops-encrypted-value}
+    expiry-days: 30
+    issuer: lemuel-xr
+  internal:
+    token: ${INTERNAL_TOKEN:dev-internal-svc-token-rotate-in-prod}
+  rate-limit:
+    enabled: true
+    default-per-minute: 60
+    classify-per-minute: 20
+    llm-realtime-per-minute: 30
+    tts-miss-per-minute: 10
+
+# === 정신건강 안전선 (5개) ===
+safety:
+  crisis-keywords-regex: ${SAFETY_CRISIS_REGEX:(자살|자해|죽고\s?싶|죽어\s?버|뛰어내리)}
+  alert-severity-threshold: medium   # 이 이상이면 사용자에게 위기 자원 표시
+  show-disclaimer-on-first-entry: true
+
+# === Telegram ChatOps 알람 ===
+chatops:
+  telegram:
+    enabled: ${CHATOPS_TELEGRAM_ENABLED:false}
+    bot-token: ${CHATOPS_TELEGRAM_BOT_TOKEN:}
+    chat-id: ${CHATOPS_TELEGRAM_CHAT_ID:}
+    base-url: https://api.telegram.org
+
+# === XR 자산 ===
+asset:
+  manifest:
+    cdn-base-url: ${ASSET_CDN:https://r2.lemuel.co.kr/assets}
+
+# === Actuator (운영 모니터링) ===
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       probes:
         enabled: true
+    info:
+      enabled: true
 
+# === Server ===
 server:
   port: ${SERVER_PORT:8080}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  tomcat:
+    uri-encoding: UTF-8
+
+# === 로깅 ===
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

@@ -1,0 +1,33 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 5,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_meditation_dark_fog", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/env_meditation_dark_fog.glb", "size_bytes": 2560000, "lod": "lod3_volumetric_lite"}
+    ],
+    "audio": [
+      {"id": "aud_s5_gen45_5_ko_softvoice", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s5_gen45_5_ko_soft.wav", "size_bytes": 880000, "voice_id": "joseph_v1_soft", "duration_ms": 10000},
+      {"id": "amb_deep_drone_60hz", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/amb_deep_drone_60hz.ogg", "size_bytes": 640000, "voice_id": null, "duration_ms": 30000},
+      {"id": "aud_s5_recovery_pack_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s5_recovery_pack_30entries_ko.tar", "size_bytes": 5440000, "voice_id": "joseph_v1_soft", "duration_ms": 360000, "note": "30 = 10 emotions x 3 faith_tones"}
+    ],
+    "textures": [
+      {"id": "tex_fog_volumetric_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/fog_volumetric_atlas_512.ktx2", "size_bytes": 560000, "format": "ktx2", "resolution": "512x512"}
+    ],
+    "scripts": [
+      {"id": "script_scene5_recovery_match", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/scripts/Scene5RecoveryMatch.cs.bundle", "size_bytes": 16000, "entry_class": "Scene5RecoveryMatch"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10096000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

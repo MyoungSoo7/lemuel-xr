@@ -1,0 +1,191 @@
+# Scene 3 — 흉년기, 분배 결정 (게임의 중심, 2분 30초)
+# 60명 NPC (LOD 4단), Scene 2 의 save_ratio 에 따라 bags_remaining 6~14 가변.
+
+scene_id: joseph_scene3
+scene_name: distribution_decision
+mission_id: joseph
+version: 1.0.0
+duration_seconds_target: 150
+
+environment:
+  space_id: dry_desert_with_distant_granaries
+  background_model: env_desert_horizon_granaries
+  lighting:
+    type: harsh_sun_high_noon
+    color_temperature_kelvin: 6500
+    shadow_intensity: 0.85
+  ambient_sound:
+    - id: dry_desert_wind
+      gain_db: -12
+      spatial: true
+    - id: silence_pressure_layer
+      gain_db: -30
+      spatial: false
+  shader_features:
+    - npc_lod_4_imposter_far
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene3_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "이 묵상은 자발적 결정의 무게를 다룹니다. 가정폭력·종교적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 위기 시 1577-0199 / 1393"
+
+npcs:
+  - id: line_A_farmers
+    voice_id: crowd_silent
+    count: 24
+    formation: queue
+    formation_origin: [-2.5, 1.65, 4.0]
+    identity_ko: "이집트 농민"
+    initial_animation: queue_idle_tired
+    front_npc_gaze_target: user_head
+    visual_traits: [sunburnt, family_with_children, empty_sack_in_hand]
+  - id: line_B_immigrants
+    voice_id: crowd_silent
+    count: 18
+    formation: queue
+    formation_origin: [0.0, 1.65, 4.0]
+    identity_ko: "이주민 가족 (야곱의 가문 포함 — 사용자에게 미공개)"
+    initial_animation: queue_idle_tired
+    front_npc_gaze_target: user_head
+    visual_traits: [travelers_dust, six_young_children, mother_holding_child]
+    micro_event:
+      id: immigrant_child_waves
+      trigger: user_gaze_dwell_500ms
+      animation: child_waves_then_outline_0_3s
+      design_intent: "감정 압박이 아니라 정보 (R3)"
+  - id: line_C_merchants
+    voice_id: crowd_silent
+    count: 14
+    formation: queue
+    formation_origin: [2.5, 1.65, 4.0]
+    identity_ko: "무역 상인 (대가 지불 가능)"
+    initial_animation: queue_idle_composed
+    front_npc_gaze_target: user_head
+    visual_traits: [silk_garments, gold_ornaments, full_pouch]
+  - id: joseph_inner
+    voice_id: joseph_v1
+    position: null
+    initial_animation: null
+
+narration_blocks:
+  - id: nb_s3_intro
+    speaker: joseph_inner
+    text_ko: "흉년이 시작되었다. 7년… 기근의 첫째 날부터 줄이 늘어선다."
+    audio_clip_id: aud_s3_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_lines_fade_in
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 15.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+  - id: nb_s3_ui_instruction
+    speaker: ui_caption
+    text_ko: "남은 곡식 {{bags_remaining}} 자루. 자루를 줄에 놓아주세요."
+    audio_clip_id: aud_s3_instruction_ko
+    start_at_seconds: 30.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+  - id: nb_s3_merchant_only_confirm
+    speaker: ui_prompt
+    text_ko: "확인할까요?"
+    audio_clip_id: aud_s3_confirm_prompt_ko
+    start_at_seconds: 0.0
+    duration_seconds: 4.0
+    hidden_until_event: about_to_place_last_bag_all_merchants_so_far
+
+interactions:
+  - id: ix_s3_place_bag_in_line
+    type: grab
+    target_assets: [model_grain_bag_generic, zone_line_A, zone_line_B, zone_line_C]
+    gesture: grip_then_release_in_zone
+    haptic:
+      intensity: 0.35
+      duration_ms: 60
+      on_hold_pulse: true
+      on_hesitation_pulse_low: true
+    validation_rules:
+      - rule: one_bag_at_a_time
+      - rule: target_must_be_one_of_lines
+        valid_targets: [line_A_farmers, line_B_immigrants, line_C_merchants]
+      - rule: on_release_in_zone
+        emit_event: bag_placed_{line_id}
+        effect: front_npcs_bow_animation
+      - rule: refill_from_granary
+        trigger: hands_empty
+        action: fade_in_new_bag_from_granary
+      - rule: track_micro_signals
+        records: [hesitation_seconds, gaze_distribution, bag_pickup_count, time_per_bag]
+      - rule: protective_confirm
+        condition: "all_previous_bags_placed_in_line_C_merchants AND remaining_bags == 1"
+        action: show_prompt_once
+        prompt_block: nb_s3_merchant_only_confirm
+
+branches:
+  - id: br_s3_distribution_pattern
+    triggered_by_event: all_bags_placed
+    decision_key: distribution
+    backend_endpoint: "POST /api/game/joseph/scene/3/distribute"
+    body_template:
+      distribution:
+        farmer: "{{count_in_line_A}}"
+        immigrant: "{{count_in_line_B}}"
+        merchant: "{{count_in_line_C}}"
+    pattern_classifier:
+      - id: pattern_farmer_primary
+        when: "line_A / total >= 0.60"
+        ending_tone_label_ko: "이집트가 살았다. 백성이 너를 기억할 것이다."
+        carry_to_scene4: { ending_tone: farmer_primary }
+      - id: pattern_immigrant_primary
+        when: "line_B / total >= 0.60"
+        ending_tone_label_ko: "야곱의 가문이 너를 통해 살았다. 형제가 너를 다시 만나러 올 것이다."
+        carry_to_scene4: { ending_tone: immigrant_primary }
+      - id: pattern_merchant_primary
+        when: "line_C / total >= 0.60"
+        ending_tone_label_ko: "재정은 견고해졌으나 굶는 자들의 원망이 쌓였다. 다시 선택할 기회가 있다."
+        carry_to_scene4: { ending_tone: merchant_primary }
+        safety_note: "R3 회복 압박 회피 — '틀렸다' 가 아니라 '다시 선택할 기회'"
+      - id: pattern_balanced
+        when: "max(line_A, line_B, line_C) / total < 0.60"
+        ending_tone_label_ko: "세 길이 함께 살았다. 어느 누구도 망하지 않았다."
+        carry_to_scene4: { ending_tone: balanced }
+
+safety_gates:
+  - id: R2_suffering_not_endurance_gaslight
+    enforced_at: scene_enter
+    description: "Scene 3 진입 시 우상단 footer 영구 노출 — '견디라는 강요가 아니다'"
+    overlay_ref: scene3_r2_footer
+  - id: R3_no_wrong_answer_for_merchant_primary
+    enforced_at: pattern_classify
+    description: "상인 우선도 '틀렸다' 가 아니라 '다시 선택할 기회'"
+  - id: R3_child_waves_as_info_not_pressure
+    enforced_at: micro_event_design
+    description: "이주민 줄 어린아이의 손 흔듦은 강조 outline 0.3초 — 정보 전달, 감정 압박 금지"
+  - id: protective_confirm_for_all_merchant
+    enforced_at: ix_validation
+    description: "모든 자루를 상인 줄에만 놓는 경우 마지막 자루 직전 1회 확인 (강요 아닌 안내)"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: joseph_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J1
+    source: "박영원 2015, 요셉 내러티브와 섭리"
+    note: "섭리는 자유의지를 제거하지 않는다 — 단일 정답 차단 근거"
+    anchor_block: nb_s3_intro
+  - disputed_points:
+      - "farmer_primary 가 가장 옳다 식의 단일 정답 차단"
+      - free_will_vs_predestination
+    handling: "패턴 4종 모두 정당"

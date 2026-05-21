@@ -1,0 +1,252 @@
+# Scene 5 — 던지기 (90초, 속도 vs 무게 신학)
+# Sling 양손 회전 → 던지기. 실패 재시도 무제한, 카운트 미노출 (R3).
+# D1 (장석정 2022, 신학논단 제109호 pp.109~135) 직접 인용 — '믿음 + 능력' 의 균형.
+
+scene_id: david_scene5
+scene_name: sling_throw
+mission_id: david
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: elah_valley_plain_one_step_closer
+  background_model: env_elah_plain_3m_closer_to_goliath
+  lighting:
+    type: harsh_midday_sun
+    color_temperature_kelvin: 6300
+    shadow_intensity: 0.85
+  ambient_sound:
+    - id: both_armies_silence_pressure
+      gain_db: -30
+      spatial: false
+    - id: heartbeat_75bpm_steady
+      gain_db: -20
+      spatial: false
+    - id: goliath_third_shout
+      gain_db: -16
+      spatial: true
+      panning: front_distant
+  shader_features:
+    - sling_two_handed_physics_grab
+    - stone_in_sling_color_preserved_from_scene4
+  user_position: [0.0, 1.10, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  goliath_distance_meters: 12.0
+  note: "Scene 3 보다 3m 더 가까운 시점 — 사용자가 한 걸음 디뎠음의 시각화"
+
+npcs:
+  - id: goliath
+    voice_id: goliath_v1
+    voice_intensity: inherits_from_scene3
+    position: [0.0, 3.0, 12.0]
+    initial_animation: third_shout_arms_extended
+  - id: israelite_army_back
+    voice_id: crowd_silent
+    count: 40
+    formation: dispersed_behind_user
+    formation_origin: [0.0, 1.65, -3.0]
+    initial_animation: silent_watching
+  - id: david_self
+    voice_id: david_v1
+    position: [0.0, 1.10, 0.0]
+    note: "사용자가 다윗 — first-person"
+
+narration_blocks:
+  - id: nb_s5_goliath_third_shout
+    speaker: goliath
+    text_ko: "네가 나를 개로 여기고 막대기를 가지고 내게 나아왔느냐… 네 살을 공중의 새와 들짐승에게 주리라. (삼상 17:43~44)"
+    audio_clip_id: aud_s5_goliath_third_shout_ko_strong
+    audio_clip_id_low: aud_s5_goliath_third_shout_ko_low
+    audio_clip_id_off: null
+    start_at_seconds: 0.0
+    duration_seconds: 15.0
+    hidden_until_event: null
+    intensity_aware: true
+  - id: nb_s5_hand_tremor
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 15.0
+    duration_seconds: 0.6
+    haptic_event: { intensity: 0.55, duration_ms: 600 }
+    camera_shake_low: { amplitude: 0.5, on_intensity_off: false }
+    intensity_aware: true
+  - id: nb_s5_david_inner_first_stone_fear
+    speaker: david_inner
+    text_ko: "두려움이 첫 돌이라면 그것이 먼저 던져진다. 두려움을 부정하지 않고 함께 간다."
+    audio_clip_id: aud_s5_inner_first_fear_ko
+    start_at_seconds: 18.0
+    duration_seconds: 9.0
+    hidden_until_event: "first_stone_emotion:fear"
+  - id: nb_s5_david_inner_first_stone_anger
+    speaker: david_inner
+    text_ko: "형들의 멸시가 나를 여기까지 끌고 왔다. 분노가 첫 돌이라면 그 분노가 거인을 향한다."
+    audio_clip_id: aud_s5_inner_first_anger_ko
+    start_at_seconds: 18.0
+    duration_seconds: 10.0
+    hidden_until_event: "first_stone_emotion:anger"
+  - id: nb_s5_david_inner_first_stone_sadness
+    speaker: david_inner
+    text_ko: "광야의 밤이 나에게 가르친 것이 있다. 슬픔도 던질 줄 안다."
+    audio_clip_id: aud_s5_inner_first_sadness_ko
+    start_at_seconds: 18.0
+    duration_seconds: 9.0
+    hidden_until_event: "first_stone_emotion:sadness"
+  - id: nb_s5_david_inner_first_stone_loneliness
+    speaker: david_inner
+    text_ko: "잊혀진 자가 일어선다. 외로움이 첫 돌이라면 그 외로움이 거인을 본다."
+    audio_clip_id: aud_s5_inner_first_loneliness_ko
+    start_at_seconds: 18.0
+    duration_seconds: 10.0
+    hidden_until_event: "first_stone_emotion:loneliness"
+  - id: nb_s5_david_inner_first_stone_hope
+    speaker: david_inner
+    text_ko: "수금이 가르친 것이 있다. 희망이 첫 돌이라면 그 희망이 사슴 발 같이 빠르다."
+    audio_clip_id: aud_s5_inner_first_hope_ko
+    start_at_seconds: 18.0
+    duration_seconds: 10.0
+    hidden_until_event: "first_stone_emotion:hope"
+  - id: nb_s5_david_inner_first_stone_unmapped
+    speaker: david_inner
+    text_ko: "이름 붙이지 않은 돌이 먼저 던져진다. 모든 감정을 다 말로 풀어야 일어설 수 있는 것은 아니다."
+    audio_clip_id: aud_s5_inner_first_unmapped_ko
+    start_at_seconds: 18.0
+    duration_seconds: 10.0
+    hidden_until_event: "first_stone_emotion:null"
+  - id: nb_s5_scripture_caption
+    speaker: scripture_caption
+    text_ko: "너는 칼과 창과 단창으로 내게 나아오거니와 나는 만군의 여호와의 이름으로 네게 나아가노라. (삼상 17:45)"
+    audio_clip_id: aud_s5_scripture_caption_ko
+    start_at_seconds: 30.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s5_giant_falls_slow
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 65.0
+    duration_seconds: 5.0
+    presentation: slow_motion_1_5x_camera_follows_stone
+    note: "돌 명중 → 1초 침묵 → 거인이 천천히 무너짐 (3초 슬로 모션 — 충격이 아닌 해방으로 연출)"
+    hidden_until_event: throw_success
+  - id: nb_s5_d1_quote_footer
+    speaker: theology_footer
+    text_ko: "다윗의 승리는 '여호와의 권능' 단일 개념이 아니라 '속도'라는 구체적 개념성으로도 읽힌다. 무거운 무기의 골리앗 vs 빠른 다윗 — 종교적 믿음만이 아닌 인간의 능력도 함께 필요하다는 메시지. — 장석정 (2022). 다윗과 골리앗 이야기 다시 보기 — 개념성을 중심으로. 신학논단 제109호, pp.109~135."
+    audio_clip_id: null
+    start_at_seconds: 78.0
+    duration_seconds: 9.0
+    presentation: bottom_fade_in_3s
+    hidden_until_event: throw_success_or_assist_success
+  - id: nb_s5_assist_prompt
+    speaker: ui_prompt
+    text_ko: "손으로 부드럽게 놓아도 골리앗에 닿게 도와드릴까요? [예 / 계속 시도]"
+    audio_clip_id: aud_s5_assist_prompt_ko
+    start_at_seconds: 0.0
+    duration_seconds: 5.0
+    hidden_until_event: throw_attempt_5_or_more
+
+interactions:
+  - id: ix_s5_sling_two_handed_throw
+    type: two_handed_grab_then_throw
+    target_assets: [model_sling, model_stone_from_pocket_first]
+    presentation:
+      sling_appears_at_seconds: 30.0
+      stone_loads_into_sling_automatic: true
+      stone_color_from_first_stone: true
+    gesture:
+      load: open_pocket_grab_first_stone_place_in_sling
+      rotate: two_handed_circular_motion
+      release: release_one_hand_at_rotation_apex
+    haptic:
+      intensity_proportional_to_rotation_speed: true
+      max_intensity: 0.7
+      duration_ms_per_rotation: 60
+    throw_distance_meters: 3.0
+    throw_distance_meters_small_room: 2.0
+    auto_aim_assist_on_release: true
+    validation_rules:
+      - rule: unlimited_retries
+        description: "회전 너무 약하면 재시도 무제한 — 실패 압박 차단"
+      - rule: failure_count_hidden
+        description: "실패 카운트 사용자에게 노출 안 함 (R3)"
+        backend_records_only: true
+      - rule: assist_offer_after_5_attempts
+        threshold_attempts: 5
+        on_threshold: show_prompt_once_nb_s5_assist_prompt
+        on_assist_yes: enable_gentle_release_auto_curve_to_target
+        on_assist_no: continue_unlimited_retries
+        design_intent: "결과가 능력 시험이 아닌 의식임을 명문화"
+      - rule: track_micro_signals
+        records:
+          - sling_rotation_count
+          - throw_velocity
+          - throw_attempts_total
+          - hit_outcome
+          - assist_used
+          - haptic_level_at_time_of_throw
+
+branches:
+  - id: br_s5_throw_outcome
+    triggered_by_event: [throw_success, throw_success_with_assist]
+    decision_key: throw_outcome
+    backend_endpoint: "POST /api/game/david/scene/5/throw"
+    body_template:
+      sling_rotation_count: "{{count}}"
+      throw_velocity: "{{velocity}}"
+      hit: true
+      assist_used: "{{bool}}"
+      throw_attempts_total: "{{attempts}}"
+      haptic_level: "{{level}}"
+    routes:
+      - when: { assist_used: false }
+        carry_to_scene6: { throw_mode: own_force }
+      - when: { assist_used: true }
+        carry_to_scene6: { throw_mode: assisted }
+        note_ko: "어시스트 사용도 정당한 통과 — Scene 6 회복 문구에 영향 없음"
+
+safety_gates:
+  - id: R3_no_failure_count_displayed
+    enforced_at: ix_s5_sling_two_handed_throw
+    description: "Sling 회전 실패 카운트 노출 안 함, 재시도 무제한"
+  - id: R3_assist_path_after_5
+    enforced_at: ix_s5_sling_two_handed_throw
+    description: "5회 실패 후 어시스트 옵션 — 결과가 능력 시험이 아닌 의식"
+  - id: R4_intensity_inherits_from_scene3
+    enforced_at: scene_enter
+    description: "Scene 3 에서 선택한 골리앗 음성 강도 (off/약/강) 가 Scene 5 에도 그대로 적용 — 재선택 강요 없음"
+  - id: R4_camera_shake_optional
+    enforced_at: nb_s5_hand_tremor
+    description: "화면 살짝 흔들림은 강도 토글 off 시 비활성 — 트라우마 사용자 보호"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: david_scene6
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D1
+    source: "장석정 (2022). 다윗과 골리앗 이야기 다시 보기 — 개념성을 중심으로. 신학논단 제109호, pp.109~135."
+    raw_text_ko: "다윗의 승리는 '여호와의 권능' 단일 개념이 아니라 '속도'라는 구체적 개념성으로도 읽힌다. 무거운 무기의 골리앗 vs 빠른 다윗 — 종교적 믿음만이 아닌 인간의 능력도 함께 필요하다는 메시지."
+    note_ko: "본 인용은 '믿음으로 다 맡기고 가만히 있으라' 식 수동성 미화를 차단하는 신학적 기둥. '믿음 + 능력' 이 적대가 아닌 짝이라는 D1 의 통찰을 사용자 안에 명문화."
+    anchor_block: nb_s5_d1_quote_footer
+  - citation_id: D3
+    source: "Embodied Cognition (Lakoff & Johnson 1999) — 몸 전체로 결단을 만드는 행위"
+    note: "양손 sling 회전은 '머리의 결심'이 아니라 '근육의 결단' — intention-behavior gap 감소"
+    anchor_block: ix_s5_sling_two_handed_throw
+  - scripture_refs:
+      - ref: "사무엘상 17:43~44"
+        translation: krv
+        anchor_block: nb_s5_goliath_third_shout
+      - ref: "사무엘상 17:45"
+        translation: krv
+        anchor_block: nb_s5_scripture_caption
+  - disputed_points:
+      - "밧세바 사건 후 시 51 회개 본문 — MVP 범위 밖 (Phase 2 로 이월, MVP-DAVID.md 와 일관). 본 미션은 17 장 골리앗 사건만 다룸 — 영웅 다윗 / 죄인 다윗 두 측면 중 전자만 명시 (디스클레이머)."
+    handling: "MVP 범위 밖 (disputed_scope) 으로 표시 — Phase 2 별도 미션"
+  - r3_recovery_pressure_disclaimer:
+      ko: "'너도 골리앗을 이길 수 있다' 류 압박 톤 차단. '오늘 한 돌만 주머니에 넣어도 충분합니다'가 본 게임의 기본 메시지."

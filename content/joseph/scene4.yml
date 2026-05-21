@@ -1,0 +1,187 @@
+# Scene 4 — 형제와 재회 (1분 30초)
+# Scene 1 과 같은 알현실 (수미상관). Scene 3 의 ending_tone 에 따라 첫 줄 분기.
+
+scene_id: joseph_scene4
+scene_name: brothers_reunion
+mission_id: joseph
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: egypt_throne_room_later
+  background_model: env_throne_room_night
+  lighting:
+    type: warm_torches
+    color_temperature_kelvin: 2700
+    torch_count: 4
+    note: "Scene 1 과 동일 — 시간 흐름은 의상으로만 표시"
+  ambient_sound:
+    - id: low_breath_layer
+      gain_db: -22
+      spatial: true
+    - id: benjamin_quiet_sob_loop
+      gain_db: -20
+      spatial: true
+      panning: front_low
+    - id: torch_crackle_lr_pan
+      gain_db: -22
+      spatial: true
+  user_position: [1.2, 1.65, 0.0]
+  user_facing: [-0.3, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: joseph_self
+    voice_id: joseph_v1
+    position: [1.2, 1.65, 0.0]
+    initial_animation: standing_beside_throne
+    visual_traits: [ornate_egyptian_garment, egyptian_headdress]
+    note: "사용자가 요셉 — first-person, 그러나 음성은 외부화"
+  - id: brother_reuben
+    voice_id: silent
+    position: [-0.6, 1.0, 3.0]
+    initial_animation: prostrate
+  - id: brother_judah
+    voice_id: silent
+    position: [-0.2, 1.0, 3.0]
+    initial_animation: prostrate
+  - id: brother_benjamin
+    voice_id: silent
+    position: [0.0, 1.0, 2.8]
+    initial_animation: prostrate_quiet_sob
+    micro_animation: shoulder_tremor_loop
+  - id: brothers_8_others
+    voice_id: silent
+    count: 8
+    formation: arc_behind
+    formation_origin: [0.2, 1.0, 3.4]
+    initial_animation: prostrate
+
+narration_blocks:
+  - id: nb_s4_first_line_farmer_primary
+    speaker: joseph_self
+    text_ko: "형제들이여… 너희가 누구인지 안다. 내가 백성을 살리는 동안, 나는 형제들도 잊지 않았다."
+    audio_clip_id: aud_s4_first_farmer_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: "ending_tone:farmer_primary"
+  - id: nb_s4_first_line_immigrant_primary
+    speaker: joseph_self
+    text_ko: "형제들이여… 너희를 보았을 때 알아보았다. 너희가 굶주린 어머니와 아이들 곁에 있었기에."
+    audio_clip_id: aud_s4_first_immigrant_ko
+    start_at_seconds: 0.0
+    duration_seconds: 13.0
+    hidden_until_event: "ending_tone:immigrant_primary"
+  - id: nb_s4_first_line_merchant_primary
+    speaker: joseph_self
+    text_ko: "형제들이여… 너희가 굶주리고 있구나. 오늘 곡식을 내 줄 수는 있다. 그러나 원망의 줄이 길어졌음을 안다."
+    audio_clip_id: aud_s4_first_merchant_ko
+    start_at_seconds: 0.0
+    duration_seconds: 14.0
+    hidden_until_event: "ending_tone:merchant_primary"
+  - id: nb_s4_first_line_balanced
+    speaker: joseph_self
+    text_ko: "형제들이여… 너희도, 이집트도, 이주민도, 함께 살았다."
+    audio_clip_id: aud_s4_first_balanced_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: "ending_tone:balanced"
+  - id: nb_s4_common_gen_45_5
+    speaker: joseph_self
+    text_ko: "하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니 (창 45:5)"
+    audio_clip_id: aud_s4_common_gen45_5_ko
+    start_at_seconds: 16.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s4_choice_prompt
+    speaker: ui_caption
+    text_ko: "이제 무엇을 하시겠어요?"
+    audio_clip_id: null
+    start_at_seconds: 60.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s4_choose_response
+    type: pinch
+    target_assets: [ui_option_A_reveal, ui_option_B_test, ui_option_C_silence]
+    presentation:
+      layout: floating_arc_in_air
+      reveal_at_seconds: 60.0
+      reveal_seconds: 1.5
+    options:
+      - id: A
+        label_ko: "자신을 즉시 밝힘 — '나는 요셉이라'"
+        gesture: pinch_or_grip
+        emit_event: choice_made_reveal
+      - id: B
+        label_ko: "베냐민을 데려오라 — 조금 더 시험"
+        gesture: pinch_or_grip
+        emit_event: choice_made_test
+      - id: C
+        label_ko: "침묵을 택함 — 10초 동안 말 없이 형들을 바라봄"
+        gesture: gaze_dwell_10s_no_other_input
+        emit_event: choice_made_silence
+        notes_ko: "욥 2:13 의 침묵 정당성 인정"
+    validation_rules:
+      - rule: r4_trigger_consent_before_scene
+        action: show_prompt_once_before_scene_enter
+        prompt_ko: "가족 재회 장면이 시작됩니다. 계속할까요? [예 / 건너뛰기]"
+        on_skip: jump_to_scene5_recovery_only
+
+branches:
+  - id: br_s4_choice
+    triggered_by_event: [choice_made_reveal, choice_made_test, choice_made_silence]
+    decision_key: choice
+    backend_endpoint: "POST /api/game/joseph/scene/4/respond"
+    body_template:
+      choice: "{{choice_id}}"
+    routes:
+      - when: { choice: reveal }
+        post_narration_generator: llm_cached
+        cache_key: "joseph:s4:reveal:{{ending_tone}}"
+        carry_to_scene5: { closure_tone: revealed }
+      - when: { choice: test }
+        post_narration_generator: llm_cached
+        cache_key: "joseph:s4:test:{{ending_tone}}"
+        carry_to_scene5: { closure_tone: tested_further }
+      - when: { choice: silence }
+        post_narration_generator: llm_cached
+        cache_key: "joseph:s4:silence:{{ending_tone}}"
+        carry_to_scene5: { closure_tone: silent_witness }
+
+safety_gates:
+  - id: R4_pre_scene4_trauma_consent
+    enforced_at: before_scene_enter
+    description: "가족 재회 트리거 가능 — 1회 추가 prompt, 건너뛰기 시 Scene 5 의 회복 문구만"
+  - id: R3_merchant_ending_recovery_balance
+    enforced_at: nb_s4_first_line_merchant_primary
+    description: "'원망이 쌓였음' 직후 '오늘 곡식을 줄 수는 있다' 로 복구 가능성 균형"
+  - id: silence_as_valid_response
+    enforced_at: ix_s4_choose_response
+    description: "침묵 (욥 2:13) 정당한 반응 — TRACK-A-5 욥기 연결"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: joseph_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J1
+    source: "박영원 2015 — '인간 죄악을 궁극의 선으로 인도'"
+    anchor_block: nb_s4_common_gen_45_5
+  - disputed_points:
+      - "창 45:5 '하나님이 보내셨다' — 섭리의 가장 강한 본문, 다중 입장 명시"
+      - free_will_vs_predestination
+    handling: "단일 입장 채택 없음"
+  - scripture_refs:
+      - ref: "창세기 45:5"
+        translation: krv
+        anchor_block: nb_s4_common_gen_45_5
+      - ref: "욥기 2:13"
+        translation: krv
+        anchor_block: ix_s4_choose_response.options.C

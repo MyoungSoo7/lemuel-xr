@@ -1,0 +1,133 @@
+# Scene 1 — 파라오의 꿈
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+
+scene_id: joseph_scene1
+scene_name: pharaoh_dream
+mission_id: joseph
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: egypt_throne_room_night
+  background_model: env_throne_room_night
+  lighting:
+    type: warm_torches
+    color_temperature_kelvin: 2700
+    torch_count: 4
+    ceiling_hieroglyph_emphasis: true
+  ambient_sound:
+    - id: nile_distant_loop
+      gain_db: -18
+      spatial: true
+    - id: torch_crackle_lr_pan
+      gain_db: -22
+      spatial: true
+    - id: low_organ_drone
+      gain_db: -24
+      spatial: false
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: pharaoh
+    voice_id: pharaoh_v1
+    position: [0.0, 1.2, 4.0]
+    initial_animation: seated_on_throne_idle
+    gaze_target: user_head
+  - id: courtier_1
+    voice_id: silent
+    position: [-1.8, 1.7, 3.6]
+    initial_animation: silent_attendant
+  - id: courtier_2
+    voice_id: silent
+    position: [-1.0, 1.7, 3.4]
+    initial_animation: silent_attendant
+  - id: courtier_3
+    voice_id: silent
+    position: [1.0, 1.7, 3.4]
+    initial_animation: silent_attendant
+  - id: courtier_4
+    voice_id: silent
+    position: [1.8, 1.7, 3.6]
+    initial_animation: silent_attendant
+
+narration_blocks:
+  - id: nb_s1_pharaoh_call
+    speaker: pharaoh
+    text_ko: "나에게 두 가지 꿈이 있었다. 살찐 일곱 마리 소가 강에서 올라왔는데… 마른 일곱 마리 소가 그것을 삼켰다. 내 술 맡은 관원장이, 옥에 있는 한 히브리 청년이 꿈을 해석한다 하더라."
+    audio_clip_id: aud_s1_pharaoh_call_ko
+    start_at_seconds: 0.0
+    duration_seconds: 18.0
+    hidden_until_event: null
+  - id: nb_s1_book_fade_in
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 18.0
+    duration_seconds: 2.0
+    hidden_until_event: null
+  - id: nb_s1_book_pages
+    speaker: book_text
+    text_ko: "일곱 살찐 소는 일곱 해의 풍년이요\n일곱 마른 소는 일곱 해의 흉년이라\n(창세기 41:26~27)"
+    audio_clip_id: null
+    start_at_seconds: 30.0
+    duration_seconds: 18.0
+    hidden_until_event: book_opened
+  - id: nb_s1_joseph_inner
+    speaker: joseph_inner
+    text_ko: "나는… 이 꿈의 의미를 알 것 같다. 그러나 알고도 그 뜻을 따라 행동하지 않는다면, 그 백성은 굶을 것이다."
+    audio_clip_id: aud_s1_joseph_inner_ko
+    start_at_seconds: 50.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s1_open_book
+    type: grab
+    target_assets: [model_dream_book]
+    gesture: two_handed_open
+    haptic:
+      intensity: 0.3
+      duration_ms: 100
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 60
+        on_timeout: auto_advance
+        voice_prompt_id: aud_s1_prompt_open_book
+        voice_prompt_max_repeat: 1
+      - rule: event_emit
+        on_success: book_opened
+
+branches: []
+
+safety_gates:
+  - id: R4_pre_scene_consent_required
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 consent gate (가족 갈등·이별·재회 사전 고지)"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "AI 보조 footer 영구 노출, opt-out 시에도 TTS 사전 캐시 재생 가능"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: joseph_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J1
+    source: "박영원 2015, 요셉 내러티브와 섭리"
+    note: "섭리가 자유의지를 제거하지 않는다 — '행동하지 않으면 백성은 굶을 것이다' 인용에 결합"
+    anchor_block: nb_s1_joseph_inner
+  - disputed_points:
+      - free_will_vs_predestination
+    handling: "단일 입장 채택 없이 두 차원을 함께 노출"

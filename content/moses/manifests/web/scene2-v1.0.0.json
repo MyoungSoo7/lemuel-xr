@@ -1,0 +1,130 @@
+{
+  "mission_id": "moses",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "scene_specific_hand_tracking_required_for_shoes_gesture": true,
+    "gesture_fallback": "button"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_midian_wilderness_dusk_dark_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/360/env_midian_wilderness_dusk_dark_360.jpg",
+        "size_bytes": 4250000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_burning_bush_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/billboards/burning_bush_billboard.webp",
+        "size_bytes": 900000,
+        "lod": "billboard_sprite_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_bush_flame_particles",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/bush_flame_particles.glb",
+        "size_bytes": 450000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      },
+      {
+        "id": "model_moses_self_shepherd_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/billboards/moses_self_shepherd_billboard.webp",
+        "size_bytes": 1100000,
+        "lod": "billboard_sprite_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_long_round_staff",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/long_round_staff.glb",
+        "size_bytes": 200000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_bush_ex_3_2_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s2_bush_ex_3_2_ko.mp3",
+        "size_bytes": 425000,
+        "voice_id": "bush_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_bush_ex_3_5_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s2_bush_ex_3_5_ko.mp3",
+        "size_bytes": 525000,
+        "voice_id": "bush_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_bush_calling_name_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s2_bush_calling_name_ko.mp3",
+        "size_bytes": 210000,
+        "voice_id": "bush_v1",
+        "duration_ms": 4000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_bush_flame_crackle_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_bush_flame_crackle_low.mp3",
+        "size_bytes": 350000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_wilderness_wind_atten",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_wilderness_wind_atten.mp3",
+        "size_bytes": 400000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_wilderness_dusk_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/wilderness_dusk_atlas_1k.webp",
+        "size_bytes": 1600000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_burning_bush_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/burning_bush_pbr_1k.webp",
+        "size_bytes": 1000000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_flame_particle_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/flame_particle_atlas_1k.webp",
+        "size_bytes": 350000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_bush_dwell_shoes_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/scripts/Scene2BushDwellShoesWebClickDrag.js",
+        "size_bytes": 18000,
+        "entry_class": "Scene2BushDwellShoesWebClickDrag"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 11778000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

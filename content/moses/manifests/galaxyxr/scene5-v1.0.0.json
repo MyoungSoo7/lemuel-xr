@@ -1,0 +1,122 @@
+{
+  "mission_id": "moses",
+  "scene_number": 5,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "max_steps": 3,
+    "skip_to_scene6": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_midian_path_east_sunrise",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/models/env_midian_path_east_sunrise.glb",
+        "size_bytes": 6000000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_step_anchor_glow",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/models/step_anchor_glow.glb",
+        "size_bytes": 224000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_moses_self_sandals",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/models/moses_self_sandals.glb",
+        "size_bytes": 1760000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_long_round_staff",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/models/long_round_staff.glb",
+        "size_bytes": 320000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_anchor_instruction_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/audio/s5_anchor_instruction_ko.wav",
+        "size_bytes": 496000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s5_bush_promise_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/audio/s5_bush_promise_ko.wav",
+        "size_bytes": 680000,
+        "voice_id": "bush_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "amb_wilderness_wind_only",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/audio/amb_wilderness_wind_only.wav",
+        "size_bytes": 880000,
+        "voice_id": null,
+        "duration_ms": 60000
+      },
+      {
+        "id": "amb_footstep_sand_pebbles",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/audio/amb_footstep_sand_pebbles.wav",
+        "size_bytes": 384000,
+        "voice_id": null,
+        "duration_ms": 3000
+      },
+      {
+        "id": "amb_bush_crackle_fade",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/audio/amb_bush_crackle_fade.wav",
+        "size_bytes": 224000,
+        "voice_id": null,
+        "duration_ms": 3000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_path_sand_pebbles_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/textures/path_sand_pebbles_pbr_512.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      },
+      {
+        "id": "tex_horizon_first_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/textures/horizon_first_light_512.ktx2",
+        "size_bytes": 720000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      },
+      {
+        "id": "tex_shepherd_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/textures/shepherd_garment_512.ktx2",
+        "size_bytes": 480000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      },
+      {
+        "id": "tex_imposter_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/textures/imposter_far_512.ktx2",
+        "size_bytes": 304000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_step_anchor",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/v1.0.0/scripts/Scene5StepAnchor.cs.bundle",
+        "size_bytes": 22000,
+        "entry_class": "Scene5StepAnchor"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 14414000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

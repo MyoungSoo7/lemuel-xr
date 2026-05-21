@@ -1,0 +1,133 @@
+# Scene 6 — 회복 메시지 (30초)
+# 진입 시 입력한 감정 + faith_tone 으로 매칭. 10 감정 × 3 tone = 30개 사전 캐싱 (LLM 0회 목표).
+# Scene 3 의 excuse_pattern + Scene 5 의 step_pattern 도 회복 문구 선택에 영향.
+
+scene_id: moses_scene6
+scene_name: closure_recovery
+mission_id: moses
+version: 1.0.0
+duration_seconds_target: 30
+
+environment:
+  space_id: dark_meditation_void
+  background_model: env_meditation_dark_fog
+  lighting:
+    type: soft_volumetric_fog_low_key
+    color_temperature_kelvin: 3200
+    overall_brightness: 0.15
+  ambient_sound:
+    - id: deep_ambient_drone_60hz
+      gain_db: -16
+      spatial: false
+      fade_to_silence_at_seconds: 25
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs: []
+
+narration_blocks:
+  - id: nb_s6_scripture_centered
+    speaker: scripture_text_only
+    text_ko: "내가 반드시 너와 함께 있으리라\n(출 3:12)"
+    audio_clip_id: aud_s6_ex3_12_ko_softvoice
+    audio_clip_id_optout: null
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    presentation: center_fade_in
+    note: "R5 AI opt-out 사용자에게도 동일 노출 — 텍스트는 항상, 음성은 옵션"
+  - id: nb_s6_silent_dwell
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 10.0
+    duration_seconds: 5.0
+    note: "사용자가 본문과 머무는 시간"
+  - id: nb_s6_recovery_phrase
+    speaker: recovery_text
+    text_ko: "{{matched_recovery_phrase_ko}}"
+    audio_clip_id: "{{matched_recovery_audio_id}}"
+    start_at_seconds: 15.0
+    duration_seconds: 12.0
+    presentation: bottom_fade_in
+    hidden_until_event: scripture_dwell_complete
+
+interactions: []
+
+branches:
+  - id: br_s6_recovery_match
+    triggered_by_event: scene_enter
+    decision_key: matched_recovery_phrase
+    backend_endpoint: "POST /api/game/moses/complete"
+    lookup_keys: [entry_emotion, faith_tone, excuse_pattern_from_scene3, step_pattern_from_scene5]
+    cache_strategy: pre_cached_30_entries_10_emotions_x_3_tones
+    recovery_phrases_ko_balanced:
+      anxious: "부름 앞의 떨림은 부름의 무게를 *제대로 느낀* 증거다. 떨림이 잘못된 것이 아니다."
+      sad: "광야 40년은 *지나간 시간이 아니라 *너를 만든 시간* 이었다."
+      angry: "애굽을 떠난 분노가 *지금의 너를 만들었다*. 그 분노가 *부름의 자원* 이 될 수 있다."
+      lonely: "네 형 아론이 있다. 그보다 더, *함께 가시는 분* 이 있다."
+      afraid: "두려움이 사라진 후가 아니라 두려운 채로 가는 것이 용기다."
+      exhausted: "한 걸음만 디뎌도 충분하다. *완벽함이 아니라 한 걸음*."
+      confused: "답을 *지금* 다 받지 않아도 된다. *스스로 있는 자* 가 함께 가신다."
+      unworthy: "부름은 자격을 묻지 않는다. *동행을 약속할 뿐* 이다."
+      joyful: "오늘 한 변명을 옆으로 치웠다. 이 작은 의식이 *내일의 한 걸음* 을 만든다."
+      grateful: "하나님이 너와 함께하신다 — 모세에게 하신 약속이 *너에게도* 그대로 있다."
+    faith_tone_variants:
+      unworthy:
+        strong: "여호와께서 너의 무자격감 한가운데서 부르신다. *내가 반드시 너와 함께 있으리라* — 부름은 자격을 묻지 않으며 동행을 약속하실 뿐이다. (출 3:12)"
+        balanced: "부름은 자격을 묻지 않는다. *동행을 약속할 뿐* 이다. 모세도 *내가 누구이기에* 라고 답했지만, 떨기나무의 답은 *너의 자격* 이 아니라 *나의 동행* 이었다."
+        soft: "3000년 전의 이야기는 *자격 없는 자에게도 부름이 온다* 는 통찰을 남겼다. 부름의 핵심은 *너의 능력* 이 아니라 *동행* 이었다는 직관이다."
+      afraid:
+        strong: "여호와는 두려움이 *없는* 자가 아니라 *떨면서도 가는* 자를 부르신다. *내가 반드시 너와 함께 있으리라* (출 3:12)."
+        balanced: "두려움이 사라진 후가 아니라 두려운 채로 가는 것이 용기다. 모세는 *떨면서* 첫 걸음을 디뎠다."
+        soft: "고대의 이야기는 *두려움 안에서도 한 걸음을 디딜 수 있다* 는 것이 자유의 시작이라 봤다. 두려움을 *없애야* 가는 것이 아니다."
+      lonely:
+        strong: "여호와께서 너의 외로움을 모르지 않으신다. *네 형 아론이 있지 아니하냐* (출 4:14) — 동행자를 *먼저* 준비하시고, 그보다 더 *내가 반드시 너와 함께 있으리라* (출 3:12) 약속하신다."
+        balanced: "네 형 아론이 있다. 그보다 더, *함께 가시는 분* 이 있다. 광야 40년의 거리감은 *낭비* 가 아니라 *지금의 너를 만든 시간* 이었다."
+        soft: "3000년 전의 이야기는 *외로운 부름에는 동행자가 함께 보내진다* 는 통찰을 남겼다. 부름은 *혼자 떠넘기는* 것이 아니라 *함께 가는* 것이라는 직관이다."
+      anxious:
+        strong: "여호와 앞에서의 떨림은 *부름의 무게를 제대로 느낀* 증거다. *스스로 있는 자* (출 3:14) 가 너에게 이름을 알리시고, *내가 반드시 너와 함께 있으리라* (출 3:12) 약속하신다. 불안은 *잘못된 신호* 가 아니다."
+        balanced: "부름 앞의 떨림은 부름의 무게를 *제대로 느낀* 증거다. 떨림이 잘못된 것이 아니다. 모세도 다섯 번 *변명* 했지만, 떨기나무는 그를 *떠나지 않았다*."
+        soft: "고대의 이야기는 *부름 앞 불안* 을 *결격사유* 가 아니라 *부름을 진지하게 받은 증거* 로 봤다. 떨림을 *없애야* 가는 것이 아니다."
+
+safety_gates:
+  - id: R3_no_recovery_pressure
+    enforced_at: nb_s6_recovery_phrase
+    description: "모든 회복 문구는 '지금 회복하지 못해도 괜찮다' 톤"
+  - id: no_user_instrumentalization
+    enforced_at: nb_s6_recovery_phrase
+    description: "'하나님이 너를 사용하셨다' 같은 도구화 표현 차단 — '너와 함께하신다' 주체성 인정 톤"
+  - id: no_push_verbs
+    enforced_at: nb_s6_recovery_phrase
+    description: "'이제 일어서라' / '이제 가라' push 어휘 0건 — 카피 정책"
+  - id: R5_optout_text_still_shown
+    enforced_at: nb_s6_scripture_centered
+    description: "AI opt-out 사용자에게도 본문 텍스트는 동일 노출, TTS 음성만 비활성"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: null
+transition_to_outro: true
+transition:
+  type: fade_to_black
+  fade_out_seconds: 3.0
+  fade_in_seconds: 0.0
+  return_to: main_screen
+
+theology_footer_refs:
+  - citation_id: M1
+    source: "한국개혁신학 2022 Vol.75 — 구약성서 성육신 관련 논의"
+    note: "동행의 인장 = 회복 문구의 신학적 기반"
+    anchor_block: nb_s6_scripture_centered
+  - citation_id: M2
+    source: "신앙과 학문 2021 Vol.26 No.1 — 소명의식과 직업만족"
+    anchor_block: nb_s6_recovery_phrase
+  - scripture_refs:
+      - ref: "출애굽기 3:12"
+        translation: krv
+        anchor_block: nb_s6_scripture_centered
+  - faith_tone_branch:
+      table: "users.faith_tone (strong | balanced | soft)"
+      doc_ref: "MVP-MOSES-CONTENT.md §7"
+      cached_count: "10 감정 × 3 tone = 30개 사전 캐싱 (Scene 6 LLM 호출 0회 목표)"

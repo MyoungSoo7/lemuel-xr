@@ -1,0 +1,45 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 2,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "throw_distance_meters": 3.0
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_barley_field_horizon", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/env_barley_field.glb", "size_bytes": 6240000, "lod": "lod4_with_imposter_far"},
+      {"id": "model_granary_far", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/granary.glb", "size_bytes": 1760000, "lod": "lod4_with_imposter_far"},
+      {"id": "model_grain_bag_A", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/grain_bag_A.glb", "size_bytes": 480000, "lod": "lod4_with_imposter_far"},
+      {"id": "model_grain_bag_B", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/grain_bag_B.glb", "size_bytes": 480000, "lod": "lod4_with_imposter_far"},
+      {"id": "model_grain_bag_C", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/grain_bag_C.glb", "size_bytes": 480000, "lod": "lod4_with_imposter_far"}
+    ],
+    "audio": [
+      {"id": "aud_s2_intro_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s2_intro_ko.wav", "size_bytes": 1120000, "voice_id": "joseph_v1", "duration_ms": 14000},
+      {"id": "aud_s2_post_A_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s2_post_A_ko.wav", "size_bytes": 720000, "voice_id": "joseph_v1", "duration_ms": 9000},
+      {"id": "aud_s2_post_B_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s2_post_B_ko.wav", "size_bytes": 880000, "voice_id": "joseph_v1", "duration_ms": 11000},
+      {"id": "aud_s2_post_C_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s2_post_C_ko.wav", "size_bytes": 960000, "voice_id": "joseph_v1", "duration_ms": 12000},
+      {"id": "amb_wind_barley", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/amb_wind_barley.ogg", "size_bytes": 800000, "voice_id": null, "duration_ms": 30000},
+      {"id": "amb_farmer_song_loop", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/amb_farmer_song_5s_loop.ogg", "size_bytes": 304000, "voice_id": "farmer_chorus_v1", "duration_ms": 5000}
+    ],
+    "textures": [
+      {"id": "tex_barley_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/barley_atlas_1k.ktx2", "size_bytes": 2240000, "format": "ktx2", "resolution": "1024x1024"},
+      {"id": "tex_granary_pbr", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/granary_pbr_1k.ktx2", "size_bytes": 1440000, "format": "ktx2", "resolution": "1024x1024"},
+      {"id": "tex_grain_bag_pbr", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/grain_bag_pbr_512.ktx2", "size_bytes": 400000, "format": "ktx2", "resolution": "512x512"},
+      {"id": "tex_imposter_far", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/imposter_granary_far_512.ktx2", "size_bytes": 380000, "format": "ktx2", "resolution": "512x512"}
+    ],
+    "scripts": [
+      {"id": "script_scene2_throw_decision", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/scripts/Scene2ThrowDecision.cs.bundle", "size_bytes": 28800, "entry_class": "Scene2ThrowDecision"},
+      {"id": "shader_barley_gpu_instanced", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/scripts/BarleyGPUInstancedLite.shadergraph.bundle", "size_bytes": 14400, "entry_class": "BarleyGPUInstancedLite"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 18727200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

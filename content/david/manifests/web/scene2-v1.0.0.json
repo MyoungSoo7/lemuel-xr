@@ -1,0 +1,171 @@
+{
+  "mission_id": "david",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_israelite_camp_12_tents_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/360/env_israelite_camp_12_tents.jpg",
+        "size_bytes": 4400000,
+        "lod": "360_panorama_6k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_eliab",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/models/eliab.glb",
+        "size_bytes": 880000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_brothers_silent_2",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/models/brothers_silent_2.glb",
+        "size_bytes": 1200000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_soldiers_18_pack",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/models/soldiers_18_pack.glb",
+        "size_bytes": 1920000,
+        "lod": "lod3_pbr_with_imposter"
+      },
+      {
+        "id": "model_provisions_bread_cheese",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/models/provisions_bread_cheese.glb",
+        "size_bytes": 192000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_choice_cards_3",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/models/choice_cards_3_floating.glb",
+        "size_bytes": 96000,
+        "lod": "lod2_ui"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_arrival_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/s2_arrival_ko.mp3",
+        "size_bytes": 700000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 14000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_eliab_rebuke_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/s2_eliab_rebuke_ko.mp3",
+        "size_bytes": 800000,
+        "voice_id": "eliab_v1",
+        "duration_ms": 16000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_post_A_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/s2_post_A_rebuttal_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "david_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_post_B_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/s2_post_B_silence_ko.mp3",
+        "size_bytes": 400000,
+        "voice_id": "david_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_post_C_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/s2_post_C_walk_away_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "david_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_low_camp_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/amb_camp_murmur.mp3",
+        "size_bytes": 550000,
+        "voice_id": "crowd_silent",
+        "duration_ms": 45000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_weapon_maintenance",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/amb_weapon_maintenance.mp3",
+        "size_bytes": 270000,
+        "voice_id": null,
+        "duration_ms": 30000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_goliath_faint_shout_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/amb_goliath_faint_distant.mp3",
+        "size_bytes": 190000,
+        "voice_id": "goliath_v1_distant",
+        "duration_ms": 18000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_philistine_distant_layer",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/audio/amb_philistine_distant.mp3",
+        "size_bytes": 210000,
+        "voice_id": null,
+        "duration_ms": 40000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_camp_tents_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/textures/camp_tents_2k.webp",
+        "size_bytes": 1120000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_brothers_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/textures/brothers_atlas_2k.webp",
+        "size_bytes": 880000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_soldiers_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/textures/soldiers_atlas_2k.webp",
+        "size_bytes": 1120000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_provisions_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/textures/provisions_pbr_1k.webp",
+        "size_bytes": 152000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_choose_reaction",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/web/v1.0.0/scripts/Scene2ChooseReaction.js",
+        "size_bytes": 32000,
+        "entry_class": "Scene2ChooseReactionWeb"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 16062000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,296 @@
+# Scene 4 — 표적 (90초, 지팡이→뱀 + 손 나병)
+# 진입 *직전* R4 2차 동의 카드 (시각적 변형 충격). 건너뛰기 = 자막만으로 표현.
+# 뱀은 *추상적 흰 빛* (실사풍 회피). 손 변형은 *피부 텍스처 변화 없음*, 흰 layer fade in/out.
+# 햅틱 *사용 안 함* — 시각 only (트라우마 자극 회피).
+
+scene_id: moses_scene4
+scene_name: signs_staff_and_hand
+mission_id: moses
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: midian_wilderness_near_bush_air_stilled
+  background_model: env_midian_wilderness_dusk_dark
+  lighting:
+    type: dusk_low_key_with_bush_glow_reduced
+    color_temperature_kelvin: 2900
+    additional_dynamic_light:
+      id: bush_flame_dynamic_reduced
+      intensity_base: 0.85
+      flicker_amplitude: 0.08
+  ambient_sound:
+    - id: bush_flame_crackle_diminished
+      gain_db: -22
+      spatial: true
+    - id: air_stilled_silence_layer
+      gain_db: -30
+      spatial: false
+  shader_features:
+    - abstract_white_light_no_realistic_snake
+    - hand_overlay_white_layer_no_skin_texture_change
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  user_posture: standing
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene4_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 시각적 변형은 상징입니다. 당신의 몸이 변해야 한다는 메시지가 아닙니다. 위기 시 1577-0199 / 1393"
+    - id: scene4_footer_persistent
+      position: bottom_left
+      style: small_persistent
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+npcs:
+  - id: moses_self
+    voice_id: silent
+    position: [0.0, 1.65, 0.0]
+    initial_animation: standing_holding_staff_again
+    visual_traits: [shepherd_garment_worn, barefoot, long_round_staff_in_hand]
+  - id: burning_bush
+    voice_id: bush_v1
+    position: [0.0, 1.60, 2.0]
+    initial_animation: continuing_flame_idle_reduced
+    voice_tone: restrained_narrator
+  - id: abstract_snake_sign
+    voice_id: silent
+    position: [0.0, 0.1, 1.5]
+    initial_animation: hidden
+    visual_traits: [abstract_warm_white_light, no_realistic_scales, no_tongue, no_eyes]
+    design_intent: "XR 공포증 사용자 보호 — 실사풍 회피"
+
+narration_blocks:
+  - id: nb_s4_consent_2nd_check_complete
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 0.0
+    duration_seconds: 0.5
+    hidden_until_event: r4_2nd_consent_continue
+    note: "Pre-Scene 4 R4 2차 동의 카드 통과 후 진입. skip 선택 시 narration_only_path 로 분기"
+  - id: nb_s4_bush_question_staff
+    speaker: burning_bush
+    text_ko: "네 손에 있는 것이 무엇이냐. (출 4:2)"
+    audio_clip_id: aud_s4_bush_q_staff_ko
+    start_at_seconds: 0.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+  - id: nb_s4_user_answer_subtitle
+    speaker: subtitle_only
+    text_ko: "지팡이입니다."
+    audio_clip_id: null
+    start_at_seconds: 5.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+  - id: nb_s4_bush_command_throw
+    speaker: burning_bush
+    text_ko: "그것을 땅에 던지라. (출 4:3)"
+    audio_clip_id: aud_s4_bush_throw_ko
+    start_at_seconds: 10.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+  - id: nb_s4_bush_command_grab_tail
+    speaker: burning_bush
+    text_ko: "네 손을 내밀어 그 꼬리를 잡으라. (출 4:4)"
+    audio_clip_id: aud_s4_bush_grab_tail_ko
+    start_at_seconds: 30.0
+    duration_seconds: 5.0
+    hidden_until_event: staff_thrown_to_snake
+  - id: nb_s4_bush_command_hand_to_chest
+    speaker: burning_bush
+    text_ko: "네 손을 품에 넣으라. (출 4:6)"
+    audio_clip_id: aud_s4_bush_hand_in_ko
+    start_at_seconds: 60.0
+    duration_seconds: 4.0
+    hidden_until_event: snake_reverted_to_staff
+  - id: nb_s4_subtitle_leprosy
+    speaker: subtitle_only
+    text_ko: "그의 손에 나병이 생겼더라 (출 4:6 후반)"
+    audio_clip_id: null
+    start_at_seconds: 70.0
+    duration_seconds: 4.0
+    hidden_until_event: hand_layer_appeared
+    note: "나병 묘사는 시각적 자극 없음 — 부드러운 흰 빛 layer 만"
+  - id: nb_s4_bush_command_hand_again
+    speaker: burning_bush
+    text_ko: "네 손을 다시 품에 넣으라. (출 4:7)"
+    audio_clip_id: aud_s4_bush_hand_in_again_ko
+    start_at_seconds: 80.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+  - id: nb_s4_subtitle_restored
+    speaker: subtitle_only
+    text_ko: "본래의 살로 돌아왔더라 (출 4:7 후반)"
+    audio_clip_id: null
+    start_at_seconds: 85.0
+    duration_seconds: 3.0
+    hidden_until_event: hand_layer_faded_out
+  - id: nb_s4_bush_closing
+    speaker: burning_bush
+    text_ko: "표적이 너에게 주어졌다.\n네가 할 일은 *완벽함* 이 아니라 *한 걸음* 이다."
+    audio_clip_id: aud_s4_bush_closing_ko
+    start_at_seconds: 90.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s4_consent_card_2nd
+    type: pinch
+    target_assets: [ui_consent_continue, ui_consent_skip]
+    presentation:
+      layout: floating_arc_in_air
+      enforced_before_scene_enter: true
+      can_skip: false
+      bypass_if_last_7d_consent_recorded: true
+    options:
+      - id: continue
+        label_ko: "계속하기"
+        gesture: pinch_or_click
+        emit_event: r4_2nd_consent_continue
+      - id: skip
+        label_ko: "이 장면만 건너뛰기"
+        gesture: pinch_or_click
+        emit_event: r4_2nd_consent_skip_to_narration_only
+    consent_card_text_ko: |
+      다음 장면에는 *시각적 변형* 이 포함됩니다.
+      · 지팡이가 *뱀* 으로 변하는 장면 (추상적 흰 빛)
+      · 손이 *나병* 으로 변했다가 다시 회복되는 장면 (부드러운 흰 layer)
+      뱀 / 피부 변형에 *불편감 (트라우마·공포증)* 이 있다면
+      *건너뛰기* 를 선택해도 미션은 그대로 진행됩니다.
+    validation_rules:
+      - rule: r4_consent_required_before_visual
+        on_skip: enter_narration_only_path
+        narration_only_path_description: "내레이션만 자막으로, 지팡이→뱀·손 변형 시각화 생략, Scene 5 자동 진입"
+  - id: ix_s4_throw_staff_short
+    type: throw
+    target_assets: [model_staff_user_held, zone_throw_target_short]
+    gesture: wrist_flick_release
+    throw_distance_meters: 1.5
+    throw_distance_meters_small_room: 1.0
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+      note: "햅틱 사용 안 함 — 시각 only, 트라우마 자극 회피"
+    validation_rules:
+      - rule: on_staff_landed
+        fade_seconds: 0.4
+        morph_target: abstract_snake_sign
+        morph_display_seconds: 5.0
+        camera_micro_shake_intensity: 0.1
+        camera_micro_shake_duration_seconds: 0.5
+        emit_event: staff_thrown_to_snake
+        design_intent: "몸을 크게 움직이지 않아도 됨 — 짧은 던지기"
+  - id: ix_s4_grab_snake_tail
+    type: hand_to_target_proximity
+    target_assets: [abstract_snake_sign]
+    gesture: hand_approach_within_1m
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+    validation_rules:
+      - rule: on_hand_within_1m
+        morph_back: model_staff_user_held
+        fade_seconds: 0.4
+        emit_event: snake_reverted_to_staff
+  - id: ix_s4_hand_to_chest_first
+    type: hand_to_target_dwell
+    target_assets: [user_chest_anchor]
+    gesture: hand_to_chest_dwell_1000ms
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+    validation_rules:
+      - rule: on_dwell_complete
+        overlay_target: user_hand_back
+        overlay_fade_in_seconds: 3.0
+        overlay_color: soft_white
+        emit_event: hand_layer_appeared
+        design_intent: "피부 텍스처 변화 X — 흰 layer 만"
+  - id: ix_s4_hand_to_chest_again
+    type: hand_to_target_dwell
+    target_assets: [user_chest_anchor]
+    gesture: hand_to_chest_dwell_1000ms
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+    validation_rules:
+      - rule: on_dwell_complete
+        overlay_fade_out_seconds: 2.0
+        emit_event: hand_layer_faded_out
+
+branches:
+  - id: br_s4_consent_path
+    triggered_by_event: [r4_2nd_consent_continue, r4_2nd_consent_skip_to_narration_only]
+    decision_key: consent_path
+    backend_endpoint: "POST /api/game/moses/scene/4/consent"
+    body_template:
+      consent: "{{continue|skip}}"
+    routes:
+      - when: { consent: continue }
+        play_full_visual_path: true
+        carry_to_session: { sign_visual_consent: granted }
+      - when: { consent: skip }
+        play_narration_only_path: true
+        skip_visual_morphs: true
+        carry_to_session: { sign_visual_consent: declined, narration_only_path: true }
+  - id: br_s4_complete
+    triggered_by_event: scene_4_complete
+    decision_key: signs_summary
+    backend_endpoint: "POST /api/game/moses/scene/4/complete"
+    body_template:
+      signs_viewed: "{{sign_visual_consent}}"
+      sign_acceptance: "{{accepted|narration_only}}"
+    routes:
+      - when: { sign_acceptance: accepted }
+        carry_to_scene5: { sign_relation: relational_accompaniment }
+      - when: { sign_acceptance: narration_only }
+        carry_to_scene5: { sign_relation: narration_only_still_accompanied }
+
+safety_gates:
+  - id: R4_pre_scene_consent_2nd
+    enforced_at: before_scene_enter
+    description: "Scene 4 진입 *직전* R4 2차 동의 카드 (시각적 변형 한정) — 강제 노출. 지난 7일 내 동의 이력 있으면 생략 (메뉴에서 다시 보기 가능)."
+    consent_card_ref: ix_s4_consent_card_2nd
+  - id: R2_persistent_footer_with_body_disclaimer
+    enforced_at: scene_enter
+    overlay_ref: scene4_r2_footer
+    description: "Scene 4 진입 시 우상단 영구 footer — '시각적 변형은 상징, 당신의 몸이 변해야 한다는 메시지 아님'"
+  - id: R3_no_perfection_push
+    enforced_at: nb_s4_bush_closing
+    description: "'네가 할 일은 완벽함이 아니라 한 걸음' — '이제 일어서라' push 차단. ACT committed action 의 '한 걸음' 번역"
+  - id: haptic_disabled_for_trauma
+    enforced_at: ix_s4_throw_staff_short
+    description: "Scene 4 햅틱 비활성화 (트라우마 자극 회피) — 시각 only"
+  - id: visual_abstract_no_realism
+    enforced_at: abstract_snake_sign
+    description: "뱀 모델 추상적 흰 빛 — 실사풍 회피 (XR 공포증 사용자 보호)"
+  - id: visual_no_skin_texture_change
+    enforced_at: ix_s4_hand_to_chest_first
+    description: "손 변형 = 피부 텍스처 변화 X — 부드러운 흰 layer fade 만"
+  - id: R5_ai_optout_text_path
+    enforced_at: always
+    description: "AI opt-out 사용자도 텍스트 자막 동일 노출, TTS 음성만 비활성"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: moses_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: M1
+    source: "한국개혁신학 2022 Vol.75 — 구약성서 성육신 관련 논의 (drill-down 후보)"
+    note: "현현 (theophany) 의 인격성 = 표적은 능력 증명이 아닌 동행의 인장"
+    anchor_block: nb_s4_bush_closing
+  - disputed_points:
+      - "표적의 신학적 위치 — 능력 증명 (apologetic) vs 동행의 인장 (relational). 본 미션은 후자. footer 한 줄 명시"
+    handling: "단일 입장 선택 + 근거 명시"
+  - scripture_refs:
+      - ref: "출애굽기 4:2~7"
+        translation: krv
+        anchor_block: nb_s4_bush_question_staff
