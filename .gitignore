@@ -21,3 +21,9 @@ unity/UserSettings/
 !**/.env.example
 *.pem
 *.key
+
+# Reviewer bootstrap — 자문가 PII 보호 (REVIEWER-BOOTSTRAP.md §6 PII 보호)
+# .example 만 git 에 체크인, 실제 application-bootstrap.yml 은 K8s Secret 또는
+# 로컬 마운트로 주입.
+backend/src/main/resources/application-bootstrap.yml
+!backend/src/main/resources/application-bootstrap.yml.example
