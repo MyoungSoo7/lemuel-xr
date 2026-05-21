@@ -20,8 +20,7 @@ CREATE INDEX IF NOT EXISTS idx_theology_reviews_profile
     WHERE reviewer_profile_id IS NOT NULL;
 
 COMMENT ON COLUMN theology_reviews.reviewer_profile_id IS
-    '자문가의 등록 프로필 (role=theology). 신규 검토는 이 컬럼 채움. ' ||
-    '레거시 row 는 reviewer_id (users) 만 있고 NULL.';
+    '자문가의 등록 프로필 (role=theology). 신규 검토는 이 컬럼 채움. 레거시 row 는 reviewer_id (users) 만 있고 NULL.';
 
 
 -- ============================================================
