@@ -72,9 +72,11 @@ scenes:
     type: outro
     duration_sec: 60
     scripture_ref: job-42:5
+    linked_values: [5, 4, 1]   # 욥(고통과 진리) · 시편(비탄) · 일기(솔직함)
+    value_prompt: "욥처럼 *답이 아닌 자리* 도 있습니다. 오늘 *솔직한 한 줄* 을 일기에 적어보세요. 부끄러운 것이 아닙니다."
     extras:
       anchor: 만남으로서의 회복
-      static_text: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다. ''내가 주께 대하여 귀로 듣기만 하였더니, 이제는 눈으로 주를 뵙습니다.'' 답이 아닌 만남이 회복의 결입니다."
-      crisis_reminder: "지금 이 순간이 무겁다면, 1393 (자살예방상담전화 24/7) 으로 사람의 목소리를 들어보세요."
+      static_text: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다."
+      crisis_reminder: "지금 이 순간이 무겁다면, 1393."
       next_scene_suggestion: "엘리야 — 죽기를 갈망한 후 천사가 음식과 잠을 주신 이야기"
     next: null

@@ -94,9 +94,12 @@ scenes:
     type: outro
     duration_sec: 30
     scripture_ref: 1sam-17:46-47
+    # CROSS-MAPPING-VR-AR.md §3 — 다윗이 빛내는 AR 1~7 가치 (●●●)
+    linked_values: [1, 4, 7]   # 일기(솔직함) · 시편(시편 저자) · 사람(사울 추격 두려움)
+    value_prompt: "다윗의 시편은 그의 *일기장* 이었습니다. 좋은 일만 적는 일기가 건강한 일기가 아닙니다. 오늘 *솔직한 한 줄* 을 적어보세요."
     extras:
       anchor: 자기 작음의 평화
-      stones_remaining: 4   # 5돌 중 1개 사용, 4개 남김 (메타포)
+      stones_remaining: 4
       recovery_keys:
         ANXIOUS:    david.recovery.fear_with_trust
         CONFUSED:   david.recovery.armor_off

@@ -65,4 +65,7 @@ scenes:
     title: 결말
     type: outro
     scripture_ref: gen-45:5
+    # CROSS-MAPPING-VR-AR.md §3 — 요셉이 빛내는 AR 1~7 가치 (●●●)
+    linked_values: [1, 2, 7]   # 일기·묵상(꾸준함) · 잠언(신중함) · 사람(용서)
+    value_prompt: "요셉의 13년 옥살이는 *꾸준함* 의 자리였습니다. 오늘 *3줄 일기* 한 번이 일주일 후 30분 묵상을 만듭니다. 잠시 일기장을 펴 보세요."
     next: null

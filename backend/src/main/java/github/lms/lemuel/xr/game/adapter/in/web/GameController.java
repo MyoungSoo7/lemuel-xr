@@ -78,7 +78,8 @@ public class GameController {
                 .tag("character", c.dbValue())
                 .register(meter).increment();
         return ResponseEntity.ok(new CompleteResponse(
-                r.sessionId(), r.completedAt(), r.durationSeconds()));
+                r.sessionId(), r.completedAt(), r.durationSeconds(),
+                r.valuePrompt()));
     }
 
     // --- DTOs ---
@@ -116,5 +117,9 @@ public class GameController {
 
     public record CompleteRequest(String finalOutcome, String closingMessage) {}
 
-    public record CompleteResponse(UUID sessionId, LocalDateTime completedAt, Integer durationSeconds) {}
+    public record CompleteResponse(
+            UUID sessionId, LocalDateTime completedAt, Integer durationSeconds,
+            /** VR→AR 연계: 이 인물이 빛내는 AR 가치 1~7 + 실천 prompt. null 가능. */
+            github.lms.lemuel.xr.game.application.CompleteGameSessionUseCase.ValuePrompt valuePrompt
+    ) {}
 }

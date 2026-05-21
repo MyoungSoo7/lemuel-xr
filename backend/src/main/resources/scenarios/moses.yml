@@ -86,6 +86,9 @@ scenes:
     type: outro
     duration_sec: 30
     scripture_ref: ex-3:12
+    # CROSS-MAPPING-VR-AR.md §3 — 모세가 빛내는 AR 1~7 가치 (●●●)
+    linked_values: [3, 4, 6, 7]
+    value_prompt: "모세의 광야 40년은 *기다림* 의 시간이었습니다. 오늘 *전도서 한 절* — 인생의 계절을 인정하는 시 — 을 읽어보세요."
     extras:
       anchor: 안식·동반
       recovery_keys:
