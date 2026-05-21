@@ -7,12 +7,18 @@ import io.micrometer.core.annotation.Timed;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/** /api/emotion/classify — 사용자 텍스트 → 감정 분류 + Track A·B 추천 (BACKEND-API-DESIGN §4). */
+/**
+ * /api/emotion/classify — 사용자 텍스트 → 감정 분류 + Track A·B 추천.
+ *
+ * <p>위기 키워드 감지 시 (R1 safety line) crisisLockout 응답 — 클라이언트는 위기 자원 화면 강제.
+ * AI 분류 응답이 *대신* 와서는 안 됨.</p>
+ */
 @RestController
 @RequestMapping("/api/emotion")
 @RequiredArgsConstructor
@@ -30,10 +36,19 @@ public class EmotionController {
                 req.text(),
                 req.context() == null ? null : req.context().preferredMode()
         );
+        if (r.crisisLockoutRequired()) {
+            // 위기 응답 — AI 분류·추천은 모두 null. 클라이언트는 crisisLockout 만 봄.
+            return ResponseEntity.ok(new ClassifyResponse(
+                    null, null, null,
+                    new CrisisLockoutDto(true, r.crisisSeverity(), r.crisisResources(),
+                            "지금 이 순간 당신과 함께 있는 사람이 있습니다. 1393 (자살예방상담전화) 또는 위 자원으로 연결됩니다.")
+            ));
+        }
         return ResponseEntity.ok(new ClassifyResponse(
                 r.emotionLogId(),
                 new EmotionDto(r.primary().name(), r.confidence()),
-                new RecommendationsDto(r.trackA(), r.trackB())
+                new RecommendationsDto(r.trackA(), r.trackB()),
+                null
         ));
     }
 
@@ -47,7 +62,9 @@ public class EmotionController {
     public record ClassifyResponse(
             Long emotionLogId,
             EmotionDto primary,
-            RecommendationsDto recommendations
+            RecommendationsDto recommendations,
+            /** R1 safety lockout — null 이면 정상 응답. non-null 이면 클라이언트는 위기 화면 강제. */
+            CrisisLockoutDto crisisLockout
     ) {}
 
     public record EmotionDto(String emotion, double confidence) {}
@@ -55,5 +72,12 @@ public class EmotionController {
     public record RecommendationsDto(
             List<EmotionRecommender.TopicSuggestion> trackA,
             List<EmotionRecommender.CharacterSuggestion> trackB
+    ) {}
+
+    public record CrisisLockoutDto(
+            boolean required,
+            String severity,
+            List<Map<String, Object>> resources,
+            String gentleMessage
     ) {}
 }

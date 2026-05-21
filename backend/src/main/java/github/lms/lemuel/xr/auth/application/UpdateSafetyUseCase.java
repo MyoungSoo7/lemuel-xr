@@ -27,6 +27,7 @@ public class UpdateSafetyUseCase {
         if (patch.faithTone() != null) u.setFaithTone(patch.faithTone());
         if (patch.preferredMode() != null) u.setPreferredMode(patch.preferredMode());
         if (patch.dataRetentionDays() != null) u.setDataRetentionDays(patch.dataRetentionDays());
+        if (patch.aiOptOut() != null) u.setAiOptOut(patch.aiOptOut());
         u.setUpdatedAt(OffsetDateTime.now(ZoneOffset.UTC));
         return users.save(u);
     }
@@ -36,6 +37,7 @@ public class UpdateSafetyUseCase {
             Boolean skipIntroSilence,
             String faithTone,
             String preferredMode,
-            Integer dataRetentionDays
+            Integer dataRetentionDays,
+            Boolean aiOptOut
     ) {}
 }

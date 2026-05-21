@@ -50,4 +50,14 @@ public class UserJpaEntity {
 
     @Column(name = "deleted_at")
     private OffsetDateTime deletedAt;
+
+    // V20260521224700 — Disclaimer 동의 게이트
+    @Column(name = "disclaimer_accepted_at")
+    private OffsetDateTime disclaimerAcceptedAt;
+
+    @Column(name = "disclaimer_version", length = 20)
+    private String disclaimerVersion;
+
+    @Column(name = "ai_opt_out", nullable = false)
+    private Boolean aiOptOut = Boolean.FALSE;
 }

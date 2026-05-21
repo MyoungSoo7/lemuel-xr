@@ -41,6 +41,12 @@ class AuthAndContentIT extends IntegrationTestBase {
         String token = (String) guest.get("token");
         assertThat(token).isNotBlank();
 
+        // 1.5 Disclaimer 동의 — DisclaimerGateFilter 통과를 위해 필수
+        rest.post().uri("/api/auth/accept-disclaimer")
+                .header("Authorization", "Bearer " + token)
+                .body(Map.of())
+                .retrieve().body(Map.class);
+
         // 2. /api/users/me
         Map<String, Object> me = rest.get().uri("/api/users/me")
                 .header("Authorization", "Bearer " + token)

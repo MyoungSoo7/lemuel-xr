@@ -18,7 +18,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
                                                    JwtAuthFilter jwtFilter,
-                                                   InternalTokenFilter internalFilter) throws Exception {
+                                                   InternalTokenFilter internalFilter,
+                                                   DisclaimerGateFilter disclaimerGateFilter,
+                                                   DisclaimerHeaderFilter disclaimerHeaderFilter) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .cors(AbstractHttpConfigurer::disable)
@@ -38,7 +40,11 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .addFilterBefore(internalFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+            .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            // DisclaimerGateFilter: JWT 검증 이후, 콘텐츠 endpoint 진입 전에 동의 검증.
+            .addFilterAfter(disclaimerGateFilter, JwtAuthFilter.class)
+            // DisclaimerHeaderFilter: 모든 응답에 X-Lemuel-* 헤더 박음 (Layer 5).
+            .addFilterAfter(disclaimerHeaderFilter, DisclaimerGateFilter.class);
         return http.build();
     }
 }

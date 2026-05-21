@@ -20,6 +20,7 @@ public enum ErrorCode {
     E_MODE_MISMATCH("Mode differs from session-initial mode", HttpStatus.CONFLICT),
     E_DUPLICATE_IDEMPOTENCY("Idempotency-Key already processed (replay)", HttpStatus.CONFLICT),
     E_RATE_LIMITED("Too many requests", HttpStatus.TOO_MANY_REQUESTS),
+    E_DISCLAIMER_REQUIRED("Disclaimer acceptance required", HttpStatus.valueOf(451)),
 
     // 5xx
     E_LLM_UPSTREAM_FAIL("AI sidecar returned error or timeout", HttpStatus.BAD_GATEWAY),
