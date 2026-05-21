@@ -102,12 +102,35 @@
 | ID | 흐름 | 주체 |
 |----|---|---|
 | F-7.1 | 콘텐츠 버전 등록 | 콘텐츠 작성자 |
-| F-7.2 | 신학 리뷰어 검토 | role=`theology_reviewer` |
+| F-7.2 | 신학 리뷰어 검토 | `reviewer_profiles.role='theology'` |
 | F-7.3 | 분쟁 가능 지점 명시 | 작성자가 `content_versions.disputed_points` JSONB 에 기록 |
-| F-7.4 | 출판 승인 / 거부 / 보류 | 리뷰어 → `theology_reviews.decision` |
+| F-7.4 | 출판 승인 / 거부 / 보류 | 신학 리뷰어 → `theology_reviews.verdict` |
 | F-7.5 | 영지주의·뉴에이지 해석 차단 | 자동 키워드 필터 + 리뷰어 수동 검수 |
 
 자동 출판 금지. 모든 LLM 출력은 사용자에게 *"AI 보조"* 표시.
+
+### F-7.5. 임상 검증 — *신학 검증과 병렬*
+
+> **거버넌스 상세**: [`docs/governance/CLINICAL-REVIEW.md`](governance/CLINICAL-REVIEW.md)
+> **이슈**: [#4 — 임상자문 영입 (Milstein 2025 COPE 프레임워크)](https://github.com/MyoungSoo7/lemuel-xr/issues/4)
+> **DB**: `reviewer_profiles` + `clinical_reviews` + `content_versions."references"` JSONB (V20260521040956)
+
+신학 검증으로는 잡지 못하는 *trauma-informed* / *crisis 자원* / *근거 적절성* 위험을 별도 게이트로 처리. 신학 + 임상 *양쪽 모두 approve* 여야 `content_versions.status='published'`.
+
+| ID | 흐름 | 주체 |
+|----|---|---|
+| F-7.5.1 | 신학 검토와 *병렬* 임상 큐 진입 | `reviewer_profiles.role='clinical'` 활성 자문가 |
+| F-7.5.2 | 임상 체크리스트 4종 (1~5 score) | trauma_safety / crisis_resource_compliance / **moral_injury_risk** (Jones 2022 PMID 35609469 직접 매핑) / evidence_quality |
+| F-7.5.3 | 인용 PMID 추적 | 작성자가 `content_versions."references"` JSONB 에 PMID 배열 적재 → 임상 자문이 `clinical_reviews.referenced_pmids` 와 cross-check |
+| F-7.5.4 | **Veto 단독 reject 권한** | moral_injury_risk ≤ 2 / 자해 안전망 부재 / consent 게이트 없는 trauma 자극 시 임상 자문 단독 reject (`clinical_reviews.veto_used`) |
+| F-7.5.5 | Required review 대상 | F-6 안전장치 변경 / LLM 시스템 프롬프트 변경 / Theme 5·11 고난 narrative / trigger_warning ≥ medium Scene |
+| F-7.5.6 | Optional review 대상 | Theme 1~3 routine 콘텐츠 (작성자 요청 시) |
+| F-7.5.7 | 결정 불일치 escalation | 신학 OK / 임상 reject → 임상 우선 (사용자 안전). 신학 reject / 임상 OK → 신학 우선 (콘텐츠 정체성) |
+| F-7.5.8 | 2-of-2 approve 필수 콘텐츠 | Theme 11 (예수) 모든 콘텐츠 + 모든 trigger_warning=high Scene |
+| F-7.5.9 | SLA | Routine 5 영업일 / 고난 narrative 10 영업일 / 안전장치 3 영업일 (긴급) |
+| F-7.5.10 | Conflict of interest | 자문가는 본인 작성 콘텐츠 검토 불가 (`reviewer_id ≠ created_by`) |
+
+전체 검토 흐름은 [`SEQUENCE-DIAGRAMS.md`](SEQUENCE-DIAGRAMS.md) §5 (신학·임상 *병렬* 검증) 참고.
 
 ### F-8. 사용자 데이터 관리
 

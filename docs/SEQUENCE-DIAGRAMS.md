@@ -257,55 +257,77 @@ sequenceDiagram
 
 ---
 
-## 5. 신학 검증 워크플로 (AI 출력 → 게시까지)
+## 5. 신학·임상 *병렬* 검증 워크플로 (AI 출력 → 게시까지)
 
-> F-7 — 모든 새 콘텐츠 (LLM 생성 묵상 / Scene 분기 / 해석문) 가 거치는 게이트.
+> F-7 + F-7.5 — 모든 새 콘텐츠가 거치는 *2-축 게이트*. 신학 자문과 임상 자문이 *동시에* 검토 큐에 진입. 양쪽 모두 `approve` 여야 published.
+> 거버넌스 상세: [`docs/governance/CLINICAL-REVIEW.md`](governance/CLINICAL-REVIEW.md)
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor Author as Content Author
-    actor Reviewer as Theology Reviewer
+    actor Theology as Theology Reviewer
+    actor Clinical as Clinical Reviewer
     participant API as Spring Backend
     participant DB as PostgreSQL
     participant Admin as Admin Telegram Bot
 
-    Author->>API: POST /api/content/versions { topicId, body, llm_assisted, disputed_points }
-    API->>DB: INSERT content_versions { status='pending_review' }
-    API->>DB: SELECT theology_reviewers WHERE topic_scope CONTAINS topicId
-    DB-->>API: [reviewer_a, reviewer_b]
-    API->>Admin: 알림 — reviewer_a 에게 신규 검토 요청
-    Admin-->>Reviewer: "콘텐츠 검토 요청"
+    Author->>API: POST /api/content/versions { topicId, body, llm_assisted, disputed_points, references[] }
+    API->>API: 자동 키워드 필터 (영지주의·뉴에이지 1차) + safety guard
+    Note over API: 자동 필터에 걸리면 즉시 rejected — reviewer 큐 진입 X
+    API->>DB: INSERT content_versions { status='in_review', "references" JSONB }
+    API->>DB: SELECT reviewer_profiles WHERE role IN ('theology','clinical') AND is_active AND scope MATCHES
+    DB-->>API: [theology_a, clinical_a]
 
-    Reviewer->>API: GET /api/theology/reviews/queue
-    API-->>Reviewer: pending content versions
-    Reviewer->>Reviewer: 본문 검토 + disputed_points 확인
-
-    alt 정통 신학 범위 안 — 승인
-        Reviewer->>API: POST /api/theology/reviews { versionId, decision='approved', comments }
-        API->>DB: INSERT theology_reviews { decision='approved' }
-        API->>DB: UPDATE content_versions SET status='published'
-    else 일부 수정 필요
-        Reviewer->>API: POST /api/theology/reviews { decision='changes_requested', diff }
-        API->>DB: UPDATE content_versions SET status='changes_requested'
-        Author->>API: POST /api/content/versions/{id}/revisions { body }
-        Note over Author,API: revisions 흐름은 검토 첫 라운드와 동일
-    else 영지주의·뉴에이지 해석 차단
-        Reviewer->>API: POST /api/theology/reviews { decision='rejected', reason }
-        API->>DB: UPDATE content_versions SET status='rejected'
-        API->>DB: INSERT content_quarantine { reason, blocked_keywords }
+    par 신학·임상 *병렬* 큐 진입
+        API->>Admin: 알림 — theology_a 에게 신규 검토 요청
+        Admin-->>Theology: "콘텐츠 검토 요청 (신학)"
+        Theology->>API: GET /api/theology/reviews/queue
+        API-->>Theology: pending content versions
+        Theology->>Theology: 본문 검토 + disputed_points 확인
+        Theology->>API: POST /api/theology/reviews { versionId, verdict, scripture_accuracy, doctrinal_balance, therapeutic_safety, notes }
+        API->>DB: INSERT theology_reviews
+    and
+        API->>Admin: 알림 — clinical_a 에게 신규 검토 요청
+        Admin-->>Clinical: "콘텐츠 검토 요청 (임상)"
+        Clinical->>API: GET /api/clinical/reviews/queue
+        API-->>Clinical: pending + references PMID
+        Clinical->>Clinical: trauma_safety / crisis_resource / moral_injury_risk / evidence_quality 체크
+        Clinical->>API: POST /api/clinical/reviews { versionId, verdict, trauma_safety, crisis_resource_compliance, moral_injury_risk, evidence_quality, referenced_pmids }
+        API->>DB: INSERT clinical_reviews
     end
 
-    alt 게시됨
+    alt clinical_reviews.veto_used = TRUE  (moral_injury / 자해 안전망 부재 / consent 게이트 없음)
+        API->>DB: UPDATE content_versions SET status='rejected'
+        API->>DB: INSERT content_quarantine { reason, veto_by='clinical' }
+        Note over API,DB: 임상 자문 단독 reject (F-7.5.4) — 신학 verdict 무관
+    else 양쪽 모두 approve
+        API->>DB: UPDATE content_versions SET status='published'
         API->>API: 콘텐츠가 사용자에게 노출 시작
         Note over API: 항상 "AI 보조" footer 자동 첨부 (F-4, F-7)
+    else 한쪽이라도 request_changes
+        API->>DB: UPDATE content_versions SET status='changes_requested'
+        Author->>API: POST /api/content/versions/{id}/revisions { body, references[] }
+        Note over Author,API: revisions 흐름은 검토 첫 라운드와 동일 (양쪽 다시 검토)
+    else 신학 reject / 임상 OK
+        Note over API,DB: 신학 우선 — 콘텐츠 정체성 보호 (F-7.5.7)
+        API->>DB: UPDATE content_versions SET status='rejected'
+        API->>DB: INSERT content_quarantine { reason, veto_by='theology' }
+    else 신학 OK / 임상 reject
+        Note over API,DB: 임상 우선 — 사용자 안전 (F-7.5.7)
+        API->>DB: UPDATE content_versions SET status='rejected'
+        API->>DB: INSERT content_quarantine { reason, veto_by='clinical' }
     end
 ```
 
 **Notes**
 - `disputed_points` 는 작성자가 *명시적으로* 등록 — "이 부분은 해석 분쟁 가능" 표시.
-- 두 명 이상의 리뷰어가 필요한 콘텐츠 종류 (예: 트랙 B 예수 미션) 는 별도 정책 — *2/2 승인 필요*.
+- **2-of-2 approve 필수 콘텐츠** (F-7.5.8): Theme 11 (예수) 모든 콘텐츠 + trigger_warning=high Scene. 같은 role 의 *두 자문가가 모두* approve.
 - 자동 키워드 필터 (영지주의·뉴에이지) 가 1차 필터링 — 리뷰어가 보는 큐에 *이미 깨끗한 후보* 만 도달.
+- `references` JSONB 의 PMID 와 `clinical_reviews.referenced_pmids` 가 *cross-check* — 인용 근거 부적절 시 evidence_quality 점수 감점.
+- SLA (F-7.5.9): routine 5 영업일 / 고난 narrative 10 영업일 / F-6 안전장치 변경 3 영업일 (긴급).
+- **Conflict of interest** (F-7.5.10): 자문가가 본인 작성 콘텐츠 검토 불가 — `reviewer_id ≠ content_versions.created_by` 가드.
+- Veto 단독 권한은 *임상 자문* 만 (사용자 안전 우선 원칙). 신학 자문은 *2-of-2 거부* 만 효력.
 
 ---
 
