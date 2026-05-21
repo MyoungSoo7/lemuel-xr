@@ -21,6 +21,37 @@ const SAMPLE_PROMPTS = [
   "감사한 하루였어",
 ];
 
+/** 분류 결과 없이도 보이는 *직접 진입* 미션 카드. D — 분류 거치지 않고도 진입 가능. */
+const DIRECT_MISSIONS: Array<{
+  href: string;
+  name: string;
+  korean: string;
+  tagline: string;
+  active: boolean;
+}> = [
+  {
+    href: "/joseph",
+    name: "Joseph",
+    korean: "요셉",
+    tagline: "곡식 7년 — 풍년의 결단이 흉년에 돌아온다",
+    active: true,
+  },
+  {
+    href: "/moses",
+    name: "Moses",
+    korean: "모세",
+    tagline: "떨기나무 앞에서 — 두려운 채로 가는 용기 (Phase 2)",
+    active: true,
+  },
+  {
+    href: "/david",
+    name: "David",
+    korean: "다윗",
+    tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다 (Phase 2)",
+    active: true,
+  },
+];
+
 export default function HomePage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<ClassifyResponse | null>(null);
@@ -83,6 +114,32 @@ export default function HomePage() {
           <p className="mt-4 text-red-400 text-sm">
             오류: {(mutation.error as Error).message}
           </p>
+        )}
+
+        {/* D — 분류 결과가 없을 때만 노출되는 *직접 진입* 카드 묶음 */}
+        {!result && (
+          <section className="mt-12 pt-8 border-t border-[var(--color-primary)]/20">
+            <h2 className="text-xs uppercase tracking-wider text-[var(--color-warm)]/40 mb-4 text-center">
+              또는 — 인물 미션을 바로 선택
+            </h2>
+            <div className="space-y-3">
+              {DIRECT_MISSIONS.map((m) => (
+                <Link
+                  key={m.href}
+                  href={m.href}
+                  className="block px-5 py-4 rounded-lg border border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/60 transition"
+                >
+                  <p className="font-semibold">
+                    {m.name}
+                    <span className="ml-2 text-sm text-[var(--color-warm)]/60">
+                      {m.korean}
+                    </span>
+                  </p>
+                  <p className="text-xs text-[var(--color-warm)]/60 mt-1">{m.tagline}</p>
+                </Link>
+              ))}
+            </div>
+          </section>
         )}
 
         {result && (
