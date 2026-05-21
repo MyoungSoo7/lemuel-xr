@@ -6,8 +6,8 @@ import github.lms.lemuel.xr.emotion.domain.Emotion;
 import org.junit.jupiter.api.Test;
 
 /**
- * 2026-05-22 mission 재정의 — 인물 우선순위 재정렬 반영:
- * Stage 1 (JOB·ELIJAH) 가 MVP. 모세·다윗·요셉은 Phase 2 이후.
+ * 2026-05-22 mission 최종 정착 — *영적 비상 대비 훈련* (큐티+민방위).
+ * 4 인물 (JOSEPH·MOSES·DAVID·JESUS) 모두 동등한 교사. JOB·ELIJAH 는 보조.
  */
 class EmotionRecommenderTest {
 
@@ -21,24 +21,39 @@ class EmotionRecommenderTest {
     }
 
     @Test
-    void ANXIOUS_는_JOB_또는_ELIJAH_캐릭터_추천() {
+    void ANXIOUS_는_MOSES_떨면서_한_발() {
         var chars = r.trackB(Emotion.ANXIOUS);
         assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
-                .contains("JOB");
+                .contains("MOSES");
     }
 
     @Test
-    void EXHAUSTED_는_ELIJAH_추천_번아웃_매칭() {
+    void EXHAUSTED_는_MOSES_광야_40년_핵심() {
         var chars = r.trackB(Emotion.EXHAUSTED);
         assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
-                .contains("ELIJAH");
+                .contains("MOSES");
     }
 
     @Test
-    void SAD_는_JOB_비탄_매칭() {
+    void GRATEFUL_은_JOSEPH_복귀() {
+        // 요셉 복귀 — 4 인물 모두 동등. 감사·회복 결에는 요셉의 *섭리 안의 회복* 핵심.
+        var chars = r.trackB(Emotion.GRATEFUL);
+        assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
+                .contains("JOSEPH");
+    }
+
+    @Test
+    void CONFUSED_는_JOSEPH_꿈해석_또는_DAVID_정체성() {
+        var chars = r.trackB(Emotion.CONFUSED);
+        assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
+                .containsAnyOf("JOSEPH", "DAVID");
+    }
+
+    @Test
+    void SAD_는_DAVID_시편_비탄() {
         var chars = r.trackB(Emotion.SAD);
         assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
-                .contains("JOB");
+                .contains("DAVID");
     }
 
     @Test
@@ -50,13 +65,12 @@ class EmotionRecommenderTest {
     }
 
     @Test
-    void JOSEPH_은_Stage_4_로_미루어져_기본_추천에_안_나옴() {
-        // R2 가스라이팅 방지 — 회복 모델 (요셉) 을 active 사용자에게 노출 X.
-        // Phase 2 에서 "이미 회복된 사용자" 분기에 재활성화 예정.
+    void 모든_감정에_4_인물_중_최소_하나는_추천() {
+        // 4 인물 동등 원칙 — 사용자가 어떤 감정에 진입해도 4명 중 누군가는 만난다.
         for (Emotion e : Emotion.values()) {
             var chars = r.trackB(e);
             assertThat(chars).extracting(EmotionRecommender.CharacterSuggestion::character)
-                    .doesNotContain("JOSEPH");
+                    .containsAnyOf("JOSEPH", "MOSES", "DAVID", "JESUS");
         }
     }
 }

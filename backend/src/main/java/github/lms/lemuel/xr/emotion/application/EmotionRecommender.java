@@ -27,24 +27,33 @@ public class EmotionRecommender {
     );
 
     /**
-     * 2026-05-22 mission 재정의 — Recovery 타겟에 맞춰 인물 매핑 재정렬.
+     * 2026-05-22 mission 최종 정착 — *영적 비상 대비 훈련* 정체성.
      *
-     * <p>Stage 1 (욥·엘리야) 우선. 비탄·죽음 갈구·번아웃에 대한 *언어 허락*.
-     * 모세·다윗·요셉은 회복 진행 단계에 따라 노출. JOSEPH 은 Phase 2 까지 *retired* —
-     * Active crisis 사용자에게 *비교 박탈감* (R2 가스라이팅) 위험 회피.</p>
+     * <p>4 인물 (요셉·모세·다윗·예수) 모두 *각자 다른 절망의 결* 을 통과한 동등한 교사.
+     * 욥·엘리야는 *보조* 로 유지 — 깊은 비탄·번아웃 결에는 강하지만 *주역 4명* 의 자리는 보존.</p>
+     *
+     * <p>설계 원칙: 각 감정에 *우선 4 인물 1명 + 보조 1~2명*. 사용자가 *4 인물 모두 만나게* 되는
+     * 다양성을 보장.</p>
      */
     private static final Map<Emotion, List<CharacterSuggestion>> TRACK_B = Map.of(
-            Emotion.ANXIOUS,    List.of(c("JOB", 1, "비탄의 언어 허락 — 침묵의 7일", 0.85),
-                                        c("ELIJAH", 3, "음식·잠 먼저", 0.78)),
-            Emotion.SAD,        List.of(c("JOB", 2, "태어난 날을 저주한 욥", 0.88),
-                                        c("ELIJAH", 2, "죽음 갈구의 정당성", 0.75)),
-            Emotion.ANGRY,      List.of(c("JOB", 3, "친구의 거짓 위로 인식", 0.82)),
-            Emotion.CONFUSED,   List.of(c("JOB", 4, "답이 아닌 만남", 0.80)),
-            Emotion.LONELY,     List.of(c("ELIJAH", 5, "7000명이 남았다", 0.86),
-                                        c("JOB", 1, "함께 있음의 침묵", 0.74)),
-            Emotion.EXHAUSTED,  List.of(c("ELIJAH", 1, "승리 후 번아웃 — 도망", 0.91),
-                                        c("ELIJAH", 3, "음식·잠 회복", 0.83)),
-            Emotion.GRATEFUL,   List.of(c("ELIJAH", 4, "세미한 소리", 0.72))
+            Emotion.ANXIOUS,    List.of(c("MOSES", 4, "두려움 가운데 떨면서도 한 발", 0.85),
+                                        c("DAVID", 4, "공포에 신뢰를 함께 가져가다", 0.78),
+                                        c("JOB", 1, "함께 있음의 침묵 (보조)", 0.72)),
+            Emotion.SAD,        List.of(c("DAVID", 1, "시편 비탄 — 솔직한 슬픔", 0.88),
+                                        c("JESUS", 1, "겟세마네 — 슬픔의 자리 (godjinho)", 0.82),
+                                        c("JOB", 2, "태어난 날을 저주할 자유 (보조)", 0.74)),
+            Emotion.ANGRY,      List.of(c("MOSES", 3, "다섯 변명을 던지든 가슴에 가져가든", 0.83),
+                                        c("DAVID", 2, "엘리압의 비웃음 — 사명 우선", 0.78)),
+            Emotion.CONFUSED,   List.of(c("JOSEPH", 1, "꿈 해석 — 답을 찾는 자리", 0.82),
+                                        c("DAVID", 3, "사울 갑옷 벗기 — 내 정체성 찾기", 0.79)),
+            Emotion.LONELY,     List.of(c("MOSES", 4, "아론과 함께 — 7000명이 남았다", 0.85),
+                                        c("DAVID", 1, "시편 23 — 동행의 시인", 0.80),
+                                        c("ELIJAH", 5, "혼자가 아니다 (보조)", 0.76)),
+            Emotion.EXHAUSTED,  List.of(c("MOSES", 1, "광야 40년의 침묵", 0.86),
+                                        c("ELIJAH", 3, "먼저 먹고 자도 됩니다 (보조)", 0.84),
+                                        c("JOSEPH", 2, "13년 옥살이의 꾸준함", 0.78)),
+            Emotion.GRATEFUL,   List.of(c("JOSEPH", 5, "섭리 안의 회복 — 형제 재회", 0.88),
+                                        c("DAVID", 1, "감사의 시편", 0.81))
     );
 
     public List<TopicSuggestion> trackA(Emotion e) {

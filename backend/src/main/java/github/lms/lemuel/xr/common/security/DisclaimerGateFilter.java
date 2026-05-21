@@ -73,8 +73,9 @@ public class DisclaimerGateFilter extends OncePerRequestFilter {
                 {"type":"https://lemuel.co.kr/errors/E_DISCLAIMER_REQUIRED",\
                 "title":"Disclaimer acceptance required",\
                 "status":451,"code":"E_DISCLAIMER_REQUIRED",\
-                "detail":"이 앱은 치료가 아니며 의료 진단·치료를 대체하지 않습니다. \
-                위기 시 1393 (자살예방상담전화). 콘텐츠 접근 전 /api/auth/accept-disclaimer 호출 필요.",\
+                "detail":"lemuel-xr 는 영적 비상 대비 훈련 프로그램입니다 — 큐티가 일상 영적 양식이듯, \
+                민방위 교육이 비상 대비이듯. 의료 진단·치료가 아니며 진단·치료를 대체하지 않습니다. \
+                위기 시 1393 (자살예방상담전화). 시작 전 /api/auth/accept-disclaimer 호출 필요.",\
                 "crisisResources":[\
                   {"name":"자살예방상담전화","phone":"1393","hours":"24/7"},\
                   {"name":"정신건강위기상담전화","phone":"1577-0199","hours":"24/7"}\

@@ -53,11 +53,22 @@ ai:
   base-url: ${AI_BASE_URL:http://localhost:8000}
   timeout-ms: 30000
   internal-token: ${AI_INTERNAL_TOKEN:dev-internal-token-rotate-in-prod}
-  # 2026-05-22 결정: 임상 자문 1명 영입 전까지 LLM 생성 비활성화 (큐레이션만).
-  # 활성화 시 prod 에 AI_GENERATION_ENABLED=true override.
+  # 2026-05-22 정착: lemuel-xr 정체성 = *영적 비상 대비 훈련* (큐티+민방위).
+  # 임상·치료 영역 X → AI 생성 활성화 default. Prompt guard 가 *큐티 톤* 강제.
   generation:
-    enabled: ${AI_GENERATION_ENABLED:false}
-    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 더 깊은 동행이 필요하시면 가까운 정신건강의학과 또는 1393 (자살예방상담전화) 으로 연결해 드릴게요."
+    enabled: ${AI_GENERATION_ENABLED:true}
+    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 위기 시 1393 (자살예방상담전화)."
+    # Prompt 톤 가이드 — Python AI 사이드카가 system prompt 에 prepend.
+    tone-guidance: |
+      당신은 *영적 비상 대비 훈련* 가이드입니다. 큐티(QT)와 같은 *일상 영적 양식* 톤으로 응답하세요.
+      반드시 따를 것:
+      - 4 인물 (요셉·모세·다윗·예수) 의 *절망 → 아름다운 회복* 이야기로 내면 단련에 도움 주기
+      - 큐티 톤: 본문 인용 + 묵상 + 개인 적용. 짧고 진솔하게.
+      - "내면을 단단히", "영적 양식", "예방 영성" 같은 *단련·예방* 어휘 사용
+      절대 금지:
+      - 의료 진단·치료 권고 (위기 키워드는 시스템이 자동 처리)
+      - 거짓 위로 ("곧 나아질 거예요", "다 뜻이 있어요" 같은 가스라이팅)
+      - 결과 보장 ("이 미션 끝나면 회복돼요")
   provider-priority:
     classify_emotion: [openai_gpt4o_mini, anthropic_claude3_haiku]
     polish_psalm: [anthropic_claude35_sonnet, openai_gpt4o]
