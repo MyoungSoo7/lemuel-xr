@@ -47,6 +47,11 @@ dependencies {
     // Micrometer Prometheus — /actuator/prometheus endpoint (Grafana 대시보드용)
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 
+    // OpenTelemetry traces — Spring → OTLP exporter → Tempo
+    // (Micrometer Tracing 이 trace_id 를 모든 로그 MDC 에 자동 박아 logs↔traces correlation)
+    implementation("io.micrometer:micrometer-tracing-bridge-otel")
+    implementation("io.opentelemetry:opentelemetry-exporter-otlp")
+
     // YAML 시나리오 로더
     implementation("org.yaml:snakeyaml")
 

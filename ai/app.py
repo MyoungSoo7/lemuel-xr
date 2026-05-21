@@ -22,6 +22,13 @@ from pydantic import BaseModel
 
 import providers
 
+# OpenTelemetry — Tempo OTLP exporter (best-effort import)
+try:
+    import tracing as _tracing
+    _TRACING_AVAILABLE = True
+except ImportError:
+    _TRACING_AVAILABLE = False
+
 # Legacy Gemini 직접 호출 (backward compat)
 try:
     from google import genai
@@ -43,6 +50,12 @@ _legacy_client = (
     else None
 )
 app = FastAPI(title="lemuel-xr-ai")
+if _TRACING_AVAILABLE:
+    try:
+        _tracing.setup(app)
+    except Exception:
+        # OTel 설정 실패는 backend 에 영향 X — graceful skip
+        pass
 
 Emotion = Literal["ANXIOUS", "SAD", "ANGRY", "CONFUSED", "LONELY", "EXHAUSTED", "GRATEFUL"]
 
