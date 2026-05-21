@@ -103,20 +103,32 @@ export default function HomePage() {
                   Track B — 인물 서사
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
-                  {result.recommendations.trackB.map((c) => (
-                    <Link
-                      key={c.character}
-                      href={c.character === "joseph" ? "/joseph" : "#"}
-                      className="block px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition"
-                    >
-                      <p className="font-semibold">{c.character}</p>
-                      {c.rationale && (
-                        <p className="text-xs text-[var(--color-warm)]/60 mt-1">
-                          {c.rationale}
+                  {result.recommendations.trackB.map((c) => {
+                    const ACTIVE = new Set(["joseph", "moses", "david"]);
+                    const href = ACTIVE.has(c.character) ? `/${c.character}` : "#";
+                    const phase2 = c.character !== "joseph";
+                    return (
+                      <Link
+                        key={c.character}
+                        href={href}
+                        className="block px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition"
+                      >
+                        <p className="font-semibold">
+                          {c.character}
+                          {phase2 && (
+                            <span className="ml-2 text-[10px] text-[var(--color-warm)]/40 uppercase">
+                              Phase 2
+                            </span>
+                          )}
                         </p>
-                      )}
-                    </Link>
-                  ))}
+                        {c.rationale && (
+                          <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                            {c.rationale}
+                          </p>
+                        )}
+                      </Link>
+                    );
+                  })}
                 </div>
               </div>
             )}
