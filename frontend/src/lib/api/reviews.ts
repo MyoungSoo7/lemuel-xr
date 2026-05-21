@@ -43,6 +43,11 @@ export interface ReviewSubmitted {
   reviewId: number;
   contentVersionId: string;
   reviewedAt: string;
+  /** 자동 status 전환 결과 (EvaluateContentStatusUseCase). */
+  previousStatus?: string | null;
+  currentStatus?: string | null;
+  /** "both_approved" | "clinical_veto" | "one_side_reject" | "changes_requested" | "waiting_other_side" | ... */
+  statusReason?: string | null;
 }
 
 export async function fetchReviewQueue(): Promise<QueueItem[]> {

@@ -9,6 +9,7 @@ import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentVersionJpaEn
 import github.lms.lemuel.xr.theology.adapter.out.persistence.ContentVersionRepository;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.TheologyReviewJpaEntity;
 import github.lms.lemuel.xr.theology.adapter.out.persistence.TheologyReviewRepository;
+import github.lms.lemuel.xr.theology.application.EvaluateContentStatusUseCase;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ public class ReviewController {
     private final ContentVersionRepository versions;
     private final TheologyReviewRepository theologyReviews;
     private final ClinicalReviewRepository clinicalReviews;
+    private final EvaluateContentStatusUseCase evaluator;
 
     @GetMapping("/api/reviews/queue")
     public ResponseEntity<List<QueueItem>> queue() {
@@ -88,7 +90,12 @@ public class ReviewController {
         row.setReviewedAt(LocalDateTime.now());
         theologyReviews.save(row);
 
-        return ResponseEntity.ok(new ReviewSubmitted(row.getId(), v.getId(), row.getReviewedAt()));
+        // 양쪽 검토 종합 → 자동 status 전환
+        var decision = evaluator.execute(v.getId());
+
+        return ResponseEntity.ok(new ReviewSubmitted(
+                row.getId(), v.getId(), row.getReviewedAt(),
+                decision.previousStatus(), decision.currentStatus(), decision.reason()));
     }
 
     @PostMapping("/api/clinical/reviews")
@@ -123,7 +130,12 @@ public class ReviewController {
         row.setReviewedAt(LocalDateTime.now());
         clinicalReviews.save(row);
 
-        return ResponseEntity.ok(new ReviewSubmitted(row.getId(), v.getId(), row.getReviewedAt()));
+        // 양쪽 검토 종합 → 자동 status 전환 (Veto 사용 시 즉시 rejected)
+        var decision = evaluator.execute(v.getId());
+
+        return ResponseEntity.ok(new ReviewSubmitted(
+                row.getId(), v.getId(), row.getReviewedAt(),
+                decision.previousStatus(), decision.currentStatus(), decision.reason()));
     }
 
     private static boolean hasReview(int count) { return count > 0; }
@@ -168,5 +180,9 @@ public class ReviewController {
             List<String> referencedPmids
     ) {}
 
-    public record ReviewSubmitted(Long reviewId, UUID contentVersionId, LocalDateTime reviewedAt) {}
+    public record ReviewSubmitted(
+            Long reviewId, UUID contentVersionId, LocalDateTime reviewedAt,
+            /** 자동 status 전환 결과 (EvaluateContentStatusUseCase). null 가능 — 콘텐츠 미발견 시. */
+            String previousStatus, String currentStatus, String statusReason
+    ) {}
 }
