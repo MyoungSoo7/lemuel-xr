@@ -172,6 +172,7 @@ PROVIDER_PRIORITY: dict[str, list[str]] = {
     "classify_emotion": ["openai_gpt4o_mini", "anthropic_claude3_haiku", "google_gemini_25_flash_lite"],
     "diary_meditation": ["anthropic_claude35_sonnet", "openai_gpt4o", "google_gemini_25_flash"],
     "game_branch":      ["openai_gpt4o_mini", "anthropic_claude3_haiku", "google_gemini_25_flash"],
+    "game_reaction":    ["openai_gpt4o_mini", "anthropic_claude3_haiku", "google_gemini_25_flash"],
     "polish_psalm":     ["anthropic_claude35_sonnet", "openai_gpt4o", "google_gemini_25_flash"],
     "weekly_report":    ["anthropic_claude35_sonnet", "openai_gpt4o", "google_gemini_25_flash"],
     "npc_dialogue":     ["openai_gpt4o_mini", "anthropic_claude3_haiku", "google_gemini_25_flash"],

@@ -94,7 +94,7 @@ def _build_prompt(prompt_key: str, variables: dict[str, Any]) -> str:
             "내면 독백을 한국어 2~3 문장으로 작성하세요. "
             "백성 책임감과 두려움이 섞여 있어야 합니다."
         )
-    if prompt_key == "joseph.s4.reunion":
+    if prompt_key in ("joseph.s4.reunion", "joseph.s4.reaction"):
         priority = {
             "farmer_first": "이집트 농민",
             "immigrant_first": "이주민 가족",
