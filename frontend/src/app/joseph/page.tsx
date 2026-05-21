@@ -79,7 +79,9 @@ export default function JosephPage() {
 
   const payload = scene.scenePayload as Record<string, unknown>;
   const title = (payload.title as string) ?? "Scene";
-  const sceneType = (payload.type as string) ?? "";
+  const rawType = (payload.type as string) ?? "";
+  const sceneType =
+    rawType === "interaction" ? ((payload.interaction as string) ?? "") : rawType;
 
   return (
     <main className="min-h-screen flex flex-col p-4 sm:p-6">
