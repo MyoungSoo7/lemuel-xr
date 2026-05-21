@@ -49,6 +49,15 @@ public class TheologyReviewJpaEntity {
     @Column(name = "suggested_changes", columnDefinition = "jsonb")
     private Map<String, Object> suggestedChanges;
 
+    /** V20260521135130 — reviewer_profiles 연결 (자문가 등록 프로필). */
+    @Column(name = "reviewer_profile_id")
+    private UUID reviewerProfileId;
+
+    /** V20260521135130 — 인용 PMID 배열 (clinical_reviews 와 cross-check). */
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "referenced_pmids", columnDefinition = "jsonb")
+    private java.util.List<String> referencedPmids;
+
     @Column(name = "reviewed_at", nullable = false)
     private LocalDateTime reviewedAt;
 }

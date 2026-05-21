@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TheologyReviewRepository extends JpaRepository<TheologyReviewJpaEntity, Long> {
     List<TheologyReviewJpaEntity> findByContentVersionIdOrderByReviewedAtDesc(UUID contentVersionId);
+
+    List<TheologyReviewJpaEntity> findByContentVersionId(UUID contentVersionId);
 }
