@@ -18,6 +18,17 @@
 
 AI 가 생성한 묵상·해석은 **자동 출판 금지**. 출력 → 검토 → 게시. 출력에 *"AI 보조"* 표시 필수.
 
+### 1.5 임상적 검증 — 신학과 *병렬*
+
+AI 가 생성한 *사용자 노출 콘텐츠* (특히 Theme 5 고통·11 십자가, F-6 안전장치, LLM 시스템 프롬프트, trigger_warning ≥ medium Scene) 는 **신학 자문 + 임상 자문 양쪽 모두 approve** 가 PUBLISHED 의 조건.
+
+- **임상 체크리스트 4종** (1-5 score): trauma_safety / crisis_resource_compliance / **moral_injury_risk** (Jones 2022 PMID 35609469 직접 매핑) / evidence_quality
+- **Veto 단독 reject**: 임상 자문은 moral_injury / 자해 안전망 부재 / consent 없는 trauma 자극 시 신학 verdict 무관하게 단독 reject 가능
+- **escalation**: 신학 OK / 임상 reject → **임상 우선** (사용자 안전). 신학 reject / 임상 OK → **신학 우선** (콘텐츠 정체성)
+- **2-of-2 approve 필수**: Theme 11 (예수) + trigger_warning=high Scene
+
+상세: [`docs/governance/CLINICAL-REVIEW.md`](docs/governance/CLINICAL-REVIEW.md) / [FUNCTIONAL-SPEC §F-7.5](docs/FUNCTIONAL-SPEC.md) / [SEQUENCE-DIAGRAMS §5](docs/SEQUENCE-DIAGRAMS.md) / [Issue #4](https://github.com/MyoungSoo7/lemuel-xr/issues/4)
+
 ### 2. 톤 — 사용자가 종교색 강도를 *선택*
 
 - 강 — 신학 용어, 성경 인용 직접
