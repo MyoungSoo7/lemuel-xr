@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
   startJoseph,
@@ -7,12 +7,33 @@ import {
   completeJoseph,
   type JosephStartResponse,
 } from "@/lib/api/game";
+import {
+  scene2Monologues,
+  scene3Outcomes,
+  scene4Reactions,
+  scene5OutroByScene3,
+  scene3DecisionToPattern,
+  type Scene2Choice,
+  type Scene3Pattern,
+  type Scene4Choice,
+} from "@/lib/content/joseph-monologues";
 
 type Scene = JosephStartResponse;
+
+/**
+ * 직전 결정에 대한 *모놀로그/아웃컴* 메모리. Scene 진입 시 상단 quote 영역에 표시.
+ * 자문 통과 후 backend 가 LLM 응답으로 교체하면 본 상태는 제거 가능 (shape 동일).
+ */
+interface DecisionEcho {
+  fromScene: number;
+  text: string;
+}
 
 export default function JosephPage() {
   const [scene, setScene] = useState<Scene | null>(null);
   const [history, setHistory] = useState<string[]>([]);
+  const [echo, setEcho] = useState<DecisionEcho | null>(null);
+  const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(null);
 
   const start = useMutation({
     mutationFn: () => startJoseph("web"),
@@ -22,7 +43,12 @@ export default function JosephPage() {
   const decide = useMutation({
     mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
       decideJoseph(scene!.sessionId, sceneId, decision),
-    onSuccess: (d) => {
+    onSuccess: (d, vars) => {
+      // 결정 직후 — *방금 떠난 Scene* 의 monologue/outcome 을 echo 로 띄움
+      const localEcho = buildLocalEcho(vars.sceneId, vars.decision);
+      if (localEcho) setEcho({ fromScene: vars.sceneId, text: localEcho.text });
+      if (localEcho?.scene3Pattern) setScene3Pattern(localEcho.scene3Pattern);
+
       setScene(d);
       setHistory((h) => [...h, JSON.stringify(d.scenePayload.title)]);
     },
@@ -31,6 +57,14 @@ export default function JosephPage() {
   useEffect(() => {
     if (!scene && !start.isPending && !start.isError) start.mutate();
   }, [scene, start]);
+
+  // Scene 5 (outro) 진입 시 Scene 3 패턴 기반 결말 톤 적용
+  const outroText = useMemo(() => {
+    if (scene?.currentScene !== 5) return null;
+    return scene3Pattern
+      ? scene5OutroByScene3[scene3Pattern]
+      : scene5OutroByScene3.farmer_first; // fallback
+  }, [scene?.currentScene, scene3Pattern]);
 
   if (!scene) {
     return (
@@ -53,7 +87,17 @@ export default function JosephPage() {
         <h1 className="text-2xl font-bold mt-1">{title}</h1>
       </header>
 
-      {/* Scene 배경 이미지 — R3F 제거, 정적 이미지 + 그라데이션 overlay (모바일 호환성↑) */}
+      {/* Decision echo — 직전 결정의 모놀로그 / 아웃컴 */}
+      {echo && (
+        <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
+          <p className="whitespace-pre-line">{echo.text}</p>
+          <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
+            * AI 보조 — 본문은 성경 참조 *
+          </p>
+        </section>
+      )}
+
+      {/* Scene 배경 이미지 */}
       <section
         className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-cover bg-center"
         style={{ backgroundImage: `url(/images/scenes/${scene.currentScene}.jpg)` }}
@@ -73,7 +117,10 @@ export default function JosephPage() {
       <section className="max-w-3xl mx-auto w-full space-y-3">
         {sceneType === "cinematic" && (
           <button
-            onClick={() => decide.mutate({ sceneId: scene.currentScene, decision: "next" })}
+            onClick={() => {
+              setEcho(null); // cinematic → 다음 진입 시 echo 클리어
+              decide.mutate({ sceneId: scene.currentScene, decision: "next" });
+            }}
             className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
             disabled={decide.isPending}
           >
@@ -123,10 +170,11 @@ export default function JosephPage() {
 
         {sceneType === "outro" && (
           <div className="text-center space-y-4">
-            <p className="text-lg italic">
-              &ldquo;하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니&rdquo;
-              <br />
-              <span className="text-sm text-[var(--color-warm)]/50">(창 45:5)</span>
+            <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
+              {outroText}
+            </p>
+            <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
+              * AI 보조 — 본문은 성경 참조 *
             </p>
             <button
               onClick={() =>
@@ -154,4 +202,28 @@ export default function JosephPage() {
       )}
     </main>
   );
+}
+
+/**
+ * 직전 결정 (vars.sceneId + vars.decision) → 사용자에게 보여줄 *모놀로그 또는 아웃컴* 매핑.
+ * Scene 3 의 경우 Scene 5 결말 톤 결정에 쓸 *pattern* 도 함께 반환.
+ */
+function buildLocalEcho(
+  fromScene: number,
+  decision: unknown,
+): { text: string; scene3Pattern?: Scene3Pattern } | null {
+  if (fromScene === 2 && typeof decision === "string") {
+    const text = scene2Monologues[decision as Scene2Choice];
+    return text ? { text } : null;
+  }
+  if (fromScene === 3) {
+    const pattern = scene3DecisionToPattern(decision);
+    if (!pattern) return null;
+    return { text: scene3Outcomes[pattern], scene3Pattern: pattern };
+  }
+  if (fromScene === 4 && typeof decision === "string") {
+    const text = scene4Reactions[decision as Scene4Choice];
+    return text ? { text } : null;
+  }
+  return null;
 }
