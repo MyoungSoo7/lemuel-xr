@@ -4,7 +4,7 @@
 > **본 문서**: 실제 사용자에게 노출되는 *대본·자산·인터랙션 트리거* — Unity 6 LTS + OpenXR 환경에서 그대로 구현 가능한 수준의 데이터.
 > **타겟 디바이스**: Quest 3 (기준) / Quest Pro / Vision Pro / Galaxy XR — capabilities-min: 6DoF + hand tracking + spatial audio. eye tracking 은 optional.
 > **세션 길이**: 6분 ± 1분. *5분 안에 종료 가능한 short path* 와 *7분 안에 종료 가능한 deep path* 분기.
-> **신학·안전 톤**: `lemuel-xr-theology-tone` + `lemuel-xr-mental-health-safety` 사전 가이드 적용 — disputed_points 명시, R1~R5 안전선 통합, *AI 보조 — 본문은 성경 참조* footer 자동.
+> **톤 가이드**: `lemuel-xr-theology-tone` + `lemuel-xr-mental-health-safety` 사전 가이드 적용 — disputed_points 명시, R1~R5 안전선 (영적 비상 대비 교육 맥락) 통합, *AI 보조 — 본문은 성경 참조* footer 자동. *임상/의료 도구 아님 — 누구나 절망 비상에 대비하는 영적 단련*.
 > **근거 인용**: `THEOLOGY-REFERENCES.md` 의 J1 (박영원 2015, 요셉 내러티브와 섭리) 을 핵심 인용.
 
 ---
@@ -56,10 +56,10 @@
 
 각 Scene 의 사용자 결정 → `POST /api/game/joseph/scene/{n}/decide` →
 - `game_decisions` 테이블에 JSONB 로 기록 (V4 schema)
-- `scene_views` 에 entered/exited timestamp 기록 (Window of Tolerance 분석용)
-- `interaction_meta` 에 *망설인 시간 (자루를 손에 쥐고 있던 시간), 시선 분배* 같은 마이크로 신호 기록
+- `scene_views` 에 entered/exited timestamp 기록 (몰입 흐름·페이스 분석용)
+- `interaction_meta` 에 *망설인 시간 (자루를 손에 쥐고 있던 시간), 시선 분배* 같은 마이크로 신호 기록 — *사용자 자신의 묵상 패턴 회고용* (임상 평가 X)
 
-→ Day 30 리포트 (`v_user_30d_summary`) 에서 의미 있는 패턴으로 노출.
+→ Day 30 리포트 (`v_user_30d_summary`) 에서 *자기 묵상 패턴* 으로 노출 — *진단/평가 톤 차단*.
 
 ### 0.5 항상 노출되는 footer
 
@@ -73,7 +73,7 @@ AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199
 
 ### 0.6 5 Scene 의 영성·감성·이성 차원 매핑
 
-본 미션은 *영성만의 미션이 아님*. 사용자가 *자기 상태에 맞춰 진입할 수 있게* 5 Scene 을 *영성 (초월·의미)*, *감성 (정서·관계)*, *이성 (분석·결정)* 의 3차원으로 매핑.
+본 미션은 *영성만의 미션이 아님*. *누구나 — 절망 대비 훈련 사용자* 가 *자기 상태에 맞춰 진입할 수 있게* 5 Scene 을 *영성 (초월·의미)*, *감성 (정서·관계)*, *이성 (분석·결정)* 의 3차원으로 매핑.
 
 - 범례: ● 주로 활성되는 차원 / ◐ 부차적 차원 / · 약한 활성
 
@@ -249,8 +249,8 @@ UI:
 ### 3.3 안전·신학 footer
 
 - **R3 회복 압박 회피**: *상인 우선* 결말도 *"틀렸다"* 가 아닌 *"다시 선택할 기회가 있다"* — 자기비난 톤 차단
-- **R2 고난 footer**: Scene 3 진입 시점에 *시야 우상단* 에 작게 footer 노출 *(영구)* — `lemuel-xr-mental-health-safety` SKILL.md R2 mandated 원문 그대로:
-  > *이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요. {{crisis_resources.default}}*
+- **R2 고난 footer (원리 유지, 어휘 일반화)**: Scene 3 진입 시점에 *시야 우상단* 에 작게 footer 노출 *(영구)* — 영적 비상 대비 교육 맥락의 안전 안내:
+  > *이 묵상은 자발적인 고난의 의미를 다룹니다. 어떤 형태의 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요. {{crisis_resources.default}}*
 - **신학 분쟁**: *"농민 우선이 가장 *옳다*"* 식의 단일 정답 차단.
   > 박영원 (2015, J1) 의 *요셉 내러티브와 섭리* 논의 — *자유의지와 예정의 공존, 인간 죄악을 궁극적 선으로 인도하는 섭리* — 를 따라 단일 정답을 배제.
 
@@ -316,7 +316,7 @@ Scene 3 fade-out 후, Scene 4 의 첫 대사 *이전* 에 1회 추가 prompt 노
 ### 4.3 안전·신학 footer
 
 - **상인 우선 결말** 의 *"원망이 쌓였음"* 은 *자기비난 톤이 아니라* *"오늘 곡식을 줄 수는 있다"* 같은 *복구 가능성* 으로 균형
-- *침묵 선택 (C)* 은 *욥 2:13* 처럼 *침묵이 정당한 반응* 임을 인정 — TRACK-A-5 의 욥기 연결
+- *침묵 선택 (C)* 은 *욥 2:13* 처럼 *침묵이 정당한 반응* 임을 인정 — *AI 는 성경 인물 절망 극복 서사의 storyteller* 로서 욥기와 연결 (TRACK-A-5)
 - **신학 분쟁**: 창 45:5 *"하나님이 보내셨다"* 는 *섭리* 의 가장 강한 본문 — *disputed_points* 에 다중 입장 명시.
   > 박영원 (2015, J1) 의 *요셉 내러티브와 섭리* 논의 — *자유의지와 예정의 공존, 인간 죄악을 궁극적 선으로 인도하는 섭리* — 를 따라 단일 입장 채택 없이 함께 노출.
 
@@ -356,8 +356,8 @@ Scene 3 fade-out 후, Scene 4 의 첫 대사 *이전* 에 1회 추가 prompt 노
 
 ### 5.3 안전·신학 footer
 
-- 모든 회복 문구는 *"지금 회복하지 못해도 괜찮다"* 톤 (R3)
-- *"하나님이 너를 사용하셨다"* 같은 *도구화* 표현 차단 — *"너의 결정이 의미를 가졌다"* 처럼 *주체성 인정* 톤
+- 모든 회복 문구는 *"지금 회복하지 못해도 괜찮다"* 톤 (R3 회복 압박 회피 — 원리 유지)
+- *"하나님이 너를 사용하셨다"* 같은 *도구화* 표현 차단 — *"너의 결정이 의미를 가졌다"* 처럼 *주체성 인정* 톤 (*AI 는 성경 인물 절망 극복 서사의 storyteller*, 치료 발화자가 아님)
 - **신학 근거 (J1 명시)**: Scene 5 의 한 줄 본문 *창 45:5* 와 회복 문구는 *섭리 + 자유의지 공존* 신학 위에 작성.
   > 박영원 (2015, J1) 의 *요셉 내러티브와 섭리* 논의 — *자유의지와 예정의 공존, 인간 죄악을 궁극적 선으로 인도하는 섭리* — 를 따라, *"너의 결정이 의미를 가졌다"* 톤이 *도구화 (수동적 운명론)* 가 아닌 *주체성 인정* 으로 작동.
   > (`THEOLOGY-REFERENCES.md` 의 권장 활용 위치: Scene 5)
@@ -476,9 +476,9 @@ scenes:
 
 ## 9. 안전 게이트 — 실 동작 예
 
-**R1 시뮬레이션** — Scene 1 의 *책 펼치기* 단계에서 사용자가 *음성 입력* 으로 *"죽고 싶다"* 같은 발화 (만약 음성 입력 기능 있다면):
+**R1 시뮬레이션 (1393 키워드 라우팅 — 유지)** — Scene 1 의 *책 펼치기* 단계에서 사용자가 *음성 입력* 으로 1393 키워드에 해당하는 발화 (만약 음성 입력 기능 있다면):
 
-1. SafetyController.detectSelfHarmRisk 통과 → severity = HIGH
+1. SafetyController.detectSelfHarmRisk 통과 → severity = HIGH (라우팅 트리거 — *AI 가 위기 개입자 역할이 아니라*, 즉시 1393·전문가 자원으로 *연결만* 함)
 2. *현재 Scene 즉시 일시정지* (fade-to-black)
 3. 위기 자원 카드 노출:
    > *"잠시 멈추겠습니다.*
@@ -487,7 +487,9 @@ scenes:
 4. 사용자가 *"메인으로"* 누르거나 30초 대기 → 미션 종료, 메인 화면 복귀. game_sessions.abandoned_at 기록.
 5. safety_alerts row 생성 (severity=high, source=game, raw_excerpt_hash 만 — 원문 미저장).
 
-**R4 시뮬레이션** — Scene 4 의 *형제 재회* 가 *가족 트라우마* 사용자에게 트리거가 될 수 있는 경우:
+→ R1 의 역할: *AI 가 자살예방 전문가가 아니다*. *영적 비상 대비 콘텐츠 가 진행 중일 때 위험 신호 감지 시 즉시 전문 자원으로 라우팅하는 게이트* 일 뿐.
+
+**R4 시뮬레이션 (원리 유지, 어휘 일반화)** — Scene 4 의 *형제 재회* 가 *가족 갈등 정서를 민감하게 떠올릴 수 있는* 사용자에게 강한 환기가 될 수 있는 경우:
 
 - Pre-Scene 0 의 동의 카드에서 *"가족 갈등·이별·재회 포함"* 사전 고지
 - Scene 4 진입 *직전* 1회 추가 prompt: *"가족 재회 장면이 시작됩니다. 계속할까요? [예 / 건너뛰기]"*
@@ -513,7 +515,7 @@ scenes:
 | 5 Scene 의 영성·감성·이성 차원 매핑 (§0.6) — theology-tone SKILL.md §6 충족 | ✅ |
 | 디바이스별 capabilities_min + 폴백 (Web) 정의 | ✅ |
 
-→ 출판 전 `lemuel-theology-reviewer` + `lemuel-mental-health-safety` 두 agent 검수 의뢰 필요.
+→ 출판 전 *운영자 self-review + R1 통과* 로 충분 (영적 비상 대비 교육 콘텐츠 — 임상 자문 불필요). 권장: `lemuel-theology-reviewer` + `lemuel-mental-health-safety` 두 agent 의 *어휘 톤 sweep* 만 사후 점검.
 
 ---
 
@@ -530,4 +532,4 @@ scenes:
 
 ---
 
-*이 문서는 lemuel-xr Phase 1 의 Joseph MVP XR 실 콘텐츠. 작성 시 `lemuel-xr-theology-tone` + `lemuel-xr-mental-health-safety` 사전 가이드 적용. 출판 전 두 agent 사후 검수 필수.*
+*이 문서는 lemuel-xr Phase 1 의 Joseph MVP XR 실 콘텐츠 — *영적 비상 대비 교육 콘텐츠* (큐티 + 민방위 metaphor). *임상/의료 도구 아님*. *누구나* 타겟. 작성 시 `lemuel-xr-theology-tone` + `lemuel-xr-mental-health-safety` 사전 가이드 적용. 출판 전 *운영자 self-review + R1 통과* 가 출판 게이트. 임상 자문 불필요. 내적 단련 근거 서지는 Pennebaker (감정 일기)·Neff (자기 자비)·Linehan (마음챙김 distress tolerance) 등 *치료 메커니즘이 아닌 일반인의 내적 단련 근거* 로만 인용.*
