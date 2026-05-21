@@ -7,6 +7,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import java.time.LocalDateTime;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -34,7 +35,15 @@ public class GenerateLlmResponseUseCase {
         this.meter = meter;
     }
 
-    @Transactional
+    /**
+     * AI 사이드카 호출은 outer transaction (예: DecideSceneUseCase) 의 rollback 신호를
+     * 오염시키지 않도록 REQUIRES_NEW 로 격리. 사이드카 5xx 발생 시 *이 transaction 만*
+     * rollback 되고 outer 는 그 RuntimeException 을 catch 해 정적 fallback 으로 계속 진행 가능.
+     *
+     * <p>주의: REQUIRES_NEW 는 Hikari 에서 *별도 connection* 을 잡음. 풀 사이즈가
+     * AI 호출 동시성 * 2 이상이어야 starvation 회피.
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Result execute(String purpose, String promptKey, Map<String, Object> variables) {
         String key = keyer.compute(promptKey, variables);
         var cached = cache.findById(key);
