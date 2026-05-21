@@ -62,9 +62,66 @@ public class DecideSceneUseCase {
                 ? Map.of("type", "end")
                 : StartGameSessionUseCase.buildScenePayload(scenario, next);
 
-        // 실시간 LLM 응답은 ai/ 모듈에서 별도 호출 — 본 use case 는 페이로드만 반환.
+        // 직전 결정에 대한 응답 텍스트 — yml 의 monologues / outcomes / reactions 에서 lookup.
+        // 실시간 LLM 응답은 ai/ 모듈에서 별도 호출 (Phase 2-B). 현재는 정적 텍스트만.
+        String responseText = matchResponseText(currentScene, input.decision());
+
         return new Result(sessionId, input.sceneId(),
-                next == null ? input.sceneId() : next, nextPayload);
+                next == null ? input.sceneId() : next, nextPayload, responseText);
+    }
+
+    /**
+     * Scene 의 extras 에서 사용자 결정 키에 매칭되는 정적 텍스트를 찾는다.
+     *
+     * <p>지원 형식 — extras 의 {@code monologues} / {@code outcomes} / {@code reactions}
+     * 중 하나가 Map&lt;String, String&gt; 이고, decision 의 key 또는 priority 값으로 lookup.
+     *
+     * <p>매칭 못 하면 null — Phase 2-B 의 LLM 호출 결과로 대체될 자리.
+     */
+    static String matchResponseText(Scenario.Scene scene, Map<String, Object> decision) {
+        if (scene.extras() == null || decision == null) return null;
+
+        // decision 에서 매칭 키 추출 — 단일 값 또는 priority 필드
+        String decisionKey = extractDecisionKey(decision);
+        if (decisionKey == null) return null;
+
+        // 우선순위 — monologues > outcomes > reactions
+        for (String mapKey : new String[]{"monologues", "outcomes", "reactions"}) {
+            Object map = scene.extras().get(mapKey);
+            if (map instanceof Map<?, ?> m) {
+                Object v = m.get(decisionKey);
+                if (v != null) return v.toString();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 결정 페이로드에서 매칭 키 추출:
+     * <ul>
+     *   <li>{ "value": "save_33" } → "save_33"</li>
+     *   <li>{ "priority": "farmer" } → "farmer"</li>
+     *   <li>{ "save_33": true } → "save_33"</li>
+     *   <li>단일 string 형태 (decision 이 {"_": "reveal"} 같은 wrapper) → 값</li>
+     * </ul>
+     */
+    private static String extractDecisionKey(Map<String, Object> decision) {
+        // 1) priority 필드 (Scene 3 distribute 패턴)
+        Object priority = decision.get("priority");
+        if (priority instanceof String s && !s.isBlank()) return s;
+
+        // 2) value 필드
+        Object value = decision.get("value");
+        if (value instanceof String s && !s.isBlank()) return s;
+
+        // 3) 단일 entry 의 key (Controller 가 raw string 을 받았을 때 wrapper)
+        if (decision.size() == 1) {
+            Map.Entry<String, Object> e = decision.entrySet().iterator().next();
+            Object v = e.getValue();
+            if (v instanceof String s) return s;       // {"_": "reveal"}
+            return e.getKey();                          // {"save_33": true}
+        }
+        return null;
     }
 
     public record Input(
@@ -75,5 +132,5 @@ public class DecideSceneUseCase {
     ) {}
 
     public record Result(UUID sessionId, int previousScene, int currentScene,
-                          Map<String, Object> scenePayload) {}
+                          Map<String, Object> scenePayload, String responseText) {}
 }

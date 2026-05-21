@@ -53,7 +53,8 @@ public class GameController {
                 req.sceneId(), req.decision(), req.interactionMeta(), req.mode()
         ));
         return ResponseEntity.ok(new DecideResponse(
-                r.sessionId(), r.previousScene(), r.currentScene(), r.scenePayload()));
+                r.sessionId(), r.previousScene(), r.currentScene(),
+                r.scenePayload(), r.responseText()));
     }
 
     @PostMapping("/{sid}/complete")
@@ -93,7 +94,10 @@ public class GameController {
     ) {}
 
     public record DecideResponse(
-            UUID sessionId, int previousScene, int currentScene, Map<String, Object> scenePayload
+            UUID sessionId, int previousScene, int currentScene,
+            Map<String, Object> scenePayload,
+            /** Phase 2-A — 직전 결정에 대한 정적 모놀로그/아웃컴 텍스트 (yml lookup). null 가능. */
+            String responseText
     ) {}
 
     public record CompleteRequest(String finalOutcome, String closingMessage) {}

@@ -44,10 +44,13 @@ export default function JosephPage() {
     mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
       decideJoseph(scene!.sessionId, sceneId, decision),
     onSuccess: (d, vars) => {
-      // 결정 직후 — *방금 떠난 Scene* 의 monologue/outcome 을 echo 로 띄움
-      const localEcho = buildLocalEcho(vars.sceneId, vars.decision);
-      if (localEcho) setEcho({ fromScene: vars.sceneId, text: localEcho.text });
-      if (localEcho?.scene3Pattern) setScene3Pattern(localEcho.scene3Pattern);
+      // 결정 직후 — backend 의 responseText 우선, 없으면 frontend hardcode fallback.
+      // Phase 2-A 마이그레이션 패턴: 점진 전환, frontend fallback 은 backend 가 매칭 못
+      // 하는 경우의 안전망 (예: yml 에 monologues 추가 전).
+      const localFallback = buildLocalEcho(vars.sceneId, vars.decision);
+      const text = d.responseText ?? localFallback?.text ?? null;
+      if (text) setEcho({ fromScene: vars.sceneId, text });
+      if (localFallback?.scene3Pattern) setScene3Pattern(localFallback.scene3Pattern);
 
       setScene(d);
       setHistory((h) => [...h, JSON.stringify(d.scenePayload.title)]);
