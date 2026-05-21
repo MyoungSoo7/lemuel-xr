@@ -1,0 +1,78 @@
+# 엘리야 미션 시나리오 — 번아웃 후 죽음 갈구 → 천사의 보살핌 → 세미한 음성.
+#
+# 핵심 메시지: "회복은 영적 통찰 *전에* 음식과 잠이다. 천사는 먼저 *몸* 을 돌보셨다."
+# 자살예방 임상 권장 패턴 — 신체적 안전 (food/sleep/contact) 우선.
+#
+# Stage 1 MVP. LLM 분기 X. 정적 큐레이션 콘텐츠만.
+
+character: elijah
+title: 로뎀나무 아래 — 먼저 먹고 자도 됩니다
+target_user: recovery
+scenes:
+  - id: 1
+    title: 갈멜산의 승리 후 도망
+    type: cinematic
+    duration_sec: 60
+    scripture_ref: 1kgs-19:3
+    extras:
+      anchor: 번아웃·소진
+      static_text: "엘리야는 *바알 선지자 450명을 이긴 직후* 도망쳤습니다. *승리 직후의 우울* 은 임상에서 흔한 패턴입니다. *큰 일 후의 텅 빈 자리* 가 실재합니다."
+    next: 2
+
+  - id: 2
+    title: 로뎀나무 아래 — 죽기를 간청
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: 1kgs-19:4
+    extras:
+      anchor: 죽음 갈구의 정당성
+      static_text: "엘리야의 기도: ''여호와여 이제 됐습니다. 내 생명을 거두소서.'' 신은 이 기도에 *책망* 하지 않으셨습니다. *죽음 갈구가 말해진 것 자체* 가 회복의 첫 단계입니다."
+      reflection_prompt: "당신도 이런 마음이 들었던 순간이 있다면 — 그 마음을 *부끄럽게* 여기지 않는 자리가 여기에 있습니다."
+      crisis_check: true   # 이 화면에서 사용자가 동의 못 하면 즉시 위기 자원
+    next: 3
+
+  - id: 3
+    title: 천사 — 먼저 음식과 잠
+    type: interaction
+    interaction: gesture_sequence
+    duration_sec: 120
+    scripture_ref: 1kgs-19:5
+    extras:
+      anchor: 신체 회복 우선
+      static_text: "신은 엘리야에게 *영적 설교* 가 아니라 *음식과 잠* 을 먼저 주셨습니다. *두 번 깨워서 두 번 먹이셨습니다*. 회복은 *몸* 부터입니다."
+      steps:
+        - { id: receive_food,  label: "음식을 받는다",   note: "마지막으로 따뜻한 음식을 드신 게 언제인가요?" }
+        - { id: lie_down,      label: "누워서 잔다",     note: "최근 7시간 이상 자신 게 언제인가요?" }
+      practical_reminders:
+        - "오늘 한 끼 따뜻한 음식을 드세요."
+        - "오늘 평소보다 30분 일찍 누우세요. (잠들지 않아도 괜찮습니다.)"
+        - "내일 산책 10분 — 햇빛 1번."
+    next: 4
+
+  - id: 4
+    title: 호렙산 — 세미한 음성
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: 1kgs-19:11
+    extras:
+      anchor: 응답의 형태
+      static_text: "신은 *바람·지진·불* 가운데 계시지 않았습니다. *세미한 소리* 가운데 계셨습니다. 큰 신호를 기다리지 마세요. 작은 회복의 신호를 *세미한 소리* 로 받으세요."
+      examples:
+        - "오늘 잠시라도 미소가 나왔던 순간"
+        - "30초간 마음이 평온했던 자리"
+        - "전화를 받을지 망설였던 마음 — 받아도 안 받아도 정당한 선택"
+    next: 5
+
+  - id: 5
+    title: 마지막 한 마디 — 너 혼자가 아니다
+    type: outro
+    duration_sec: 60
+    scripture_ref: 1kgs-19:18
+    extras:
+      anchor: 비-고립
+      static_text: "신의 마지막 말씀: ''내가 이스라엘 가운데 칠천 명을 남기리니 다 바알에게 무릎 꿇지 아니한 자라.'' 엘리야가 *''나만 남았다''* 라고 생각했을 때, 사실은 *7,000명* 이 남아 있었습니다. 우리는 우리가 생각하는 것보다 *덜 혼자* 입니다."
+      crisis_reminder: "지금 이 순간 누군가의 목소리가 필요하다면 — 1393. 이름을 말하지 않아도 됩니다."
+      next_scene_suggestion: "시편 88 — 답 없는 시편, 어둠으로 끝나는 자리"
+    next: null

@@ -3,11 +3,25 @@ package github.lms.lemuel.xr.game.domain;
 import github.lms.lemuel.xr.common.AppException;
 import github.lms.lemuel.xr.common.ErrorCode;
 
-/** 트랙 B 4 인물. character 컬럼은 lowercase 문자열. */
+/**
+ * 트랙 B 인물. character 컬럼은 lowercase 문자열.
+ *
+ * <p>2026-05-22 mission 재정의 — 인물 우선순위 재정렬:
+ * <ul>
+ *   <li>Stage 1 (MVP — Recovery 사용자 *언어 허락*): JOB · ELIJAH</li>
+ *   <li>Stage 2: MOSES (광야 죽음 갈구 → 부름)</li>
+ *   <li>Stage 3: DAVID (시편 비탄 + 골리앗)</li>
+ *   <li>Stage 4 (Phase 2 회복 후 시야): JOSEPH</li>
+ *   <li>Stage 5: JESUS (godjinho 담당)</li>
+ * </ul>
+ * </p>
+ */
 public enum Character {
-    JOSEPH("joseph"),
+    JOB("job"),
+    ELIJAH("elijah"),
     MOSES("moses"),
     DAVID("david"),
+    JOSEPH("joseph"),
     JESUS("jesus");
 
     private final String dbValue;

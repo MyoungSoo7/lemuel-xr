@@ -6,6 +6,7 @@ import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.time.LocalDateTime;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,15 +25,21 @@ public class GenerateLlmResponseUseCase {
     private final AiSidecarClient sidecar;
     private final CacheKeyComputer keyer;
     private final MeterRegistry meter;
+    private final boolean generationEnabled;
+    private final String disabledFallback;
 
     public GenerateLlmResponseUseCase(LlmCacheRepository cache,
                                        AiSidecarClient sidecar,
                                        CacheKeyComputer keyer,
-                                       MeterRegistry meter) {
+                                       MeterRegistry meter,
+                                       @Value("${ai.generation.enabled:false}") boolean generationEnabled,
+                                       @Value("${ai.generation.disabled-fallback-text:}") String disabledFallback) {
         this.cache = cache;
         this.sidecar = sidecar;
         this.keyer = keyer;
         this.meter = meter;
+        this.generationEnabled = generationEnabled;
+        this.disabledFallback = disabledFallback;
     }
 
     /**
@@ -45,6 +52,19 @@ public class GenerateLlmResponseUseCase {
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Result execute(String purpose, String promptKey, Map<String, Object> variables) {
+        // 2026-05-22 결정: 임상 자문 영입 전까지 LLM 생성 비활성화.
+        // 사전 캐시된 응답이 있으면 그것만 반환, 없으면 정적 fallback.
+        if (!generationEnabled) {
+            Counter.builder("llm.generation.disabled").tag("purpose", purpose).register(meter).increment();
+            String key0 = keyer.compute(promptKey, variables);
+            var cached0 = cache.findById(key0);
+            if (cached0.isPresent()) {
+                return new Result(cached0.get().getResponse(),
+                        cached0.get().getProvider(), cached0.get().getModel(), true);
+            }
+            return new Result(disabledFallback, "static", "fallback", false);
+        }
+
         String key = keyer.compute(promptKey, variables);
         var cached = cache.findById(key);
         if (cached.isPresent()) {

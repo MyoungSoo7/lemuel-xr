@@ -53,6 +53,11 @@ ai:
   base-url: ${AI_BASE_URL:http://localhost:8000}
   timeout-ms: 30000
   internal-token: ${AI_INTERNAL_TOKEN:dev-internal-token-rotate-in-prod}
+  # 2026-05-22 결정: 임상 자문 1명 영입 전까지 LLM 생성 비활성화 (큐레이션만).
+  # 활성화 시 prod 에 AI_GENERATION_ENABLED=true override.
+  generation:
+    enabled: ${AI_GENERATION_ENABLED:false}
+    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 더 깊은 동행이 필요하시면 가까운 정신건강의학과 또는 1393 (자살예방상담전화) 으로 연결해 드릴게요."
   provider-priority:
     classify_emotion: [openai_gpt4o_mini, anthropic_claude3_haiku]
     polish_psalm: [anthropic_claude35_sonnet, openai_gpt4o]

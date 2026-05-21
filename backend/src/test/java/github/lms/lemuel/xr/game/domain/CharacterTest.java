@@ -10,6 +10,8 @@ class CharacterTest {
 
     @Test
     void lowercase_dbValue_파싱() {
+        assertThat(Character.from("job")).isEqualTo(Character.JOB);
+        assertThat(Character.from("elijah")).isEqualTo(Character.ELIJAH);
         assertThat(Character.from("joseph")).isEqualTo(Character.JOSEPH);
         assertThat(Character.from("moses")).isEqualTo(Character.MOSES);
         assertThat(Character.from("david")).isEqualTo(Character.DAVID);

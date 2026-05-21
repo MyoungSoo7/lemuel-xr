@@ -26,14 +26,25 @@ public class EmotionRecommender {
             Emotion.GRATEFUL,   List.of(t(1, "일기와 묵상", 0.88), t(4, "시편과 감정", 0.75))
     );
 
+    /**
+     * 2026-05-22 mission 재정의 — Recovery 타겟에 맞춰 인물 매핑 재정렬.
+     *
+     * <p>Stage 1 (욥·엘리야) 우선. 비탄·죽음 갈구·번아웃에 대한 *언어 허락*.
+     * 모세·다윗·요셉은 회복 진행 단계에 따라 노출. JOSEPH 은 Phase 2 까지 *retired* —
+     * Active crisis 사용자에게 *비교 박탈감* (R2 가스라이팅) 위험 회피.</p>
+     */
     private static final Map<Emotion, List<CharacterSuggestion>> TRACK_B = Map.of(
-            Emotion.ANXIOUS,    List.of(c("MOSES", 4, "두려움 → 동행 인식", 0.83), c("DAVID", 4, "공포·신뢰 통합", 0.70)),
-            Emotion.SAD,        List.of(c("DAVID", 1, "시편 23 평온", 0.81)),
-            Emotion.ANGRY,      List.of(c("DAVID", 2, "모욕 후 사명 우선", 0.72)),
-            Emotion.CONFUSED,   List.of(c("DAVID", 3, "남의 옷을 벗다", 0.78)),
-            Emotion.LONELY,     List.of(c("MOSES", 4, "혼자가 아니다", 0.79)),
-            Emotion.EXHAUSTED,  List.of(c("MOSES", 1, "광야의 침묵", 0.84)),
-            Emotion.GRATEFUL,   List.of(c("JOSEPH", 5, "섭리 회복", 0.81))
+            Emotion.ANXIOUS,    List.of(c("JOB", 1, "비탄의 언어 허락 — 침묵의 7일", 0.85),
+                                        c("ELIJAH", 3, "음식·잠 먼저", 0.78)),
+            Emotion.SAD,        List.of(c("JOB", 2, "태어난 날을 저주한 욥", 0.88),
+                                        c("ELIJAH", 2, "죽음 갈구의 정당성", 0.75)),
+            Emotion.ANGRY,      List.of(c("JOB", 3, "친구의 거짓 위로 인식", 0.82)),
+            Emotion.CONFUSED,   List.of(c("JOB", 4, "답이 아닌 만남", 0.80)),
+            Emotion.LONELY,     List.of(c("ELIJAH", 5, "7000명이 남았다", 0.86),
+                                        c("JOB", 1, "함께 있음의 침묵", 0.74)),
+            Emotion.EXHAUSTED,  List.of(c("ELIJAH", 1, "승리 후 번아웃 — 도망", 0.91),
+                                        c("ELIJAH", 3, "음식·잠 회복", 0.83)),
+            Emotion.GRATEFUL,   List.of(c("ELIJAH", 4, "세미한 소리", 0.72))
     );
 
     public List<TopicSuggestion> trackA(Emotion e) {
