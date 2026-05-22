@@ -14,13 +14,57 @@ backend (Spring Boot) 가 호출하는 LLM 사이드카.
   POST /joseph-reunion     { decision, distribution_pattern } → { text }  (legacy)
 """
 import json
+import logging
 import os
+import re
 from typing import Any, Literal, Optional
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 import providers
+
+logger = logging.getLogger("lemuel-xr-ai.safety")
+
+
+# ===================================================================
+# 출력 안전 필터 — docs/safety-guidelines.md §4 (LLM Output Guardrails)
+# ===================================================================
+# LLM 이 system prompt 를 무시하고 트리거 표현을 생성한 경우를 대비한 사후 거름망.
+# false positive 회피 — 위기자원 안내 ("자살예방상담전화 1393") 는 통과.
+# 매칭 시 응답을 안전 fallback 으로 *대체* + Sentry/stdout 로깅 (Sentry 미설정 시 stdout).
+_TRIGGER_PATTERNS = [
+    re.compile(r"목숨을\s*끊"),            # "목숨을 끊다/끊고/끊어"
+    re.compile(r"스스로\s*목숨"),          # "스스로 목숨을"
+    re.compile(r"자살(?!예방|률|문제)"),   # "자살" 자체 (예방·률·문제 등은 통과)
+    re.compile(r"자해(?!\s*예방)"),        # "자해" 자체 (예방 표현은 통과)
+    re.compile(r"(목|손목|혈관)\s*을\s*(긋|그어|그었|그을|베|베어|베었|찌르|찔러|찔렀)"),  # 자해 방법 묘사 (한국어 동사 활용 커버)
+]
+
+_SAFE_FALLBACK = (
+    "(이번 응답이 안전 검토를 통과하지 못해 표시되지 않습니다. "
+    "잠시 후 다시 시도해 주세요. 위기 상태라면 1393 자살예방상담전화로 연락해 주세요.)"
+)
+
+
+def _safety_filter(text: str) -> tuple[str, Optional[str]]:
+    """
+    LLM 출력 문자열에 트리거 표현이 포함됐는지 검사.
+    매칭 시 (fallback, blocked_pattern) 반환. 통과 시 (original, None).
+
+    docs/safety-guidelines.md §4 의 사후 정규식 필터 구현. 추가 패턴은
+    _TRIGGER_PATTERNS 리스트에 추가하면 즉시 적용.
+    """
+    if not text:
+        return (text, None)
+    for pat in _TRIGGER_PATTERNS:
+        if pat.search(text):
+            logger.warning(
+                "trigger pattern matched in LLM output, returning safe fallback",
+                extra={"pattern": pat.pattern, "text_prefix": text[:80]},
+            )
+            return (_SAFE_FALLBACK, pat.pattern)
+    return (text, None)
 
 # OpenTelemetry — Tempo OTLP exporter (best-effort import)
 try:
@@ -202,8 +246,12 @@ def ai_generate(req: GenerateRequest) -> GenerateResponse:
             temperature=req.temperature or 0.5,
             json_mode=req.jsonMode or False,
         )
+        # 사후 안전 필터 — JSON 모드 응답은 구조화된 데이터라 skip, 자연어만 검사.
+        text = r["text"]
+        if not (req.jsonMode or False):
+            text, _ = _safety_filter(text)
         return GenerateResponse(
-            text=r["text"],
+            text=text,
             provider=r.get("provider", "unknown"),
             model=r.get("model", "unknown"),
             promptTokens=r.get("promptTokens"),
@@ -294,7 +342,8 @@ def joseph_monologue(req: MonologueRequest) -> MonologueResponse:
             prompt=_build_prompt("joseph.s2.monologue", {"decision": req.decision}),
             temperature=0.6,
         )
-        return MonologueResponse(text=r["text"])
+        text, _ = _safety_filter(r["text"])
+        return MonologueResponse(text=text)
     except providers.ProviderError:
         pass
     text = _legacy_generate(
@@ -302,6 +351,7 @@ def joseph_monologue(req: MonologueRequest) -> MonologueResponse:
     )
     if not text:
         text = "[mock] 풍요로운 7년 동안 곡식을 저장한다. 그 결정의 무게가 어깨에 얹힌다."
+    text, _ = _safety_filter(text)
     return MonologueResponse(text=text)
 
 
@@ -319,10 +369,12 @@ def joseph_reunion(req: ReunionRequest) -> MonologueResponse:
             prompt=_build_prompt("joseph.s4.reunion", vars_),
             temperature=0.7,
         )
-        return MonologueResponse(text=r["text"])
+        text, _ = _safety_filter(r["text"])
+        return MonologueResponse(text=text)
     except providers.ProviderError:
         pass
     text = _legacy_generate(_build_prompt("joseph.s4.reunion", vars_), temperature=0.7)
     if not text:
         text = "[mock] 형제들이여, 가까이 오라."
+    text, _ = _safety_filter(text)
     return MonologueResponse(text=text)
