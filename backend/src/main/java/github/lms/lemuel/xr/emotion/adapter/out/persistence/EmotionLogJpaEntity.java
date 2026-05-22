@@ -25,11 +25,8 @@ public class EmotionLogJpaEntity {
     @Column(name = "app_session_id")
     private UUID appSessionId;
 
-    @Column(name = "raw_text", columnDefinition = "text")
-    private String rawText;
-
-    @Column(name = "raw_text_encrypted")
-    private byte[] rawTextEncrypted;
+    // raw_text / raw_text_encrypted 컬럼은 docs/safety-guidelines.md §3 (PHI 비수집)
+    // 에 의거 *영속화 금지*. 분류 직후 폐기됨. V20260522210000 마이그레이션이 DB 에서도 제거.
 
     @Column(name = "classified_emotion", length = 30)
     private String classifiedEmotion;

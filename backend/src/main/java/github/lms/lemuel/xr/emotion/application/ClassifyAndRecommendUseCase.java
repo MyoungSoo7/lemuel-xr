@@ -56,9 +56,10 @@ public class ClassifyAndRecommendUseCase {
         var topicSuggestions = recommender.trackA(emo);
         var characterSuggestions = recommender.trackB(emo);
 
+        // docs/safety-guidelines.md §3 (PHI 비수집) — 사용자 자유 텍스트 는 분류에만 사용,
+        // 영속화 금지. text 변수는 이 메서드 끝나면 GC. raw_text 컬럼은 V20260522210000 에서 DB 제거.
         EmotionLogJpaEntity log = new EmotionLogJpaEntity();
         log.setUserId(userId);
-        log.setRawText(text);
         log.setClassifiedEmotion(emo.name());
         log.setConfidence(BigDecimal.valueOf(classified.confidence()).setScale(3, RoundingMode.HALF_UP));
         log.setChosenDimension(preferredMode);
