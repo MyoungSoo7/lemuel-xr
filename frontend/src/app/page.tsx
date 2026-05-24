@@ -128,20 +128,36 @@ export default function HomePage() {
               <h2 className="text-xs uppercase tracking-wider text-[var(--color-warm)]/40 mb-4 text-center">
                 매일의 단련 — AR 7가지 가치
               </h2>
-              <Link
-                href="/values"
-                className="block px-5 py-4 rounded-lg border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition"
-              >
-                <p className="font-semibold">
-                  자기만의 7 가치 빌더
-                  <span className="ml-2 text-xs text-amber-500/80 uppercase tracking-wider">
-                    Practice
-                  </span>
-                </p>
-                <p className="text-xs text-[var(--color-warm)]/60 mt-1">
-                  매일 5분 — 가치를 정의하고, 실천을 기록하고, 습관으로 새깁니다.
-                </p>
-              </Link>
+              <div className="space-y-3">
+                <Link
+                  href="/values"
+                  className="block px-5 py-4 rounded-lg border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 transition"
+                >
+                  <p className="font-semibold">
+                    자기만의 7 가치 빌더
+                    <span className="ml-2 text-xs text-amber-500/80 uppercase tracking-wider">
+                      Practice
+                    </span>
+                  </p>
+                  <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                    매일 5분 — 가치를 정의하고, 실천을 기록하고, 습관으로 새깁니다.
+                  </p>
+                </Link>
+                <Link
+                  href="/topics"
+                  className="block px-5 py-4 rounded-lg border border-[var(--color-primary)]/30 bg-[var(--color-primary)]/5 hover:bg-[var(--color-primary)]/10 transition"
+                >
+                  <p className="font-semibold">
+                    일상 영적 양식 — 7 주제 카드
+                    <span className="ml-2 text-xs text-[var(--color-primary)]/80 uppercase tracking-wider">
+                      Read
+                    </span>
+                  </p>
+                  <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                    일기 · 잠언 · 전도서 · 시편 · 고통(욥) · 마음지키기 · 사람두려워하지않기 — 매일 한 카드.
+                  </p>
+                </Link>
+              </div>
             </section>
 
             <section className="mt-8 pt-8 border-t border-[var(--color-primary)]/20">
