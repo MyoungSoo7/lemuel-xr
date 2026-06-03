@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ public class OutboxRelayJob {
     private final OutboxEventRepository repo;
 
     @Scheduled(fixedDelay = 5_000)
+    @SchedulerLock(name = "xr-outbox-relay", lockAtMostFor = "PT1M", lockAtLeastFor = "PT1S")
     @Transactional
     public void relay() {
         List<OutboxEventJpaEntity> batch = repo.findByStatus("pending", PageRequest.of(0, 50));

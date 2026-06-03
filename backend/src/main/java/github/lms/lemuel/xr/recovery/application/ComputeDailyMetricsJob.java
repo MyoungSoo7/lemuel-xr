@@ -2,6 +2,7 @@ package github.lms.lemuel.xr.recovery.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.javacrumbs.shedlock.spring.annotation.SchedulerLock;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Component;
 public class ComputeDailyMetricsJob {
 
     @Scheduled(cron = "0 0 4 * * *", zone = "Asia/Seoul")
+    @SchedulerLock(name = "xr-compute-daily-metrics", lockAtMostFor = "PT30M")
     public void run() {
         log.info("recovery_metrics 일별 집계 시작");
         // TODO: implement aggregation
