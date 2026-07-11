@@ -129,7 +129,7 @@ async function readAllScripture(page: Page) {
     page
       .locator("main section")
       .getByRole("button")
-      .filter({ hasNotText: /다음으로|모두 읽어|계속|미션 완료|오류|Jesus|David|홈/ })
+      .filter({ hasNotText: /다음으로|모두 읽어|계속|미션 완료|오류|듣기|정지|불러오는 중|음성|Jesus|David|홈/ })
       .filter({ hasNotText: /✓/ });
   // 최대 5줄까지 (팔복 3줄 / 부활 2줄) — 남지 않을 때까지 클릭
   for (let i = 0; i < 6; i++) {
@@ -171,7 +171,7 @@ async function pickFirstSceneButton(page: Page) {
   const btn = page
     .locator("main section")
     .getByRole("button")
-    .filter({ hasNotText: /계속|미션 완료|오류|다음으로|머문다|건너뛸게요|준비됐어요/ })
+    .filter({ hasNotText: /계속|미션 완료|오류|듣기|정지|불러오는 중|음성|다음으로|머문다|건너뛸게요|준비됐어요/ })
     .first();
   await expect(btn).toBeVisible({ timeout: 20_000 });
   await btn.click();

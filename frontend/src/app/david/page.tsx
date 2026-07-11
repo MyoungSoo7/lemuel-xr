@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import {
   startMission,
   decideMission,
@@ -127,6 +128,9 @@ export default function DavidPage() {
       {echo && (
         <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
           <p className="whitespace-pre-line">{echo.text}</p>
+          <div className="mt-2">
+            <NarrationAudioButton text={echo.text} onUnavailable="hide" />
+          </div>
           <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
             * AI 보조 — 본문은 성경 참조 *
           </p>
@@ -152,9 +156,14 @@ export default function DavidPage() {
         {sceneType === "contemplative" && (
           <>
             {scene.currentScene === 1 && (
-              <p className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                {scene1Psalm23}
-              </p>
+              <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
+                <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                  {scene1Psalm23}
+                </p>
+                <div className="mt-3">
+                  <NarrationAudioButton text={scene1Psalm23} onUnavailable="hide" />
+                </div>
+              </div>
             )}
             <button
               onClick={() => {

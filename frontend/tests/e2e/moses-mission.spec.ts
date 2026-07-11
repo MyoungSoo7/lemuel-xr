@@ -127,7 +127,7 @@ async function pickFirstSceneButton(page: Page) {
   const btn = page
     .locator("main section")
     .getByRole("button")
-    .filter({ hasNotText: /계속|미션 완료|오류|결정|내려놓기|가슴에 품기/ })
+    .filter({ hasNotText: /계속|미션 완료|오류|듣기|정지|불러오는 중|음성|결정|내려놓기|가슴에 품기/ })
     .first();
   await expect(btn).toBeVisible({ timeout: 20_000 });
   await btn.click();

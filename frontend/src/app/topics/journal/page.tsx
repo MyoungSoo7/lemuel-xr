@@ -9,6 +9,7 @@ import {
   type Guidance,
   type GuidanceResponse,
 } from "@/lib/api/content";
+import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 
 /**
  * /topics/journal — 기준1 (일기와 묵상) 성경 기반 조언.
@@ -154,6 +155,22 @@ export default function JournalGuidancePage() {
   );
 }
 
+/**
+ * 조언 화면을 음성으로 읽어줄 스크립트를 만든다 — 인증 문구 + 성경 구절 + 성찰 질문.
+ * 고령자 대상: 화면을 눈으로 좇지 않아도 조언 전체를 귀로 들을 수 있게 한다.
+ */
+function buildGuidanceNarration(guidance: Guidance): string {
+  const parts: string[] = [guidance.validation];
+  for (const v of guidance.verses) {
+    parts.push(`${v.ref}. ${v.text}`);
+  }
+  if (guidance.reflectionQuestions.length > 0) {
+    parts.push("성찰 질문입니다.");
+    parts.push(...guidance.reflectionQuestions);
+  }
+  return parts.join("\n");
+}
+
 function GuidanceView({
   guidance,
   safetyFooter,
@@ -169,6 +186,13 @@ function GuidanceView({
       <p className="text-sm text-[var(--color-warm)]/80 mt-2 leading-relaxed">
         {guidance.validation}
       </p>
+      <div className="mt-2">
+        <NarrationAudioButton
+          text={buildGuidanceNarration(guidance)}
+          label="듣기"
+          onUnavailable="hide"
+        />
+      </div>
 
       {/* 성경 구절 (성경만 근거) */}
       <div className="mt-4 space-y-3">

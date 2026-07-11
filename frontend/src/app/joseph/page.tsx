@@ -18,6 +18,7 @@ import {
   type Scene3Pattern,
   type Scene4Choice,
 } from "@/lib/content/joseph-monologues";
+import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 
 type Scene = JosephStartResponse;
 
@@ -97,6 +98,9 @@ export default function JosephPage() {
       {echo && (
         <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
           <p className="whitespace-pre-line">{echo.text}</p>
+          <div className="mt-2">
+            <NarrationAudioButton text={echo.text} onUnavailable="hide" />
+          </div>
           <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
             * AI 보조 — 본문은 성경 참조 *
           </p>
@@ -125,9 +129,14 @@ export default function JosephPage() {
           <>
             {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}
             {scene.currentScene === 1 && (
-              <p className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                {scene1Dream}
-              </p>
+              <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
+                <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                  {scene1Dream}
+                </p>
+                <div className="mt-3">
+                  <NarrationAudioButton text={scene1Dream} onUnavailable="hide" />
+                </div>
+              </div>
             )}
             <button
               onClick={() => {

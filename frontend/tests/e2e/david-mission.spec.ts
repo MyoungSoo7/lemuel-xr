@@ -138,7 +138,7 @@ async function pickAllStones(page: Page) {
     page
       .locator("main section")
       .getByRole("button")
-      .filter({ hasNotText: /계속|미션 완료|오류|나아간다|모두 집으세요|Joseph|홈/ })
+      .filter({ hasNotText: /계속|미션 완료|오류|듣기|정지|불러오는 중|음성|나아간다|모두 집으세요|Joseph|홈/ })
       .filter({ hasNotText: /번째 ✓/ });
   for (let i = 0; i < 5; i++) {
     const btn = stoneScope().first();
@@ -155,7 +155,7 @@ async function pickFirstSceneButton(page: Page) {
   const btn = page
     .locator("main section")
     .getByRole("button")
-    .filter({ hasNotText: /계속|미션 완료|오류|나아간다|던진다/ })
+    .filter({ hasNotText: /계속|미션 완료|오류|듣기|정지|불러오는 중|음성|나아간다|던진다/ })
     .first();
   await expect(btn).toBeVisible({ timeout: 20_000 });
   await btn.click();
