@@ -126,3 +126,83 @@ export async function fetchPractices(topicId: PracticeTopicId, limit = 20): Prom
   });
   return res.data;
 }
+
+// --- 기준4: 전도서와 인생 (TRACK-A-1-4-WISDOM-EMOTION §4) ---
+
+/** 인생에 관한 전도서 진리 — 카테고리 분류. 근거는 성경만. */
+export interface EcclesiastesCategory {
+  key: string;
+  title: string;
+  chapterRef: string;
+  verse: string;
+  /** "해 아래 유한함" 을 정직하게 인정하는 문구 (헛됨 축). */
+  honestNote: string;
+  /** 그 유한함 너머 — 창조주 경외로 향하는 문구 (의미 축). */
+  meaningNote: string;
+}
+
+/** 전 3:1-8 의 인생 계절 선택지. */
+export interface EcclesiastesSeason {
+  key: string;
+  label: string;
+  verse: string;
+}
+
+export interface EcclesiastesCategoriesResponse {
+  categories: EcclesiastesCategory[];
+  seasons: EcclesiastesSeason[];
+  aiFooter: string;
+}
+
+export interface EcclesiastesCreateRequest {
+  chapterRef?: string;
+  userSeason?: string;
+  futilityNote?: string;
+  meaningNote?: string;
+  listenedAudio?: boolean;
+  conclusionViewed?: boolean;
+}
+
+export interface EcclesiastesDto {
+  id: number;
+  chapterRef: string | null;
+  userSeason: string | null;
+  futilityNote: string | null;
+  meaningNote: string | null;
+  listenedAudio: boolean | null;
+  conclusionViewed: boolean | null;
+  createdAt: string;
+}
+
+export interface EcclesiastesResponse {
+  view: EcclesiastesDto;
+  crisis: CrisisRouting;
+  safetyFooter: string;
+  conclusionInvite: string;
+  aiFooter: string;
+}
+
+export interface EcclesiastesListResponse {
+  items: EcclesiastesDto[];
+  conclusionViewedCount: number;
+  conclusionInvite: string;
+}
+
+export async function fetchEcclesiastesCategories(): Promise<EcclesiastesCategoriesResponse> {
+  const res = await api.get<EcclesiastesCategoriesResponse>("/api/content/ecclesiastes/categories");
+  return res.data;
+}
+
+export async function recordEcclesiastesView(
+  req: EcclesiastesCreateRequest,
+): Promise<EcclesiastesResponse> {
+  const res = await api.post<EcclesiastesResponse>("/api/content/ecclesiastes", req);
+  return res.data;
+}
+
+export async function fetchEcclesiastesViews(limit = 20): Promise<EcclesiastesListResponse> {
+  const res = await api.get<EcclesiastesListResponse>("/api/content/ecclesiastes", {
+    params: { limit },
+  });
+  return res.data;
+}
