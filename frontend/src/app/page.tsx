@@ -47,7 +47,7 @@ const DIRECT_MISSIONS: Array<{
     href: "/david",
     name: "David",
     korean: "다윗",
-    tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다 (Phase 2)",
+    tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다",
     active: true,
   },
   {
