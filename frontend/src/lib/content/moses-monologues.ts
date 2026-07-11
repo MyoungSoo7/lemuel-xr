@@ -25,8 +25,25 @@
 
 export type Scene2Gesture = "reverence" | "hesitation";
 export type Scene3Pattern = "all_throw" | "all_heart" | "mixed";
+export type Scene3Card =
+  | "who_am_i"
+  | "who_sent_me"
+  | "trust_me"
+  | "cant_speak"
+  | "send_other";
 export type Scene4Choice = "cast_now" | "hesitate" | "with_aaron";
 export type Scene5Gesture = "lift_staff";
+
+/**
+ * Scene 1 — 미디안 광야(부름 받기 전 40년). MVP-MOSES-CONTENT.md §1.2 대본.
+ * §0.7 톤: 소명 회피 이전의 *기다림·이름 없음* 을 다룬다. R2 가드 — 광야의 무게를
+ * 의미화·미화하지 않고, 있는 그대로 앉아 있게 둔다.
+ */
+export const scene1Wilderness =
+  "미디안 광야. 해가 진다. 애굽에서 도망친 지 40년이 지났다.\n\n" +
+  "이제 나는 이름 없는 양치기다. 왕자였던 기억도, 도망친 죄도, 시간이 덮었다. " +
+  "오늘도 어제와 같고, 내일도 어제와 같을 것이다.\n\n" +
+  "부름은 아직 오지 않았다. 다만, 이 기다림의 자리에 잠시 앉아 있어도 된다.";
 
 /** Scene 2 — 떨기나무 앞. 신을 벗고 고개를 드는 경외. */
 export const scene2Monologues: Record<Scene2Gesture, string> = {
@@ -59,6 +76,34 @@ export const scene3Outcomes: Record<Scene3Pattern, string> = {
     "어떤 변명은 내려놓고, 어떤 변명은 아직 품고 있다 — 실제 모세가 걸은 길이다. " +
     "순종은 두려움이 다 사라진 뒤에 오는 것이 아니라, 두려움과 함께 시작된다. " +
     "완전하지 않은 걸음도 걸음이다.",
+};
+
+/**
+ * Scene 3 — 카드별 떨기나무 응답 (MVP-MOSES-CONTENT.md §3.4).
+ * 각 변명 카드를 내려놓거나 품는 순간, 떨기나무가 *본문 인용* 으로 응답한다.
+ *  ① who_am_i(정체성)   → 출 3:12
+ *  ② who_sent_me(권위)  → 출 3:14  (disputed: E.J. Young 자존성 vs Brueggemann 관계적·미래지향)
+ *  ③ trust_me(신뢰)     → 출 4:2~5
+ *  ④ cant_speak(능력)   → 출 4:11~12  (능력 평가 ≠ 인격 평가 — R2 학습된 무력감 정당화 차단)
+ *  ⑤ send_other(책임)   → 출 4:14~16  (§3.4 결정: 진노 어휘 회피, *동행자 제공* 해결책 톤으로만)
+ */
+export const scene3CardResponses: Record<Scene3Card, string> = {
+  who_am_i:
+    "\"내가 반드시 너와 함께 있으리라\"(출 3:12). " +
+    "\"제가 누구이기에\"라는 물음의 답은 *네가 누구인가* 가 아니라, *누가 함께 가는가* 였다.",
+  who_sent_me:
+    "\"나는 스스로 있는 자이니라 … 스스로 있는 자가 나를 너희에게 보내셨다 하라\"(출 3:14). " +
+    "이름을 여쭙는 자리에서, 그분은 자기 존재로 답하셨다. " +
+    "(이 이름은 '스스로 계신 분'(E.J. Young)으로도, '함께 있으실 분'(Brueggemann)으로도 읽힌다 — 한 줄로 다 담기지 않는 이름이다.)",
+  trust_me:
+    "\"네 손에 있는 것이 무엇이냐 … 그것을 땅에 던지라\"(출 4:2~5). " +
+    "믿지 않으면 어쩌나 하는 두려움 앞에서, 그분은 네가 이미 쥐고 있는 지팡이 하나를 가리키셨다.",
+  cant_speak:
+    "\"누가 사람의 입을 지었느냐 … 이제 가라 내가 네 입과 함께 있어서 할 말을 가르치리라\"(출 4:11~12). " +
+    "말이 둔한 것은 *능력의 결* 일 뿐, *인격의 결* 이 아니다. 둔한 입에도 그분이 함께 계신다.",
+  send_other:
+    "\"네 형 아론이 있지 아니하냐 … 내가 네 입과 그의 입에 함께 있어서 할 말을 가르치리라\"(출 4:14~16). " +
+    "다른 이를 보내달라는 회피 앞에서도, 그분은 꾸짖어 내치는 대신 *함께 걸을 사람* 을 붙여 주셨다.",
 };
 
 /** Scene 4 — 파라오 앞에서 지팡이. */
@@ -116,4 +161,33 @@ export function scene3AssignmentsToPattern(
   if (allThrow) return "all_throw";
   if (allHeart) return "all_heart";
   return "mixed";
+}
+
+const SCENE3_CARD_ORDER: Scene3Card[] = [
+  "who_am_i",
+  "who_sent_me",
+  "trust_me",
+  "cant_speak",
+  "send_other",
+];
+
+/**
+ * Scene 3 echo — outcome 패턴 텍스트 뒤에 *내려놓은(throw)* 카드별 떨기나무 본문 응답을 잇는다.
+ * 응답은 카드를 *놓거나 치우는 순간* 울린다(§3.4) — 여기서는 내려놓은 카드에 한해 인용한다.
+ * 하나도 내려놓지 않았으면(all_heart) 대표 응답(정체성, 출 3:12)만 붙여 과부하를 피한다.
+ */
+export function buildScene3Echo(
+  pattern: Scene3Pattern,
+  assignments: Record<string, "throw" | "heart">,
+): string {
+  const base = scene3Outcomes[pattern];
+  const thrown = SCENE3_CARD_ORDER.filter(
+    (id) => assignments[id] === "throw" && scene3CardResponses[id],
+  );
+  const cards =
+    thrown.length > 0
+      ? thrown
+      : (["who_am_i"] as Scene3Card[]); // all_heart 등 — 대표 응답만
+  const responses = cards.map((id) => scene3CardResponses[id]).join("\n\n");
+  return `${base}\n\n${responses}`;
 }

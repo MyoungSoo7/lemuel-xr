@@ -8,6 +8,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  scene1Dream,
   scene2Monologues,
   scene3Outcomes,
   scene4Reactions,
@@ -121,16 +122,24 @@ export default function JosephPage() {
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
         {sceneType === "cinematic" && (
-          <button
-            onClick={() => {
-              setEcho(null); // cinematic → 다음 진입 시 echo 클리어
-              decide.mutate({ sceneId: scene.currentScene, decision: "next" });
-            }}
-            className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
-            disabled={decide.isPending}
-          >
-            {decide.isPending ? "..." : "계속 →"}
-          </button>
+          <>
+            {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}
+            {scene.currentScene === 1 && (
+              <p className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                {scene1Dream}
+              </p>
+            )}
+            <button
+              onClick={() => {
+                setEcho(null); // cinematic → 다음 진입 시 echo 클리어
+                decide.mutate({ sceneId: scene.currentScene, decision: "next" });
+              }}
+              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
+              disabled={decide.isPending}
+            >
+              {decide.isPending ? "..." : "계속 →"}
+            </button>
+          </>
         )}
 
         {sceneType === "pick_one" && Array.isArray(payload.options) && (

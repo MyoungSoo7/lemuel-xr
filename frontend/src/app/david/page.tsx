@@ -10,6 +10,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  scene1Psalm23,
   scene2Reactions,
   scene4LastStone,
   scene5Monologue,
@@ -147,18 +148,25 @@ export default function DavidPage() {
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {/* Scene 1 — contemplative (계속) */}
+        {/* Scene 1 — contemplative (시편 23 도입 내레이션 렌더 후 계속) */}
         {sceneType === "contemplative" && (
-          <button
-            onClick={() => {
-              setEcho(null);
-              advance(scene.currentScene, "next");
-            }}
-            className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-            disabled={decide.isPending}
-          >
-            {decide.isPending ? "..." : "계속 →"}
-          </button>
+          <>
+            {scene.currentScene === 1 && (
+              <p className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                {scene1Psalm23}
+              </p>
+            )}
+            <button
+              onClick={() => {
+                setEcho(null);
+                advance(scene.currentScene, "next");
+              }}
+              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+              disabled={decide.isPending}
+            >
+              {decide.isPending ? "..." : "계속 →"}
+            </button>
+          </>
         )}
 
         {/* Scene 2 — pick_one (형의 비웃음) */}

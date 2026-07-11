@@ -10,12 +10,14 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  scene1Wilderness,
   scene2Monologues,
-  scene3Outcomes,
   scene4Reactions,
   scene5Monologue,
   scene6OutroByScene3,
   scene3AssignmentsToPattern,
+  buildScene3Echo,
+  type Scene2Gesture,
   type Scene3Pattern,
   type Scene4Choice,
 } from "@/lib/content/moses-monologues";
@@ -139,29 +141,46 @@ export default function MosesPage() {
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {/* Scene 1 — cinematic */}
+        {/* Scene 1 — cinematic (광야 40년 내레이션 본문 렌더 후 계속) */}
         {sceneType === "cinematic" && (
-          <button
-            onClick={() => {
-              setEcho(null);
-              advance(scene.currentScene, "next");
-            }}
-            className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-            disabled={decide.isPending}
-          >
-            {decide.isPending ? "..." : "계속 →"}
-          </button>
+          <>
+            {scene.currentScene === 1 && (
+              <p className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                {scene1Wilderness}
+              </p>
+            )}
+            <button
+              onClick={() => {
+                setEcho(null);
+                advance(scene.currentScene, "next");
+              }}
+              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+              disabled={decide.isPending}
+            >
+              {decide.isPending ? "..." : "계속 →"}
+            </button>
+          </>
         )}
 
-        {/* Scene 2 & 5 — gesture_sequence */}
-        {sceneType === "gesture_sequence" && (
+        {/* Scene 2 — gesture_sequence(경외/거부 분기): 다가가기·신 벗기 뒤,
+            고개를 든다(경외, 출 3:5) 또는 얼굴을 가린다(거부·머뭇거림, 출 3:6)로 갈린다. */}
+        {sceneType === "gesture_sequence" && scene.currentScene === 2 && (
+          <ReverenceGesture
+            steps={field<OptionLike[]>("steps") ?? []}
+            pending={decide.isPending}
+            onComplete={(gesture) =>
+              advance(scene.currentScene, { value: "completed", gesture })
+            }
+          />
+        )}
+
+        {/* Scene 5 — gesture_sequence(홍해, 단일 행동) */}
+        {sceneType === "gesture_sequence" && scene.currentScene !== 2 && (
           <GestureSequence
             steps={field<OptionLike[]>("steps") ?? []}
             pending={decide.isPending}
             onComplete={() =>
-              advance(scene.currentScene, {
-                value: scene.currentScene === 5 ? "lift_staff" : "completed",
-              })
+              advance(scene.currentScene, { value: "lift_staff" })
             }
           />
         )}
@@ -302,6 +321,77 @@ function GestureSequence({
 }
 
 /**
+ * Scene 2 gesture (경외/거부 분기) — 마지막 단계 전까지는 순서 몸짓(다가가기·신 벗기)을 밟고,
+ * 마지막에 *고개를 든다*(경외, 출 3:5) 또는 *얼굴을 가린다*(거부·머뭇거림, 출 3:6) 중 하나를 고른다.
+ * 두 최종 선택 모두 "3. …" 처럼 번호로 시작해, 기존 gesture e2e(번호 버튼 순차 클릭)와 호환된다.
+ * yml steps 의 마지막(look_up, 고개 들기)은 경외 브랜치로 흡수하고, 얼굴 가림을 추가 브랜치로 제공한다.
+ */
+function ReverenceGesture({
+  steps,
+  pending,
+  onComplete,
+}: {
+  steps: OptionLike[];
+  pending: boolean;
+  onComplete: (gesture: Scene2Gesture) => void;
+}) {
+  const list =
+    steps.length > 0
+      ? steps
+      : [
+          { id: "approach", label: "다가가기" },
+          { id: "remove_shoes", label: "신을 벗기" },
+          { id: "look_up", label: "고개 들기" },
+        ];
+  const [done, setDone] = useState<Set<string>>(new Set());
+
+  // 순차 몸짓(다가가기·신 벗기·고개 들기)을 다 밟으면 = 경외(reverence)로 완료(출 3:5).
+  // 마지막 step(고개 들기)이 곧 경외 행동이므로, 번호 step 을 다 누르면 자동으로 reverence 완료.
+  // 이는 기존 gesture e2e(번호 버튼 순차 클릭 → 마지막에 advance)와 그대로 호환된다.
+  const handleStep = (id: string, isLast: boolean) => {
+    const next = new Set(done);
+    next.add(id);
+    setDone(next);
+    if (isLast || next.size >= list.length) onComplete("reverence");
+  };
+
+  // 언제든 얼굴을 가리면(출 3:6) = 거부·머뭇거림(hesitation)으로 완료. 번호 없는 별도 버튼이라
+  // 번호 버튼만 훑는 gesture e2e 에는 잡히지 않는다(회귀 없음).
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-[var(--color-warm)]/60">
+        순서대로 몸짓을 이어가세요 — 혹은, 지금이 버겁다면 얼굴을 가려도 됩니다.
+      </p>
+      <div className="grid grid-cols-1 gap-3">
+        {list.map((s, i) => {
+          const isLast = i === list.length - 1;
+          const already = done.has(s.id);
+          return (
+            <button
+              key={s.id}
+              onClick={() => handleStep(s.id, isLast)}
+              disabled={pending || already}
+              className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-40 text-left"
+            >
+              <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
+              {s.label}
+              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+            </button>
+          );
+        })}
+        <button
+          onClick={() => onComplete("hesitation")}
+          disabled={pending}
+          className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/60 transition disabled:opacity-40 text-left text-[var(--color-warm)]/70"
+        >
+          얼굴을 가린다 — 뵙기가 두렵다 (출 3:6, 머뭇거림)
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/**
  * distribute (Scene 3) — 다섯 변명 카드를 throw(내려놓기) / heart(품기) 로 배정.
  * 모든 카드를 배정하면 제출 버튼 활성. all_throw / all_heart / mixed 로 결말 분기.
  */
@@ -390,14 +480,17 @@ function buildLocalEcho(
   decision: unknown,
 ): { text: string; scene3Pattern?: Scene3Pattern } | null {
   if (fromScene === 2) {
-    // gesture 완료 — 경외 톤 (얼굴 가림/머뭇거림 분기는 단순화해 reverence 고정)
-    return { text: scene2Monologues.reverence };
+    // gesture 결과에 따라 경외(고개 듦, 출 3:5) / 거부·머뭇거림(얼굴 가림, 출 3:6) 분기.
+    const gesture = readGesture(decision);
+    return { text: scene2Monologues[gesture] };
   }
   if (fromScene === 3) {
     const priority = readPriority(decision);
     const pattern: Scene3Pattern =
       priority === "all_throw" || priority === "all_heart" ? priority : "mixed";
-    return { text: scene3Outcomes[pattern], scene3Pattern: pattern };
+    // 카드별 떨기나무 본문 응답(§3.4)을 outcome 뒤에 잇는다.
+    const assignments = readAssignments(decision);
+    return { text: buildScene3Echo(pattern, assignments), scene3Pattern: pattern };
   }
   if (fromScene === 4) {
     const key = readValue(decision) as Scene4Choice | null;
@@ -416,6 +509,26 @@ function readPriority(decision: unknown): string | null {
     if (typeof p === "string") return p;
   }
   return null;
+}
+
+/** Scene 2 gesture 결과 → reverence/hesitation. 불명확하면 reverence(경외) fallback. */
+function readGesture(decision: unknown): Scene2Gesture {
+  if (typeof decision === "object" && decision !== null) {
+    const g = (decision as { gesture?: unknown }).gesture;
+    if (g === "hesitation" || g === "reverence") return g;
+  }
+  return "reverence";
+}
+
+/** Scene 3 배정(카드 id → throw/heart) 추출. 없으면 빈 객체. */
+function readAssignments(decision: unknown): Record<string, "throw" | "heart"> {
+  if (typeof decision === "object" && decision !== null) {
+    const a = (decision as { assignments?: unknown }).assignments;
+    if (a && typeof a === "object") {
+      return a as Record<string, "throw" | "heart">;
+    }
+  }
+  return {};
 }
 
 function readValue(decision: unknown): string | null {
