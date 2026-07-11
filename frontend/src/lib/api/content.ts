@@ -206,3 +206,110 @@ export async function fetchEcclesiastesViews(limit = 20): Promise<EcclesiastesLi
   });
   return res.data;
 }
+
+// --- 기준1: 일기 조언 (TRACK-A-1-4-WISDOM-EMOTION §2 · 성경 기반 규칙형 조언) ---
+
+/** 성경 구절 — ref + 본문. 성경 외 인용 없음. */
+export interface GuidanceVerse {
+  ref: string;
+  text: string;
+}
+
+/** 감정별 성경 기반 조언 (구절 + 성찰 질문). */
+export interface Guidance {
+  emotion: string;
+  emotionLabel: string;
+  /** "이 감정도 성경 안에 있다" 인증 문구 (R2/R3). */
+  validation: string;
+  verses: GuidanceVerse[];
+  reflectionQuestions: string[];
+}
+
+export interface GuidanceResponse {
+  /** 단건(감정 지정/텍스트 조언) 시 채워짐. */
+  guidance: Guidance | null;
+  /** 감정 미지정 GET 시 전체 감정 선택지. */
+  catalog: Guidance[];
+  crisis: CrisisRouting;
+  safetyFooter: string;
+  aiFooter: string;
+}
+
+/** GET /journal/guidance — 감정으로 조회. 미지정이면 전체 카탈로그. */
+export async function fetchJournalGuidance(emotion?: string): Promise<GuidanceResponse> {
+  const res = await api.get<GuidanceResponse>("/api/content/journal/guidance", {
+    params: emotion ? { emotion } : undefined,
+  });
+  return res.data;
+}
+
+/** POST /journal/guidance — 일기 텍스트 → 조언 (R1 위기 스캔 포함). */
+export async function requestJournalGuidance(req: {
+  text?: string;
+  emotion?: string;
+}): Promise<GuidanceResponse> {
+  const res = await api.post<GuidanceResponse>("/api/content/journal/guidance", req);
+  return res.data;
+}
+
+// --- 기준2: 잠언 주제별 조회 (TRACK-A-1-4-WISDOM-EMOTION §3 · 잠언만 근거) ---
+
+export interface ProverbVerse {
+  ref: string;
+  text: string;
+}
+
+/** 잠언 주제 + 실존 잠언 구절 매핑. */
+export interface ProverbsTheme {
+  key: string;
+  title: string;
+  summary: string;
+  /** R2/R3 — "결과 보장이 아니라 방향" 톤 안내. */
+  guidance: string;
+  verses: ProverbVerse[];
+}
+
+export interface ProverbsThemeListResponse {
+  themes: ProverbsTheme[];
+  safetyFooter: string;
+  aiFooter: string;
+}
+
+export interface ProverbsByThemeResponse {
+  theme: ProverbsTheme;
+  safetyFooter: string;
+  aiFooter: string;
+}
+
+export interface ProverbsInteractionResponse {
+  id: number;
+  theme: string;
+  chosenProverbRef: string | null;
+  safetyFooter: string;
+  aiFooter: string;
+}
+
+export async function fetchProverbsThemes(): Promise<ProverbsThemeListResponse> {
+  const res = await api.get<ProverbsThemeListResponse>("/api/content/proverbs/themes");
+  return res.data;
+}
+
+export async function fetchProverbsByTheme(theme: string): Promise<ProverbsByThemeResponse> {
+  const res = await api.get<ProverbsByThemeResponse>("/api/content/proverbs/by-theme", {
+    params: { theme },
+  });
+  return res.data;
+}
+
+export async function recordProverbsInteraction(req: {
+  theme: string;
+  situation?: string;
+  chosenProverbRef?: string;
+  dimension?: string;
+}): Promise<ProverbsInteractionResponse> {
+  const res = await api.post<ProverbsInteractionResponse>(
+    "/api/content/proverbs/interactions",
+    req,
+  );
+  return res.data;
+}

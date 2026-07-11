@@ -102,6 +102,20 @@ export default function TopicsPage() {
             <p className="text-xs text-[var(--color-warm)]/40">기준4 전도서</p>
             <p className="font-semibold mt-1 text-sm">전도서와 인생 — 헛됨과 의미 성찰하기 →</p>
           </Link>
+          <Link
+            href="/topics/journal"
+            className="block mt-2 px-4 py-3 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]/70 transition"
+          >
+            <p className="text-xs text-[var(--color-warm)]/40">기준1 일기</p>
+            <p className="font-semibold mt-1 text-sm">일기와 조언 — 감정에 맞는 성경 구절 받기 →</p>
+          </Link>
+          <Link
+            href="/topics/proverbs"
+            className="block mt-2 px-4 py-3 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]/70 transition"
+          >
+            <p className="text-xs text-[var(--color-warm)]/40">기준2 잠언</p>
+            <p className="font-semibold mt-1 text-sm">잠언과 지혜 — 주제로 지혜 구절 찾기 →</p>
+          </Link>
           <p className="text-[10px] text-[var(--color-warm)]/30 mt-4 leading-relaxed">
             * 본문 인용: 현대인의 성경 (생명의말씀사) — MVP 비공개 테스터 fair use.
             <br />
