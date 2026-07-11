@@ -59,3 +59,70 @@ export async function fetchScripturePassage(reference: string, translation = "mo
   });
   return res.data;
 }
+
+// --- Theme 6·7 실천/성찰 (TRACK-A-5-7-ACTION-GUIDANCE §3·§4) ---
+
+/** 6 = 마음 지킴, 7 = 사람 두려움. */
+export type PracticeTopicId = 6 | 7;
+
+/**
+ * Theme 6: 'heart_checkin' | 'boundary_sentence'
+ * Theme 7: 'courage_act'   | 'thought_record'
+ */
+export type PracticeKind =
+  | "heart_checkin"
+  | "boundary_sentence"
+  | "courage_act"
+  | "thought_record";
+
+export interface PracticeCreateRequest {
+  topicId: PracticeTopicId;
+  practiceKind: PracticeKind;
+  situation?: string;
+  reflection?: Record<string, unknown>;
+  actionTaken?: boolean;
+  scriptureRef?: string;
+  dimension?: "spiritual" | "emotional" | "rational";
+}
+
+export interface PracticeDto {
+  id: number;
+  topicId: number;
+  practiceKind: string;
+  situation: string | null;
+  reflection: Record<string, unknown> | null;
+  actionTaken: boolean | null;
+  scriptureRef: string | null;
+  dimension: string | null;
+  createdAt: string;
+}
+
+export interface CrisisRouting {
+  routed: boolean;
+  resources: Record<string, unknown>[];
+}
+
+export interface PracticeResponse {
+  practice: PracticeDto;
+  crisis: CrisisRouting;
+  safetyFooter: string;
+  aiFooter: string;
+}
+
+export interface PracticeListResponse {
+  topicId: number;
+  items: PracticeDto[];
+  actionCount: number;
+}
+
+export async function recordPractice(req: PracticeCreateRequest): Promise<PracticeResponse> {
+  const res = await api.post<PracticeResponse>("/api/content/practice", req);
+  return res.data;
+}
+
+export async function fetchPractices(topicId: PracticeTopicId, limit = 20): Promise<PracticeListResponse> {
+  const res = await api.get<PracticeListResponse>("/api/content/practice", {
+    params: { topicId, limit },
+  });
+  return res.data;
+}

@@ -88,6 +88,13 @@ export default function TopicsPage() {
               </button>
             ))}
           </div>
+          <Link
+            href="/topics/practice"
+            className="block mt-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]/70 transition"
+          >
+            <p className="text-xs text-[var(--color-warm)]/40">#6 · #7 실천</p>
+            <p className="font-semibold mt-1 text-sm">마음 지킴 · 사람 두려움 실천하기 →</p>
+          </Link>
           <p className="text-[10px] text-[var(--color-warm)]/30 mt-4 leading-relaxed">
             * 본문 인용: 현대인의 성경 (생명의말씀사) — MVP 비공개 테스터 fair use.
             <br />
