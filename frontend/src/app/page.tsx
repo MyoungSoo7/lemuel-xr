@@ -40,14 +40,21 @@ const DIRECT_MISSIONS: Array<{
     href: "/moses",
     name: "Moses",
     korean: "모세",
-    tagline: "떨기나무 앞에서 — 두려운 채로 가는 용기 (Phase 2)",
+    tagline: "떨기나무 앞에서 — 두려운 채로 가는 용기",
     active: true,
   },
   {
     href: "/david",
     name: "David",
     korean: "다윗",
-    tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다 (Phase 2)",
+    tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다",
+    active: true,
+  },
+  {
+    href: "/jesus",
+    name: "Jesus",
+    korean: "예수",
+    tagline: "길이요 진리요 생명 — 네 구원을 감싸는 정점",
     active: true,
   },
 ];
@@ -204,9 +211,9 @@ export default function HomePage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {result.recommendations.trackB.map((c) => {
-                    const ACTIVE = new Set(["joseph", "moses", "david"]);
+                    const ACTIVE = new Set(["joseph", "moses", "david", "jesus"]);
                     const href = ACTIVE.has(c.character) ? `/${c.character}` : "#";
-                    const phase2 = c.character !== "joseph";
+                    const phase2 = !ACTIVE.has(c.character);
                     return (
                       <Link
                         key={c.character}

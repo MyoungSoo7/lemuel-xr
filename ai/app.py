@@ -296,8 +296,29 @@ class EmotionResponse(BaseModel):
     confidence: float
 
 
+# AI_MOCK=1 일 때 사용하는 결정형 키워드 감정 분류 (LLM API 키 없이 로컬 개발/e2e 용).
+# 운영에서는 절대 켜지 않는다 — 정확도가 낮은 휴리스틱이다.
+_MOCK_EMOTION_KEYWORDS: list[tuple[str, list[str]]] = [
+    ("ANXIOUS", ["불안", "걱정", "초조", "두려", "긴장", "떨"]),
+    ("SAD", ["슬프", "슬퍼", "눈물", "우울", "울고", "비참"]),
+    ("ANGRY", ["화", "분노", "짜증", "억울", "미워", "열받"]),
+    ("LONELY", ["외로", "혼자", "고립", "쓸쓸", "그리워"]),
+    ("EXHAUSTED", ["지쳐", "지침", "피곤", "번아웃", "탈진", "힘들"]),
+    ("GRATEFUL", ["감사", "고마", "다행", "기쁨", "기뻐", "행복"]),
+]
+
+
+def _mock_classify(text: str) -> EmotionResponse:
+    for emotion, kws in _MOCK_EMOTION_KEYWORDS:
+        if any(kw in text for kw in kws):
+            return EmotionResponse(emotion=emotion, confidence=0.75)  # type: ignore[arg-type]
+    return EmotionResponse(emotion="CONFUSED", confidence=0.5)
+
+
 @app.post("/classify-emotion", response_model=EmotionResponse)
 def classify_emotion(req: EmotionRequest) -> EmotionResponse:
+    if os.environ.get("AI_MOCK") == "1":
+        return _mock_classify(req.text)
     try:
         r = providers.generate(
             purpose="classify_emotion",

@@ -7,6 +7,7 @@ import github.lms.lemuel.xr.common.ErrorCode;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Limit;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class AssetManifestController {
     public ResponseEntity<ManifestResponse> manifest(@RequestParam String mission,
                                                        @RequestParam String device,
                                                        @RequestParam(required = false) Short scene) {
-        AssetManifestJpaEntity m = repo.findLatest(mission, scene, device)
+        AssetManifestJpaEntity m = repo.findLatest(mission, scene, device, Limit.of(1))
                 .orElseThrow(() -> new AppException(ErrorCode.E_VALIDATION,
                         "No active manifest for mission=" + mission + " device=" + device));
         return ResponseEntity.ok(new ManifestResponse(

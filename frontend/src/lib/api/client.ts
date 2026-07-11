@@ -26,9 +26,32 @@ function clearToken() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
+  localStorage.removeItem(DISCLAIMER_KEY);
 }
 
 let pendingIssue: Promise<string> | null = null;
+
+const DISCLAIMER_KEY = "lemuel_xr_disclaimer_accepted";
+
+/**
+ * 게스트 토큰 발급 직후 disclaimer 동의를 확정한다. 실패하더라도 토큰 발급 자체는
+ * 유효하므로 조용히 넘어간다 (콘텐츠 요청 시 451 이 다시 표면화됨).
+ * 세션당 1회만 시도하도록 localStorage 플래그로 가드.
+ */
+async function ensureDisclaimerAccepted(token: string): Promise<void> {
+  if (typeof window === "undefined") return;
+  if (localStorage.getItem(DISCLAIMER_KEY) === "true") return;
+  try {
+    await axios.post(
+      "/api/auth/accept-disclaimer",
+      {},
+      { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } },
+    );
+    localStorage.setItem(DISCLAIMER_KEY, "true");
+  } catch (e) {
+    console.warn("disclaimer acceptance failed:", e);
+  }
+}
 
 async function ensureGuestToken(): Promise<string> {
   const existing = getStoredToken();
@@ -42,6 +65,10 @@ async function ensureGuestToken(): Promise<string> {
         { headers: { "Content-Type": "application/json" } },
       );
       storeToken(res.data.token, res.data.userId);
+      // 갓 발급된 게스트는 disclaimer 미동의 상태 — 콘텐츠/게임 endpoint 는
+      // DisclaimerGateFilter 가 451 로 차단한다. 발급 직후 동의를 확정해
+      // 이후 요청이 게이트를 통과하도록 한다.
+      await ensureDisclaimerAccepted(res.data.token);
       return res.data.token;
     } finally {
       pendingIssue = null;
