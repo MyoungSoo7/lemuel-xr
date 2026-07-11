@@ -116,6 +116,18 @@ class MiscEndpointsWebIT extends IntegrationTestBase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    void assetManifest_scene미지정_다중매칭도_200_한건반환() {
+        // 회귀: scene 파라미터 없으면 여러 씬 manifest 가 매칭돼 이전엔 NonUniqueResultException→500.
+        // Limit.of(1) 로 version 최신 1건만 취해 200 반환해야 한다.
+        Map<String, Object> body = client().get()
+                .uri("/api/config/asset-manifest?mission=joseph&device=web")
+                .retrieve().body(Map.class);
+        assertThat(body).containsEntry("missionId", "joseph").containsEntry("deviceType", "web");
+        assertThat(body.get("manifest")).isNotNull();
+    }
+
+    @Test
     void assetManifest_미지미션_400() {
         try {
             client().get().uri("/api/config/asset-manifest?mission=nobody&device=web")
