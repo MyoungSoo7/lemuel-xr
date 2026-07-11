@@ -1,4 +1,9 @@
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
 TTS==0.22.0
+# Coqui TTS 0.22.0 은 transformers 의 BeamSearchScorer 를 import 하는데, 이는
+# transformers 4.41+ 에서 제거됨 → 미고정 시 최신 transformers 가 깔려
+# "ImportError: cannot import name 'BeamSearchScorer'" 로 모델 로드 실패(무한 크래시).
+# BeamSearchScorer 가 존재하는 마지막 계열로 고정.
+transformers==4.40.2
 pydantic==2.9.2
