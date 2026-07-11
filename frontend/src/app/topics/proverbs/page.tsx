@@ -8,6 +8,7 @@ import {
   recordProverbsInteraction,
   type ProverbsTheme,
 } from "@/lib/api/content";
+import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 
 /**
  * /topics/proverbs — 기준2 (잠언과 지혜) 주제별 조회.
@@ -113,6 +114,17 @@ function ThemeVerses({ theme }: { theme: ProverbsTheme }) {
       <p className="text-xs text-[var(--color-warm)]/60 mt-2 leading-relaxed">
         {theme.guidance}
       </p>
+      <div className="mt-2">
+        <NarrationAudioButton
+          text={[
+            theme.summary,
+            theme.guidance,
+            ...theme.verses.map((v) => `${v.ref}. ${v.text}`),
+          ].join("\n")}
+          label="듣기"
+          onUnavailable="hide"
+        />
+      </div>
 
       {/* 잠언 구절 리스트 (잠언만 근거) — 클릭 시 '고른 구절' 기록 */}
       <div className="mt-4 space-y-3">
