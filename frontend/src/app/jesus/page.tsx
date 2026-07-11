@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import {
@@ -9,44 +9,87 @@ import {
   completeMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+import {
+  scene2Beatitudes,
+  scene3Touch,
+  scene4Iam,
+  scene4Teaching,
+  scene5Passion,
+  scene6Resurrection,
+  scene7Ascension,
+  scene7CrisisReminder,
+  iamOf,
+} from "@/lib/content/jesus-monologues";
 
 /**
- * Jesus 미션 — B 트랙의 정점(capstone).
+ * Jesus 미션 — 트랙 B 정점(capstone). Phase 2 완전 활성 (요셉·모세·다윗 동급).
  *
- * Scene 1 (성육신 cinematic) 까지만 실제 backend 호출 + UI 인터랙션.
- * Scene 2~7 의 *interaction* (팔복 / 만짐 / 길·진리·생명 / 겟세마네 / 부활 / 승천)
- * 은 신학·임상 자문 검토 통과 후 활성. Joseph/David 미션과 같은 골격.
+ * jesus.yml 7 Scene:
+ *   1 cinematic(성육신) → 2 scripture_reading(팔복) → 3 gesture_sequence(만짐) →
+ *   4 pick_one(길·진리·생명 3분기) → 5 contemplative(겟세마네·십자가, R4 게이트) →
+ *   6 scripture_reading(부활 빈 무덤) → 7 outro(승천·생명의 강) → complete → 홈.
  *
- * 영적 구원이 경제(요셉)·정치(모세)·외세(다윗) 구원을 감싸는 포괄 서사.
+ * echo(직전 결정/씬 모놀로그) 는 jesus-monologues.ts 의 frontend fallback 이 담당한다 —
+ * backend 는 jesus.yml 에 monologues/outcomes/reactions map 이 없어 responseText=null.
+ * shape 는 요셉/다윗과 동일하므로 9+15 캐시 시드 완료 후 backend round-trip 으로 교체 가능.
+ *
+ * ─────────────── 안전선 (예수는 정점이라 특히 엄격) ───────────────
+ *  · R4 — Scene 5(겟세마네·십자가, 고통·죽음) 진입 전 정서 경고 동의 카드 + 건너뛰기(→ Scene 6).
+ *    jesus.yml Scene 5 trigger_warning(level medium, [suffering, death]) 을 프론트가 소비하는 지점.
+ *  · R3 — Scene 6 부활을 "너도 부활/극복하라" 로 틀지 않는다. *이름이 불린다* 는 수동 은혜만.
+ *  · R2 — Scene 5 겟세마네 흔들림 = 믿음의 결함 아님. 고난 미화 X.
+ *  · R1 — Scene 7 outro 에 위기 라우팅(1393·1577-0199) + 일기·트랙 A 안내.
+ *  · R5 — 모든 echo/outro 에 "AI 보조 — 본문은 성경 참조" footer.
  */
 type Scene = JosephStartResponse;
 
-const SCENE_PREVIEW = [
-  { id: 1, title: "성육신 — 말씀이 육신이 되어", anchor: "낮아짐 · 임재 · 시작", active: true },
-  { id: 2, title: "산 위의 가르침 — 팔복", anchor: "뒤집힌 복 · 마음의 가난", active: false },
-  { id: 3, title: "만짐 — 병자를 고치심", anchor: "접촉 · 존엄 회복", active: false },
-  { id: 4, title: "길이요 진리요 생명", anchor: "방향 · 신뢰 · 핵심 통찰 ★", active: false },
-  { id: 5, title: "겟세마네와 십자가", anchor: "내려놓음 · 함께 고통하심 ★", active: false },
-  { id: 6, title: "부활 — 빈 무덤", anchor: "소망 · 부르심 · 이름", active: false },
-  { id: 7, title: "승천과 생명의 강", anchor: "임재의 지속 · 흐르는 생명", active: false },
-];
+interface DecisionEcho {
+  fromScene: number;
+  text: string;
+}
+
+interface OptionLike {
+  id: string;
+  label: string;
+}
 
 export default function JesusPage() {
   const [scene, setScene] = useState<Scene | null>(null);
+  const [history, setHistory] = useState<string[]>([]);
+  const [echo, setEcho] = useState<DecisionEcho | null>(null);
+  // R4 — Scene 5(겟세마네·십자가, 고통·죽음 트리거) 진입 전 정서 경고 동의 게이트.
+  // 동의(들어간다) 전에는 묵상 버튼을 렌더하지 않으며, 건너뛰기(→ Scene 6)는 화면 위에 노출한다.
+  const [passionConsented, setPassionConsented] = useState(false);
 
   const start = useMutation({
     mutationFn: () => startMission("jesus", "web"),
     onSuccess: (d) => setScene(d),
   });
+
   const decide = useMutation({
     mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
       decideMission("jesus", scene!.sessionId, sceneId, decision),
-    onSuccess: (d) => setScene(d),
+    onSuccess: (d, vars) => {
+      // backend responseText 우선, 없으면 frontend fallback (jesus 는 항상 fallback).
+      const local = buildLocalEcho(vars.sceneId, vars.decision);
+      const text = d.responseText ?? local ?? null;
+      if (text) setEcho({ fromScene: vars.sceneId, text });
+      else setEcho(null);
+      setPassionConsented(false); // R4 — 다음 씬 진입 시 동의 게이트 초기화
+      setScene(d);
+      setHistory((h) => [...h, JSON.stringify(d.scenePayload.title)]);
+    },
   });
 
   useEffect(() => {
     if (!scene && !start.isPending && !start.isError) start.mutate();
   }, [scene, start]);
+
+  // Scene 7 (outro) 진입 시 승천·생명의 강 텍스트
+  const outroText = useMemo(() => {
+    if (scene?.currentScene !== 7) return null;
+    return scene7Ascension;
+  }, [scene?.currentScene]);
 
   if (!scene) {
     return (
@@ -58,32 +101,65 @@ export default function JesusPage() {
 
   const payload = scene.scenePayload as Record<string, unknown>;
   const title = (payload.title as string) ?? "Scene";
-  const sceneType = (payload.type as string) ?? "";
+  const rawType = (payload.type as string) ?? "";
+  const interaction = (payload.interaction as string) ?? "";
+  const sceneType = rawType === "interaction" ? interaction : rawType;
 
-  const isActiveCinematic = scene.currentScene === 1 && sceneType === "cinematic";
+  // jesus.yml 은 interaction 데이터(options/steps/lines)를 씬의 `extras:` 블록 안에
+  // 중첩한다 (moses/david.yml 과 동일). loader 가 그 블록을 통째로 payload.extras 로 넘기므로,
+  // extras 를 우선 읽고 top-level 을 fallback.
+  const extras = (payload.extras as Record<string, unknown> | undefined) ?? {};
+  const field = <T,>(key: string): T | undefined =>
+    (extras[key] as T | undefined) ?? (payload[key] as T | undefined);
+
+  const advance = (sceneId: number, decision: unknown) => {
+    decide.mutate({ sceneId, decision });
+  };
+
+  const lines = field<Array<{ ref?: string; text?: string }>>("lines") ?? [];
 
   return (
     <main className="min-h-screen flex flex-col p-4 sm:p-6">
       <header className="max-w-3xl mx-auto w-full mb-4">
         <p className="text-xs text-[var(--color-warm)]/40 uppercase tracking-wider">
-          Jesus — Scene {scene.currentScene}/7 · Phase {scene.currentScene === 1 ? "1" : "2 (안내)"}
+          Jesus — Scene {scene.currentScene}/7 · Mode: VR
         </p>
         <h1 className="text-2xl font-bold mt-1">{title}</h1>
       </header>
 
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950">
+      {/* Decision echo — 직전 결정/씬의 모놀로그 */}
+      {echo && (
+        <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
+          <p className="whitespace-pre-line">{echo.text}</p>
+          <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
+            * AI 보조 — 본문은 성경 참조 *
+          </p>
+        </section>
+      )}
+
+      {/* Scene 배경 — jesus 전용 이미지 없으면 grad placeholder */}
+      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950">
         <div className="absolute inset-0 flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
-            {scene.currentScene === 1 && "말씀이 육신이 되어 우리 가운데 오셨다. 가장 낮은 자리에서 시작되는 임재 — 요한복음 1장이 흐른다."}
-            {scene.currentScene > 1 && "Phase 2 — 자문 통과 후 본 Scene 의 인터랙션이 활성됩니다."}
+            {scene.currentScene === 1 && "베들레헴 외곽의 밤. 별빛 아래 소박한 구유 — 하늘이 낮은 자리로 내려온다."}
+            {scene.currentScene === 2 && "갈릴리 언덕의 아침. 무리 가운데 앉아 팔복을 듣는다 — 비어 있음이 복이라 하신다."}
+            {scene.currentScene === 3 && "군중이 물러선 자리. 나병 환자에게 예수는 오히려 다가가신다 — 손을 내밀어 닿으신다."}
+            {scene.currentScene === 4 && "어둑한 다락방. 세 갈래 빛의 길이 갈린다 — 길·진리·생명, 어느 결핍으로 다가갈 것인가."}
+            {scene.currentScene === 5 && "감람산 겟세마네의 밤. 빛과 그림자로만 그려지는 잔 — 뜻대로 마옵시고."}
+            {scene.currentScene === 6 && "이른 새벽 동산 무덤. 어둠이 여명으로 밝아 온다 — 이름을 부르시는 음성."}
+            {scene.currentScene === 7 && "밝은 묵상의 자리. 발치에서 작은 물줄기가 흐르기 시작한다 — 생명의 강."}
           </p>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {isActiveCinematic && (
+        {/* Scene 1 — cinematic (성육신, 계속) */}
+        {sceneType === "cinematic" && (
           <button
-            onClick={() => decide.mutate({ sceneId: scene.currentScene, decision: "next" })}
+            onClick={() => {
+              setEcho(null);
+              advance(scene.currentScene, "next");
+            }}
             className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
             disabled={decide.isPending}
           >
@@ -91,29 +167,113 @@ export default function JesusPage() {
           </button>
         )}
 
-        {!isActiveCinematic && (
-          <div className="rounded-lg border border-[var(--color-primary)]/30 bg-black/30 px-5 py-4 space-y-3">
-            <p className="text-sm text-[var(--color-warm)]/80">
-              <strong className="text-[var(--color-primary)]">Phase 2 — 자문 통과 후 활성</strong>
-              <br />
-              본 미션의 Scene 2~7 인터랙션은 신학·임상 자문 검토 후 활성됩니다. ★ = 핵심 Scene.
+        {/* Scene 2·6 — scripture_reading (팔복 / 부활 본문 건드리며 읽기) */}
+        {sceneType === "scripture_reading" && (
+          <ScriptureReading
+            lines={lines}
+            reflection={field<string>("reflection_prompt")}
+            pending={decide.isPending}
+            onComplete={() => advance(scene.currentScene, { value: "read" })}
+          />
+        )}
+
+        {/* Scene 3 — gesture_sequence (만짐: 다가간다 → 손을 내민다) */}
+        {sceneType === "gesture_sequence" && (
+          <GestureSequence
+            steps={field<OptionLike[]>("steps") ?? []}
+            pending={decide.isPending}
+            onComplete={() => advance(scene.currentScene, { value: "touch" })}
+          />
+        )}
+
+        {/* Scene 4 — pick_one (길·진리·생명 3분기) */}
+        {sceneType === "pick_one" && Array.isArray(field<OptionLike[]>("options")) && (
+          <div className="space-y-3">
+            {field<string>("context_line") && (
+              <p className="text-xs text-[var(--color-warm)]/60 italic px-1">
+                {field<string>("context_line")}
+              </p>
+            )}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => advance(scene.currentScene, o.id)}
+                  disabled={decide.isPending}
+                  className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Scene 5 — contemplative (겟세마네·십자가). R4 정서 경고 동의 게이트. */}
+        {sceneType === "contemplative" && !passionConsented && (
+          <div className="space-y-3 px-4 py-4 rounded-lg border border-[var(--color-primary)]/40 bg-black/30">
+            <p className="text-sm text-[var(--color-warm)]/90">
+              다음 장면은 <strong>고통과 죽음(겟세마네·십자가)</strong> 을 다룹니다. 약 2분.
+              직접 묘사 없이 빛과 그림자·본문으로만 그려지지만, 지금이 버겁다면 이 장면은{" "}
+              <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 결말과 부활은 그대로 이어집니다.
             </p>
-            <p className="text-xs text-[var(--color-warm)]/60 italic whitespace-pre-line">
-              {SCENE_PREVIEW.slice(1)
-                .map((s) => `Scene ${s.id} — ${s.title} (${s.anchor})`)
-                .join("\n")}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={() => setPassionConsented(true)}
+                disabled={decide.isPending}
+                className="px-4 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+              >
+                준비됐어요 · 함께 머물게요
+              </button>
+              <button
+                onClick={() => advance(scene.currentScene, { value: "skip" })}
+                disabled={decide.isPending}
+                className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90"
+              >
+                이 장면은 건너뛸게요 → 부활로
+              </button>
+            </div>
+          </div>
+        )}
+        {sceneType === "contemplative" && passionConsented && (
+          <button
+            onClick={() => advance(scene.currentScene, { value: "contemplate" })}
+            disabled={decide.isPending}
+            className="w-full py-4 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+          >
+            {decide.isPending ? "..." : "잔 앞에 잠시 머문다 →"}
+          </button>
+        )}
+
+        {/* Scene 7 — outro (승천·생명의 강 + 위기 라우팅) */}
+        {sceneType === "outro" && (
+          <div className="text-center space-y-4">
+            <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
+              {outroText}
+            </p>
+            <p className="text-xs whitespace-pre-line text-[var(--color-warm)]/60 max-w-prose mx-auto not-italic">
+              {scene7CrisisReminder}
+            </p>
+            <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
+              * AI 보조 — 본문은 성경 참조 *
             </p>
             <button
               onClick={() =>
-                completeMission("jesus", scene.sessionId, "phase1_only").then(
+                completeMission("jesus", scene.sessionId, "completed").then(
                   () => (location.href = "/"),
                 )
               }
-              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold mt-2"
+              className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
             >
-              미션 종료 (Phase 1 완료)
+              미션 완료
             </button>
           </div>
+        )}
+
+        {decide.isError && (
+          <p className="text-red-400 text-sm mt-2">
+            오류: {(decide.error as Error).message}
+          </p>
         )}
 
         <div className="pt-2 flex gap-3">
@@ -131,6 +291,162 @@ export default function JesusPage() {
           </Link>
         </div>
       </section>
+
+      {history.length > 0 && (
+        <details className="max-w-3xl mx-auto w-full mt-6 text-xs text-[var(--color-warm)]/40">
+          <summary>진행 기록</summary>
+          <pre className="overflow-x-auto">{JSON.stringify(history, null, 2)}</pre>
+        </details>
+      )}
     </main>
   );
+}
+
+/**
+ * scripture_reading (Scene 2 팔복 / Scene 6 부활) — 본문 줄을 하나씩 손으로 건드려(눌러) 읽고,
+ * 모두 읽으면 성찰 프롬프트가 열린 뒤 다음 씬으로 advance. 다윗 수금·모세 낭독과 동형.
+ */
+function ScriptureReading({
+  lines,
+  reflection,
+  pending,
+  onComplete,
+}: {
+  lines: Array<{ ref?: string; text?: string }>;
+  reflection?: string;
+  pending: boolean;
+  onComplete: () => void;
+}) {
+  const [read, setRead] = useState<Set<number>>(new Set());
+  const list = lines.length > 0 ? lines : [{ text: "본문을 천천히 읽어 봅니다." }];
+  const allRead = read.size >= list.length;
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-[var(--color-warm)]/60">
+        한 줄씩 손으로 짚어 천천히 읽어 보세요.
+      </p>
+      <div className="space-y-2">
+        {list.map((ln, i) => {
+          const done = read.has(i);
+          return (
+            <button
+              key={i}
+              onClick={() => setRead((prev) => new Set(prev).add(i))}
+              disabled={pending || done}
+              className={`w-full text-left px-4 py-3 rounded-lg border transition disabled:cursor-default ${
+                done
+                  ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10"
+                  : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
+              }`}
+            >
+              <span className="text-sm text-[var(--color-warm)]/90">{ln.text}</span>
+              {ln.ref && (
+                <span className="ml-2 text-[10px] text-[var(--color-warm)]/40 uppercase">
+                  {ln.ref}
+                </span>
+              )}
+              {done && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+            </button>
+          );
+        })}
+      </div>
+      {allRead && reflection && (
+        <p className="px-4 py-3 rounded-lg bg-black/20 border border-[var(--color-primary)]/20 text-sm italic text-[var(--color-warm)]/80 whitespace-pre-line">
+          {reflection}
+        </p>
+      )}
+      <button
+        onClick={onComplete}
+        disabled={pending || !allRead}
+        className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+      >
+        {allRead ? "다음으로 →" : "본문을 모두 읽어 보세요"}
+      </button>
+    </div>
+  );
+}
+
+/**
+ * gesture_sequence (Scene 3 만짐) — steps 를 순서대로 눌러 완료. 마지막 step 에서 onComplete.
+ * 다가간다 → 손을 내민다. 예수의 *접촉하시는 성품* 을 몸으로 체험 (치유 즉효 약속 아님).
+ */
+function GestureSequence({
+  steps,
+  pending,
+  onComplete,
+}: {
+  steps: OptionLike[];
+  pending: boolean;
+  onComplete: () => void;
+}) {
+  const [done, setDone] = useState<Set<string>>(new Set());
+  const list = steps.length > 0 ? steps : [{ id: "act", label: "손을 내민다" }];
+
+  const handle = (id: string, isLast: boolean) => {
+    const nextDone = new Set(done);
+    nextDone.add(id);
+    setDone(nextDone);
+    if (isLast || nextDone.size >= list.length) onComplete();
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-xs text-[var(--color-warm)]/60">순서대로 몸짓을 이어가세요</p>
+      <div className="grid grid-cols-1 gap-3">
+        {list.map((s, i) => {
+          const isLast = i === list.length - 1;
+          const already = done.has(s.id);
+          return (
+            <button
+              key={s.id}
+              onClick={() => handle(s.id, isLast)}
+              disabled={pending || already}
+              className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-40 text-left"
+            >
+              <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
+              {s.label}
+              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 직전 결정 (sceneId + decision) → echo 텍스트. jesus 는 씬별 정적 모놀로그(frontend fallback).
+ * Scene 5 skip(건너뛰기) 시엔 십자가 고난 echo 를 띄우지 않는다 (R4).
+ * Scene 4 는 선택(길/진리/생명)에 따른 예수의 응답 + teaching_note.
+ */
+function buildLocalEcho(fromScene: number, decision: unknown): string | null {
+  switch (fromScene) {
+    case 2: // 팔복
+      return scene2Beatitudes;
+    case 3: // 만짐
+      return scene3Touch;
+    case 4: {
+      // 길·진리·생명 — 선택 분기 응답 + 세 얼굴이 한 분임(요 14:6 의도)
+      const iam = iamOf(readValue(decision));
+      return `${scene4Iam[iam]}\n\n${scene4Teaching}`;
+    }
+    case 5:
+      // 건너뛰기(skip) 시엔 십자가 고난 묘사 echo 를 띄우지 않는다 (R4).
+      if (readValue(decision) === "skip") return null;
+      return scene5Passion;
+    case 6: // 부활 — 이름이 불린다(R3)
+      return scene6Resurrection;
+    default:
+      return null;
+  }
+}
+
+function readValue(decision: unknown): string | null {
+  if (typeof decision === "string") return decision;
+  if (typeof decision === "object" && decision !== null) {
+    const v = (decision as { value?: unknown }).value;
+    if (typeof v === "string") return v;
+  }
+  return null;
 }

@@ -54,8 +54,8 @@ const DIRECT_MISSIONS: Array<{
     href: "/jesus",
     name: "Jesus",
     korean: "예수",
-    tagline: "길이요 진리요 생명 — 네 구원을 감싸는 정점 (자문 검토 중)",
-    active: false,
+    tagline: "길이요 진리요 생명 — 네 구원을 감싸는 정점",
+    active: true,
   },
 ];
 
@@ -211,7 +211,7 @@ export default function HomePage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {result.recommendations.trackB.map((c) => {
-                    const ACTIVE = new Set(["joseph", "moses", "david"]);
+                    const ACTIVE = new Set(["joseph", "moses", "david", "jesus"]);
                     const href = ACTIVE.has(c.character) ? `/${c.character}` : "#";
                     const phase2 = !ACTIVE.has(c.character);
                     return (
