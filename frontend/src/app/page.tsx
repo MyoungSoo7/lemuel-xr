@@ -50,6 +50,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "다섯 개의 돌 — 작다는 것은 약함이 아니다 (Phase 2)",
     active: true,
   },
+  {
+    href: "/jesus",
+    name: "Jesus",
+    korean: "예수",
+    tagline: "길이요 진리요 생명 — 네 구원을 감싸는 정점 (자문 검토 중)",
+    active: false,
+  },
 ];
 
 export default function HomePage() {
