@@ -1,0 +1,46 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 2,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "throw_distance_meters": 3.0,
+    "throw_via_pinch_release": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_barley_field_horizon", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/env_barley_field.glb", "size_bytes": 9360000, "lod": "lod3_pbr_upscale_4k"},
+      {"id": "model_granary_far", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/granary.glb", "size_bytes": 2640000, "lod": "lod3_pbr_upscale_4k"},
+      {"id": "model_grain_bag_A", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/grain_bag_A.glb", "size_bytes": 720000, "lod": "lod3_pbr_upscale_4k"},
+      {"id": "model_grain_bag_B", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/grain_bag_B.glb", "size_bytes": 720000, "lod": "lod3_pbr_upscale_4k"},
+      {"id": "model_grain_bag_C", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/grain_bag_C.glb", "size_bytes": 720000, "lod": "lod3_pbr_upscale_4k"}
+    ],
+    "audio": [
+      {"id": "aud_s2_intro_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s2_intro_ko.wav", "size_bytes": 1680000, "voice_id": "joseph_v1", "duration_ms": 14000, "spatial_audio_personal": true},
+      {"id": "aud_s2_post_A_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s2_post_A_ko.wav", "size_bytes": 1080000, "voice_id": "joseph_v1", "duration_ms": 9000},
+      {"id": "aud_s2_post_B_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s2_post_B_ko.wav", "size_bytes": 1320000, "voice_id": "joseph_v1", "duration_ms": 11000},
+      {"id": "aud_s2_post_C_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s2_post_C_ko.wav", "size_bytes": 1440000, "voice_id": "joseph_v1", "duration_ms": 12000},
+      {"id": "amb_wind_barley", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/amb_wind_barley.ogg", "size_bytes": 1200000, "voice_id": null, "duration_ms": 30000},
+      {"id": "amb_farmer_song_loop", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/amb_farmer_song_5s_loop.ogg", "size_bytes": 456000, "voice_id": "farmer_chorus_v1", "duration_ms": 5000}
+    ],
+    "textures": [
+      {"id": "tex_barley_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/barley_atlas_4k.ktx2", "size_bytes": 3360000, "format": "ktx2", "resolution": "4096x4096"},
+      {"id": "tex_granary_pbr", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/granary_pbr_4k.ktx2", "size_bytes": 2160000, "format": "ktx2", "resolution": "4096x4096"},
+      {"id": "tex_grain_bag_pbr", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/grain_bag_pbr_2k.ktx2", "size_bytes": 600000, "format": "ktx2", "resolution": "2048x2048"}
+    ],
+    "scripts": [
+      {"id": "script_scene2_throw_decision", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/Scene2ThrowDecisionPolySpatial.cs.bundle", "size_bytes": 43200, "entry_class": "Scene2ThrowDecisionPolySpatial"},
+      {"id": "shader_barley_gpu_instanced", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/BarleyGPUInstanced.shadergraph.bundle", "size_bytes": 21600, "entry_class": "BarleyGPUInstanced"},
+      {"id": "script_pinch_throw_remap", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/PinchThrowRemap.cs.bundle", "size_bytes": 12000, "entry_class": "PinchThrowRemap"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 27532800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,50 @@
+{
+  "mission_id": "david",
+  "scene_number": 3,
+  "device_type": "quest3",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "haptic_required": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_elah_frontline_ridge", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/env_elah_frontline.glb", "size_bytes": 6800000, "lod": "lod3_pbr"},
+      {"id": "model_goliath", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/goliath.glb", "size_bytes": 25000000, "lod": "lod3_pbr_face_abstracted", "scene_exclusive": true, "note": "대용량 — Scene 3 만 (Scene 5 는 imposter 재사용)"},
+      {"id": "model_saul", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/saul.glb", "size_bytes": 2400000, "lod": "lod3_pbr"},
+      {"id": "model_saul_army_80_imposter", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/saul_army_80_imposter.glb", "size_bytes": 4400000, "lod": "lod3_pbr_with_imposter_far_60"},
+      {"id": "model_bronze_armor_set", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/models/bronze_armor_helmet_breastplate_sword.glb", "size_bytes": 2600000, "lod": "lod3_pbr"}
+    ],
+    "audio": [
+      {"id": "aud_s3_intro_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_intro_ko.wav", "size_bytes": 1200000, "voice_id": "narrator_v1", "duration_ms": 12000},
+      {"id": "aud_s3_goliath_shout_ko_strong", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_goliath_shout_ko_strong.wav", "size_bytes": 1700000, "voice_id": "goliath_v1", "duration_ms": 15000, "intensity": "high"},
+      {"id": "aud_s3_goliath_shout_ko_low", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_goliath_shout_ko_low.wav", "size_bytes": 1500000, "voice_id": "goliath_v1_low", "duration_ms": 15000, "intensity": "low"},
+      {"id": "aud_s3_saul_approach_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_saul_approach_ko.wav", "size_bytes": 1200000, "voice_id": "saul_v1", "duration_ms": 12000},
+      {"id": "aud_s3_david_inner_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_david_inner_ko.wav", "size_bytes": 820000, "voice_id": "david_v1", "duration_ms": 8000},
+      {"id": "aud_s3_armor_caption_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_armor_caption_ko.wav", "size_bytes": 820000, "voice_id": "narrator_v1", "duration_ms": 8000},
+      {"id": "aud_s3_david_decision_ko", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/s3_david_decision_ko.wav", "size_bytes": 820000, "voice_id": "david_v1", "duration_ms": 8000},
+      {"id": "amb_silence_pressure", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/amb_silence_pressure.ogg", "size_bytes": 300000, "voice_id": null, "duration_ms": 60000},
+      {"id": "amb_battlefield_wind", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/amb_battlefield_wind.ogg", "size_bytes": 1100000, "voice_id": null, "duration_ms": 45000},
+      {"id": "amb_saul_army_breath", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/audio/amb_saul_army_anxious_breath.ogg", "size_bytes": 480000, "voice_id": "crowd_silent", "duration_ms": 30000}
+    ],
+    "textures": [
+      {"id": "tex_elah_frontline_atlas", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/elah_frontline_2k.ktx2", "size_bytes": 2800000, "format": "ktx2", "resolution": "2048x2048"},
+      {"id": "tex_goliath_armor_2k", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/goliath_armor_2k.ktx2", "size_bytes": 3200000, "format": "ktx2", "resolution": "2048x2048"},
+      {"id": "tex_saul_royal_armor", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/saul_royal_armor_2k.ktx2", "size_bytes": 1900000, "format": "ktx2", "resolution": "2048x2048"},
+      {"id": "tex_bronze_armor_pbr", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/bronze_armor_2k.ktx2", "size_bytes": 1600000, "format": "ktx2", "resolution": "2048x2048"},
+      {"id": "tex_saul_army_imposter", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/textures/saul_army_imposter_1k.ktx2", "size_bytes": 800000, "format": "ktx2", "resolution": "1024x1024"}
+    ],
+    "scripts": [
+      {"id": "script_scene3_armor_multi_socket", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/scripts/Scene3ArmorMultiSocket.cs.bundle", "size_bytes": 42000, "entry_class": "Scene3ArmorMultiSocket"},
+      {"id": "script_intensity_router", "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/v1.0.0/scripts/IntensityRouter.cs.bundle", "size_bytes": 18000, "entry_class": "IntensityRouter"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 60930000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

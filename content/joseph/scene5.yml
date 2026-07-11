@@ -1,0 +1,112 @@
+# Scene 5 — 결말·회복 메시지 (30초)
+# 진입 시 입력한 감정 + faith_tone 으로 매칭. 사전 캐싱 (LLM 0회 목표).
+
+scene_id: joseph_scene5
+scene_name: closure_recovery
+mission_id: joseph
+version: 1.0.0
+duration_seconds_target: 30
+
+environment:
+  space_id: dark_meditation_void
+  background_model: env_meditation_dark_fog
+  lighting:
+    type: soft_volumetric_fog_low_key
+    color_temperature_kelvin: 3200
+    overall_brightness: 0.15
+  ambient_sound:
+    - id: deep_ambient_drone_60hz
+      gain_db: -16
+      spatial: false
+      fade_to_silence_at_seconds: 25
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs: []
+
+narration_blocks:
+  - id: nb_s5_scripture_centered
+    speaker: scripture_text_only
+    text_ko: "하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니\n(창 45:5)"
+    audio_clip_id: aud_s5_gen45_5_ko_softvoice
+    audio_clip_id_optout: null
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    presentation: center_fade_in
+    note: "R5 AI opt-out 사용자에게도 동일 노출 — 텍스트는 항상, 음성은 옵션"
+  - id: nb_s5_silent_dwell
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 10.0
+    duration_seconds: 5.0
+    note: "10초 정적 (실제 정적 5초 + dwell 시간 5초) — 사용자가 본문과 머무는 시간"
+  - id: nb_s5_recovery_phrase
+    speaker: recovery_text
+    text_ko: "{{matched_recovery_phrase_ko}}"
+    audio_clip_id: "{{matched_recovery_audio_id}}"
+    start_at_seconds: 15.0
+    duration_seconds: 12.0
+    presentation: bottom_fade_in
+    hidden_until_event: scripture_dwell_complete
+
+interactions: []
+
+branches:
+  - id: br_s5_recovery_match
+    triggered_by_event: scene_enter
+    decision_key: matched_recovery_phrase
+    backend_endpoint: "POST /api/game/joseph/complete"
+    lookup_keys: [entry_emotion, faith_tone, closure_tone_from_scene4]
+    cache_strategy: pre_cached_30_entries_per_tone
+    recovery_phrases_ko:
+      anxious: "지금의 결핍이 미래의 누군가를 살릴 양식이 될지 모른다."
+      sad: "보낼 때 보이지 않던 의미가 시간이 지나 보이기도 한다. 지금 안 보여도 괜찮다."
+      angry: "형제의 해함이 너의 길을 막은 듯 보였으나, 그 길이 끝이 아니었다."
+      lonely: "홀로 있던 13년 동안에도, 너는 기억되고 있었다."
+      afraid: "두려움 안에서도 너는 책임 있는 결정을 했다. 그 자체가 자유다."
+      exhausted: "오늘 다 못 했다면, 내일도 곡식이 남아 있다."
+      confused: "답을 지금 다 못 받아도 괜찮다. 요셉도 13년이 걸렸다."
+      unworthy: "노예와 죄수의 자리에서도 너는 총리였다. 자리가 너를 만들지 않는다."
+      joyful: "풍년의 곡식을 흉년에 나누었듯이, 오늘의 기쁨이 누군가의 양식이 될 수 있다."
+      grateful: "하나님이 생명을 구원하시려고 너를 보내셨다."
+    faith_tone_variants:
+      example_emotion: afraid
+      strong: "여호와는 너의 두려움 안에서도 책임 있는 결정을 하게 하셨다. 그 자체가 그분의 자유다. (창 45:5)"
+      balanced: "두려움 안에서도 너는 책임 있는 결정을 했다. 그 자체가 자유다. 요셉의 이야기는 결정의 의미가 시간이 흘러 드러난다 말한다."
+      soft: "3000년 전의 이야기는 두려움 속에서도 결정을 내릴 수 있다는 것이 자유의 시작이라 보았다. 결정의 의미는 지금 다 보이지 않아도 된다."
+
+safety_gates:
+  - id: R3_no_recovery_pressure
+    enforced_at: nb_s5_recovery_phrase
+    description: "모든 회복 문구는 '지금 회복하지 못해도 괜찮다' 톤"
+  - id: no_user_instrumentalization
+    enforced_at: nb_s5_recovery_phrase
+    description: "'하나님이 너를 사용하셨다' 같은 도구화 표현 차단 — '너의 결정이 의미를 가졌다' 주체성 인정 톤"
+  - id: R5_optout_text_still_shown
+    enforced_at: nb_s5_scripture_centered
+    description: "AI opt-out 사용자에게도 본문 텍스트는 동일 노출, TTS 음성만 비활성"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: null
+transition_to_outro: true
+transition:
+  type: fade_to_black
+  fade_out_seconds: 3.0
+  fade_in_seconds: 0.0
+  return_to: main_screen
+
+theology_footer_refs:
+  - citation_id: J1
+    source: "박영원 2015 — 섭리와 자유의지 균형"
+    anchor_block: nb_s5_scripture_centered
+  - scripture_refs:
+      - ref: "창세기 45:5"
+        translation: krv
+        anchor_block: nb_s5_scripture_centered
+  - faith_tone_branch:
+      table: "users.faith_tone (strong | balanced | soft)"
+      doc_ref: "MVP-JOSEPH-CONTENT.md §6"

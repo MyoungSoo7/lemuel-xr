@@ -1,0 +1,248 @@
+# Scene 3 — 골리앗과 마주함 (120초, 40일 도전 + 사울 갑옷 거절)
+# Scene 3 진입 직전 R4 추가 동의 카드 + 골리앗 음성 강도 토글 (off/약/강/건너뛰기).
+
+scene_id: david_scene3
+scene_name: facing_goliath
+mission_id: david
+version: 1.0.0
+duration_seconds_target: 120
+
+environment:
+  space_id: elah_valley_frontline
+  background_model: env_elah_frontline_ridge
+  lighting:
+    type: harsh_midday_sun
+    color_temperature_kelvin: 6300
+    shadow_intensity: 0.85
+  ambient_sound:
+    - id: silence_pressure_layer
+      gain_db: -28
+      spatial: false
+    - id: distant_wind_battlefield
+      gain_db: -16
+      spatial: true
+    - id: saul_army_subtle_anxious_breath
+      gain_db: -24
+      spatial: true
+  shader_features:
+    - distant_imposter_for_saul_army_80
+    - goliath_face_abstraction_low_detail
+  user_position: [0.0, 1.10, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene3_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "이 묵상은 자기 정체성을 지키는 자유를 다룹니다. 남이 주는 역할을 거부하는 결정이 가정폭력·종교적 학대 상황의 견딤을 강요하는 메시지가 아닙니다. 안전이 우선입니다. 위기 시 1577-0199 / 1393"
+    - id: scene3_r2_footer_bottom
+      position: bottom_left
+      style: small_persistent
+      text_ko: "믿음과 능력은 적이 아니다 | AI 보조 — 본문은 성경 참조"
+
+npcs:
+  - id: goliath
+    voice_id: goliath_v1
+    voice_intensity: configurable_off_low_high
+    position: [0.0, 3.0, 15.0]
+    initial_animation: ridge_stance_arms_raised
+    visual_traits: [armor_detail_emphasized, face_abstracted, helmet_obscures_eyes]
+    note: "거리감 유지 (zoom 없음) — 실사풍 차단으로 트라우마 자극 우려 최소화"
+  - id: saul
+    voice_id: saul_v1
+    position: [1.5, 1.65, 1.2]
+    initial_animation: approaches_at_40s
+    visual_traits: [royal_armor_weary, dignified_but_tired]
+  - id: saul_army_80
+    voice_id: crowd_silent
+    count: 80
+    formation: dispersed_behind_user
+    formation_origin: [0.0, 1.65, -3.0]
+    initial_animation: withered_at_frontline_idle
+    visual_traits: [low_morale_postures, weapons_lowered]
+    lod: imposter_for_far_60_of_80
+  - id: david_self
+    voice_id: david_v1
+    position: [0.0, 1.10, 0.0]
+    note: "사용자가 다윗 — first-person, 음성은 내면 독백만"
+
+narration_blocks:
+  - id: nb_s3_intro_40_days
+    speaker: narrator
+    text_ko: "40일째 같은 외침이 반복된다. 이스라엘 군대는 멈춰 서 있다. 너는 이제 막 진영에 도착했다."
+    audio_clip_id: aud_s3_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_goliath_shout
+    speaker: goliath
+    text_ko: "너희가 어찌하여 나와서 항오를 벌였느냐? 나는 블레셋 사람이요 너희는 사울의 신복이 아니냐. 너희는 한 사람을 택하여 내게로 내려보내라. (삼상 17:8 요약)"
+    audio_clip_id: aud_s3_goliath_shout_ko_strong
+    audio_clip_id_low: aud_s3_goliath_shout_ko_low
+    audio_clip_id_off: null
+    start_at_seconds: 15.0
+    duration_seconds: 15.0
+    hidden_until_event: null
+    intensity_aware: true
+  - id: nb_s3_silence_dwell
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 30.0
+    duration_seconds: 8.0
+    note: "3초 침묵 후 사용자가 주변 둘러봄 — 사울 군대 위축 표정 강조 (LOD 가까운 단계)"
+  - id: nb_s3_saul_approach
+    speaker: saul
+    text_ko: "네가 이 블레셋 사람을 대적하여 함께 싸우기에 능치 못하리니, 너는 소년이요 그는 어려서부터 용사임이니라. (삼상 17:33)"
+    audio_clip_id: aud_s3_saul_approach_ko
+    start_at_seconds: 40.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_david_inner_lion_bear
+    speaker: david_inner
+    text_ko: "내가 사자와 곰을 잡았던 손이 있다 (삼상 17:36). 그러나 이것은… 다르다."
+    audio_clip_id: aud_s3_david_inner_ko
+    start_at_seconds: 55.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s3_armor_caption
+    speaker: scripture_caption
+    text_ko: "왕이 자기 군복으로 다윗에게 입히고 놋 투구를 그의 머리에 씌우고 또 그에게 갑옷을 입히매… (삼상 17:38)"
+    audio_clip_id: aud_s3_armor_caption_ko
+    start_at_seconds: 65.0
+    duration_seconds: 8.0
+    hidden_until_event: armor_wear_start
+  - id: nb_s3_david_decision
+    speaker: david_inner
+    text_ko: "내가 익히지 아니하였으니 이것을 입고 가지 못하겠나이다. (삼상 17:39)"
+    audio_clip_id: aud_s3_david_decision_ko
+    start_at_seconds: 95.0
+    duration_seconds: 8.0
+    hidden_until_event: armor_all_worn
+
+interactions:
+  - id: ix_s3_armor_wear_then_remove
+    type: multi_socket
+    target_assets: [model_bronze_helmet, model_bronze_breastplate, model_bronze_sword, socket_head, socket_chest, socket_belt]
+    presentation:
+      wear_sequence: [head, chest, belt]
+      reveal_at_seconds: 65.0
+    haptic:
+      intensity_on_wear: 0.5
+      duration_ms_on_wear: 200
+      intensity_continuous_after_worn: 0.3
+      locomotion_speed_multiplier_after_worn: 0.4
+      duration_seconds_after_worn: 3.0
+      note: "몸으로 무게를 느낌"
+    sub_interactions:
+      - id: wear_helmet
+        gesture: grab_and_place_on_head_socket
+        emits_event: armor_worn_head
+      - id: wear_breastplate
+        gesture: grab_and_place_on_chest_socket
+        emits_event: armor_worn_chest
+      - id: wear_belt_sword
+        gesture: grab_and_place_on_belt_socket
+        emits_event: armor_worn_belt
+        on_all_three_worn: armor_all_worn
+      - id: remove_helmet
+        gesture: hand_to_head_then_pull_off
+        emits_event: armor_removed_head
+        haptic_release: true
+      - id: remove_breastplate
+        gesture: hand_to_chest_then_pull_off
+        emits_event: armor_removed_chest
+        haptic_release: true
+      - id: remove_belt_sword
+        gesture: hand_to_belt_then_pull_off
+        emits_event: armor_removed_belt
+        on_all_three_removed: armor_all_removed
+        locomotion_speed_restore: true
+    validation_rules:
+      - rule: armor_acceptance_either_way
+        description: "사용자가 갑옷을 *수용* (그대로 다음 Scene 진입) 도 *거절* (다 벗고 진행) 도 모두 정당. 단 디폴트는 거절 (성경 본문 충실)."
+        timeout_seconds: 25
+        on_timeout_with_armor_worn: emit_event_armor_kept_by_default
+        on_armor_all_removed: emit_event_armor_rejected
+      - rule: track_micro_signals
+        records: [armor_wear_seconds, armor_remove_order, hesitation_seconds]
+
+branches:
+  - id: br_s3_armor_decision
+    triggered_by_event: [armor_all_removed, armor_kept_by_default]
+    decision_key: armor_decision
+    backend_endpoint: "POST /api/game/david/scene/3/armor"
+    body_template:
+      armor_decision: "{{rejected|accepted}}"
+      armor_wear_seconds: "{{seconds}}"
+      armor_remove_order: "{{order_array_or_null}}"
+    routes:
+      - when: { armor_decision: rejected }
+        carry_to_scene6: { identity_choice: own_familiarity }
+        narration_block: nb_s3_david_decision
+      - when: { armor_decision: accepted }
+        narration_ko_override: "갑옷을 입은 채로 한 걸음 디딘다. 무게는 익숙해질 수도 있다."
+        carry_to_scene6: { identity_choice: accepted_role }
+        safety_note: "R3 — 수용도 정당한 선택. '틀린 답' 으로 처리 금지"
+
+safety_gates:
+  - id: R4_pre_scene3_goliath_consent
+    enforced_at: before_scene_enter
+    description: "Scene 3 진입 직전 추가 R4 동의 카드 — 거대한 존재 앞 공포 사전 고지"
+    consent_card_id: david_scene3_goliath_warning
+    consent_card_ko: |
+      다음 장면은 거대한 존재 앞 공포를 다룹니다.
+      · 위협적 음성 (강도 조정 가능)
+      · 약 2분
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — Scene 4 (시냇가) 로 바로 이동]
+      골리앗 음성 강도: [ off ] [ 약 ] [ 강 (기본) ]
+    skip_alternative_scene_id: 4
+    voice_intensity_options: [off, low, high]
+  - id: R2_identity_freedom_not_endurance_gaslight
+    enforced_at: scene_enter
+    overlay_ref: scene3_r2_footer
+    description: "Scene 3 진입부터 우상단 R2 footer 영구 — 자기 정체성 지킴이지 견딤 강요 아님"
+  - id: R2_belief_and_capacity_not_enemies
+    enforced_at: always
+    overlay_ref: scene3_r2_footer_bottom
+    description: "Scene 1·3 영구 footer — '믿음과 능력은 적이 아니다'"
+  - id: R3_armor_acceptance_also_valid
+    enforced_at: br_s3_armor_decision
+    description: "갑옷 거절이 디폴트지만 수용도 정당한 선택 — 단일 정답 금지"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: david_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D3
+    source: "Identity Formation (Erikson) — 정체성 이행 임상 메커니즘"
+    note: "갑옷 벗기 = 목동 정체성에서 왕 정체성으로의 이행이 '남이 주는 옷' 거치지 않고 '자기 익숙한 것'으로 진행되는 순간"
+    anchor_block: nb_s3_david_decision
+  - scripture_refs:
+      - ref: "사무엘상 17:8"
+        translation: krv
+        anchor_block: nb_s3_goliath_shout
+      - ref: "사무엘상 17:33"
+        translation: krv
+        anchor_block: nb_s3_saul_approach
+      - ref: "사무엘상 17:36"
+        translation: krv
+        anchor_block: nb_s3_david_inner_lion_bear
+      - ref: "사무엘상 17:38~39"
+        translation: krv
+        anchor_block: nb_s3_armor_caption
+      - ref: "시편 139:14"
+        translation: krv
+        anchor_block: nb_s3_david_decision
+        note_ko: "'내가 정의하는 나'와 '하나님이 정의하시는 나' 균형의 보조 텍스트"
+  - disputed_points:
+      - "사울 갑옷 해석 — 왕권 거부 vs 현실적 부적합"
+      - "'네가 정의하는 나' 표현 — 현대 자기결정·자기정체성 신학 어휘. 시 139:14 '하나님이 정의하시는 나'와 균형 필요. 보수 진영 일부 우려 가능."
+    handling: "둘 다 가능 톤 유지 — 사울 갑옷 거절은 자기 정체성 인식이면서 동시에 하나님이 부르신 자리에 머무는 결정"

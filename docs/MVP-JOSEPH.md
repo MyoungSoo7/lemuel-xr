@@ -266,18 +266,33 @@ CREATE TABLE llm_cache (
 
 ---
 
-## 9. 사전 결정 필요한 것
+## 9. 결정 사항 (2026-05-20 확정)
 
-1. **타겟 디바이스** — Quest 2 / Quest 3 / Quest Pro / WebXR 중 어느 것 우선?
-   - 추천: **Quest 2/3** (Quest Pro 는 Eye Gaze 옵션, WebXR 는 Phase 2)
-2. **LLM 호출 시점** — 미션 중 실시간 (지연 1~2초) vs 사전 캐싱 (변형 없음)
-   - 추천: **하이브리드** — 시나리오 핵심 분기는 사전 캐시, 사용자 입력 응답만 실시간
-3. **TTS 음성** — ElevenLabs (영문 자연, 한국어 약함) vs 사전 녹음 (지인 음성 활용)
-   - 추천: **사전 녹음 시작** — MVP 단계에선 단순 + 비용 0
-4. **본문 번역본** — 개역개정 / 새번역 / 공동번역?
-   - 결정: 사용자 본인 선호
-5. **사용자 데이터 익명화** — 게스트 모드만 / 회원가입 옵션 / 익명+로그인 둘 다?
-   - 추천: **게스트만 (MVP)**, Phase 2 에서 회원 시스템
+1. **타겟 디바이스** — Meta Quest 3 + Apple Vision Pro + Galaxy XR 모두 동작
+   - 구현 전략: **Unity 6 + OpenXR 코어** + 플랫폼별 빌드 분기
+     - Quest 3 → Android 빌드 + Meta XR SDK
+     - Vision Pro → visionOS 빌드 + Apple PolySpatial
+     - Galaxy XR → Android XR (Google) 빌드 + OpenXR
+   - 작업량 영향: **+50% (단일 디바이스 대비)**. 첫 3주는 Quest 3 우선, Week 4 부터 Vision Pro + Galaxy XR 포팅
+   - 공통 인터랙션은 OpenXR Input Action 으로 추상화 — 각 플랫폼 binding 만 정의
+
+2. **LLM 호출** — 하이브리드
+   - 사전 캐시: Scene 2/3 결정 분기별 요셉 독백 (3~4 분기 × 1독백 = 캐시)
+   - 실시간: Scene 4 형제 재회 시 사용자 미세 선택에 따른 대사 한 줄
+   - 캐시 hit rate 목표 80%+
+
+3. **TTS** — **자체 호스팅** (외부 유료 서비스 사용 X)
+   - 후보 모델: **Coqui TTS XTTS-v2** (한국어 + 음성 cloning) 또는 **ESPnet-TTS** 한국어 모델
+   - 인프라: 기존 K3s 의 `david` 노드 (`ai-inference=true` 라벨)
+   - 구성: TTS pod (Python + FastAPI) + 캐시 (생성 wav 를 R2 또는 PVC 에 저장)
+   - 음성 정체성: 첫 라운드 모델 기본 보이스 → Phase 2 에서 cloning 옵션
+
+4. **본문 번역** — **현대인의 성경**
+   - ⚠️ **저작권 주의** — 생명의말씀사 저작권. 짧은 인용은 fair use 가능하나, 공개 출시 전 라이선스 협의 필요
+   - 단기: MVP 데모 + 비공개 테스터 5~10명은 fair use 범위
+   - Fallback: 개역개정 (대한성서공회 비영리 사용 약관) 변경 가능하도록 본문 테이블에 translation 컬럼 분리
+
+5. **사용자** — **게스트만** (MVP). 디바이스별 UUID 자동 발급, 로컬 저장. Phase 2 OAuth.
 
 ---
 
@@ -289,3 +304,97 @@ CREATE TABLE llm_cache (
 - 그 5분이 "*내가 풍요로울 때 무엇을 저장해 두는가*" 라는 질문을 사용자 안에 남김
 
 이게 핵심 가치 명제.
+
+---
+
+## 11. 영성·감성·이성 3차원 진입 + 정신건강 효과
+
+### 11.1 요셉 서사를 3차원으로 풀면
+
+| 차원 | 요셉 서사의 핵심 | 사용자에게 활성화되는 인지 |
+|---|---|---|
+| **영성** | *"하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니"* (창 45:5) | 의미 추구 — 고통 안에 *섭리* 가 있다는 인식. 디폴트 모드 네트워크(DMN) |
+| **감성** | 배신·노예·옥살이·재회의 감정의 폭 | 변연계 활성. 사용자가 *13년의 어둠 후 용서* 라는 감정 거리 체험 |
+| **이성** | 7년 풍년·7년 흉년의 *전략적 계획* | 전전두엽 PFC. 위기 대처·자원 관리·장기적 사고 |
+
+### 11.2 Scene 별 3차원 mapping
+
+| Scene | 영성 | 감성 | 이성 |
+|---|---|---|---|
+| 1 꿈 해석 | 꿈의 *수직적* 의미 | 파라오의 *불안 공감* | 7년 주기 *예측* |
+| 2 저장 결정 | *지금의 풍요 안에 미래 책임* | 보리밭의 *황금빛 평온* | 1/5 · 1/3 · 1/2 *합리적 선택* |
+| 3 분배 결정 (핵심) | *생명 살리는 분배* 윤리 | 농민·이주민·상인의 *얼굴* 공감 | *최적 분배* 알고리즘 |
+| 4 형제 재회 | *용서의 신학* (창 45:5) | 13년 묵은 *복합 감정* | 시험 vs 즉시 공개의 *전략* |
+| 5 회복 | *섭리 안의 한 점* 깨달음 | 평온·감사 | 자기 인생 *재해석* |
+
+→ 사용자는 *진입 시점* 에 3 모드 중 선택. 같은 5분의 미션이 *3가지 인지 경로* 로 풀림.
+
+### 11.3 정신건강 효과 (근거 기반)
+
+#### A. **Narrative Reframing** (Pennebaker, McAdams)
+배신·억울함의 기억을 *현재 위치* 에서 *재해석* 하는 능력. 요셉의 13년 후 *"하나님이 보내셨다"* 는 *전형적 narrative reframing*.
+
+- 효과: 우울 ↓, 외상 후 성장 (PTG) ↑
+- 우리 앱: Scene 5 의 *회복 문구* 가 사용자에게 *자기 서사 재해석* 유도
+
+#### B. **Distress Tolerance** (Linehan DBT)
+Scene 2·3 의 *결정 압박* — 모든 선택이 *완벽하지 않은 상태에서 결단*. *"가장 안 좋은 결과를 받아들이며 결정하는* 능력".
+
+- 효과: 충동성 ↓, 불안 장애 회복
+- 우리 앱: 사용자가 *모든 분배가 완벽하지 않다는 좌절* 을 안전하게 체험
+
+#### C. **Future-Oriented Coping** (Aspinwall & Taylor, 1997)
+*"7년 후를 위해 지금 저장한다"* 는 인지 — 단순 *현재 만족 지연* 이 아니라 *적극적 준비*.
+
+- 효과: 우울증 환자의 *미래 비관* 완화. 자기 효능감 ↑
+- 우리 앱: Scene 2 의 저장 결정 = *현재 자원* 의 *미래 가치* 인식 훈련
+
+### 11.4 정신건강 안전장치 (요셉 특화)
+
+| 위험 | 대응 |
+|---|---|
+| *"고통도 다 뜻이 있다"* 로 트라우마 피해자 가스라이팅 | Scene 5 결말에 *"섭리는 가해자의 정당화가 아니다"* 명시. 형제 죄 인정 (창 45:24 *"노중에 다투지 말라"*) 도 함께 |
+| Scene 3 의 *희소 자원 분배* 가 *현실 한국 빈부 격차* 자극 | 결말 메시지에 *"누구를 우선할까는 사용자 가치관"* — 정답 없음 강조 |
+| 요셉의 *극적 회복 서사* 가 사용자 현재 곤경 *경시* 우려 | 회복 문구를 *"내일 회복된다"* 가 아니라 *"오늘 손에 쥔 자루의 의미"* 톤 |
+
+### 11.5 사용자 진입 모드 선택 UX
+
+미션 시작 전 1개 화면:
+
+```
+┌─────────────┐ ┌─────────────┐ ┌─────────────┐
+│  영성       │ │  감성       │ │  이성       │
+│             │ │             │ │             │
+│ *섭리를*    │ │ *감정의*    │ │ *결정의*    │
+│ *느끼며*    │ │ *결을*      │ │ *무게를*    │
+│             │ │ *따라*      │ │ *재며*      │
+└─────────────┘ └─────────────┘ └─────────────┘
+        또는: ⚙ AI 자동 (이전 패턴 기반)
+```
+
+같은 미션, 3 가지 *내레이션 톤* + Scene 강조점 변화.
+
+### 11.6 References — 학술 근거
+
+§11.3 의 각 메커니즘이 의지하는 동료 평가 논문. 전체 큐레이션은 [`docs/research/MENTAL-HEALTH-PAPERS.md`](research/MENTAL-HEALTH-PAPERS.md) 참고.
+
+**A. Narrative Reframing (Pennebaker / McAdams)** — Scene 5 의 *자기 서사 재해석* 정당성
+- Gerger H, et al. "Expressive writing treatments network meta-analysis" Psychol Med 2022. PMID [33634766](https://pubmed.ncbi.nlm.nih.gov/33634766/)
+- Lee Y, et al. "Expressive writing on Koreans: meta-analysis" Front Psychiatry 2023. PMID [38076691](https://pubmed.ncbi.nlm.nih.gov/38076691/) ⭐ 한국 표본
+- Verhagen RM, et al. "Self-esteem during expressive writing about trauma predicts decreased depression in PLWH" AIDS Care 2023. PMID [37149898](https://pubmed.ncbi.nlm.nih.gov/37149898/)
+- Dekel S, et al. "Preventing PTSD following childbirth: systematic review and meta-analysis" Am J Obstet Gynecol 2024. PMID [38122842](https://pubmed.ncbi.nlm.nih.gov/38122842/)
+
+**B. Distress Tolerance (Linehan DBT)** — Scene 2·3 의 *불완전한 결단* 정당성
+- Li Y, et al. "DBT on affective symptoms in BPD: systematic review and meta-analysis" Psychiatry Res 2026. PMID [41819776](https://pubmed.ncbi.nlm.nih.gov/41819776/)
+- Sagcan A, et al. "DBT for complex PTSD — gender-specific effectiveness" Eur J Psychotraumatol 2025. PMID [41230649](https://pubmed.ncbi.nlm.nih.gov/41230649/)
+
+**C. Future-Oriented Coping** — Scene 2 의 *현재 자원의 미래 가치* 인식
+- *기초 이론*: Aspinwall LG & Taylor SE. "Proactive coping" Psychological Bulletin 1997 (전반적 적용 — meta-analysis 형식의 직접 PubMed hit 가 적음; 향후 보강 후보)
+- 관련 보완: Wang K, et al. "Connection thinking and afterlife beliefs in Chinese context (mortality salience coping)" Front Psychol 2023. PMID [38078250](https://pubmed.ncbi.nlm.nih.gov/38078250/) — 동아시아 맥락의 *미래·내세 지향* 대처
+
+**§11.4 안전장치 — 정책 근거 (가스라이팅 방지)**
+- Jones TW. "Religious trauma and moral injury from LGBTQA+ conversion practices" Soc Sci Med 2022. PMID [35609469](https://pubmed.ncbi.nlm.nih.gov/35609469/) ⭐ *moral injury* 메커니즘 — Scene 5 결말의 *"섭리는 가해자의 정당화가 아니다"* 명시 정책
+- Nisar S, et al. "Forgiveness Therapy in battered women in Pakistan" Clin Psychol Psychother 2025. PMID [40425169](https://pubmed.ncbi.nlm.nih.gov/40425169/) — 가정폭력 피해자 표본에서도 *premature forgiveness* 위험 함께 논의
+
+⚠️ 모든 인용은 *1차 큐레이션* 단계. 신학·임상 자문 검토 후 *§11.6 채택본* 결정. PMID 는 `content_versions.references` JSONB 컬럼에 적재.
+

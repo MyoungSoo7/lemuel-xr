@@ -1,0 +1,212 @@
+# Scene 2 — 형들의 진영 방문 (75초)
+# 엘리압의 비웃음 앞 3 가지 반응. 모든 선택이 정당 — Scene 6 결말 톤에만 영향.
+
+scene_id: david_scene2
+scene_name: brothers_camp_mockery
+mission_id: david
+version: 1.0.0
+duration_seconds_target: 75
+
+environment:
+  space_id: elah_valley_israelite_camp
+  background_model: env_israelite_camp_12_tents
+  lighting:
+    type: muted_daylight_overcast
+    color_temperature_kelvin: 5800
+    shadow_intensity: 0.55
+  ambient_sound:
+    - id: low_camp_murmur_loop
+      gain_db: -18
+      spatial: true
+    - id: weapon_maintenance_slow_heavy
+      gain_db: -22
+      spatial: true
+    - id: goliath_faint_shout_distant
+      gain_db: -28
+      spatial: true
+      panning: front_distant
+    - id: philistine_camp_distant_layer
+      gain_db: -30
+      spatial: true
+  shader_features:
+    - npc_lod_3_for_soldiers
+    - distant_philistine_camp_fog_obscured
+  user_position: [0.0, 1.10, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: eliab
+    voice_id: eliab_v1
+    position: [0.0, 1.65, 2.5]
+    initial_animation: cleaning_sword_then_turn
+    gaze_target: user_head
+    visual_traits: [elder_brother_30s, slight_sneer, worn_armor]
+  - id: abinadab
+    voice_id: silent
+    position: [-1.4, 1.65, 2.8]
+    initial_animation: silent_standing
+  - id: shammah
+    voice_id: silent
+    position: [1.4, 1.65, 2.8]
+    initial_animation: silent_standing
+  - id: soldiers_18_pack
+    voice_id: crowd_silent
+    count: 18
+    formation: scattered_around_tents
+    formation_origin: [0.0, 1.65, 5.0]
+    initial_animation: weary_idle_low_morale
+    visual_traits: [withered_posture, dusty_armor]
+  - id: david_self
+    voice_id: david_v1
+    position: [0.0, 1.10, 0.0]
+    initial_animation: standing_with_provisions
+    note: "사용자가 다윗 — first-person"
+
+narration_blocks:
+  - id: nb_s2_arrival
+    speaker: narrator
+    text_ko: "네가 아버지에게서 보내져 왔다. 떡과 치즈를 형들에게 가져왔다. 너는 아직 심부름꾼일 뿐이다. (삼상 17:17~18)"
+    audio_clip_id: aud_s2_arrival_ko
+    start_at_seconds: 0.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+  - id: nb_s2_eliab_rebuke
+    speaker: eliab
+    text_ko: "네가 어찌하여 이리로 내려왔느냐? 들에 있는 양들을 누구에게 맡겼느냐? 나는 네 교만과 네 마음의 완악함을 아노니, 네가 전쟁을 구경하러 온 것이라. (삼상 17:28)"
+    audio_clip_id: aud_s2_eliab_rebuke_ko
+    start_at_seconds: 15.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+  - id: nb_s2_choice_prompt
+    speaker: ui_caption
+    text_ko: "이제 어떻게 반응하시겠어요?"
+    audio_clip_id: null
+    start_at_seconds: 35.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+  - id: nb_s2_post_reaction_A
+    speaker: david_inner
+    text_ko: "내가 무엇을 하였나이까? 어찌 묻지 못하리이까. (삼상 17:29) — 분노가 일어났다는 것은 너의 자리가 밟히고 있다는 신호다."
+    audio_clip_id: aud_s2_post_A_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: choice_made_rebuttal
+  - id: nb_s2_post_reaction_B
+    speaker: david_inner
+    text_ko: "말 없이 떡을 내려놓는다. 침묵도 다윗의 자리에 있는 한 종류의 지혜."
+    audio_clip_id: aud_s2_post_B_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: choice_made_silence
+  - id: nb_s2_post_reaction_C
+    speaker: david_inner
+    text_ko: "등을 돌려 전선 쪽으로 걷는다. 형의 말을 듣지 않은 척. 사명이 비웃음보다 먼저였다."
+    audio_clip_id: aud_s2_post_C_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: choice_made_walk_away
+
+interactions:
+  - id: ix_s2_choose_reaction
+    type: grab
+    target_assets: [model_provisions_bread_cheese, ui_card_A_rebuttal, ui_card_B_silence, ui_card_C_walk_away]
+    presentation:
+      layout: floating_arc_in_air
+      reveal_at_seconds: 35.0
+      reveal_seconds: 1.5
+    options:
+      - id: A
+        label_ko: "반박한다 — '어찌 묻지 못하리이까'"
+        gesture: grab_card_throw_toward_eliab
+        haptic:
+          intensity: 0.4
+          duration_ms: 100
+        emit_event: choice_made_rebuttal
+      - id: B
+        label_ko: "침묵한다 — 떡을 내려놓고 다른 형제에게"
+        gesture: grab_provisions_lower_to_ground
+        haptic:
+          intensity: 0.25
+          duration_ms: 60
+        emit_event: choice_made_silence
+      - id: C
+        label_ko: "전선 쪽으로 걸어간다 — 등을 돌림"
+        gesture: grab_card_release_toward_battlefield_then_turn
+        haptic:
+          intensity: 0.3
+          duration_ms: 80
+        emit_event: choice_made_walk_away
+    validation_rules:
+      - rule: track_micro_signals
+        records: [hesitation_seconds, card_pickup_count, gaze_distribution]
+      - rule: skip_after_2s_visible
+        position: top_right
+        style: small_fade_in_at_2s
+        on_press: jump_to_scene3
+        design_intent: "가족 모욕 트라우마 사용자 보호 (R2)"
+
+branches:
+  - id: br_s2_reaction
+    triggered_by_event: [choice_made_rebuttal, choice_made_silence, choice_made_walk_away]
+    decision_key: reaction
+    backend_endpoint: "POST /api/game/david/scene/2/decide"
+    body_template:
+      reaction: "{{choice_id}}"
+      card_label: "{{label}}"
+      interaction_meta:
+        hesitation_seconds: "{{hesitation}}"
+        card_pickup_count: "{{pickups}}"
+        gaze_distribution: "{{gaze}}"
+    routes:
+      - when: { reaction: rebuttal }
+        post_narration_generator: llm_cached
+        cache_key: "david:s2:rebuttal"
+        narration_block: nb_s2_post_reaction_A
+        carry_to_scene6: { mockery_response: anger_outflow }
+      - when: { reaction: silence }
+        post_narration_generator: llm_cached
+        cache_key: "david:s2:silence"
+        narration_block: nb_s2_post_reaction_B
+        carry_to_scene6: { mockery_response: inner_endurance }
+      - when: { reaction: walk_away }
+        post_narration_generator: llm_cached
+        cache_key: "david:s2:walk_away"
+        narration_block: nb_s2_post_reaction_C
+        carry_to_scene6: { mockery_response: mission_priority }
+
+safety_gates:
+  - id: R3_all_reactions_equally_valid
+    enforced_at: br_s2_reaction
+    description: "'B 침묵을 골랐다 = 비겁' 같은 자동 해석 차단 — 세 선택 모두 정당한 다윗의 자리"
+  - id: R2_family_mockery_trigger_skip
+    enforced_at: ix_s2_choose_reaction
+    description: "가족 모욕이 형제 비교 트라우마 사용자에게 자극될 수 있음 — 진입 2초 뒤 우상단 건너뛰기 버튼 (3초 페이드인)"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: david_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D3
+    source: "Self-Compassion in Comparison (Neff) — 형제 위계 안의 가장 어린 자 원형"
+    note: "'엘리압이 틀렸다'가 아니라 '엘리압의 말은 다윗을 멈추지 못했다' — 가족 안의 자기 인정 reframing"
+    anchor_block: nb_s2_eliab_rebuke
+  - scripture_refs:
+      - ref: "사무엘상 17:17~18"
+        translation: krv
+        anchor_block: nb_s2_arrival
+      - ref: "사무엘상 17:28"
+        translation: krv
+        anchor_block: nb_s2_eliab_rebuke
+      - ref: "사무엘상 17:29"
+        translation: krv
+        anchor_block: nb_s2_post_reaction_A
+  - disputed_points:
+      - "엘리압의 동기 해석 — 단순 형의 권위 vs 다윗 기름부음(삼상 16) 인식 후 질투"
+    handling: "둘 다 가능 톤 — 단일 입장 채택 없음"

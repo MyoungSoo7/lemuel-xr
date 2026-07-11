@@ -1,0 +1,242 @@
+{
+  "mission_id": "david",
+  "scene_number": 4,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "stone_count_min": 7
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_elah_stream_kneeling_view",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/env_elah_stream_kneeling.glb",
+        "size_bytes": 5520000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_stone_red",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_red.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": "anger",
+        "haptic_profile": "short_strong_double"
+      },
+      {
+        "id": "model_stone_blue",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_blue.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": "sadness",
+        "haptic_profile": "long_soft_single"
+      },
+      {
+        "id": "model_stone_gray",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_gray.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": "loneliness",
+        "haptic_profile": "heavy_single"
+      },
+      {
+        "id": "model_stone_yellow",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_yellow.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": "hope",
+        "haptic_profile": "soft_tremor"
+      },
+      {
+        "id": "model_stone_black",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_black.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": "fear",
+        "haptic_profile": "faint_then_silence"
+      },
+      {
+        "id": "model_stone_neutral_a",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_neutral_a.glb",
+        "size_bytes": 456000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": null
+      },
+      {
+        "id": "model_stone_neutral_b",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stone_neutral_b.glb",
+        "size_bytes": 456000,
+        "lod": "lod3_pbr_upscale_4k",
+        "emotion": null
+      },
+      {
+        "id": "model_leather_pocket_pouch",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/leather_pocket_pouch.glb",
+        "size_bytes": 504000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_scripture_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_scripture_caption_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_instruction_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_instruction_ko.wav",
+        "size_bytes": 984000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_no_pressure_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_no_pressure_ko.wav",
+        "size_bytes": 1104000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_stone_red_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_stone_red_ko_soft.wav",
+        "size_bytes": 744000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_stone_blue_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_stone_blue_ko_soft.wav",
+        "size_bytes": 744000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_stone_gray_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_stone_gray_ko_soft.wav",
+        "size_bytes": 744000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_stone_yellow_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_stone_yellow_ko_soft.wav",
+        "size_bytes": 744000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_stone_black_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_stone_black_ko_soft.wav",
+        "size_bytes": 864000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 7000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_complete_inner_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s4_complete_inner_ko.wav",
+        "size_bytes": 1104000,
+        "voice_id": "david_v1",
+        "duration_ms": 9000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_stream_running_water",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_stream_running.ogg",
+        "size_bytes": 1320000,
+        "voice_id": null,
+        "duration_ms": 45000
+      },
+      {
+        "id": "amb_goliath_faint_distant_bass",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_goliath_faint_bass.ogg",
+        "size_bytes": 456000,
+        "voice_id": "goliath_v1_distant_bass",
+        "duration_ms": 18000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_heartbeat_60_to_70",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_heartbeat_60_to_70_progressive.ogg",
+        "size_bytes": 648000,
+        "voice_id": null,
+        "duration_ms": 180000,
+        "note": "60BPM -> 70BPM 점진"
+      },
+      {
+        "id": "amb_stones_underwater_clack",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_stones_underwater_clack.ogg",
+        "size_bytes": 336000,
+        "voice_id": null,
+        "duration_ms": 20000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_stream_water_caustics",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/stream_water_caustics_4k.ktx2",
+        "size_bytes": 2280000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_stone_color_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/stones_5_color_plus_2_neutral_2k.ktx2",
+        "size_bytes": 1176000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_pocket_pouch_leather",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/pocket_pouch_leather_2k.ktx2",
+        "size_bytes": 504000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_pocket_socket",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/Scene4PocketSocketPolySpatial.cs.bundle",
+        "size_bytes": 57600,
+        "entry_class": "Scene4PocketSocketPolySpatial"
+      },
+      {
+        "id": "script_stone_haptic_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/StoneHapticRouter.cs.bundle",
+        "size_bytes": 26400,
+        "entry_class": "StoneHapticRouter"
+      },
+      {
+        "id": "script_emotion_diversity_classifier",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/EmotionDiversityClassifier.cs.bundle",
+        "size_bytes": 31200,
+        "entry_class": "EmotionDiversityClassifier"
+      },
+      {
+        "id": "script_eye_gaze_dwell",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/EyeGazeDwell.cs.bundle",
+        "size_bytes": 14400,
+        "entry_class": "EyeGazeDwell500ms"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 25017600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

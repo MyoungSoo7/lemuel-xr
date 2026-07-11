@@ -1,0 +1,45 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 3,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "npc_micro_expression_on_eye_contact": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_desert_horizon_granaries", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/env_desert_granaries.glb", "size_bytes": 11280000, "lod": "lod3_pbr_upscale_4k"},
+      {"id": "model_npc_farmer_pack", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/npc_farmer_pack_24.glb", "size_bytes": 7440000, "lod": "lod3_pbr_upscale_4k_with_micro_expressions"},
+      {"id": "model_npc_immigrant_pack", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/npc_immigrant_pack_18.glb", "size_bytes": 6480000, "lod": "lod3_pbr_upscale_4k_with_micro_expressions"},
+      {"id": "model_npc_merchant_pack", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/npc_merchant_pack_14.glb", "size_bytes": 5520000, "lod": "lod3_pbr_upscale_4k_with_micro_expressions"},
+      {"id": "model_grain_bag_generic", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/models/grain_bag_generic.glb", "size_bytes": 600000, "lod": "lod3_pbr_upscale_4k"}
+    ],
+    "audio": [
+      {"id": "aud_s3_intro_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s3_intro_ko.wav", "size_bytes": 1440000, "voice_id": "joseph_v1", "duration_ms": 12000, "spatial_audio_personal": true},
+      {"id": "aud_s3_instruction_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s3_instruction_ko.wav", "size_bytes": 744000, "voice_id": "narrator_v1", "duration_ms": 6000},
+      {"id": "aud_s3_confirm_prompt_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/s3_confirm_prompt_ko.wav", "size_bytes": 504000, "voice_id": "narrator_v1", "duration_ms": 4000},
+      {"id": "amb_dry_desert_wind", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/amb_dry_desert_wind.ogg", "size_bytes": 1320000, "voice_id": null, "duration_ms": 40000},
+      {"id": "amb_silence_pressure", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/audio/amb_silence_pressure.ogg", "size_bytes": 360000, "voice_id": null, "duration_ms": 60000}
+    ],
+    "textures": [
+      {"id": "tex_desert_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/desert_atlas_4k.ktx2", "size_bytes": 2880000, "format": "ktx2", "resolution": "4096x4096"},
+      {"id": "tex_npc_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/npc_atlas_4k.ktx2", "size_bytes": 4320000, "format": "ktx2", "resolution": "4096x4096"},
+      {"id": "tex_npc_micro_expression_blendshapes", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/textures/npc_micro_expression_2k.ktx2", "size_bytes": 1100000, "format": "ktx2", "resolution": "2048x2048"}
+    ],
+    "scripts": [
+      {"id": "script_scene3_distribution", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/Scene3DistributionPolySpatial.cs.bundle", "size_bytes": 57600, "entry_class": "Scene3DistributionPolySpatial"},
+      {"id": "script_pattern_classifier", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/PatternClassifier.cs.bundle", "size_bytes": 26400, "entry_class": "PatternClassifier"},
+      {"id": "script_eye_contact_micro_expression", "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/v1.0.0/scripts/EyeContactMicroExpression.cs.bundle", "size_bytes": 18000, "entry_class": "EyeContactMicroExpression"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 44090000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

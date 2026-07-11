@@ -1,0 +1,178 @@
+spring:
+  application:
+    name: lemuel-xr-backend
+
+  # === UTF-8 일관성 강제 (Spring HTTP) ===
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/lemuel_xr?charSet=UTF8&characterEncoding=UTF-8}
+    username: ${SPRING_DATASOURCE_USERNAME:xr}
+    password: ${SPRING_DATASOURCE_PASSWORD:xr1234}
+    hikari:
+      connection-init-sql: "SET client_encoding = 'UTF8'"
+
+  jpa:
+    hibernate:
+      ddl-auto: validate    # Flyway 가 진실. JPA 는 검증만.
+    properties:
+      hibernate:
+        default_schema: public
+        format_sql: false
+        connection:
+          characterEncoding: UTF-8
+          useUnicode: true
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    encoding: UTF-8
+    # 기존 DB에 schema history 가 없으면 baseline 으로 시작 (initial 마이그레이션 X 처리)
+    baseline-on-migrate: true
+    baseline-version: 0
+    # 운영 환경에서 실수 방지 — out-of-order 차단
+    out-of-order: false
+
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: UTC
+
+# === AI 사이드카 (Python FastAPI + LangChain) ===
+ai:
+  base-url: ${AI_BASE_URL:http://localhost:8000}
+  timeout-ms: 30000
+  internal-token: ${AI_INTERNAL_TOKEN:dev-internal-token-rotate-in-prod}
+  # 2026-05-22 정착: lemuel-xr 정체성 = *영적 비상 대비 훈련* (큐티+민방위).
+  # 임상·치료 영역 X → AI 생성 활성화 default. Prompt guard 가 *큐티 톤* 강제.
+  generation:
+    enabled: ${AI_GENERATION_ENABLED:true}
+    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 위기 시 1393 (자살예방상담전화)."
+    # Prompt 톤 가이드 — Python AI 사이드카가 system prompt 에 prepend.
+    tone-guidance: |
+      당신은 *영적 비상 대비 훈련* 가이드입니다. 큐티(QT)와 같은 *일상 영적 양식* 톤으로 응답하세요.
+      반드시 따를 것:
+      - 4 인물 (요셉·모세·다윗·예수) 의 *절망 → 아름다운 회복* 이야기로 내면 단련에 도움 주기
+      - 큐티 톤: 본문 인용 + 묵상 + 개인 적용. 짧고 진솔하게.
+      - "내면을 단단히", "영적 양식", "예방 영성" 같은 *단련·예방* 어휘 사용
+      절대 금지:
+      - 의료 진단·치료 권고 (위기 키워드는 시스템이 자동 처리)
+      - 거짓 위로 ("곧 나아질 거예요", "다 뜻이 있어요" 같은 가스라이팅)
+      - 결과 보장 ("이 미션 끝나면 회복돼요")
+  provider-priority:
+    classify_emotion: [openai_gpt4o_mini, anthropic_claude3_haiku]
+    polish_psalm: [anthropic_claude35_sonnet, openai_gpt4o]
+    game_branch: [openai_gpt4o_mini, anthropic_claude3_haiku]
+    weekly_report: [anthropic_claude35_sonnet, openai_gpt4o]
+    diary_meditation: [anthropic_claude35_sonnet, openai_gpt4o]
+
+# === TTS 사이드카 (Coqui XTTS-v2, self-hosted) ===
+tts:
+  base-url: ${TTS_BASE_URL:http://localhost:5002}
+  cache-ttl-seconds: 86400
+  storage:
+    bucket: ${TTS_BUCKET:lemuel-xr-tts}
+    public-base-url: ${TTS_PUBLIC_URL:https://r2.lemuel.co.kr/tts}
+
+# === 인증 (게스트 JWT) ===
+security:
+  jwt:
+    secret: ${JWT_SECRET:dev-secret-min-32-chars-rotate-in-prod-please-use-sops-encrypted-value}
+    expiry-days: 30
+    issuer: lemuel-xr
+  internal:
+    token: ${INTERNAL_TOKEN:dev-internal-svc-token-rotate-in-prod}
+  rate-limit:
+    enabled: true
+    default-per-minute: 60
+    classify-per-minute: 20
+    llm-realtime-per-minute: 30
+    tts-miss-per-minute: 10
+
+# === 정신건강 안전선 (5개) ===
+safety:
+  crisis-keywords-regex: ${SAFETY_CRISIS_REGEX:(자살|자해|죽고\s?싶|죽어\s?버|뛰어내리)}
+  alert-severity-threshold: medium   # 이 이상이면 사용자에게 위기 자원 표시
+  show-disclaimer-on-first-entry: true
+
+# === Telegram ChatOps 알람 ===
+chatops:
+  telegram:
+    enabled: ${CHATOPS_TELEGRAM_ENABLED:false}
+    bot-token: ${CHATOPS_TELEGRAM_BOT_TOKEN:}
+    chat-id: ${CHATOPS_TELEGRAM_CHAT_ID:}
+    base-url: https://api.telegram.org
+
+# === XR 자산 ===
+asset:
+  manifest:
+    cdn-base-url: ${ASSET_CDN:https://r2.lemuel.co.kr/assets}
+
+# === Actuator (운영 모니터링) ===
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+    info:
+      enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  tracing:
+    # 운영 10% 샘플링. dev: TRACING_SAMPLING=1.0 으로 모두.
+    sampling:
+      probability: ${TRACING_SAMPLING:0.1}
+    propagation:
+      type: w3c
+  otlp:
+    tracing:
+      endpoint: ${OTLP_ENDPOINT:http://tempo.monitoring.svc:4318/v1/traces}
+      compression: gzip
+      timeout: 10s
+  metrics:
+    distribution:
+      # endpoint별 latency histogram (Grafana p50/p95/p99 차트용)
+      percentiles-histogram:
+        http.server.requests: true
+        emotion.classify: true
+        game.decide: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+    tags:
+      application: lemuel-xr-backend
+
+# === Server ===
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    encoding:
+      charset: UTF-8
+      force: true
+  tomcat:
+    uri-encoding: UTF-8
+
+# === 로깅 ===
+logging:
+  charset:
+    console: UTF-8
+    file: UTF-8
+  pattern:
+    # %X{traceId}/%X{spanId} — Micrometer Tracing 이 MDC 에 박는 OTel trace context.
+    # Grafana 에서 log → trace jump 가능 (Tempo derived field 매핑).
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{traceId:-}/%X{spanId:-}] %-5level %logger{36} - %msg%n"

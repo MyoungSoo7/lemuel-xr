@@ -1,0 +1,43 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "throw_via_click_drag": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_barley_field_360", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/360/env_barley_field.jpg", "size_bytes": 6400000, "lod": "360_panorama_8k_jpeg", "type": "360_image_fallback"},
+      {"id": "model_grain_bag_A_lite", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/models/grain_bag_A_lite.glb", "size_bytes": 240000, "lod": "lod1_low_poly"},
+      {"id": "model_grain_bag_B_lite", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/models/grain_bag_B_lite.glb", "size_bytes": 240000, "lod": "lod1_low_poly"},
+      {"id": "model_grain_bag_C_lite", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/models/grain_bag_C_lite.glb", "size_bytes": 240000, "lod": "lod1_low_poly"},
+      {"id": "model_granary_billboard", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/billboards/granary_billboard.webp", "size_bytes": 560000, "lod": "billboard_sprite_2k", "type": "2d_sprite"},
+      {"id": "tex_barley_overlay", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/textures/barley_animated_overlay.webp", "size_bytes": 720000, "lod": "animated_2d_overlay_4_frames", "type": "2d_sprite"}
+    ],
+    "audio": [
+      {"id": "aud_s2_intro_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s2_intro_ko.mp3", "size_bytes": 700000, "voice_id": "joseph_v1", "duration_ms": 14000, "format": "mp3_192kbps"},
+      {"id": "aud_s2_post_A_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s2_post_A_ko.mp3", "size_bytes": 450000, "voice_id": "joseph_v1", "duration_ms": 9000, "format": "mp3_192kbps"},
+      {"id": "aud_s2_post_B_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s2_post_B_ko.mp3", "size_bytes": 550000, "voice_id": "joseph_v1", "duration_ms": 11000, "format": "mp3_192kbps"},
+      {"id": "aud_s2_post_C_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s2_post_C_ko.mp3", "size_bytes": 600000, "voice_id": "joseph_v1", "duration_ms": 12000, "format": "mp3_192kbps"},
+      {"id": "amb_wind_barley", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/amb_wind_barley.mp3", "size_bytes": 500000, "voice_id": null, "duration_ms": 30000, "format": "mp3_160kbps"},
+      {"id": "amb_farmer_song_loop", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/amb_farmer_song_5s_loop.mp3", "size_bytes": 192000, "voice_id": "farmer_chorus_v1", "duration_ms": 5000, "format": "mp3_160kbps"}
+    ],
+    "textures": [
+      {"id": "tex_grain_bag_web", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/textures/grain_bag_1k.webp", "size_bytes": 320000, "format": "webp", "resolution": "1024x1024"}
+    ],
+    "scripts": [
+      {"id": "script_scene2_web_click_drag_throw", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/scripts/Scene2WebClickDragThrow.js", "size_bytes": 28000, "entry_class": "Scene2WebClickDragThrow"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 11740000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

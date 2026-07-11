@@ -1,0 +1,82 @@
+# 욥 미션 시나리오 — *절망의 언어 허락*.
+#
+# 핵심 메시지: "너의 비탄은 부끄러운 것이 아니다. 욥의 친구들이 틀렸다."
+# 신·임상 양쪽 검토 전이라 LLM 분기 X. 모든 응답은 정적 (큐레이션).
+#
+# Stage 1 MVP. Recovery 사용자 — 우울증 안정기 + 비탄의 언어 자체가 위로.
+# Active crisis 사용자는 EmotionController 의 CrisisLockout 이 진입 차단.
+#
+# 임상 자문 영입 후 추가 양식 (사용자의 비탄 작성, AI 친구의 응답) 검토 예정.
+
+character: job
+title: 너의 비탄은 부끄러운 것이 아니다
+target_user: recovery
+scenes:
+  - id: 1
+    title: 침묵의 7일
+    type: cinematic
+    duration_sec: 60
+    narration_id: job.scene1.narration
+    scripture_ref: job-2:13
+    extras:
+      anchor: 함께 있음의 동행
+      static_text: "친구 세 명이 욥의 슬픔이 너무 큰 것을 보고 *말없이* 7일 밤낮 함께 앉았습니다. 말이 필요 없는 자리가 있습니다."
+      skippable_after_sec: 5
+    next: 2
+
+  - id: 2
+    title: 욥의 첫 외침 — 태어난 날을 저주
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: job-3:3
+    extras:
+      anchor: 비탄의 언어 정당화
+      static_text: "욥은 *침묵을 깨고* 자기 태어난 날을 저주합니다. 신은 욥의 이 외침을 책망하지 않으셨습니다. *비탄을 말할 자유* 가 신앙 안에 있습니다."
+      additional_refs: ["job-3:11", "job-6:8"]
+      reflection_prompt: "당신이 지금 *말할 수 없었던* 외침이 있다면, 한 단어라도 떠올려 보세요. 화면에 적을 필요 없습니다. 단지 *떠올리는 것* 만으로 욥의 자리에 한 발 다가갑니다."
+    next: 3
+
+  - id: 3
+    title: 친구들의 위로 — 정답이 아닌 것
+    type: interaction
+    interaction: pick_one
+    duration_sec: 90
+    scripture_ref: job-4:7
+    extras:
+      anchor: 거짓 위로 인식
+      static_text: "친구들은 *답을 가지고* 왔습니다. ''네가 죄가 있어서다'', ''곧 회복될 거다''. 신은 마지막에 친구들을 책망하셨습니다 (욥 42:7). *거짓 위로* 가 *침묵* 보다 해롭다는 것."
+      options:
+        - { id: heard_it_before, label: "나도 이런 말 들어본 적 있다",
+            response: "당신만이 아닙니다. 그 말을 들으셨을 때 느꼈던 외로움은 정당한 감정입니다." }
+        - { id: said_it_before,  label: "내가 다른 사람에게 이런 말 했을지도 모른다",
+            response: "그 자각이 욥의 친구들이 끝까지 못 한 것입니다. 다음에 누군가 곁에 있을 때, *침묵* 의 선택지가 있다는 것을 기억해주세요." }
+        - { id: not_sure,        label: "잘 모르겠다",
+            response: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다." }
+    next: 4
+
+  - id: 4
+    title: 폭풍 가운데서 하나님의 응답
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: job-38:1
+    extras:
+      anchor: 응답의 형태
+      static_text: "신은 욥의 *질문에 답하지 않으셨습니다*. 대신 *우주의 광활함* 을 보여주셨습니다. 답이 *설명* 이 아니라 *함께 있음* 이라는 것."
+      reflection_prompt: "당신의 *지금* 의 무게를 설명할 수 있는 사람은 없을지도 모릅니다. 하지만 *함께 있을* 수 있는 사람이 한 명 있다면 — 그 자리를 부탁해 보는 것도 회복의 한 걸음입니다."
+    next: 5
+
+  - id: 5
+    title: 회복 — 그러나 답 없이
+    type: outro
+    duration_sec: 60
+    scripture_ref: job-42:5
+    linked_values: [5, 4, 1]   # 욥(고통과 진리) · 시편(비탄) · 일기(솔직함)
+    value_prompt: "욥처럼 *답이 아닌 자리* 도 있습니다. 오늘 *솔직한 한 줄* 을 일기에 적어보세요. 부끄러운 것이 아닙니다."
+    extras:
+      anchor: 만남으로서의 회복
+      static_text: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다."
+      crisis_reminder: "지금 이 순간이 무겁다면, 1393."
+      next_scene_suggestion: "엘리야 — 죽기를 갈망한 후 천사가 음식과 잠을 주신 이야기"
+    next: null

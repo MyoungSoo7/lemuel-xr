@@ -1,0 +1,91 @@
+{
+  "mission_id": "david",
+  "scene_number": 6,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_meditation_dark_fog",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/env_meditation_dark_fog.glb",
+        "size_bytes": 3840000,
+        "lod": "lod2_volumetric_upscale_4k"
+      },
+      {
+        "id": "model_4_stones_in_palm",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/stones_palm_floating_4_remaining.glb",
+        "size_bytes": 864000,
+        "lod": "lod3_pbr_upscale_4k",
+        "note": "Scene 4 의 5 돌 중 첫 돌 (Scene 5 사용) 제외한 4 돌 — 색상 dynamic"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s6_samuel_17_46_47_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s6_samuel_17_46_47_ko_soft.wav",
+        "size_bytes": 1320000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_deep_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_deep_drone_60hz.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 30000
+      },
+      {
+        "id": "aud_s6_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s6_recovery_pack_150entries_ko.tar",
+        "size_bytes": 10080000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 1800000,
+        "note": "150 = 10 emotions x 3 faith_tones x 5 first_stone, pre-cached. R5 opt-out 사용자는 30 entries (first_stone 분기 제거)",
+        "spatial_audio_personal": true
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_fog_volumetric_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/fog_volumetric_2k.ktx2",
+        "size_bytes": 840000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_stones_palm_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/stones_palm_5_colors_2k.ktx2",
+        "size_bytes": 576000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene6_recovery_match",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/Scene6RecoveryMatch.cs.bundle",
+        "size_bytes": 28800,
+        "entry_class": "Scene6RecoveryMatch"
+      },
+      {
+        "id": "script_persisted_stones_writer",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/PersistedStonesWriter.cs.bundle",
+        "size_bytes": 16800,
+        "entry_class": "PersistedStonesWriter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 18525600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

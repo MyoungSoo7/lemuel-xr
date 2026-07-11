@@ -1,0 +1,187 @@
+{
+  "mission_id": "david",
+  "scene_number": 3,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "haptic_required": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_elah_frontline_ridge",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/env_elah_frontline.glb",
+        "size_bytes": 8160000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_goliath",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/goliath.glb",
+        "size_bytes": 30000000,
+        "lod": "lod3_pbr_upscale_4k_face_abstracted",
+        "scene_exclusive": true,
+        "note": "대용량 — Scene 3 만 (Scene 5 는 imposter 재사용)"
+      },
+      {
+        "id": "model_saul",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/saul.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_saul_army_80_imposter",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/saul_army_80_imposter.glb",
+        "size_bytes": 5280000,
+        "lod": "lod3_pbr_upscale_4k_with_imposter_far_60"
+      },
+      {
+        "id": "model_bronze_armor_set",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/models/bronze_armor_helmet_breastplate_sword.glb",
+        "size_bytes": 3120000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_intro_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_intro_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_goliath_shout_ko_strong",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_goliath_shout_ko_strong.wav",
+        "size_bytes": 2040000,
+        "voice_id": "goliath_v1",
+        "duration_ms": 15000,
+        "intensity": "high",
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_goliath_shout_ko_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_goliath_shout_ko_low.wav",
+        "size_bytes": 1800000,
+        "voice_id": "goliath_v1_low",
+        "duration_ms": 15000,
+        "intensity": "low",
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_saul_approach_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_saul_approach_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "saul_v1",
+        "duration_ms": 12000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_david_inner_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_david_inner_ko.wav",
+        "size_bytes": 984000,
+        "voice_id": "david_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_armor_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_armor_caption_ko.wav",
+        "size_bytes": 984000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_david_decision_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/s3_david_decision_ko.wav",
+        "size_bytes": 984000,
+        "voice_id": "david_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_silence_pressure",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_silence_pressure.ogg",
+        "size_bytes": 360000,
+        "voice_id": null,
+        "duration_ms": 60000
+      },
+      {
+        "id": "amb_battlefield_wind",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_battlefield_wind.ogg",
+        "size_bytes": 1320000,
+        "voice_id": null,
+        "duration_ms": 45000
+      },
+      {
+        "id": "amb_saul_army_breath",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/audio/amb_saul_army_anxious_breath.ogg",
+        "size_bytes": 576000,
+        "voice_id": "crowd_silent",
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_elah_frontline_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/elah_frontline_4k.ktx2",
+        "size_bytes": 3360000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_goliath_armor_2k",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/goliath_armor_4k.ktx2",
+        "size_bytes": 3840000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_saul_royal_armor",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/saul_royal_armor_4k.ktx2",
+        "size_bytes": 2280000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_bronze_armor_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/bronze_armor_4k.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_saul_army_imposter",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/textures/saul_army_imposter_2k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_armor_multi_socket",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/Scene3ArmorMultiSocketPolySpatial.cs.bundle",
+        "size_bytes": 50400,
+        "entry_class": "Scene3ArmorMultiSocketPolySpatial"
+      },
+      {
+        "id": "script_intensity_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/visionpro/v1.0.0/scripts/IntensityRouter.cs.bundle",
+        "size_bytes": 21600,
+        "entry_class": "IntensityRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 73800000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

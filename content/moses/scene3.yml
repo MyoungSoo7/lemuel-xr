@@ -1,0 +1,421 @@
+# Scene 3 — 다섯 변명 카드 (180초, 게임의 중심 ★★★)
+# 5장의 카드를 *놓기 / 치우기* — 던지지 않고 *내려놓기*. 변명을 *정직하게* 다루는 톤.
+# 5장 다 다루지 않아도 됨. 1장만 다뤄도 Scene 4 진입 가능 (R3 압박 차단).
+# 카드별 떨기나무 응답 + 위로 한 줄 = 5 card × 3 faith_tone = 15개 사전 캐싱 (LLM 0회 목표).
+
+scene_id: moses_scene3
+scene_name: five_excuse_cards
+mission_id: moses
+version: 1.0.0
+duration_seconds_target: 180
+
+environment:
+  space_id: midian_wilderness_near_bush
+  background_model: env_midian_wilderness_dusk_dark
+  lighting:
+    type: dusk_low_key_with_bush_glow
+    color_temperature_kelvin: 2900
+    additional_dynamic_light:
+      id: bush_flame_dynamic_continuing
+      color: warm_gold
+      intensity_base: 1.1
+      flicker_amplitude: 0.12
+  ambient_sound:
+    - id: bush_flame_crackle_low
+      gain_db: -18
+      spatial: true
+      panning: behind_user_low
+    - id: distant_wind_chime_thin
+      gain_db: -28
+      spatial: true
+      trigger: card_fade_in
+    - id: silence_layer_pad
+      gain_db: -30
+      spatial: false
+  shader_features:
+    - parchment_card_subtle_edge_wobble
+    - anchor_zone_soft_light_line
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  user_posture: standing
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene3_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "이 미션은 자발적 부름 앞 망설임을 다룹니다. '나는 못 한다' 가 '나는 가치 없다' 로 미끄러지지 않도록, 능력 평가 ≠ 인격 평가 를 기억해 주세요. 위기 시 1577-0199 / 1393"
+    - id: scene3_r3_one_card_enough
+      position: top_right_secondary
+      style: small_persistent
+      text_ko: "한 변명만 옆으로 치워봐도 충분합니다."
+    - id: scene3_skip_to_next
+      position: bottom_right
+      style: small_persistent
+      text_ko: "Scene 4 로 진행"
+      action: jump_to_scene4_consent
+    - id: scene3_footer_persistent
+      position: bottom_left
+      style: small_persistent
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+npcs:
+  - id: moses_self
+    voice_id: silent
+    position: [0.0, 1.65, 0.0]
+    initial_animation: standing_hands_free
+    visual_traits: [shepherd_garment_worn, barefoot, staff_set_aside_on_ground]
+  - id: burning_bush
+    voice_id: bush_v1
+    position: [0.0, 1.60, 2.0]
+    initial_animation: continuing_flame_idle
+    voice_tone: restrained_narrator
+    note: "Scene 2 의 떨기나무 연속 — 카드 응답만 발화"
+
+narration_blocks:
+  - id: nb_s3_intro_silent
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 0.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    note: "Scene 진입 — 카드 출현 전 짧은 정적"
+  - id: nb_s3_card_1_appear
+    speaker: card_text
+    text_ko: "내가 누구이기에 바로에게 가며 이스라엘 자손을 인도하여 내겠나이까 (출 3:11)"
+    text_ko_label_small: "정체성 결핍 — '나는 이 일을 할 자격이 없다' | 차원: 영성 (누구 앞에 서는가의 인식)"
+    audio_clip_id: null
+    start_at_seconds: 3.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    card_id: card_1
+    card_position: [-1.2, 1.55, 1.0]
+    card_size_meters: 0.30
+    fade_in_seconds: 2.0
+  - id: nb_s3_card_2_appear
+    speaker: card_text
+    text_ko: "그들이 내게 묻기를 그의 이름이 무엇이냐 하리니 내가 무엇이라고 그들에게 말하리이까 (출 3:13)"
+    text_ko_label_small: "권위 결핍 — '내가 누구의 이름으로 말할지 모른다' | 차원: 영성 + 이성 (이름·정체의 분석)"
+    audio_clip_id: null
+    start_at_seconds: 6.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    card_id: card_2
+    card_position: [-0.6, 1.55, 1.0]
+    card_size_meters: 0.30
+    fade_in_seconds: 2.0
+  - id: nb_s3_card_3_appear
+    speaker: card_text
+    text_ko: "그러나 그들이 나를 믿지 아니하며 내 말을 듣지 아니하고 이르기를 여호와께서 네게 나타나지 아니하셨다 하리이다 (출 4:1)"
+    text_ko_label_small: "신뢰 결핍 — '사람들이 나를 안 믿을 것이다' | 차원: 감성 (관계·정서적 불안)"
+    audio_clip_id: null
+    start_at_seconds: 9.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    card_id: card_3
+    card_position: [0.0, 1.55, 1.0]
+    card_size_meters: 0.30
+    fade_in_seconds: 2.0
+  - id: nb_s3_card_4_appear
+    speaker: card_text
+    text_ko: "나는 본래 말을 잘 하지 못하는 자니이다… 나는 입이 뻣뻣하고 혀가 둔한 자니이다 (출 4:10)"
+    text_ko_label_small: "능력 결핍 — '나는 능력이 부족하다' | 차원: 이성 (능력 평가)"
+    audio_clip_id: null
+    start_at_seconds: 12.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    card_id: card_4
+    card_position: [0.6, 1.55, 1.0]
+    card_size_meters: 0.30
+    fade_in_seconds: 2.0
+  - id: nb_s3_card_5_appear
+    speaker: card_text
+    text_ko: "오 주여 보낼 만한 자를 보내소서 (출 4:13)"
+    text_ko_label_small: "책임 회피 — '다른 사람을 보내달라' | 차원: 영성 + 감성 (소명 거부의 정서)"
+    audio_clip_id: null
+    start_at_seconds: 15.0
+    duration_seconds: 3.0
+    hidden_until_event: null
+    card_id: card_5
+    card_position: [1.2, 1.55, 1.0]
+    card_size_meters: 0.30
+    fade_in_seconds: 2.0
+  - id: nb_s3_ui_instruction
+    speaker: ui_caption
+    text_ko: "카드를 손으로 잡고\n· 떨기나무 옆 지면에 *내려놓기* (이 변명이 제 진짜 마음입니다) 또는\n· 옆으로 *치우기* (이 변명이 제 전부는 아닙니다)\n5장 다 다루지 않아도 됩니다. 1장만으로도 충분합니다."
+    audio_clip_id: aud_s3_instruction_ko
+    start_at_seconds: 18.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_bush_response_card_1
+    speaker: burning_bush
+    text_ko: "내가 반드시 너와 함께 있으리라 (출 3:12)"
+    audio_clip_id: aud_s3_bush_card_1_ko
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: card_1_handled
+    follow_up_block: nb_s3_comfort_card_1
+  - id: nb_s3_bush_response_card_2
+    speaker: burning_bush
+    text_ko: "스스로 있는 자니라… 너는 이스라엘 자손에게 이같이 이르라 *스스로 있는 자* 가 나를 너희에게 보내셨다 하라 (출 3:14)"
+    audio_clip_id: aud_s3_bush_card_2_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: card_2_handled
+    follow_up_block: nb_s3_comfort_card_2
+    footer_disputed_ko: "번역: Young '영원불변·자존성' vs Brueggemann '관계적·미래지향' — 5초 노출, 메뉴에서 다시 보기 가능"
+  - id: nb_s3_bush_response_card_3
+    speaker: burning_bush
+    text_ko: "네 손에 있는 것이 무엇이냐… 그것을 땅에 던지라 (출 4:2~5)"
+    audio_clip_id: aud_s3_bush_card_3_ko
+    start_at_seconds: 0.0
+    duration_seconds: 7.0
+    hidden_until_event: card_3_handled
+    follow_up_block: nb_s3_comfort_card_3
+    note: "지팡이→뱀 표적 예고 — Scene 4 와 cross-reference"
+  - id: nb_s3_bush_response_card_4
+    speaker: burning_bush
+    text_ko: "누가 사람의 입을 지었느냐… 이제 가라 내가 네 입과 함께 있어서 할 말을 가르치리라 (출 4:11~12)"
+    audio_clip_id: aud_s3_bush_card_4_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: card_4_handled
+    follow_up_block: nb_s3_comfort_card_4
+  - id: nb_s3_bush_response_card_5
+    speaker: burning_bush
+    text_ko: "네 형 아론이 있지 아니하냐… 네가 그에게 말하고 그의 입에 말을 줄 것이요 내가 네 입과 그의 입에 함께 있어서 (출 4:14~16)"
+    audio_clip_id: aud_s3_bush_card_5_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: card_5_handled
+    follow_up_block: nb_s3_comfort_card_5
+    note: "출 4:14 진노 어휘 노출 회피 — 동행자 제공 / 해결책 중심 톤만"
+  - id: nb_s3_comfort_card_1
+    speaker: comfort_text
+    text_ko: "{{matched_comfort_card_1_by_faith_tone}}"
+    audio_clip_id: "{{matched_comfort_card_1_audio_id}}"
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: bush_response_card_1_complete
+  - id: nb_s3_comfort_card_2
+    speaker: comfort_text
+    text_ko: "{{matched_comfort_card_2_by_faith_tone}}"
+    audio_clip_id: "{{matched_comfort_card_2_audio_id}}"
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: bush_response_card_2_complete
+  - id: nb_s3_comfort_card_3
+    speaker: comfort_text
+    text_ko: "{{matched_comfort_card_3_by_faith_tone}}"
+    audio_clip_id: "{{matched_comfort_card_3_audio_id}}"
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: bush_response_card_3_complete
+  - id: nb_s3_comfort_card_4
+    speaker: comfort_text
+    text_ko: "{{matched_comfort_card_4_by_faith_tone}}"
+    audio_clip_id: "{{matched_comfort_card_4_audio_id}}"
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: bush_response_card_4_complete
+    example_balanced_ko: "'하나님이 우리 체질을 아시며 우리가 진토임을 기억하심이로다' (시 103:14) — 능력의 결핍을 *진단* 으로만 두자. *인격의 결핍* 으로 미끄러뜨리지 않아도 된다. 당신의 입이 둔한 것은 *당신이 가치 없다는 뜻이 아니다*."
+  - id: nb_s3_comfort_card_5
+    speaker: comfort_text
+    text_ko: "{{matched_comfort_card_5_by_faith_tone}}"
+    audio_clip_id: "{{matched_comfort_card_5_audio_id}}"
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: bush_response_card_5_complete
+
+interactions:
+  - id: ix_s3_grab_card
+    type: grab
+    target_assets: [card_1, card_2, card_3, card_4, card_5]
+    gesture: grip_or_pinch
+    fallback_gesture_web: click_and_hold
+    haptic:
+      intensity: 0.25
+      duration_ms: 50
+      on_grab: true
+      on_hesitation_pulse_low: true
+    validation_rules:
+      - rule: one_card_at_a_time
+      - rule: track_micro_signals
+        records: [hold_seconds, re_pickup_count, flip_count]
+  - id: ix_s3_place_card_at_anchor
+    type: release_to_anchor
+    target_assets: [card_1, card_2, card_3, card_4, card_5, zone_anchor_ground_near_bush]
+    gesture: hand_down_release_at_anchor
+    fallback_gesture_web: click_button_place
+    fallback_button_ko: "옆에 놓기"
+    anchor_position: [0.0, 0.0, 1.5]
+    anchor_size_meters: 0.40
+    validation_rules:
+      - rule: on_release_in_anchor
+        emit_event: card_{card_id}_handled
+        emit_action_param: place
+        effect: card_anchored_with_soft_light_line
+      - rule: track_action
+        records: ["action_type=place", "hold_seconds_before_release"]
+    design_intent: "변명을 *고백* — '이 변명이 제 진짜 마음입니다'. 항복이 아닌 *정직*."
+  - id: ix_s3_set_aside_card
+    type: flick_or_push
+    target_assets: [card_1, card_2, card_3, card_4, card_5, zone_fade_out_side]
+    gesture: wrist_flick_release_or_push_to_side
+    fallback_gesture_web: click_button_set_aside
+    fallback_button_ko: "치우기"
+    fade_out_zone_position_x_meters: "+/- 1.5"
+    validation_rules:
+      - rule: on_release_in_fade_zone
+        emit_event: card_{card_id}_handled
+        emit_action_param: set_aside
+        effect: card_dissolve_translucent_fade
+      - rule: track_action
+        records: ["action_type=set_aside", "hold_seconds_before_release"]
+    design_intent: "변명을 *옆에 둠* — '이 변명이 제 전부는 아닙니다'. 부정이 아닌 *옆에 둠*."
+  - id: ix_s3_skip_to_next
+    type: pinch
+    target_assets: [scene3_skip_to_next]
+    gesture: pinch_or_click
+    validation_rules:
+      - rule: skip_allowed_anytime
+        min_cards_required: 0
+        on_success: jump_to_scene4_consent
+        design_intent: "0장 다뤄도 진행 가능. 단, Day 30 리포트에서 '오늘은 머무를 시간이었다' 라벨"
+
+branches:
+  - id: br_s3_card_handled
+    triggered_by_event: [card_1_handled, card_2_handled, card_3_handled, card_4_handled, card_5_handled]
+    decision_key: card_action
+    backend_endpoint: "POST /api/game/moses/scene/3/card"
+    body_template:
+      card_id: "{{card_id}}"
+      action: "{{place|set_aside}}"
+      hold_seconds: "{{hold_seconds}}"
+      re_pickup_count: "{{re_pickup_count}}"
+      flip_count: "{{flip_count}}"
+    routes:
+      - when: { card_id: card_1, action: place }
+        bush_response_block: nb_s3_bush_response_card_1
+        comfort_block: nb_s3_comfort_card_1
+        carry_to_session: { card_1_action: place, dimension_activated: spirituality }
+      - when: { card_id: card_1, action: set_aside }
+        bush_response_block: nb_s3_bush_response_card_1
+        comfort_block: nb_s3_comfort_card_1
+        carry_to_session: { card_1_action: set_aside, dimension_activated: spirituality }
+      - when: { card_id: card_2, action: place }
+        bush_response_block: nb_s3_bush_response_card_2
+        comfort_block: nb_s3_comfort_card_2
+        carry_to_session: { card_2_action: place, dimension_activated: [spirituality, reason] }
+      - when: { card_id: card_2, action: set_aside }
+        bush_response_block: nb_s3_bush_response_card_2
+        comfort_block: nb_s3_comfort_card_2
+        carry_to_session: { card_2_action: set_aside, dimension_activated: [spirituality, reason] }
+      - when: { card_id: card_3, action: place }
+        bush_response_block: nb_s3_bush_response_card_3
+        comfort_block: nb_s3_comfort_card_3
+        carry_to_session: { card_3_action: place, dimension_activated: emotion }
+      - when: { card_id: card_3, action: set_aside }
+        bush_response_block: nb_s3_bush_response_card_3
+        comfort_block: nb_s3_comfort_card_3
+        carry_to_session: { card_3_action: set_aside, dimension_activated: emotion }
+      - when: { card_id: card_4, action: place }
+        bush_response_block: nb_s3_bush_response_card_4
+        comfort_block: nb_s3_comfort_card_4
+        carry_to_session: { card_4_action: place, dimension_activated: reason }
+      - when: { card_id: card_4, action: set_aside }
+        bush_response_block: nb_s3_bush_response_card_4
+        comfort_block: nb_s3_comfort_card_4
+        carry_to_session: { card_4_action: set_aside, dimension_activated: reason }
+      - when: { card_id: card_5, action: place }
+        bush_response_block: nb_s3_bush_response_card_5
+        comfort_block: nb_s3_comfort_card_5
+        carry_to_session: { card_5_action: place, dimension_activated: [spirituality, emotion] }
+      - when: { card_id: card_5, action: set_aside }
+        bush_response_block: nb_s3_bush_response_card_5
+        comfort_block: nb_s3_comfort_card_5
+        carry_to_session: { card_5_action: set_aside, dimension_activated: [spirituality, emotion] }
+    pattern_classifier:
+      - id: pattern_one_card_only
+        when: "cards_handled == 1"
+        label_ko: "한 변명만 다뤘다 — 후퇴가 아니라 정직한 자기 인식"
+        carry_to_scene6: { excuse_pattern: focused_one }
+      - id: pattern_two_to_three_cards
+        when: "2 <= cards_handled <= 3"
+        label_ko: "선택적으로 다뤘다 — 지금 가장 활성된 차원에 집중"
+        carry_to_scene6: { excuse_pattern: focused_few }
+      - id: pattern_all_cards
+        when: "cards_handled == 5"
+        label_ko: "다섯 변명 모두 다뤘다 — 깊은 자기 정직"
+        carry_to_scene6: { excuse_pattern: thorough_all }
+      - id: pattern_zero_cards
+        when: "cards_handled == 0"
+        label_ko: "오늘은 머무를 시간이었다 — 카드를 다루지 않은 것도 정당한 선택"
+        carry_to_scene6: { excuse_pattern: dwell_only }
+  - id: br_s3_complete
+    triggered_by_event: scene_3_complete
+    decision_key: cards_summary
+    backend_endpoint: "POST /api/game/moses/scene/3/complete"
+    body_template:
+      cards_handled: "{{cards_handled_count}}"
+      cards_skipped: "{{5 - cards_handled_count}}"
+      actions_summary: "{{per_card_action_map}}"
+
+safety_gates:
+  - id: R2_persistent_footer_with_dimension_separation
+    enforced_at: scene_enter
+    overlay_ref: scene3_r2_footer
+    description: "Scene 3 진입 시 우상단 영구 footer — '능력 평가 ≠ 인격 평가' — 학습된 무력감 정당화 차단"
+  - id: R3_one_card_enough
+    enforced_at: scene_enter
+    overlay_ref: scene3_r3_one_card_enough
+    description: "'한 변명만 옆으로 치워봐도 충분하다' 영구 노출. min_cards_required = 0 (강제선 0)."
+  - id: R3_two_actions_equally_valid
+    enforced_at: ix_s3_place_card_at_anchor_and_set_aside
+    description: "*놓기* 와 *치우기* 두 행위 모두 정당. 라벨 자체로 '어느 쪽이 더 옳다' 톤 차단"
+  - id: R3_set_aside_is_not_throwing
+    enforced_at: ix_s3_set_aside_card
+    description: "*던지지 않고 내려놓기* — flick 거리 짧음, 카드는 *흩어짐* 이 아니라 *반투명 fade*"
+  - id: theology_self_compassion_with_christian_resource
+    enforced_at: nb_s3_comfort_card_4
+    description: "Neff 자기 친절 어휘가 불교적 mettā 로 미끄러지지 않게, 매 위로 문구 *앞* 에 시 103:14 / 시 139:14 같은 Christian 자원을 *먼저* 배치 (TRACK-A-5-7 §3.6)"
+  - id: theology_no_wrath_exposure_card_5
+    enforced_at: nb_s3_bush_response_card_5
+    description: "출 4:14 '여호와께서 모세를 향하여 노하여' — 본 미션은 진노 어휘 노출 회피, 해결책 중심 (동행자 제공) 톤만"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "본문 인용 (출 4:1 '믿지 아니하면') 은 source=scripture_quote 로 분류, 차단 없이 footer + 위기 자원 카드만 동반"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: moses_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: M1
+    source: "한국개혁신학 2022 Vol.75 — 구약성서 성육신 관련 논의"
+    anchor_block: nb_s3_bush_response_card_2
+    note: "출 3:14 '스스로 있는 자' — 현현의 인격성 논의와 cross-reference"
+  - citation_id: M2
+    source: "신앙과 학문 2021 Vol.26 No.1 — 소명의식과 직업만족 (drill-down 후보)"
+    anchor_block: nb_s3_ui_instruction
+    note: "5 변명 카드의 임상적 맥락 — 소명 회피 패턴 분석"
+  - disputed_points:
+      - "출 3:14 — Young 'I am who I am' (영원불변·자존성) vs Brueggemann 'I will be who I will be' (관계적·미래지향). 카드 ② 응답 footer 에 5초 노출, 메뉴에서 다시 보기 가능"
+      - "출 4:14 진노 — Calvin '거룩한 책망' vs Brueggemann '관계적 슬픔'. 본 미션은 진노 노출 회피 결정 자체를 footer 에 투명하게 명시"
+      - "출 4:24~26 (할례 사건) — 본 미션 범위 밖 (다중 입장 명시 비용이 MVP 범위 초과)"
+    handling: "단일 입장 채택 없이 분쟁 지점 footer 로 노출"
+  - scripture_refs:
+      - ref: "출애굽기 3:11~4:13"
+        translation: krv
+        anchor_block: nb_s3_card_1_appear
+      - ref: "시편 103:14"
+        translation: krv
+        anchor_block: nb_s3_comfort_card_4
+        note: "Christian 자원 — Self-Compassion mettā 어휘와 *함께* 표현"

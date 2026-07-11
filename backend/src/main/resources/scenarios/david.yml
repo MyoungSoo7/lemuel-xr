@@ -1,0 +1,109 @@
+# 다윗 미션 시나리오 — 다섯 개의 돌. MVP-DAVID.md 설계 기반.
+# 핵심 감정 anchor: 작음 · 모욕 · 정체성 · 떨림 · 해방.
+# 6 Scene · 5~7분.
+
+character: david
+title: 다섯 개의 돌
+scenes:
+  - id: 1
+    title: 양 떼와 시편
+    type: interaction
+    interaction: contemplative
+    duration_sec: 60
+    narration_id: david.scene1.narration
+    scripture_ref: ps-23:1-6
+    extras:
+      anchor: 평온·자기 존재감
+      activity: lyre_strings
+      strings_count: 25
+    next: 2
+
+  - id: 2
+    title: 형들의 비웃음
+    type: interaction
+    interaction: pick_one
+    duration_sec: 60
+    scripture_ref: 1sam-17:28
+    extras:
+      anchor: 모욕감·내적 분노
+      options:
+        - { id: rebut,  label: "반박한다",   reference: 1sam-17:29 }
+        - { id: silence, label: "침묵한다" }
+        - { id: walk_past, label: "전선 쪽으로 걸어간다" }
+      monologue_cache_keys:
+        rebut:     david.s2.reaction.rebut
+        silence:   david.s2.reaction.silence
+        walk_past: david.s2.reaction.walk_past
+      safety_skip_after_sec: 3   # 가족 트라우마 자극 시 skip
+    next: 3
+
+  - id: 3
+    title: 사울의 갑옷
+    type: interaction
+    interaction: gesture_sequence
+    duration_sec: 120
+    scripture_ref: 1sam-17:38-39
+    extras:
+      anchor: 자기 정체성·해방
+      steps:
+        - { id: wear,    label: "갑옷을 입어본다" }
+        - { id: walk,    label: "걸어본다 (비틀거림)" }
+        - { id: remove,  label: "벗는다" }
+      hapticHint: { intensity: 0.8, pattern: RUMBLE, channel: BOTH, fallback: { audioCueId: armor-weight } }
+    next: 4
+
+  - id: 4
+    title: 시냇가의 5돌
+    type: interaction
+    interaction: distribute
+    duration_sec: 120
+    scripture_ref: 1sam-17:40
+    extras:
+      anchor: 두려움+신뢰 통합
+      stones:
+        - { id: fear,         label: "공포",   weight: 0.20 }
+        - { id: humiliation,  label: "모욕",   weight: 0.20 }
+        - { id: loneliness,   label: "외로움", weight: 0.20 }
+        - { id: trust,        label: "신뢰",   weight: 0.20 }
+        - { id: prayer,       label: "기도",   weight: 0.20 }
+      pool_total: 7   # 7개 중 5개 선택
+      monologue_cache_keys:
+        # 어느 돌을 *마지막*으로 가져가느냐로 캐시 분기 (5종)
+        last_fear:        david.s4.last.fear
+        last_humiliation: david.s4.last.humiliation
+        last_loneliness:  david.s4.last.loneliness
+        last_trust:       david.s4.last.trust
+        last_prayer:      david.s4.last.prayer
+    next: 5
+
+  - id: 5
+    title: 골리앗
+    type: interaction
+    interaction: two_handed_throw
+    duration_sec: 60
+    scripture_ref: 1sam-17:45
+    extras:
+      anchor: 떨림 → 일어섬
+      sling_rotation_min_sec: 5
+      hapticHint: { intensity: 1.0, pattern: PULSE_HARD, channel: BOTH, fallback: { audioCueId: heart-pound } }
+      violence_warning: true   # 사용자 동의 토글 (R4)
+    next: 6
+
+  - id: 6
+    title: 회복
+    type: outro
+    duration_sec: 30
+    scripture_ref: 1sam-17:46-47
+    # CROSS-MAPPING-VR-AR.md §3 — 다윗이 빛내는 AR 1~7 가치 (●●●)
+    linked_values: [1, 4, 7]   # 일기(솔직함) · 시편(시편 저자) · 사람(사울 추격 두려움)
+    value_prompt: "다윗의 시편은 그의 *일기장* 이었습니다. 좋은 일만 적는 일기가 건강한 일기가 아닙니다. 오늘 *솔직한 한 줄* 을 적어보세요."
+    extras:
+      anchor: 자기 작음의 평화
+      stones_remaining: 4
+      recovery_keys:
+        ANXIOUS:    david.recovery.fear_with_trust
+        CONFUSED:   david.recovery.armor_off
+        LONELY:     david.recovery.psalm_companion
+        ANGRY:      david.recovery.eliav_silenced
+        EXHAUSTED:  david.recovery.small_active
+    next: null

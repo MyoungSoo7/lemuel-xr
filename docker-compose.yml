@@ -1,0 +1,55 @@
+# 로컬 smoke 테스트용 — Postgres + (옵션) AI/TTS 사이드카.
+# backend 는 host 에서 `gradle bootRun` 으로 실행.
+#
+# 사용:
+#   docker compose up -d postgres        # DB 만 띄움 (가장 빠른 smoke)
+#   docker compose --profile sidecars up -d  # AI/TTS 까지
+#
+# Postgres 17 + pgvector 확장 사전 설치 이미지.
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: lemuel-xr-postgres
+    environment:
+      POSTGRES_DB: lemuel_xr
+      POSTGRES_USER: xr
+      POSTGRES_PASSWORD: xr1234
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+      TZ: Asia/Seoul
+    ports:
+      - "5432:5432"
+    volumes:
+      - lemuel_xr_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U xr -d lemuel_xr"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  ai:
+    profiles: ["sidecars"]
+    build:
+      context: ./ai
+    container_name: lemuel-xr-ai
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  tts:
+    profiles: ["sidecars"]
+    build:
+      context: ./tts
+    container_name: lemuel-xr-tts
+    environment:
+      - PORT=5002
+    ports:
+      - "5002:5002"
+    restart: unless-stopped
+
+volumes:
+  lemuel_xr_pg:

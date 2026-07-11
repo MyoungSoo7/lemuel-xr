@@ -1,0 +1,164 @@
+# Scene 1 — 양치는 미디안 (1분 30초, 광야 들어가기)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# *광야의 무게* 흡수 — 인터랙션 없음 (의도적). 사용자는 *돌 위에 앉아* 시각·자막만 받는다.
+
+scene_id: moses_scene1
+scene_name: midian_wilderness_shepherd
+mission_id: moses
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: midian_wilderness_golden_hour
+  background_model: env_midian_wilderness_dusk
+  lighting:
+    type: golden_hour_sunset
+    color_temperature_kelvin: 3200
+    sun_angle_degrees: 8
+    shadow_intensity: 0.55
+  ambient_sound:
+    - id: low_freq_wilderness_wind
+      gain_db: -14
+      spatial: true
+    - id: distant_sheep_low_bleat_2x
+      gain_db: -24
+      spatial: true
+    - id: silence_layer_pad
+      gain_db: -30
+      spatial: false
+  user_position: [0.0, 1.20, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  user_posture: seated_on_rock_auto_align
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene1_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 가정·종교·직장에서 떠밀리는 의무가 아닙니다. 위기 시 1577-0199 / 1393"
+    - id: scene1_footer_persistent
+      position: bottom_left
+      style: small_persistent
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    - id: scene1_skip_button
+      position: bottom_left_right_offset
+      style: faint_appears_after_5s
+      text_ko: "건너뛰기"
+      action: jump_to_scene2
+
+npcs:
+  - id: moses_self
+    voice_id: silent
+    position: [0.0, 1.20, 0.0]
+    initial_animation: seated_holding_staff
+    visual_traits: [shepherd_garment_worn, weathered_hands, long_round_staff_in_hand]
+    note: "사용자가 모세 — first-person, 음성 없음 (내레이션 자막 only)"
+  - id: distant_sheep_flock
+    voice_id: silent
+    count: 6
+    formation: scattered_far
+    formation_origin: [4.0, 0.6, 10.0]
+    initial_animation: distant_grazing_specks
+    visual_traits: [small_dot_silhouette]
+    design_intent: "외로움의 거리감 — 사람 소리 전혀 없음"
+
+narration_blocks:
+  - id: nb_s1_intro_caption
+    speaker: subtitle_only
+    text_ko: "미디안 광야. 해가 진다.\n애굽에서 도망친 지 40년이 지났다."
+    audio_clip_id: null
+    start_at_seconds: 0.0
+    duration_seconds: 5.0
+    hidden_until_event: null
+    note: "내레이터 음성 없음 — 자막 only. 15초 정적 흡수 시간 시작"
+  - id: nb_s1_silent_dwell_1
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 5.0
+    duration_seconds: 15.0
+    hidden_until_event: null
+    note: "15초 정적 — 광야의 무게 흡수"
+  - id: nb_s1_no_name_shepherd
+    speaker: subtitle_only
+    text_ko: "이제 나는 이름 없는 양치기다.\n왕자였던 기억도, 도망친 죄도, 시간이 덮었다."
+    audio_clip_id: null
+    start_at_seconds: 20.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s1_silent_dwell_2
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 30.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s1_same_as_yesterday
+    speaker: subtitle_only
+    text_ko: "오늘도 어제와 같다.\n내일도 어제와 같을 것이다."
+    audio_clip_id: null
+    start_at_seconds: 40.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s1_silent_dwell_3
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 52.0
+    duration_seconds: 33.0
+    hidden_until_event: null
+    note: "긴 흡수 — 광야의 시간감"
+
+interactions:
+  - id: ix_s1_idle_silent_mode
+    type: passive_idle_detect
+    target_assets: []
+    gesture: controller_set_down_or_no_input_10s
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+    validation_rules:
+      - rule: detect_silent_mode
+        on_no_input_seconds: 10
+        action: enter_silent_mode_no_prompt
+        design_intent: "지친 사용자 보호 — 침묵 모드 인식, 추가 안내 0건"
+
+branches: []
+
+safety_gates:
+  - id: R4_pre_scene_consent_1st
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 의 R4 1차 동의 카드 — 전체 미션 (소명 회피·시각적 변형·자기 무자격감 사전 고지). 본 씬 진입 *전* 강제 노출. 건너뛰기 불가."
+    consent_card_ref: pre_scene_0_consent_card
+  - id: R2_suffering_not_obligation_gaslight
+    enforced_at: scene_enter
+    description: "Scene 1 진입 시점 우상단 영구 footer — '떠밀리는 의무가 아니다'"
+    overlay_ref: scene1_r2_footer
+  - id: R3_skip_button_after_5s
+    enforced_at: scene_enter
+    description: "5초 후 건너뛰기 버튼 흐릿하게 노출 — 지친 사용자 보호"
+    overlay_ref: scene1_skip_button
+  - id: R3_no_push_for_resilience
+    enforced_at: nb_s1_same_as_yesterday
+    description: "'오늘도 어제와 같다' 체념 어휘는 공감 목적. '그래도 일어나라' push 미동반"
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "AI 음성 0건 (자막 only) — opt-out 사용자도 동일 경험"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+
+next_scene_id: moses_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: M2
+    source: "신앙과 학문 2021 Vol.26 No.1 — 소명의식과 직업만족 (학술지 출처 확보, drill-down 후보)"
+    note: "광야 40년 = 낭비가 아닌 형성의 시간 — 소명 준비 단계로 의미화"
+    anchor_block: nb_s1_no_name_shepherd
+  - disputed_points:
+      - "광야 40년의 신적 목적 — 형성론 vs 심판론"
+    handling: "단일 채택 없이 '시간이 그를 만들었다' 균형 어휘만 사용"

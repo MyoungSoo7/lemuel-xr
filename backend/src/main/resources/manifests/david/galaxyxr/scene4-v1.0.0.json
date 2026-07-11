@@ -1,0 +1,225 @@
+{
+  "mission_id": "david",
+  "scene_number": 4,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "stone_count_min": 7
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_elah_stream_kneeling_view",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/env_elah_stream_kneeling.glb",
+        "size_bytes": 3680000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_stone_red",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_red.glb",
+        "size_bytes": 400000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": "anger",
+        "haptic_profile": "short_strong_double"
+      },
+      {
+        "id": "model_stone_blue",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_blue.glb",
+        "size_bytes": 400000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": "sadness",
+        "haptic_profile": "long_soft_single"
+      },
+      {
+        "id": "model_stone_gray",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_gray.glb",
+        "size_bytes": 400000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": "loneliness",
+        "haptic_profile": "heavy_single"
+      },
+      {
+        "id": "model_stone_yellow",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_yellow.glb",
+        "size_bytes": 400000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": "hope",
+        "haptic_profile": "soft_tremor"
+      },
+      {
+        "id": "model_stone_black",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_black.glb",
+        "size_bytes": 400000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": "fear",
+        "haptic_profile": "faint_then_silence"
+      },
+      {
+        "id": "model_stone_neutral_a",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_neutral_a.glb",
+        "size_bytes": 304000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": null
+      },
+      {
+        "id": "model_stone_neutral_b",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/stone_neutral_b.glb",
+        "size_bytes": 304000,
+        "lod": "lod4_with_imposter_far",
+        "emotion": null
+      },
+      {
+        "id": "model_leather_pocket_pouch",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/models/leather_pocket_pouch.glb",
+        "size_bytes": 336000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_scripture_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_scripture_caption_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s4_instruction_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_instruction_ko.wav",
+        "size_bytes": 656000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s4_no_pressure_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_no_pressure_ko.wav",
+        "size_bytes": 736000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s4_stone_red_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_stone_red_ko_soft.wav",
+        "size_bytes": 496000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s4_stone_blue_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_stone_blue_ko_soft.wav",
+        "size_bytes": 496000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s4_stone_gray_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_stone_gray_ko_soft.wav",
+        "size_bytes": 496000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s4_stone_yellow_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_stone_yellow_ko_soft.wav",
+        "size_bytes": 496000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s4_stone_black_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_stone_black_ko_soft.wav",
+        "size_bytes": 576000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 7000
+      },
+      {
+        "id": "aud_s4_complete_inner_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/s4_complete_inner_ko.wav",
+        "size_bytes": 736000,
+        "voice_id": "david_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "amb_stream_running_water",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/amb_stream_running.ogg",
+        "size_bytes": 880000,
+        "voice_id": null,
+        "duration_ms": 45000
+      },
+      {
+        "id": "amb_goliath_faint_distant_bass",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/amb_goliath_faint_bass.ogg",
+        "size_bytes": 304000,
+        "voice_id": "goliath_v1_distant_bass",
+        "duration_ms": 18000
+      },
+      {
+        "id": "amb_heartbeat_60_to_70",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/amb_heartbeat_60_to_70_progressive.ogg",
+        "size_bytes": 432000,
+        "voice_id": null,
+        "duration_ms": 180000,
+        "note": "60BPM -> 70BPM 점진"
+      },
+      {
+        "id": "amb_stones_underwater_clack",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/audio/amb_stones_underwater_clack.ogg",
+        "size_bytes": 224000,
+        "voice_id": null,
+        "duration_ms": 20000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_stream_water_caustics",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/textures/stream_water_caustics_1k.ktx2",
+        "size_bytes": 1520000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_stone_color_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/textures/stones_5_color_plus_2_neutral_512.ktx2",
+        "size_bytes": 784000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      },
+      {
+        "id": "tex_pocket_pouch_leather",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/textures/pocket_pouch_leather_512.ktx2",
+        "size_bytes": 336000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_pocket_socket",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/scripts/Scene4PocketSocket.cs.bundle",
+        "size_bytes": 38400,
+        "entry_class": "Scene4PocketSocket"
+      },
+      {
+        "id": "script_stone_haptic_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/scripts/StoneHapticRouter.cs.bundle",
+        "size_bytes": 17600,
+        "entry_class": "StoneHapticRouter"
+      },
+      {
+        "id": "script_emotion_diversity_classifier",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/galaxyxr/v1.0.0/scripts/EmotionDiversityClassifier.cs.bundle",
+        "size_bytes": 20800,
+        "entry_class": "EmotionDiversityClassifier"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 16668800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

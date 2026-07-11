@@ -1,0 +1,41 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag"
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_throne_room_360", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/360/env_throne_room_night.jpg", "size_bytes": 6800000, "lod": "360_panorama_8k_jpeg", "type": "360_image_fallback"},
+      {"id": "model_pharaoh_billboard", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/billboards/pharaoh_billboard.webp", "size_bytes": 720000, "lod": "billboard_sprite_2k", "type": "2d_sprite"},
+      {"id": "model_courtier_billboard_sheet", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/billboards/courtier_sheet_4npcs.webp", "size_bytes": 480000, "lod": "billboard_sprite_sheet_4", "type": "2d_sprite"},
+      {"id": "model_dream_book_3d_lite", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/models/dream_book_lite.glb", "size_bytes": 380000, "lod": "lod1_low_poly"}
+    ],
+    "audio": [
+      {"id": "aud_s1_pharaoh_call_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s1_pharaoh_call_ko.mp3", "size_bytes": 900000, "voice_id": "pharaoh_v1", "duration_ms": 18000, "format": "mp3_192kbps"},
+      {"id": "aud_s1_joseph_inner_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s1_joseph_inner_ko.mp3", "size_bytes": 475000, "voice_id": "joseph_v1", "duration_ms": 9000, "format": "mp3_192kbps"},
+      {"id": "aud_s1_prompt_open_book", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/s1_prompt_open_book.mp3", "size_bytes": 140000, "voice_id": "narrator_v1", "duration_ms": 2500, "format": "mp3_192kbps"},
+      {"id": "amb_nile_distant", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/amb_nile_distant.mp3", "size_bytes": 600000, "voice_id": null, "duration_ms": 30000, "format": "mp3_160kbps"},
+      {"id": "amb_torch_crackle", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/amb_torch_crackle.mp3", "size_bytes": 300000, "voice_id": null, "duration_ms": 20000, "format": "mp3_160kbps"},
+      {"id": "amb_low_organ_drone", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/audio/amb_low_organ_drone.mp3", "size_bytes": 400000, "voice_id": null, "duration_ms": 60000, "format": "mp3_160kbps"}
+    ],
+    "textures": [
+      {"id": "tex_dream_book_pages_web", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/textures/dream_book_pages_1k.webp", "size_bytes": 380000, "format": "webp", "resolution": "1024x1024"},
+      {"id": "tex_throne_room_overlay", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/textures/throne_room_overlay_1k.webp", "size_bytes": 460000, "format": "webp", "resolution": "1024x1024"}
+    ],
+    "scripts": [
+      {"id": "script_scene1_web_click_drag", "url": "https://cdn.r2.dev/lemuel-xr/joseph/web/v1.0.0/scripts/Scene1WebClickDrag.js", "size_bytes": 24000, "entry_class": "Scene1WebClickDrag"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12059000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

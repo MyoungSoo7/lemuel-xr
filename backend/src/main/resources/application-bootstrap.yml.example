@@ -1,0 +1,61 @@
+# application-bootstrap.yml.example — Reviewer 부팅 시 시드 활성화 예시
+#
+# 본 파일은 git 에 *체크인되지 않음*. K8s Secret 또는 외부 mount 로 주입.
+# Spring profile: `bootstrap` 활성 시 추가 적용 (`SPRING_PROFILES_ACTIVE=docker,bootstrap`).
+#
+# 자문가 시드 동작:
+#   1. enabled=true 일 때만 ReviewerBootstrap.seed() 실행
+#   2. 각 entry 의 external_id 가 users 에 존재해야 매칭 (없으면 skip + WARN 로그)
+#   3. ON CONFLICT (user_id, role) DO UPDATE — idempotent 재배포 안전
+#   4. 비활성된 자문가를 yml 에 다시 넣으면 재활성 (is_active=TRUE, deactivated_at=NULL)
+#
+# PII 주의 — credential / organization / bio 는 자문가 *명시 동의 범위 만*. 익명 가능.
+# 자세한 시드 가이드: docs/governance/REVIEWER-BOOTSTRAP.md
+
+lemuel:
+  bootstrap:
+    reviewers:
+      enabled: true
+      reviewers:
+        # ---- 신학 자문 (운영 책임자) ----
+        - external-id: "oauth-google|myoungsoo7@example.com"  # 본인 — 실제 sub claim 대치
+          role: theology
+          credential: "운영 책임자 / 신학 자문 코디네이터"
+          organization: "MyoungSoo7 / lemuel ecosystem"
+          bio: "운영 책임자. 모든 신학 검토의 1차 게이트."
+          can-veto: false       # 운영자가 veto 도 가지면 권력 집중 — 의도적으로 false
+          review-scopes:
+            - theme_1
+            - theme_2
+            - theme_3
+            - theme_4
+            - theme_5
+            - theme_6
+            - theme_7
+            - theme_8
+            - theme_9
+            - theme_10
+
+        # ---- 신학 자문 (Theme 11 예수 서사 담당) ----
+        - external-id: "oauth-google|godjinho@example.com"
+          role: theology
+          credential: "신학 협업자"
+          organization: "개인"
+          bio: "Theme 11 (예수 서사) 1차 담당. Issue #3 MVP-JESUS 설계 책임."
+          can-veto: false
+          review-scopes:
+            - theme_11
+
+        # ---- 임상 자문 (영입 후 추가) ----
+        # - external-id: "oauth-google|clinician-a@example.com"
+        #   role: clinical
+        #   credential: "정신과 의사 (대한신경정신의학회 회원 #...)"
+        #   organization: "<소속 병원·기관>"
+        #   bio: "<자문가 명시 동의 범위 만>"
+        #   can-veto: true       # 임상 자문 default TRUE (F-7.5.4)
+        #   review-scopes:
+        #     - theme_5
+        #     - theme_11
+        #     - trigger_high
+        #     - f6_safety
+        #     - llm_system_prompt

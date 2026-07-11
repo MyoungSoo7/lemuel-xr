@@ -1,0 +1,141 @@
+# 예수 미션 시나리오 — 길이요 진리요 생명. MVP-JESUS.md 설계 기반.
+# 핵심 메시지: "나는 길이요 진리요 생명이니 나로 말미암지 않고는 아버지께로 올 자가 없느니라" (요 14:6)
+#   — 요셉(경제)·모세(정치)·다윗(외세) 구원을 *영적 구원* 이 감싸 안는 정점(capstone).
+# 성령·생명의 강(요 7:38-39, 계 22:1) 모티프 — 성령을 구속사적으로만 다룸(은사지속·체험 프레임 X).
+# 구원은 오직 그리스도 안에서 오직 믿음으로(sola fide) — 믿음은 칭의를 받는 유일한 도구, 행위는 열매.
+# 7 Scene · 7~9분.
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 로 단일 확정 (MVP-JESUS.md §4.3).
+#   속죄론=형벌 대속(penal substitution) 중심 · 신론=고전적 유신론(그리스도 인성이 고난받으심) ·
+#   성령=은사중지론 계열(구속사적) · 구원론=특수구속·유일성(포용주의·다원주의·만인구원 배제) · 이신칭의=sola fide.
+# 배제: 외경·영지주의·뉴에이지·타종교 혼합·아르미니우스주의·펜테코스탈 은사지속·개방신론·번영복음.
+#
+# 안전선: R3(부활 회복 압박) 금지 — 부활은 예수의 사역/약속으로 제시, 사용자에게 회복 강요 X.
+#         R2(고난 가스라이팅) 금지 — 고난 미화·정당화 X. R1 위기 라우팅 훅 outro 에 배치.
+#         R5 AI 보조 footer("AI 보조 — 본문은 성경 참조") 항상 노출.
+# 개혁주의 정통성과 R1~R5 정신건강 안전선은 양립 — 형벌 대속 확정이 고난 미화/회복 강요 근거가 되어선 안 됨.
+
+character: jesus
+title: 길이요 진리요 생명
+target_user: general
+# AI 보조 — 본문은 성경 참조. Scene 4·7 응답은 LLM 생성(사전 캐시), 나머지는 정적 본문 낭독.
+ai_assist_footer: "AI 보조 — 본문은 성경 참조"
+scenes:
+  - id: 1
+    title: 성육신 — 말씀이 육신이 되어
+    type: cinematic
+    duration_sec: 60
+    narration_id: jesus.scene1.narration
+    scripture_ref: jn-1:14
+    extras:
+      anchor: 낮아짐·임재·시작
+      static_monologue: "말씀이 육신이 되어 우리 가운데 거하셨습니다. 요셉의 저장도, 모세의 인도도, 다윗의 돌도 — 이 아기 앞에서 한 이야기의 여러 장(章)이 됩니다. 하늘이 낮은 구유로 내려왔습니다."
+      skippable_after_sec: 3   # safety — 조용한 도입이 지루한 사용자 보호 (users.skip_intro_silence)
+    next: 2
+
+  - id: 2
+    title: 산 위의 가르침 — 팔복
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: mt-5:3
+    extras:
+      anchor: 뒤집힌 복·마음의 가난
+      lines:
+        - { ref: mt-5:3, text: "심령이 가난한 자는 복이 있나니 천국이 그들의 것임이요" }
+        - { ref: mt-5:4, text: "애통하는 자는 복이 있나니 그들이 위로를 받을 것임이요" }
+        - { ref: mt-5:6, text: "의에 주리고 목마른 자는 복이 있나니 그들이 배부를 것임이요" }
+      reflection_prompt: "여기서 '복'은 성취가 아니라 *비어 있음* 에서 시작됩니다. 오늘 당신의 비어 있는 자리 하나를 떠올려 보세요 — 채우라는 압박 없이, 그저 인정만."
+    next: 3
+
+  - id: 3
+    title: 만짐 — 병자를 고치심
+    type: interaction
+    interaction: gesture_sequence
+    duration_sec: 90
+    scripture_ref: mk-1:41
+    extras:
+      anchor: 접촉·존엄 회복
+      steps:
+        - { id: approach,   label: "다가간다",          note: "군중이 피하던 나병 환자에게 예수는 오히려 다가가셨습니다." }
+        - { id: reach_out,  label: "손을 내민다",        note: "'내가 원하노니 깨끗함을 받으라' — 말보다 먼저 손이 닿았습니다." }
+      hapticHint: { intensity: 0.35, pattern: PULSE_SOFT, channel: BOTH, fallback: { audioCueId: touch-warm } }
+      note: "이 씬은 *치유의 즉효* 를 약속하지 않습니다. 예수의 *접촉하시는 성품* 을 체험하는 자리입니다. (R3 회복 압박 회피)"
+    next: 4
+
+  - id: 4
+    title: 길이요 진리요 생명 — 갈림길에서
+    type: interaction
+    interaction: pick_one
+    duration_sec: 120
+    scripture_ref: jn-14:6
+    extras:
+      anchor: 방향·신뢰·핵심 통찰
+      context_line: "'주여 어디로 가시는지 우리가 알지 못하거늘 그 길을 어찌 알겠사옵나이까' 하는 도마에게 (요 14:5)"
+      options:
+        - { id: the_way,    label: "길 — 어디로 가야 할지 모를 때",   scripture: jn-14:6, reference: jn-14:4 }
+        - { id: the_truth,  label: "진리 — 무엇이 참인지 흔들릴 때",   scripture: jn-14:6, reference: jn-8:32 }
+        - { id: the_life,   label: "생명 — 살아갈 힘이 없을 때",       scripture: jn-14:6, reference: jn-10:10 }
+      monologue_cache_keys:
+        # 어느 결핍으로 예수께 다가가느냐로 캐시 3분기 (× faith_tone 3 = 9 패턴)
+        the_way:   jesus.s4.iam.way
+        the_truth: jesus.s4.iam.truth
+        the_life:  jesus.s4.iam.life
+      teaching_note: "세 단어는 서로 다른 세 길이 아니라 *한 분* 의 세 얼굴입니다. 어느 결핍으로 오든 같은 분께 도착합니다. — 요 14:6 의 의도."
+    next: 5
+
+  - id: 5
+    title: 겟세마네와 십자가 — 뜻대로 마옵시고
+    type: interaction
+    interaction: contemplative
+    duration_sec: 120
+    scripture_ref: lk-22:42
+    extras:
+      anchor: 내려놓음·함께 고통하심
+      static_monologue: "'아버지여 만일 아버지의 뜻이거든 이 잔을 내게서 옮기시옵소서 그러나 내 원대로 마시옵고 아버지의 원대로 되기를 원하나이다.' 사람이 되신 그리스도께서 그 잔이 옮겨지기를 구하셨습니다. 고통 앞에서 흔들리는 것은 믿음의 결함이 아닙니다."
+      cross_line: "'다 이루었다' (요 19:30) — 그리스도께서 죄의 형벌을 대신 다 치르셨습니다. 이것은 당신이 이루어야 할 숙제가 아니라, 이미 이루어진 선물입니다."
+      contemplation_sec: 15
+    trigger_warning:
+      level: medium
+      content: ["suffering", "death"]
+      consent_card_id: "jesus_scene5_passion_warning"
+      skip_alternative_scene_id: 6
+    next: 6
+
+  - id: 6
+    title: 부활 — 빈 무덤
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 90
+    scripture_ref: jn-20:15
+    extras:
+      anchor: 소망·부르심·이름
+      lines:
+        - { ref: jn-20:15, text: "예수께서 이르시되 여자여 어찌하여 울며 누구를 찾느냐" }
+        - { ref: jn-20:16, text: "예수께서 마리아야 하시거늘 마리아가 돌이켜 히브리 말로 랍오니 하니 (이는 선생님이라는 말이라)" }
+      reflection_prompt: "부활은 마리아에게 *이름을 불러 주심* 으로 왔습니다. 이 소망은 당신이 스스로 부활해 내야 하는 과제가 아니라, *당신의 이름이 불린다* 는 약속입니다."
+      note: "R3 사전 가드 — '너도 부활하라/극복하라' 압박 서사 절대 금지. 부활은 *예수의 사역과 약속* 으로만 제시."
+    next: 7
+
+  - id: 7
+    title: 승천과 생명의 강 — 보내신 성령
+    type: outro
+    duration_sec: 60
+    scripture_ref: jn-7:38
+    # CROSS-MAPPING-VR-AR.md §3 — 예수가 빛내는 AR 1~7 가치 (●●●): 마음(겟세마네)·시편(시22)·사람(원수까지)·전도서(염려X)
+    linked_values: [6, 4, 7, 3]
+    value_prompt: "예수는 떠나시며 '생수의 강' 을 약속하셨습니다 (요 7:38, 계 22:1). 오늘 *1분 호흡 + 마음 한 줄 기록* — 강물처럼 흐르는 작은 회복 하나를 받아 보세요."
+    extras:
+      anchor: 임재의 지속·흐르는 생명
+      static_monologue: "예수는 승천하시며 홀로 두지 않겠다 하셨습니다 (요 14:18). 약속하신 성령이 오셨고 (요 7:39 가 가리키는 오순절), 생명의 강은 지금도 흐릅니다 (계 22:1). 요셉의 곳간, 모세의 지팡이, 다윗의 돌 — 그 모든 구원 위로 *영적 구원* 의 강이 흐릅니다."
+      spirit_framing_note: "R/신학 가드 — '생명의 강·성령' 은 구속사적 임재(중생·성화·그리스도께로 인도)로만 표현. 은사 체험(방언·예언·치유 현상)·뉴에이지 에너지/차크라 프레임 금지 (합신 은사중지론, MVP-JESUS §4.3-3)."
+      capstone_note: "이 미션은 앞 네 인물(요셉·모세·다윗·엘리야/욥)의 정점입니다. 경제·정치·외세·소진의 구원을 *영적 구원* 이 감싸 안습니다."
+      recovery_keys:
+        ANXIOUS:    jesus.recovery.gethsemane_trembling
+        LONELY:     jesus.recovery.i_am_with_you
+        EXHAUSTED:  jesus.recovery.living_water
+        SAD:        jesus.recovery.he_wept
+        CONFUSED:   jesus.recovery.the_way
+      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      next_scene_suggestion: "트랙 A — 시편 22 (버림받음의 부르짖음) 또는 1번 일기·묵상"
+    next: null

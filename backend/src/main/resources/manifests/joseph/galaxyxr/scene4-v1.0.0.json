@@ -1,0 +1,40 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 4,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true
+  },
+  "manifest": {
+    "models": [
+      {"id": "env_throne_room_night_reused", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/env_throne_room_night.glb", "size_bytes": 6560000, "lod": "lod4_with_imposter_far", "shared_with_scene": 1},
+      {"id": "model_joseph_self_outfit", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/joseph_egyptian_outfit.glb", "size_bytes": 2080000, "lod": "lod4_with_imposter_far"},
+      {"id": "model_brothers_11", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/models/brothers_11_pack.glb", "size_bytes": 3840000, "lod": "lod4_imposter_distant_npc"}
+    ],
+    "audio": [
+      {"id": "aud_s4_first_farmer_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s4_first_farmer_ko.wav", "size_bytes": 992000, "voice_id": "joseph_v1", "duration_ms": 12000},
+      {"id": "aud_s4_first_immigrant_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s4_first_immigrant_ko.wav", "size_bytes": 1056000, "voice_id": "joseph_v1", "duration_ms": 13000},
+      {"id": "aud_s4_first_merchant_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s4_first_merchant_ko.wav", "size_bytes": 1136000, "voice_id": "joseph_v1", "duration_ms": 14000},
+      {"id": "aud_s4_first_balanced_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s4_first_balanced_ko.wav", "size_bytes": 816000, "voice_id": "joseph_v1", "duration_ms": 10000},
+      {"id": "aud_s4_common_gen45_5_ko", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/s4_common_gen45_5_ko.wav", "size_bytes": 864000, "voice_id": "joseph_v1", "duration_ms": 10000},
+      {"id": "amb_benjamin_sob_loop", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/amb_benjamin_sob_loop.ogg", "size_bytes": 432000, "voice_id": "benjamin_silent_v1", "duration_ms": 18000},
+      {"id": "amb_low_breath_layer", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/audio/amb_low_breath.ogg", "size_bytes": 480000, "voice_id": null, "duration_ms": 30000}
+    ],
+    "textures": [
+      {"id": "tex_joseph_outfit_pbr", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/joseph_outfit_1k.ktx2", "size_bytes": 1520000, "format": "ktx2", "resolution": "1024x1024"},
+      {"id": "tex_brothers_atlas", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/textures/brothers_atlas_1k.ktx2", "size_bytes": 2560000, "format": "ktx2", "resolution": "1024x1024"}
+    ],
+    "scripts": [
+      {"id": "script_scene4_choice", "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/v1.0.0/scripts/Scene4Choice.cs.bundle", "size_bytes": 24000, "entry_class": "Scene4Choice"}
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 22360000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

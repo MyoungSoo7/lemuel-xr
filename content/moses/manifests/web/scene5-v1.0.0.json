@@ -1,0 +1,123 @@
+{
+  "mission_id": "moses",
+  "scene_number": 5,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "max_steps": 3,
+    "skip_to_scene6": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_midian_path_east_sunrise_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/360/env_midian_path_east_sunrise_360.jpg",
+        "size_bytes": 3750000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_step_anchor_glow",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/step_anchor_glow.glb",
+        "size_bytes": 140000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      },
+      {
+        "id": "model_moses_self_sandals_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/billboards/moses_self_sandals_billboard.webp",
+        "size_bytes": 1100000,
+        "lod": "billboard_sprite_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_long_round_staff",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/models/long_round_staff.glb",
+        "size_bytes": 200000,
+        "lod": "lod1_low_poly_or_360_fallback"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_anchor_instruction_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s5_anchor_instruction_ko.mp3",
+        "size_bytes": 310000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 6000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_bush_promise_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/s5_bush_promise_ko.mp3",
+        "size_bytes": 425000,
+        "voice_id": "bush_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_wilderness_wind_only",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_wilderness_wind_only.mp3",
+        "size_bytes": 550000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_footstep_sand_pebbles",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_footstep_sand_pebbles.mp3",
+        "size_bytes": 240000,
+        "voice_id": null,
+        "duration_ms": 3000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_bush_crackle_fade",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/audio/amb_bush_crackle_fade.mp3",
+        "size_bytes": 140000,
+        "voice_id": null,
+        "duration_ms": 3000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_path_sand_pebbles_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/path_sand_pebbles_pbr_1k.webp",
+        "size_bytes": 1200000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_horizon_first_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/horizon_first_light_1k.webp",
+        "size_bytes": 450000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_shepherd_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/textures/shepherd_garment_1k.webp",
+        "size_bytes": 300000,
+        "format": "webp",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_step_anchor_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/web/v1.0.0/scripts/Scene5StepAnchorWebClickDrag.js",
+        "size_bytes": 14000,
+        "entry_class": "Scene5StepAnchorWebClickDrag"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 8819000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
