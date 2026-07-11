@@ -40,7 +40,7 @@ const DIRECT_MISSIONS: Array<{
     href: "/moses",
     name: "Moses",
     korean: "모세",
-    tagline: "떨기나무 앞에서 — 두려운 채로 가는 용기 (Phase 2)",
+    tagline: "떨기나무 앞에서 — 두려운 채로 가는 용기",
     active: true,
   },
   {
@@ -213,7 +213,7 @@ export default function HomePage() {
                   {result.recommendations.trackB.map((c) => {
                     const ACTIVE = new Set(["joseph", "moses", "david"]);
                     const href = ACTIVE.has(c.character) ? `/${c.character}` : "#";
-                    const phase2 = c.character !== "joseph";
+                    const phase2 = !ACTIVE.has(c.character);
                     return (
                       <Link
                         key={c.character}

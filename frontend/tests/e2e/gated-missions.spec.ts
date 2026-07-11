@@ -17,12 +17,14 @@ interface GatedMission {
 
 /**
  * Scene 1 payload type 이 인물마다 다르다:
- *   - moses / jesus → "cinematic" (계속 버튼 활성 → 누른 뒤 Phase 2 안내)
- *   - david         → "interaction" (Scene 1 부터 곧장 Phase 2 안내 노출)
+ *   - jesus → "cinematic" (계속 버튼 활성 → 누른 뒤 Phase 2 안내)
+ *   - david → "interaction" (Scene 1 부터 곧장 Phase 2 안내 노출)
  * 두 흐름 모두 최종적으로 "자문 통과 후 활성" 안내 + "미션 종료" 버튼에 도달한다.
+ *
+ * moses 는 Phase 2 완전 활성(요셉 동급)이라 이 gated 테스트에서 제외됨 —
+ * 완주 검증은 moses-mission.spec.ts 참조.
  */
 const MISSIONS: GatedMission[] = [
-  { slug: "moses", headerRe: /Moses — Scene/i, linkName: /Moses/ },
   { slug: "david", headerRe: /David — Scene/i, linkName: /David/ },
   { slug: "jesus", headerRe: /Jesus — Scene/i, linkName: /Jesus/ },
 ];
