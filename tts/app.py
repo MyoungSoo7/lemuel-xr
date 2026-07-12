@@ -1,70 +1,113 @@
 """
-Lemuel XR — TTS service.
+Lemuel XR — TTS service (Coqui XTTS-v2).
 
-Coqui XTTS-v2 multilingual TTS 를 FastAPI 로 래핑.
-요청 받은 텍스트를 한국어 음성 wav 로 생성, 캐시 후 반환.
+백엔드 계약(TtsSidecarClient)에 정확히 맞춘 사이드카:
+  GET  /healthz
+  POST /synthesize  { text, voiceId, speakingRate } -> { audioUrl, durationMs, engine }
 
-엔드포인트:
-  GET  /healthz                  → 200 OK
-  POST /tts   { text, voice_id } → wav 바이너리 (cached)
+audioUrl 은 `data:audio/wav;base64,...` 인라인 URL 로 반환한다.
+사이드카는 ClusterIP 라 브라우저가 직접 못 오므로, 별도 오브젝트 스토리지(R2) 업로드/
+프록시 없이 자족적으로 재생 가능한 data URL 이 가장 단순하고 확실하다. (R2 업로드는 추후 최적화.)
 
-캐시 키: sha256(text + voice_id). 첫 호출은 모델 추론, 이후 호출은 디스크 캐시.
+모델은 Dockerfile 빌드 단계에서 이미지에 baked-in → 런타임 다운로드가 전혀 없다
+(emptyDir 재다운로드 doom loop 원천 차단). 부팅 시엔 baked 모델을 RAM 으로 로딩만 한다.
 """
+import base64
 import hashlib
 import os
+import wave
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 CACHE_DIR = Path(os.getenv("CACHE_DIR", "/data/cache"))
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 MODEL_NAME = os.getenv("MODEL", "tts_models/multilingual/multi-dataset/xtts_v2")
+DEFAULT_LANG = os.getenv("TTS_LANG", "ko")
 
-# Coqui TTS 는 import 시 모델 다운로드 + 로딩이라 시간이 걸린다.
-# 모듈 레벨에서 한 번만 로딩해 reuse.
-print(f"[lemuel-xr-tts] loading model: {MODEL_NAME}")
+# Coqui TTS 는 import + 생성자에서 모델을 로딩한다. baked 모델이라 다운로드는 없고 로딩만.
+print(f"[lemuel-xr-tts] loading model: {MODEL_NAME}", flush=True)
 from TTS.api import TTS  # noqa: E402
 
 tts_engine = TTS(MODEL_NAME)
-print("[lemuel-xr-tts] model loaded")
+print("[lemuel-xr-tts] model loaded", flush=True)
+
+# --- speaker 해석 — XTTS-v2 는 multi-speaker 라 speaker 지정이 필수(없으면 합성 실패) ---
+try:
+    _speakers = list(tts_engine.speakers or [])
+except Exception:  # noqa: BLE001
+    _speakers = []
+
+
+def _pick(*prefs):
+    """선호 speaker 중 실제 존재하는 첫 번째, 없으면 첫 번째 사용 가능 speaker."""
+    for p in prefs:
+        if p in _speakers:
+            return p
+    return _speakers[0] if _speakers else None
+
+
+VOICE_MAP = {
+    "narrator-male-low": _pick("Damien Black", "Baldur Sanjin", "Viktor Eka", "Andrew Chipper"),
+    "narrator-female-soft": _pick("Gracie Wise", "Tammie Ema", "Daisy Studious", "Claribel Dervla"),
+    "goliath-bass": _pick("Baldur Sanjin", "Damien Black", "Viktor Eka"),
+}
+DEFAULT_SPEAKER = _pick("Damien Black", "Claribel Dervla")
+print(f"[lemuel-xr-tts] speakers={len(_speakers)} default={DEFAULT_SPEAKER}", flush=True)
 
 app = FastAPI(title="lemuel-xr-tts")
 
 
-class TTSRequest(BaseModel):
+class SynthesizeRequest(BaseModel):
     text: str
-    voice_id: str = "default"
-    language: str = "ko"
+    voiceId: str = "narrator-male-low"
+    speakingRate: float | None = None
+    language: str = DEFAULT_LANG
 
 
-def cache_key(text: str, voice_id: str, language: str) -> str:
-    h = hashlib.sha256(f"{voice_id}::{language}::{text}".encode("utf-8")).hexdigest()
-    return f"{h}.wav"
+def _cache_key(text: str, voice_id: str, rate: float) -> str:
+    raw = f"{voice_id}::{rate}::{text}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest() + ".wav"
+
+
+def _duration_ms(path: Path) -> int:
+    try:
+        with wave.open(str(path), "rb") as w:
+            rate = w.getframerate() or 1
+            return int(w.getnframes() * 1000 / rate)
+    except Exception:  # noqa: BLE001
+        return 0
 
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok", "model": MODEL_NAME}
+    return {"status": "ok", "model": MODEL_NAME, "speakers": len(_speakers)}
 
 
-@app.post("/tts")
-def synthesize(req: TTSRequest):
-    if not req.text.strip():
+@app.post("/synthesize")
+def synthesize(req: SynthesizeRequest):
+    text = (req.text or "").strip()
+    if not text:
         raise HTTPException(status_code=400, detail="text is empty")
 
-    fname = cache_key(req.text, req.voice_id, req.language)
-    fpath = CACHE_DIR / fname
+    speaker = VOICE_MAP.get(req.voiceId) or DEFAULT_SPEAKER
+    rate = req.speakingRate if (req.speakingRate and req.speakingRate > 0) else 1.0
 
+    fpath = CACHE_DIR / _cache_key(text, req.voiceId, rate)
     if not fpath.exists():
-        # Coqui XTTS-v2 는 voice reference (speaker_wav) 가 필요.
-        # MVP 첫 라운드는 multilingual 기본 보이스 — speaker_wav 생략 시 합성기 기본.
-        tts_engine.tts_to_file(
-            text=req.text,
-            file_path=str(fpath),
-            language=req.language,
-        )
+        kwargs = {"text": text, "file_path": str(fpath), "language": req.language}
+        if speaker:
+            kwargs["speaker"] = speaker
+        try:
+            tts_engine.tts_to_file(speed=rate, **kwargs)  # XTTS 는 speed 지원
+        except TypeError:
+            tts_engine.tts_to_file(**kwargs)  # speed 미지원 버전 fallback
 
-    return FileResponse(fpath, media_type="audio/wav", filename=fname)
+    audio_b64 = base64.b64encode(fpath.read_bytes()).decode("ascii")
+    return {
+        "audioUrl": f"data:audio/wav;base64,{audio_b64}",
+        "durationMs": _duration_ms(fpath),
+        "engine": "xtts-v2",
+    }
