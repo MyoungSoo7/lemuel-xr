@@ -11,7 +11,12 @@ WORKDIR /app
 ENV COQUI_TOS_AGREED=1
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# 클러스터엔 GPU 가 없다(CPU 추론). 기본 PyPI 의 torch 는 CUDA 휠(~2.5GB + nvidia 라이브러리)
+# 이라 이미지가 ~7GB 로 불어 CI 디스크·홈노드 pull(디스크 압박)에 위험. CPU 전용 휠로 설치해
+# 이미지를 ~3GB 로 낮춘다. requirements.txt 도 동일 버전 핀이라 아래 -r 설치 시 재설치 없음.
+RUN pip install --no-cache-dir torch==2.5.1 torchaudio==2.5.1 \
+      --index-url https://download.pytorch.org/whl/cpu \
+ && pip install --no-cache-dir -r requirements.txt
 
 # 모델(~1.87GB)을 빌드 타임에 이미지로 굽는다 — 런타임 다운로드 완전 제거.
 # emptyDir 재다운로드 doom loop(louise 노드 압박)의 원천 차단. app.py 보다 먼저 실행해
