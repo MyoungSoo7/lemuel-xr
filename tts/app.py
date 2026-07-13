@@ -72,18 +72,20 @@ print(f"[lemuel-xr-tts] speakers={len(_speakers)} default={DEFAULT_SPEAKER}", fl
 def synthesize_to_file(text: str, voice_id: str, rate: float, out_path: str) -> None:
     """합성 단일 경로. 엔드포인트와 빌드 selftest 가 공유한다.
 
-    XTTS-v2 는 multi-speaker 라 speaker 지정이 필수. speakingRate 는 현재 무시(호환 우선;
-    speed 인자는 버전별 지원차로 500 유발 가능해 제거). 추후 안전 확인 후 재도입.
+    XTTS-v2 는 multi-speaker 라 speaker 지정이 필수. speakingRate(speed)는 안전 범위(0.5~2.0)
+    로 clamp 해 적용하되, 버전별 미지원/오류 시 자동으로 speed 없이 재시도(graceful fallback).
+    → 속도 조절이 되면 반영되고, 안 되는 환경이면 정상 속도로라도 반드시 소리가 나게 한다.
     """
     speaker = VOICE_MAP.get(voice_id) or DEFAULT_SPEAKER
     if not speaker:
-        raise RuntimeError(f"no XTTS speaker available (resolved 0 speakers)")
-    tts_engine.tts_to_file(
-        text=text,
-        file_path=out_path,
-        language=DEFAULT_LANG,
-        speaker=speaker,
-    )
+        raise RuntimeError("no XTTS speaker available (resolved 0 speakers)")
+    speed = min(max(rate or 1.0, 0.5), 2.0)
+    common = {"text": text, "file_path": out_path, "language": DEFAULT_LANG, "speaker": speaker}
+    try:
+        tts_engine.tts_to_file(speed=speed, **common)
+    except Exception as e:  # noqa: BLE001
+        print(f"[lemuel-xr-tts] speed={speed} 미적용({e!r}) → speed 없이 재시도", flush=True)
+        tts_engine.tts_to_file(**common)
 
 
 app = FastAPI(title="lemuel-xr-tts")
@@ -96,8 +98,8 @@ class SynthesizeRequest(BaseModel):
     language: str = DEFAULT_LANG
 
 
-def _cache_key(text: str, voice_id: str) -> str:
-    return hashlib.sha256(f"{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
+def _cache_key(text: str, voice_id: str, rate: float) -> str:
+    return hashlib.sha256(f"{voice_id}::{rate}::{text}".encode("utf-8")).hexdigest() + ".wav"
 
 
 def _duration_ms(path: Path) -> int:
@@ -120,9 +122,10 @@ def synthesize(req: SynthesizeRequest):
     if not text:
         raise HTTPException(status_code=400, detail="text is empty")
 
-    fpath = CACHE_DIR / _cache_key(text, req.voiceId)
+    rate = req.speakingRate or 1.0
+    fpath = CACHE_DIR / _cache_key(text, req.voiceId, rate)
     if not fpath.exists():
-        synthesize_to_file(text, req.voiceId, req.speakingRate or 1.0, str(fpath))
+        synthesize_to_file(text, req.voiceId, rate, str(fpath))
 
     audio_b64 = base64.b64encode(fpath.read_bytes()).decode("ascii")
     return {
