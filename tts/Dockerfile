@@ -1,43 +1,22 @@
-FROM python:3.11-slim
-
-# Coqui TTS 의존성 (libsndfile, espeak-ng for phoneme)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libsndfile1 espeak-ng ffmpeg curl ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+# Coqui 모델 다운로드 서버가 speakers_xtts.pth 를 HTML 로 반환(_pickle.UnpicklingError:
+# invalid load key, '<')하며 지속 실패한다(2026-07-14). GitHub Actions 는 레이어 캐시가
+# 런간 유지되지 않아 매 빌드가 모델(~1.87GB)을 재다운로드하므로, 다운로드 장애 시 빌드 자체가
+# 막힌다.
+#
+# 해결: 모델+의존성(torch2.5.1 CPU, TTS, transformers)이 이미 baked-in 된 "마지막 정상 이미지"를
+# 베이스로 삼고 app 레이어만 덮어쓴다. → Coqui 다운로드에 의존하지 않고, app 반복이 빨라지며,
+# 노드도 베이스 레이어를 이미 캐시해 pull 이 가볍다. (아래 base 는 audio 재생 검증된 이미지.)
+#
+# Coqui 다운로드가 복구되면 전체 빌드(python:3.11-slim + 모델 bake)로 되돌릴 수 있다 —
+# git history 의 fe09f84 이전 Dockerfile 참조. 장기적으로는 model+deps 전용 -base 이미지 분리 권장.
+FROM ghcr.io/myoungsoo7/lemuel-xr-tts:main-6e83f1397c6250fa505a0e5f9231502c33455889
 
 WORKDIR /app
 
-# Coqui TTS 모델 라이선스 자동 수락 — CPML (research only, but ok for non-commercial demo)
-ENV COQUI_TOS_AGREED=1
-
-COPY requirements.txt .
-# 클러스터엔 GPU 가 없다(CPU 추론). 기본 PyPI 의 torch 는 CUDA 휠(~2.5GB + nvidia 라이브러리)
-# 이라 이미지가 ~7GB 로 불어 CI 디스크·홈노드 pull(디스크 압박)에 위험. CPU 전용 휠로 설치해
-# 이미지를 ~3GB 로 낮춘다. requirements.txt 도 동일 버전 핀이라 아래 -r 설치 시 재설치 없음.
-RUN pip install --no-cache-dir torch==2.5.1 torchaudio==2.5.1 \
-      --index-url https://download.pytorch.org/whl/cpu \
- && pip install --no-cache-dir -r requirements.txt
-
-# 모델(~1.87GB)을 빌드 타임에 이미지로 굽는다 — 런타임 다운로드 완전 제거.
-# emptyDir 재다운로드 doom loop(louise 노드 압박)의 원천 차단. app.py 보다 먼저 실행해
-# 코드만 바뀔 때 이 무거운 레이어가 캐시되도록 한다. COQUI_TOS_AGREED=1(위 ENV)로 무프롬프트.
-# 이 RUN 이 성공하면 transformers 핀/의존성 스택이 import 가능함도 함께 증명된다.
-#
-# Coqui 다운로드 서버가 간헐적으로 HTML 에러페이지를 주면 .pth 가 깨져
-# "_pickle.UnpicklingError: invalid load key, '<'" 로 실패한다. 재시도 시 깨진 파일을
-# 재사용하지 않도록 캐시(~/.local/share/tts)를 비우고 최대 4회 재시도한다.
-RUN set -e; \
-    for i in 1 2 3 4; do \
-      rm -rf /root/.local/share/tts; \
-      if python -c "from TTS.api import TTS; TTS('tts_models/multilingual/multi-dataset/xtts_v2')"; then \
-        echo "[bake] model ready (attempt $i)"; exit 0; \
-      fi; \
-      echo "[bake] download/load failed, retry $i"; sleep 20; \
-    done; \
-    echo "[bake] all attempts failed"; exit 1
-
+# app 코드만 갱신 (모델/deps/ENV(COQUI_TOS_AGREED)는 베이스에서 상속)
 COPY app.py selftest.py .
-# 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file)를 실행한다.
+
+# 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file, speed 포함) 실행.
 # 실패 시 build 실패 + CI 로그에 traceback → kubectl 없이 원인 파악. 성공 = 런타임 동작 보장에 근접.
 RUN python selftest.py
 
