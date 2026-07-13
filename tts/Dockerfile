@@ -24,7 +24,10 @@ RUN pip install --no-cache-dir torch==2.5.1 torchaudio==2.5.1 \
 # 이 RUN 이 성공하면 transformers 핀/의존성 스택이 import 가능함도 함께 증명된다.
 RUN python -c "from TTS.api import TTS; TTS('tts_models/multilingual/multi-dataset/xtts_v2')"
 
-COPY app.py .
+COPY app.py selftest.py .
+# 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file)를 실행한다.
+# 실패 시 build 실패 + CI 로그에 traceback → kubectl 없이 원인 파악. 성공 = 런타임 동작 보장에 근접.
+RUN python selftest.py
 
 EXPOSE 5002
 HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=10 \
