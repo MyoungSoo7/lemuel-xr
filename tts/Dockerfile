@@ -22,7 +22,19 @@ RUN pip install --no-cache-dir torch==2.5.1 torchaudio==2.5.1 \
 # emptyDir 재다운로드 doom loop(louise 노드 압박)의 원천 차단. app.py 보다 먼저 실행해
 # 코드만 바뀔 때 이 무거운 레이어가 캐시되도록 한다. COQUI_TOS_AGREED=1(위 ENV)로 무프롬프트.
 # 이 RUN 이 성공하면 transformers 핀/의존성 스택이 import 가능함도 함께 증명된다.
-RUN python -c "from TTS.api import TTS; TTS('tts_models/multilingual/multi-dataset/xtts_v2')"
+#
+# Coqui 다운로드 서버가 간헐적으로 HTML 에러페이지를 주면 .pth 가 깨져
+# "_pickle.UnpicklingError: invalid load key, '<'" 로 실패한다. 재시도 시 깨진 파일을
+# 재사용하지 않도록 캐시(~/.local/share/tts)를 비우고 최대 4회 재시도한다.
+RUN set -e; \
+    for i in 1 2 3 4; do \
+      rm -rf /root/.local/share/tts; \
+      if python -c "from TTS.api import TTS; TTS('tts_models/multilingual/multi-dataset/xtts_v2')"; then \
+        echo "[bake] model ready (attempt $i)"; exit 0; \
+      fi; \
+      echo "[bake] download/load failed, retry $i"; sleep 20; \
+    done; \
+    echo "[bake] all attempts failed"; exit 1
 
 COPY app.py selftest.py .
 # 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file)를 실행한다.
