@@ -12,12 +12,11 @@ out = os.path.join(tempfile.gettempdir(), "selftest.wav")
 print(f"[selftest] speakers={len(app._speakers)} default={app.DEFAULT_SPEAKER} "
       f"voice_map={app.VOICE_MAP}", flush=True)
 
-# speed(=speakingRate) 경로도 빌드에서 검증 — non-1.0 으로 호출해 speed 적용/폴백 모두 확인.
-app.synthesize_to_file("다윗과 골리앗, 믿음으로 나아가라", "narrator-male-low", 1.15, out)
+app.synthesize_to_file("다윗과 골리앗, 믿음으로 나아가라", "narrator-male-low", 1.0, out)
 
 size = os.path.getsize(out)
 assert size > 1000, f"[selftest] wav too small: {size} bytes"
 with open(out, "rb") as f:
     head = f.read(12)
 assert head[:4] == b"RIFF" and head[8:12] == b"WAVE", f"[selftest] not a WAV: {head!r}"
-print(f"[selftest] OK — wav={size} bytes, RIFF/WAVE verified (speed path)", flush=True)
+print(f"[selftest] OK — wav={size} bytes, RIFF/WAVE verified", flush=True)
