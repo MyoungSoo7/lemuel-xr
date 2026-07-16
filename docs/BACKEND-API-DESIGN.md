@@ -683,6 +683,9 @@ pgvector 기반 의미 검색. 감정·키워드 → 본문 매칭.
 
 ### 주요 ErrorCode
 
+> 오류 모델은 Kotlin — `ErrorCode` 는 enum class, `AppException` 은 Kotlin class,
+> `ProblemDetailMapper` 가 RFC 7807 `application/problem+json` 으로 매핑 (의미는 위와 동일).
+
 | Code | HTTP | 의미 |
 |---|---:|---|
 | `E_SESSION_NOT_FOUND` | 404 | sessionId 무효 |
@@ -813,42 +816,47 @@ CREATE INDEX idx_events_session ON interaction_events (session_id, ts);
 
 ## 15. Hexagonal 패키지 구조 (제안)
 
+> 전 소스 Kotlin (`.kt`). 아웃바운드는 `application/port/out/*Port` 인터페이스 →
+> `adapter/out/persistence/*PersistenceAdapter` (또는 `adapter/out/sidecar`) 구현.
+> 포트는 도메인 타입만 주고받고, JPA 엔티티는 어댑터 안에서 도메인 모델로 매핑.
+> 컨트롤러는 use-case 에만 의존하고 DTO 를 반환 (repository 직접 주입 없음).
+
 ```
 github.lms.lemuel.xr/
 ├── auth/                    ← (신규) JWT 발급, 게스트 사용자
-│   ├── adapter/in/web/AuthController.java
-│   ├── adapter/out/persistence/...
-│   ├── application/CreateGuestUserUseCase.java
-│   └── domain/User.java
+│   ├── adapter/in/web/AuthController.kt
+│   ├── adapter/out/persistence/...   ← *PersistenceAdapter (port/out 구현)
+│   ├── application/CreateGuestUserUseCase.kt
+│   └── domain/User.kt                ← 순수 도메인 모델 (JPA 엔티티 아님)
 ├── emotion/                  ← 기존, 응답 확장만
 ├── content/                  ← (신규) Track A 1~7
-│   └── adapter/in/web/ContentController.java
+│   └── adapter/in/web/ContentController.kt
 ├── game/                     ← 기존, 일반화 필요
 │   ├── adapter/in/web/
-│   │   ├── GameController.java         ← (신규) /api/game/{character}/*
-│   │   └── JosephGameController.java   ← 기존 유지, deprecation note
+│   │   ├── GameController.kt           ← (신규) /api/game/{character}/*
+│   │   └── JosephGameController.kt     ← 기존 유지, deprecation note
 │   ├── application/
-│   │   ├── StartGameSessionUseCase.java
-│   │   ├── DecideSceneUseCase.java
-│   │   ├── CompleteGameSessionUseCase.java
-│   │   └── ScenarioLoader.java         ← yaml → domain mapping
+│   │   ├── StartGameSessionUseCase.kt
+│   │   ├── DecideSceneUseCase.kt
+│   │   ├── CompleteGameSessionUseCase.kt
+│   │   └── ScenarioLoader.kt           ← yaml → domain mapping
 │   └── domain/
-│       ├── GameSession.java
-│       ├── Scenario.java
-│       ├── Scene.java
-│       └── Decision.java
+│       ├── GameSession.kt              ← companion object 팩토리 start/reconstitute
+│       ├── Scenario.kt
+│       ├── Scene.kt
+│       └── Decision.kt
 ├── scripture/                ← 기존, 확장 (range, search)
 ├── tts/                      ← (신규) Python 사이드카 proxy
-│   ├── adapter/in/web/TtsController.java
-│   ├── adapter/out/sidecar/PythonTtsClient.java  ← WebClient
-│   └── application/SynthesizeTtsUseCase.java
+│   ├── adapter/in/web/TtsController.kt
+│   ├── adapter/out/sidecar/PythonTtsClient.kt  ← WebClient (SidecarHttp 공유)
+│   └── application/SynthesizeTtsUseCase.kt
 ├── llm/                      ← (신규) 내부 service
-│   ├── adapter/in/web/InternalLlmController.java
-│   ├── adapter/out/sidecar/PythonLlmClient.java
-│   └── application/GenerateLlmResponseUseCase.java
+│   ├── adapter/in/web/InternalLlmController.kt
+│   ├── adapter/out/sidecar/PythonLlmClient.kt
+│   └── application/GenerateLlmResponseUseCase.kt
 ├── safety/                   ← (신규) emergency exit
 ├── analytics/                ← (신규) event collector
-└── common/                   ← ErrorCode, ProblemDetail mapper, InternalServiceTokenFilter
+└── common/                   ← ErrorCode, ProblemDetailMapper, InternalTokenFilter
 ```
 
 ---
@@ -892,7 +900,7 @@ github.lms.lemuel.xr/
 5. **사용자 일기 → AI 코멘트 (Phase 3)** — 일기 본문을 LLM 에 보낼 때 사용자 동의 명시 필요. 별도 consent flow.
 6. **분석/리포트** — 사용자 *journey* 를 정기적으로 묶어 PDF 리포트로 제공할지. asat 의 ReportArtifact 패턴 재사용 가능.
 7. **scenarios yaml vs DB** — 현재 `resources/scenarios/joseph.yml` 정적. *동적 시나리오 추가* 필요 시 DB 로 이전 (asat 의 ScenarioLoader 와 같은 패턴).
-8. **Spring Boot 4 복귀 시점** — 현재 SB 3.5.4 + JDK 21. Spring AI 1.0 GA 가 4.x 호환 후 다시 올림.
+8. **~~Spring Boot 4 복귀 시점~~ (해결)** — 현재 Spring Boot 4.0.4 + JDK 25 툴체인 (전 소스 Kotlin 2.2.20, JVM 바이트코드 24 타깃 → JVM 25 로드 정상). AI 사이드카는 Spring AI 대신 자체 Python 사이드카(WebClient proxy)로 운영.
 
 ---
 
@@ -916,6 +924,6 @@ github.lms.lemuel.xr/
 
 ## 19. 참고
 
-- 기존 `JosephGameController.java` — generic 화 시 deprecation 대상이지만 *동작 호환* 유지 권장
-- asat 의 `InternalServiceTokenFilter`, `RateLimitFilter`, `ErrorCode` 패턴 — 그대로 재사용 가능
+- 기존 `JosephGameController.kt` — generic 화 시 deprecation 대상이지만 *동작 호환* 유지 권장
+- asat 의 `InternalServiceTokenFilter`, `RateLimitFilter`, `ErrorCode` 패턴 — Kotlin 으로 재사용 (각각 `InternalTokenFilter`, `RateLimitFilter`, `ErrorCode` enum class)
 - `docs/MVP-JOSEPH.md` §4 / `MVP-MOSES.md` §4 / `MVP-DAVID.md` §4 — 인물별 endpoint 메모와 본 문서 동기화 필요 시 본 문서가 진실의 원천 (single source of truth)

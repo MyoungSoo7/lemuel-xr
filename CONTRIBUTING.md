@@ -59,12 +59,14 @@ cat docs/MVP-JOSEPH.md # MVP 요셉 게임 상세
 - 의심 시 `theology/` 브랜치에 올리고 자문 받기
 - 환각 가능성 — 항상 *성경 본문 직접 인용* 으로 보완
 
-## 코드 (V1.0 부터)
+## 코드
 
-- Backend: Spring Boot 4 + Kotlin
-- Frontend: React Native
-- 헥사고날 아키텍처 (settlement 프로젝트 패턴 재사용)
-- 테스트 커버리지 80%+ 목표
+- Backend: **Spring Boot 4.0.4 + Kotlin 2.2.20** — 100% Kotlin (Java·Lombok 없음). JDK 25 툴체인.
+  - Java `record` → `data class` (+ `companion object` 팩토리), `@Getter/@RequiredArgsConstructor` → 주생성자 주입, `@Slf4j` → `companion object { private val log = LoggerFactory.getLogger(...) }`, JPA `@Entity` → `kotlin-jpa` 플러그인 no-arg + mutable `var`
+  - 빌드: `build.gradle.kts` (gradlew 래퍼 없음 — gradle 이미지/`setup-gradle` 제공). 명령 `gradle bootJar -x test`
+- Frontend: React Native / Next.js
+- 헥사고날 아키텍처 (ports & adapters — settlement 프로젝트 패턴 재사용). 포트는 도메인 타입, 어댑터가 JPA 매핑, 컨트롤러는 use-case 의존
+- 테스트: JUnit 5 + mockito-kotlin + Testcontainers(Postgres/pgvector). 커버리지 목표 90%+ (현재 316 tests, line coverage ~98.7%)
 
 ## 의사소통
 

@@ -112,13 +112,13 @@ AI 가 생성한 *사용자 노출 콘텐츠* (특히 Theme 5 고통·11 십자�
 
 Lemuel 차별화: **개신교 + 게임 듀얼 + AI 전방위 + 한국/동아시아**
 
-## 기술 스택 (예정)
+## 기술 스택
 
-- Backend: Spring Boot 4 + Kotlin
-- AI: LangChain + OpenAI/Claude
+- Backend: **Spring Boot 4.0.4 + Kotlin 2.2.20** — 100% Kotlin (Java 0개, .kt 305개), Lombok 완전 제거. JDK 25 툴체인 / Kotlin JVM 바이트코드 24 타깃(JVM 25 로드 정상). 헥사고날(ports & adapters) — 각 바운디드 컨텍스트가 `application/port/out/*Port` ↔ `adapter/out/persistence/*PersistenceAdapter`, 순수 도메인 모델은 어댑터에서 JPA 엔티티와 매핑. `build.gradle.kts` (gradlew 래퍼 없음, `gradle bootJar -x test`)
+- AI: Python 사이드카(`ai/`, `tts/`) — WebClient proxy (`adapter/out/sidecar`) + OpenAI/Gemini/Claude
 - Game: Unity 6 LTS
-- Frontend: React Native
-- DB: PostgreSQL + Pinecone (성경 임베딩)
+- Frontend: React Native / Next.js
+- DB: PostgreSQL 16 + pgvector (성경 임베딩)
 
 ## 다음 액션 (시간 순)
 

@@ -71,7 +71,7 @@
 | 영역 | 기술 | 선택 이유 |
 |---|---|---|
 | XR 클라이언트 | **Unity 6 (LTS) + XR Interaction Toolkit** | Quest·WebXR·iOS 동시 빌드 가능 |
-| Backend | **Spring Boot 4 + Java 25** | 본인 settlement·asat 와 동일 스택. 운영 노하우 그대로 이전 |
+| Backend | **Spring Boot 4 + Kotlin 2.2.20** (JDK 25 툴체인, 100% Kotlin·Lombok 제거) | 본인 settlement·asat 와 동일 스택 계열. 운영 노하우 그대로 이전 |
 | LLM | **OpenAI GPT-4o 또는 Google Gemini** | Spring AI 1.0 로 양쪽 모두 swap 가능 |
 | DB | **PostgreSQL 16 + pgvector** | 본인 sparta-msa 와 동일. 본문 의미 검색 즉시 적용 |
 | Cache | **Redis** | 세션·동시 사용자 추적 |
