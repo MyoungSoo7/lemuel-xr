@@ -28,13 +28,13 @@
 
 ### 0.1 한 문장
 
-> 11개 성경 주제(정적 회복 7 + 서사 게임 4)를 **3차원 진입(영성·감성·이성) × 정서 보호 가드레일** 하에서 제공하는 **AI 전방위** 백엔드 — Spring Boot 모놀리스 + Python 사이드카(AI/TTS) + PostgreSQL(+pgvector) + Redis + R2 5-tier.
+> 11개 성경 주제(정적 회복 7 + 서사 게임 4)를 **3차원 진입(영성·감성·이성) × 정서 보호 가드레일** 하에서 제공하는 **AI 전방위** 백엔드 — Spring Boot(Kotlin) 모놀리스 + Python 사이드카(AI/TTS) + PostgreSQL(+pgvector) + Redis + R2 5-tier.
 
 ### 0.2 핵심 결정 7가지
 
 | # | 결정 | 근거 |
 |---|---|---|
-| 1 | **모놀리스 (Spring Boot 3.5.4) + Python 사이드카 2개 (AI/TTS)** | 풀 MSA 비용 미정당화 (예상 동시 사용자 ≤ 1k). asat 의 *Java 모놀리스 + Python 사이드카* 검증 패턴 재사용. |
+| 1 | **모놀리스 (Spring Boot 4.0.4, Kotlin 2.2.20) + Python 사이드카 2개 (AI/TTS)** | 풀 MSA 비용 미정당화 (예상 동시 사용자 ≤ 1k). asat 의 *모놀리스 + Python 사이드카* 검증 패턴 재사용. (백엔드는 Java 25 → Kotlin 100% 마이그레이션 완료, Lombok 제거) |
 | 2 | **헥사고날 아키텍처** | 11개 주제가 *유사 도메인 다른 콘텐츠* — 포트/어댑터로 콘텐츠 교체 가능하게. 기존 `JosephGameController` 구조 확장. |
 | 3 | **이벤트 driven 부분 도입** (Redis Streams) | 분석 이벤트·LLM cache-warmup 은 비동기. 사용자 응답 경로는 동기. |
 | 4 | **3차원 모드(영성·감성·이성) 는 세션 단위 일관성** | scene payload 가 모드별 다른 자산 반환. 모드 도중 변경 X. |
@@ -74,7 +74,7 @@ Phase 2 (1k 사용자 + 다국어 + 이미지 생성) 시 $300~500/월 가능. �
        ┌──────────────────────────────────────────────────────────┐
        │              System: lemuel-xr Backend                    │
        │   ┌──────────────────────────────────────────────────┐    │
-       │   │  Spring Boot 3.5.4 (모놀리스, hexagonal)         │    │
+       │   │  Spring Boot 4.0.4 · Kotlin (모놀리스, hexagonal) │    │
        │   └──────┬──────────────┬──────────────┬────────────┘    │
        │          │              │              │                  │
        │   ┌──────▼──────┐ ┌─────▼──────┐ ┌────▼────────┐         │
@@ -298,7 +298,7 @@ JournalEntry (id, userId, topicId, text, linkedEmotionLogId, createdAt)
 
 | Container | 기술 | 용도 | 노드 라벨 | Replicas |
 |---|---|---|---|---:|
-| `lemuel-xr-backend` | Spring Boot 3.5.4 + JDK 21 | API · orchestration · DB I/O | `general` | 2 |
+| `lemuel-xr-backend` | Spring Boot 4.0.4 + Kotlin 2.2.20 (JDK 25 툴체인, Kotlin JVM target 24) | API · orchestration · DB I/O | `general` | 2 |
 | `lemuel-xr-ai` | Python 3.12 + FastAPI + google-genai | LLM proxy + prompt template | `ai-inference` (david) | 1 (Phase 2: 2) |
 | `lemuel-xr-tts` | Python 3.12 + FastAPI + Coqui XTTS-v2 | TTS 생성 | `ai-inference` (david) | 1 |
 | `lemuel-xr-postgres` | PostgreSQL 16 + pgvector | 관계 데이터 + 임베딩 | `ssd` (solomon) | 1 (PVC) |
@@ -348,138 +348,163 @@ Spring backend (NodePort 30xxx via traefik)
 ```
 github.lms.lemuel.xr/
 │
-├── LemuelXrApplication.java       ← @SpringBootApplication
+├── LemuelXrApplication.kt       ← @SpringBootApplication
 │
 ├── auth/                           ← (신규) [User & Auth]
-│   ├── adapter/in/web/AuthController.java
-│   ├── adapter/out/persistence/{User,Device}{JpaEntity,Repository}.java
-│   ├── application/{CreateGuestUser,IssueJwt,RotateToken}UseCase.java
-│   └── domain/{User,Device,SafetyDefaults}.java
+│   ├── adapter/in/web/AuthController.kt
+│   ├── adapter/out/persistence/{User,Device}{JpaEntity,Repository}.kt
+│   ├── application/{CreateGuestUser,IssueJwt,RotateToken}UseCase.kt
+│   └── domain/{User,Device,SafetyDefaults}.kt
 │
 ├── emotion/                        ← 기존, 확장
-│   ├── adapter/in/web/EmotionController.java
-│   ├── adapter/out/persistence/EmotionLog{JpaEntity,Repository}.java
-│   ├── adapter/out/llm/EmotionLlmClient.java  ← AI sidecar 호출
-│   ├── application/{ClassifyEmotion,RecommendByEmotion}UseCase.java
-│   └── domain/{Emotion,EmotionLog,Classification}.java
+│   ├── adapter/in/web/EmotionController.kt
+│   ├── adapter/out/persistence/EmotionLog{JpaEntity,Repository}.kt
+│   ├── adapter/out/llm/EmotionLlmClient.kt  ← AI sidecar 호출
+│   ├── application/{ClassifyEmotion,RecommendByEmotion}UseCase.kt
+│   └── domain/{Emotion,EmotionLog,Classification}.kt
 │
 ├── content/                        ← (신규) [Content - Track A]
 │   ├── adapter/in/web/
-│   │   ├── ContentController.java
-│   │   ├── JournalController.java
-│   │   ├── WisdomController.java
-│   │   └── HeartGuardController.java
+│   │   ├── ContentController.kt
+│   │   ├── JournalController.kt
+│   │   ├── WisdomController.kt
+│   │   └── HeartGuardController.kt
 │   ├── adapter/out/persistence/
-│   │   ├── JournalEntry{JpaEntity,Repository}.java
-│   │   ├── ProverbCard{JpaEntity,Repository}.java
-│   │   ├── LifeViewCard{JpaEntity,Repository}.java
-│   │   ├── PsalmMapping{JpaEntity,Repository}.java
-│   │   ├── SufferingNarrative{JpaEntity,Repository}.java
-│   │   ├── HeartGuardSession{JpaEntity,Repository}.java
-│   │   └── InterpersonalScenario{JpaEntity,Repository}.java
+│   │   ├── JournalEntry{JpaEntity,Repository}.kt
+│   │   ├── ProverbCard{JpaEntity,Repository}.kt
+│   │   ├── LifeViewCard{JpaEntity,Repository}.kt
+│   │   ├── PsalmMapping{JpaEntity,Repository}.kt
+│   │   ├── SufferingNarrative{JpaEntity,Repository}.kt
+│   │   ├── HeartGuardSession{JpaEntity,Repository}.kt
+│   │   └── InterpersonalScenario{JpaEntity,Repository}.kt
 │   ├── application/
-│   │   ├── RecommendTopicByEmotionUseCase.java
-│   │   ├── LoadTopicSceneUseCase.java
-│   │   ├── CreateJournalUseCase.java
-│   │   ├── GenerateMeditationFromJournalUseCase.java   ← AI sidecar
-│   │   ├── RecommendProverbsBySituationUseCase.java     ← pgvector + LLM rerank
-│   │   ├── MapEmotionToPsalmUseCase.java
+│   │   ├── RecommendTopicByEmotionUseCase.kt
+│   │   ├── LoadTopicSceneUseCase.kt
+│   │   ├── CreateJournalUseCase.kt
+│   │   ├── GenerateMeditationFromJournalUseCase.kt   ← AI sidecar
+│   │   ├── RecommendProverbsBySituationUseCase.kt     ← pgvector + LLM rerank
+│   │   ├── MapEmotionToPsalmUseCase.kt
 │   │   └── ...
 │   └── domain/                     ← 7개 Theme 별 도메인 클래스
-│       ├── Topic.java (enum: JOURNAL/PROVERBS/.../FEAR)
-│       ├── theme1_journal/{Journal,Meditation}.java
-│       ├── theme2_proverbs/ProverbCard.java
-│       ├── theme3_ecclesiastes/LifeViewCard.java
-│       ├── theme4_psalms/{PsalmMapping,PsalmRendition}.java
-│       ├── theme5_job/SufferingNarrative.java
-│       ├── theme6_heart/HeartGuardSession.java
-│       └── theme7_fear/InterpersonalScenario.java
+│       ├── Topic.kt (enum: JOURNAL/PROVERBS/.../FEAR)
+│       ├── theme1_journal/{Journal,Meditation}.kt
+│       ├── theme2_proverbs/ProverbCard.kt
+│       ├── theme3_ecclesiastes/LifeViewCard.kt
+│       ├── theme4_psalms/{PsalmMapping,PsalmRendition}.kt
+│       ├── theme5_job/SufferingNarrative.kt
+│       ├── theme6_heart/HeartGuardSession.kt
+│       └── theme7_fear/InterpersonalScenario.kt
 │
 ├── game/                           ← 기존, 일반화 + 인물 확장
 │   ├── adapter/in/web/
-│   │   ├── GameController.java                     ← (신규) /api/game/{character}/*
-│   │   ├── JosephGameController.java               ← 기존 유지, alias
-│   │   └── SessionController.java                  ← /api/game/sessions/*
+│   │   ├── GameController.kt                     ← (신규) /api/game/{character}/*
+│   │   ├── JosephGameController.kt               ← 기존 유지, alias
+│   │   └── SessionController.kt                  ← /api/game/sessions/*
 │   ├── adapter/out/persistence/
-│   │   ├── GameSession{JpaEntity,Repository}.java  ← 기존
-│   │   ├── DecisionRecord{JpaEntity,Repository}.java
-│   │   └── Scenario{JpaEntity,Repository}.java
-│   ├── adapter/out/scenario/ScenarioYamlLoader.java
+│   │   ├── GameSession{JpaEntity,Repository}.kt  ← 기존
+│   │   ├── DecisionRecord{JpaEntity,Repository}.kt
+│   │   └── Scenario{JpaEntity,Repository}.kt
+│   ├── adapter/out/scenario/ScenarioYamlLoader.kt
 │   ├── application/
-│   │   ├── StartGameSessionUseCase.java
-│   │   ├── DecideSceneUseCase.java
-│   │   ├── CompleteGameSessionUseCase.java
-│   │   ├── ExitSessionUseCase.java
-│   │   ├── GenerateBranchOutcomeUseCase.java       ← LLM 호출
-│   │   └── MapEmotionToCharacterUseCase.java
+│   │   ├── StartGameSessionUseCase.kt
+│   │   ├── DecideSceneUseCase.kt
+│   │   ├── CompleteGameSessionUseCase.kt
+│   │   ├── ExitSessionUseCase.kt
+│   │   ├── GenerateBranchOutcomeUseCase.kt       ← LLM 호출
+│   │   └── MapEmotionToCharacterUseCase.kt
 │   └── domain/
-│       ├── Character.java (enum: JOSEPH/MOSES/DAVID/JESUS)
-│       ├── GameSession.java                         ← 기존
-│       ├── Scenario.java
-│       ├── Scene.java (with SceneType enum)
-│       ├── Decision.java
-│       ├── RecoveryMessage.java
-│       └── ApplicableMode.java (영성/감성/이성/AUTO)
+│       ├── Character.kt (enum: JOSEPH/MOSES/DAVID/JESUS)
+│       ├── GameSession.kt                         ← 기존
+│       ├── Scenario.kt
+│       ├── Scene.kt (with SceneType enum)
+│       ├── Decision.kt
+│       ├── RecoveryMessage.kt
+│       └── ApplicableMode.kt (영성/감성/이성/AUTO)
 │
 ├── scripture/                      ← 기존, 확장
-│   ├── adapter/in/web/ScriptureController.java
-│   ├── adapter/out/persistence/ScripturePassage{Entity,Repository}.java
-│   ├── adapter/out/embedding/EmbeddingClient.java  ← AI sidecar
+│   ├── adapter/in/web/ScriptureController.kt
+│   ├── adapter/out/persistence/ScripturePassage{Entity,Repository}.kt
+│   ├── adapter/out/embedding/EmbeddingClient.kt  ← AI sidecar
 │   ├── application/
-│   │   ├── GetPassageByRefUseCase.java
-│   │   ├── GetRangeUseCase.java
-│   │   ├── SemanticSearchUseCase.java
-│   │   └── ReindexEmbeddingsBatchJob.java          ← @Scheduled
-│   └── domain/{Reference,Passage,Translation}.java
+│   │   ├── GetPassageByRefUseCase.kt
+│   │   ├── GetRangeUseCase.kt
+│   │   ├── SemanticSearchUseCase.kt
+│   │   └── ReindexEmbeddingsBatchJob.kt          ← @Scheduled
+│   └── domain/{Reference,Passage,Translation}.kt
 │
 ├── ai/                             ← (신규) [AI Orchestration]
-│   ├── adapter/in/web/InternalLlmController.java (X-Internal-Token)
-│   ├── adapter/out/sidecar/AiSidecarClient.java    ← WebClient → Python
-│   ├── adapter/out/persistence/LlmCache{Entity,Repository}.java
+│   ├── adapter/in/web/InternalLlmController.kt (X-Internal-Token)
+│   ├── adapter/out/sidecar/AiSidecarClient.kt    ← WebClient → Python
+│   ├── adapter/out/persistence/LlmCache{Entity,Repository}.kt
 │   ├── application/
-│   │   ├── GenerateLlmResponseUseCase.java
-│   │   ├── CacheKeyComputer.java                   ← sha256(promptKey || JSON.stringify(variables))
-│   │   ├── WarmupCacheUseCase.java                 ← batch endpoint + scheduled
-│   │   └── PromptTemplateRegistry.java             ← .yaml 로 prompt 관리
+│   │   ├── GenerateLlmResponseUseCase.kt
+│   │   ├── CacheKeyComputer.kt                   ← sha256(promptKey || JSON.stringify(variables))
+│   │   ├── WarmupCacheUseCase.kt                 ← batch endpoint + scheduled
+│   │   └── PromptTemplateRegistry.kt             ← .yaml 로 prompt 관리
 │   └── domain/
-│       ├── PromptKey.java                          ← 'joseph.s2.monologue' 등 ID 체계
-│       ├── LlmRequest.java
-│       └── LlmResponse.java
+│       ├── PromptKey.kt                          ← 'joseph.s2.monologue' 등 ID 체계
+│       ├── LlmRequest.kt
+│       └── LlmResponse.kt
 │
 ├── tts/                            ← (신규) AI 의 하위 자매
-│   ├── adapter/in/web/TtsController.java
-│   ├── adapter/out/sidecar/TtsSidecarClient.java
-│   ├── adapter/out/storage/R2StorageClient.java
-│   ├── adapter/out/persistence/TtsCache{Entity,Repository}.java
-│   ├── application/{SynthesizeTts,WarmupTtsBatch}UseCase.java
-│   └── domain/{Voice,Synthesis,SpeakingRate}.java
+│   ├── adapter/in/web/TtsController.kt
+│   ├── adapter/out/sidecar/TtsSidecarClient.kt
+│   ├── adapter/out/storage/R2StorageClient.kt
+│   ├── adapter/out/persistence/TtsCache{Entity,Repository}.kt
+│   ├── application/{SynthesizeTts,WarmupTtsBatch}UseCase.kt
+│   └── domain/{Voice,Synthesis,SpeakingRate}.kt
 │
 ├── safety/                         ← (신규) [Safety]
-│   ├── adapter/in/web/SafetyController.java        ← /api/game/sessions/{sid}/exit
-│   ├── application/{EmergencyExit,SoftLanding}UseCase.java
-│   └── domain/{ExitReason,SoftLandingMessage}.java
+│   ├── adapter/in/web/SafetyController.kt        ← /api/game/sessions/{sid}/exit
+│   ├── application/{EmergencyExit,SoftLanding}UseCase.kt
+│   └── domain/{ExitReason,SoftLandingMessage}.kt
 │
 ├── analytics/                      ← (신규) [Analytics]
-│   ├── adapter/in/web/AnalyticsController.java
-│   ├── adapter/in/stream/InteractionEventConsumer.java (Redis Streams)
-│   ├── adapter/out/persistence/InteractionEvent{Entity,Repository}.java
-│   ├── adapter/out/elastic/EventShipperClient.java (옵션, ELK 클러스터로)
+│   ├── adapter/in/web/AnalyticsController.kt
+│   ├── adapter/in/stream/InteractionEventConsumer.kt (Redis Streams)
+│   ├── adapter/out/persistence/InteractionEvent{Entity,Repository}.kt
+│   ├── adapter/out/elastic/EventShipperClient.kt (옵션, ELK 클러스터로)
 │   ├── application/
-│   │   ├── RecordEventUseCase.java
-│   │   ├── BuildJourneyUseCase.java
-│   │   └── GenerateWeeklyReportJob.java            ← @Scheduled, asat ReportArtifact 패턴
-│   └── domain/{InteractionEvent,Journey,WeeklyReport}.java
+│   │   ├── RecordEventUseCase.kt
+│   │   ├── BuildJourneyUseCase.kt
+│   │   └── GenerateWeeklyReportJob.kt            ← @Scheduled, asat ReportArtifact 패턴
+│   └── domain/{InteractionEvent,Journey,WeeklyReport}.kt
 │
 └── common/                         ← 공유 인프라
-    ├── ErrorCode.java                              ← E_SESSION_INVALID 등
-    ├── ProblemDetailMapper.java                    ← @ControllerAdvice RFC 7807
-    ├── RateLimitFilter.java                        ← asat 패턴 재사용
-    ├── InternalServiceTokenFilter.java             ← asat 패턴 재사용
-    ├── jwt/{JwtIssuer,JwtVerifier}.java
-    └── observability/{LoggingFilter,MetricsConfig}.java
+    ├── ErrorCode.kt                              ← E_SESSION_INVALID 등
+    ├── ProblemDetailMapper.kt                    ← @ControllerAdvice RFC 7807
+    ├── RateLimitFilter.kt                        ← asat 패턴 재사용
+    ├── InternalServiceTokenFilter.kt             ← asat 패턴 재사용
+    ├── jwt/{JwtIssuer,JwtVerifier}.kt
+    └── observability/{LoggingFilter,MetricsConfig}.kt
 ```
 
 총 **9 bounded context · 패키지 수십 개 · @Controller 약 12개**. 모놀리스지만 *DDD-segregated* 구조라 향후 추출 가능.
+
+> **헥사고날 규약 (2026-07 클린 리팩터 후)** — 각 bounded context 는
+> `application/port/out/*Port` **아웃바운드 포트 인터페이스**를 두고, 이를
+> `adapter/out/persistence/*PersistenceAdapter` (또는 `adapter/out/sidecar`,
+> `adapter/out/metrics`) 가 구현한다. **포트는 도메인 타입만 주고받으며 JPA 엔티티를
+> 노출하지 않는다** — 순수 도메인 모델은 `<ctx>/domain/` 에 있고, 어댑터 내부에서
+> 도메인 ↔ JPA 엔티티를 매핑한다. 컨트롤러는 use-case 에만 의존하고 DTO 를 반환하며
+> repository 를 직접 주입받지 않는다. HTTP 사이드카 클라이언트(ai·tts)는
+> `adapter/out/sidecar` 에서 포트 뒤에, 메트릭은 `adapter/out/metrics` 의
+> `*MetricsPort` 뒤에 둔다.
+>
+> **언어/관용구 (Java 25 → Kotlin 2.2.20 마이그레이션 완료, Lombok 제거)** — DTO 는
+> `data class`(+ `companion object` 팩토리), 의존성은 **primary-constructor 주입**,
+> 로거는 `companion object { private val log = LoggerFactory.getLogger(...) }`,
+> JPA `@Entity` 는 가변 `var` 를 가진 Kotlin `class` (no-arg 는 `kotlin-jpa` 플러그인).
+> Java `record`/Lombok `@Getter`/`@RequiredArgsConstructor`/`@Slf4j` 는 더 이상 없다.
+
+**적용된 디자인 패턴**:
+
+| 패턴 | 위치 |
+|---|---|
+| **Adapter** (헥사고날) | `adapter/out/*` 가 `application/port/out/*Port` 구현 |
+| **Strategy** | `asset` 의 디바이스별 `InputMappingProvider` 빈 + `InputMappingResolver`; `game` 의 `ResponseResolver` |
+| **Factory Method** | 도메인 companion 팩토리 — `GameSession.start`/`reconstitute`, `OutboxEvent.pending`, `LlmCache.freshEntry`, `TtsCache.freshEntry`, `CdrIndex.fromPractices` |
+| **Template Method (합성)** | `common/sidecar/SidecarHttp` 를 ai·tts WebClient 사이드카 어댑터가 공유 |
 
 ---
 
@@ -1292,33 +1317,33 @@ github.lms.lemuel.xr/
 ├── auth/             ← §5 그대로
 ├── emotion/          ← §5 그대로
 ├── recovery/         ★신규 — RecoveryMetricsScheduler + GetRecoveryTrendUseCase
-│   ├── adapter/out/persistence/RecoveryMetric{Entity,Repository}.java
-│   ├── application/{ComputeDailyMetrics, GetTrendOver30Days}UseCase.java
-│   └── domain/{RecoveryMetric, Trend, RiskSignal}.java
+│   ├── adapter/out/persistence/RecoveryMetric{Entity,Repository}.kt
+│   ├── application/{ComputeDailyMetrics, GetTrendOver30Days}UseCase.kt
+│   └── domain/{RecoveryMetric, Trend, RiskSignal}.kt
 ├── content/          ← §5 + theme별 도메인 추가 (diary, psalm, proverbs, ecclesiastes)
 ├── game/             ← §5 그대로
 ├── scripture/        ← §5 그대로 (V6 embedding HNSW 인덱스 활용)
 ├── safety/           ★확장 — V7 safety_alerts 자동 매칭
-│   ├── adapter/in/web/{SafetyController,CrisisResourceController}.java
-│   ├── adapter/in/scheduler/SafetyAlertScannerJob.java
-│   ├── application/{DetectCrisisKeyword, SuggestResource, AcknowledgeAlert}UseCase.java
-│   └── domain/{SafetyAlert, CrisisResource, Severity}.java
+│   ├── adapter/in/web/{SafetyController,CrisisResourceController}.kt
+│   ├── adapter/in/scheduler/SafetyAlertScannerJob.kt
+│   ├── application/{DetectCrisisKeyword, SuggestResource, AcknowledgeAlert}UseCase.kt
+│   └── domain/{SafetyAlert, CrisisResource, Severity}.kt
 ├── theology/         ★신규 — V8 content_versions 워크플로우
-│   ├── adapter/in/web/ContentVersionController.java  (admin only)
-│   ├── application/{SubmitForReview, ApproveContent, PublishContent}UseCase.java
-│   └── domain/{ContentVersion, TheologyReview, Status: DRAFT/REVIEW/APPROVED/PUBLISHED/ARCHIVED}.java
+│   ├── adapter/in/web/ContentVersionController.kt  (admin only)
+│   ├── application/{SubmitForReview, ApproveContent, PublishContent}UseCase.kt
+│   └── domain/{ContentVersion, TheologyReview, Status: DRAFT/REVIEW/APPROVED/PUBLISHED/ARCHIVED}.kt
 ├── ai/               ← §5 그대로 (multi-provider routing 적용)
 ├── tts/              ← §5 그대로
 ├── asset/            ★신규 — V10 asset_manifests
-│   ├── adapter/in/web/AssetManifestController.java
-│   ├── adapter/out/persistence/{AssetManifest,AssetDownload}{Entity,Repository}.java
-│   ├── application/{GetManifestForDeviceQuality, RecordDownload}UseCase.java
-│   └── domain/{AssetManifest, DeviceType, QualityTier}.java
+│   ├── adapter/in/web/AssetManifestController.kt
+│   ├── adapter/out/persistence/{AssetManifest,AssetDownload}{Entity,Repository}.kt
+│   ├── application/{GetManifestForDeviceQuality, RecordDownload}UseCase.kt
+│   └── domain/{AssetManifest, DeviceType, QualityTier}.kt
 ├── outbox/           ★신규 — V11 outbox_events + Triple Idempotency
-│   ├── adapter/in/scheduler/OutboxRelayJob.java
-│   ├── adapter/out/persistence/{OutboxEvent,ProcessedEvent}{Entity,Repository}.java
-│   ├── application/{PublishEventTx, MarkProcessed, DeduplicateByIdempotencyKey}UseCase.java
-│   └── domain/{OutboxEvent, IdempotencyKey, EventStatus}.java
+│   ├── adapter/in/scheduler/OutboxRelayJob.kt
+│   ├── adapter/out/persistence/{OutboxEvent,ProcessedEvent}{Entity,Repository}.kt
+│   ├── application/{PublishEventTx, MarkProcessed, DeduplicateByIdempotencyKey}UseCase.kt
+│   └── domain/{OutboxEvent, IdempotencyKey, EventStatus}.kt
 ├── analytics/        ← §5 + V12 views 활용
 └── common/           ← §5 그대로
 ```

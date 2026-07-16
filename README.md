@@ -75,8 +75,8 @@ lemuel-xr/
 │   ├── interviews/        ← 인터뷰 노트 (예정)
 │   ├── wireframes/        ← Figma 링크/스크린샷 (예정)
 │   └── theology-review/   ← 신학 자문 피드백 (예정)
-├── backend/               ← Spring Boot (예정)
-├── ai-orchestration/      ← LangChain (예정)
+├── backend/               ← Spring Boot 4 + Kotlin (헥사고날, 100% Kotlin)
+├── ai/, tts/              ← Python 사이드카 (WebClient proxy)
 ├── game/                  ← Unity (예정, V2.0)
 └── frontend/              ← React Native (예정)
 ```

@@ -1,0 +1,11 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": { "webgl": 2 },
+  "manifest": { "bundle": "scene1.glb" },
+  "audio_locale": "ko",
+  "total_size_bytes": 2048,
+  "cdn_base_url": "https://cdn.example/joseph"
+}

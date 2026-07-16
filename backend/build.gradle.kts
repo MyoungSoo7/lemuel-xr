@@ -1,6 +1,9 @@
 plugins {
     java
     jacoco
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.20"
+    kotlin("plugin.jpa") version "2.2.20"
     id("org.springframework.boot") version "4.0.4"
     id("io.spring.dependency-management") version "1.1.6"
 }
@@ -60,9 +63,9 @@ dependencies {
     implementation("net.javacrumbs.shedlock:shedlock-spring:5.16.0")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.16.0")
 
-    // Lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    // Kotlin — 전체 소스 Kotlin (Java→Kotlin 100% 마이그레이션 완료; Lombok 제거됨)
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     // Test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -72,6 +75,23 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:postgresql:1.20.4")
+    // Kotlin 친화 Mockito — `when` 키워드 충돌 회피(whenever), reified mock()
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
+}
+
+// === Kotlin =====================================================
+kotlin {
+    jvmToolchain(25)
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
+}
+
+// Kotlin 2.2.x 는 JDK 25 를 아직 JVM target 으로 지원하지 않아 JVM_24 로 폴백한다.
+// Java 는 25 바이트코드를, Kotlin 은 24 바이트코드를 내는데 JVM 25 는 24 를 문제없이
+// 로드하므로 이 target 일관성 검증만 warning 으로 완화한다 (Kotlin 이 25 지원 시 제거).
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
 }
 
 // === UTF-8 일관성 강제 ===========================================
