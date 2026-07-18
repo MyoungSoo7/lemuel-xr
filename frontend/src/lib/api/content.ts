@@ -60,6 +60,42 @@ export async function fetchScripturePassage(reference: string, translation = "mo
   return res.data;
 }
 
+// --- AR 토픽 카드 북마크 (ooo Seed — 익명 게스트가 카드를 담고 '내 북마크'에서 다시 봄) ---
+
+/** '내 북마크' 목록 항목 — 카드 표시정보(원문 열기 포함) + 담은 시각. */
+export interface BookmarkedCard {
+  topicContentId: number;
+  topicId: number | null;
+  title: string;
+  scriptureRef: string | null;
+  body: string;
+  anchorCharacter: string | null;
+  bookmarkedAt: string;
+}
+
+export interface BookmarkDto {
+  id: string;
+  topicContentId: number;
+  createdAt: string;
+}
+
+/** 내 북마크 목록 — 최신순. */
+export async function fetchBookmarks(): Promise<BookmarkedCard[]> {
+  const res = await api.get<BookmarkedCard[]>("/api/content/bookmarks");
+  return res.data;
+}
+
+/** 담기 — 멱등. */
+export async function addBookmark(topicContentId: number): Promise<BookmarkDto> {
+  const res = await api.post<BookmarkDto>("/api/content/bookmarks", { topicContentId });
+  return res.data;
+}
+
+/** 빼기 — 토글. */
+export async function removeBookmark(topicContentId: number): Promise<void> {
+  await api.delete(`/api/content/bookmarks/${topicContentId}`);
+}
+
 // --- Theme 6·7 실천/성찰 (TRACK-A-5-7-ACTION-GUIDANCE §3·§4) ---
 
 /** 6 = 마음 지킴, 7 = 사람 두려움. */
