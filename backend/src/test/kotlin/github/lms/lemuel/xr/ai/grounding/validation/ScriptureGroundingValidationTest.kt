@@ -1,6 +1,6 @@
 package github.lms.lemuel.xr.ai.grounding.validation
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import github.lms.lemuel.xr.ai.grounding.adapter.out.embedding.GeminiEmbeddingAdapter
 import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase
 import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase.Passage
@@ -30,7 +30,7 @@ class ScriptureGroundingValidationTest {
         val passages: List<Passage> = emptyList(),
     )
 
-    private val mapper = ObjectMapper()
+    private val mapper = jacksonObjectMapper()
     private val noopMetrics = object : GroundingMetricsPort {
         override fun evaluated(purpose: String) {}
         override fun rejected(purpose: String) {}
