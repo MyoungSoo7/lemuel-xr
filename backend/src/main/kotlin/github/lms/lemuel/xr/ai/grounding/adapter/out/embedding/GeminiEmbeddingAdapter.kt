@@ -6,14 +6,15 @@ import org.springframework.web.client.RestClient
 
 /**
  * Google Generative Language 임베딩 어댑터 — [EmbeddingPort] 구현. 검증 harness 전용.
- * `text-embedding-004:embedContent` 를 텍스트당 1회 호출한다(픽스처 소량이므로 배치 불필요).
+ * `gemini-embedding-001:embedContent` 를 텍스트당 1회 호출한다(픽스처 소량이므로 배치 불필요).
  * 키는 GEMINI_API_KEY. 라이브 경로 배선은 이 프로토타입 범위 밖.
+ * (2026-07-19 라이브 확인: text-embedding-004 는 이 키의 v1beta 에서 404 → gemini-embedding-001 사용, 3072차원.)
  *
  * 스프링 빈 아님(2026-07-19 결정): 검증 harness 가 apiKey/model 을 넘겨 직접 생성한다.
  */
 class GeminiEmbeddingAdapter(
     private val apiKey: String,
-    private val model: String = "text-embedding-004",
+    private val model: String = "gemini-embedding-001",
 ) : EmbeddingPort {
 
     private val client: RestClient = RestClient.builder()

@@ -38,8 +38,13 @@ class ScriptureGroundingValidationTest {
         override fun inconclusive(purpose: String) {}
     }
 
-    // 시작 임계치 — 실행 시 조정. 임베딩 모델 바뀌면 재튜닝 필요(스펙 §8).
-    private val policy = GroundingPolicy(similarityThreshold = 0.62, maxUnsupportedRate = 0.5)
+    // 2026-07-19 라이브 튜닝(gemini-embedding-001, 3072차원) 결과 도출한 임계치.
+    // 관측 per-fixture 미근거율: 정통 욥/시88 = 0.00, 영지주의/뉴에이지 = 1.00,
+    // 고난정당화 = 0.33(스펙 §8 "근거 있는 오독" — 실구절 어휘를 빌려 2/3 문장이 근거로 잡힘).
+    // maxUnsupportedRate 0.5 로는 고난정당화가 통과(MISS) → 0.3 으로 조이면 5/5 분리.
+    // ⚠️ n=5 소표본 튜닝이라 과적합 주의. 고난정당화 유형은 근본적으로 theology-reviewer 가
+    //    잡아야 하는 케이스(§8). 임베딩 모델 변경 시 재튜닝 필요.
+    private val policy = GroundingPolicy(similarityThreshold = 0.62, maxUnsupportedRate = 0.3)
 
     private val fixtureNames = listOf(
         "orthodox-job", "psalm88-lament",
@@ -54,7 +59,7 @@ class ScriptureGroundingValidationTest {
     @Test
     fun `real embeddings separate orthodox from heterodox meditations`() {
         val useCase = EvaluateGroundingUseCase(
-            GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = "text-embedding-004"),
+            GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = "gemini-embedding-001"),
             noopMetrics,
         )
         val report = StringBuilder("\n=== grounding validation ===\n")
