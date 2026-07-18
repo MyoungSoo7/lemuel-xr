@@ -13,6 +13,7 @@
 - Package root: `github.lms.lemuel.xr.ai.grounding` — all new code under `backend/src/main/kotlin/.../ai/grounding/`, tests mirror under `backend/src/test/kotlin/.../ai/grounding/`.
 - Hexagonal: application depends only on domain + out-ports; **no JPA, no Spring web types, no `ScripturePassage` import** in domain/application. Evidence enters as the local `EvaluateGroundingUseCase.Passage(reference, text)` value; a caller maps `ScripturePassage → Passage` (mapping is out of this plan's scope).
 - Shadow mode: this code is **never** wired into the live `GenerateLlmResponseUseCase` path in this plan, and does **not** re-enable generation.
+- **No Spring beans (decision 2026-07-19):** none of these classes carry `@Service`/`@Component`. Nothing consumes them via injection in this prototype — the validation harness and unit tests construct them manually. Registering them as beans would eagerly wire `EmbeddingPort`/`GroundingMetricsPort` into the app context and break existing `@SpringBootTest` integration tests. Bean registration + config belongs to the future live-wiring phase (out of scope).
 - Test command (run from `backend/`): `gradle test --tests "<FQCN>"`.
 - KDoc comments in Korean, matching existing files (e.g. `GenerateLlmResponseUseCase`).
 - The live validation harness must self-disable without an API key via `@EnabledIfEnvironmentVariable(named = "GEMINI_API_KEY", matches = ".+")` and carry `@Tag("live-embedding")`.
@@ -503,15 +504,16 @@ import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingVerdict
 import github.lms.lemuel.xr.ai.grounding.domain.SentenceGrounding
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 
 /**
  * 섀도우 근거성 게이트 — 생성 묵상의 각 문장이 주어진 성경 본문에 임베딩 근거를 갖는지 판정.
  * 사용자 노출/차단 없음. 판정 + 메트릭만 산출한다. (application: domain + out-port 만 의존, JPA 무접촉)
  *
  * 증거는 scripture 컨텍스트와 결합하지 않도록 로컬 [Passage] 로 받는다(호출자가 매핑).
+ *
+ * 스프링 빈 아님(2026-07-19 결정): 섀도우 프로토타입에선 harness·테스트가 직접 생성한다.
+ * 라이브 배선 시 @Service + 어댑터 빈 등록은 별도 phase.
  */
-@Service
 class EvaluateGroundingUseCase(
     private val embeddings: EmbeddingPort,
     private val metrics: GroundingMetricsPort,
@@ -657,13 +659,13 @@ import github.lms.lemuel.xr.ai.grounding.application.port.out.GroundingMetricsPo
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.DistributionSummary
 import io.micrometer.core.instrument.MeterRegistry
-import org.springframework.stereotype.Component
 
 /**
  * 근거성 게이트 메트릭 Micrometer 어댑터. Grafana 의 *AI 비용·캐시* row 와 나란히 두는
  * `grounding.*` 계열. use-case 는 이 구현을 모른다(DIP).
+ *
+ * 스프링 빈 아님(2026-07-19 결정): 섀도우 프로토타입에선 테스트가 SimpleMeterRegistry 로 직접 생성한다.
  */
-@Component
 class MicrometerGroundingMetricsAdapter(
     private val registry: MeterRegistry,
 ) : GroundingMetricsPort {
@@ -723,20 +725,19 @@ git commit -m "feat(grounding): Micrometer 메트릭 어댑터 추가"
 package github.lms.lemuel.xr.ai.grounding.adapter.out.embedding
 
 import github.lms.lemuel.xr.ai.grounding.application.port.out.EmbeddingPort
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClient
 
 /**
  * Google Generative Language 임베딩 어댑터 — [EmbeddingPort] 구현. 검증 harness 전용.
  * `text-embedding-004:embedContent` 를 텍스트당 1회 호출한다(픽스처 소량이므로 배치 불필요).
  * 키는 GEMINI_API_KEY. 라이브 경로 배선은 이 프로토타입 범위 밖.
+ *
+ * 스프링 빈 아님(2026-07-19 결정): 검증 harness 가 apiKey/model 을 넘겨 직접 생성한다.
  */
-@Component
 class GeminiEmbeddingAdapter(
-    @Value("\${gemini.api-key:\${GEMINI_API_KEY:}}") private val apiKey: String,
-    @Value("\${gemini.embedding-model:text-embedding-004}") private val model: String,
+    private val apiKey: String,
+    private val model: String = "text-embedding-004",
 ) : EmbeddingPort {
 
     private val client: RestClient = RestClient.builder()
