@@ -8,15 +8,15 @@ import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingVerdict
 import github.lms.lemuel.xr.ai.grounding.domain.SentenceGrounding
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 
 /**
  * 섀도우 근거성 게이트 — 생성 묵상의 각 문장이 주어진 성경 본문에 임베딩 근거를 갖는지 판정.
  * 사용자 노출/차단 없음. 판정 + 메트릭만 산출한다. (application: domain + out-port 만 의존, JPA 무접촉)
  *
  * 증거는 scripture 컨텍스트와 결합하지 않도록 로컬 [Passage] 로 받는다(호출자가 매핑).
+ *
+ * 스프링 빈 아님(2026-07-19 결정): 섀도우 프로토타입에선 harness·테스트가 직접 생성한다. 라이브 배선 시 @Service + 어댑터 빈 등록은 별도 phase.
  */
-@Service
 class EvaluateGroundingUseCase(
     private val embeddings: EmbeddingPort,
     private val metrics: GroundingMetricsPort,
