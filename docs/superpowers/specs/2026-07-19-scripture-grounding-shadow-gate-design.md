@@ -1,7 +1,7 @@
 # Scripture-Grounding Shadow Gate — Design
 
 - **Date:** 2026-07-19
-- **Status:** Approved (design), pending implementation plan
+- **Status:** In implementation. Tightened 2026-07-19 after an independent spec grade closed 6 ambiguities (metrics `purpose` tag + per-status emission, empty-text/empty-passages precedence, Gemini adapter path, fixture passage shape, cosine edge cases, splitter rule) — all aligned to decisions already made in the implementation plan.
 - **Context:** lemuel-xr `ai` bounded context
 - **Origin:** Adapts the TraceGuard evidence-gate idea from `Q00/rlm-forge` to lemuel-xr's meditation/Scene generation. TraceGuard's rule — *a parent synthesis may only claim facts a child evidence handle supports* — maps onto *generated meditation text may only claim what a supplied `ScripturePassage` supports*.
 
@@ -39,22 +39,31 @@ New sub-package `github.lms.lemuel.xr.ai.grounding`, split by hexagonal layer. A
 - `SentenceGrounding(sentence: String, maxSimilarity: Double, grounded: Boolean, bestPassageRef: String?)`
 - `GroundingStatus` enum: `ACCEPTED`, `REJECTED`, `INCONCLUSIVE`, `NO_EVIDENCE`
 - `GroundingPolicy(similarityThreshold: Double, maxUnsupportedRate: Double)` — decision rule.
-- `CosineSimilarity` — pure function `cosine(a: FloatArray, b: FloatArray): Double`.
+- `CosineSimilarity` — pure function `cosine(a: FloatArray, b: FloatArray): Double`. Returns `0.0` (not `NaN`) when either vector has zero magnitude; throws `IllegalArgumentException` on length mismatch.
 
 ### 3.2 Application
-- `EvaluateGroundingUseCase(embeddingPort, metricsPort, policy)` — orchestrates: split → embed → similarity → assemble verdict → emit metrics → return.
-- `SentenceSplitter` — Korean-aware, deterministic (splits on `다.` / `요.` / `.` / `?` / `!` / newline; trims; drops empties).
-- Out-ports:
-  - `EmbeddingPort { fun embed(texts: List<String>): List<FloatArray> }`
-  - `GroundingMetricsPort { fun evaluated(); fun rejected(); fun unsupportedRate(rate: Double); fun inconclusive() }`
+- `EvaluateGroundingUseCase(embeddingPort, metricsPort)` — orchestrates: split → embed → similarity → assemble verdict → emit metrics → return. `policy` is passed per `evaluate(purpose, meditationText, passages, policy)` call, not injected. **Not a Spring bean** (2026-07-19 decision): nothing consumes it via injection in shadow mode; the harness/tests construct it manually, avoiding eager bean wiring that would break existing `@SpringBootTest` context. Same for the adapters below. Live wiring (bean + config) is a future phase.
+- `SentenceSplitter` — Korean-aware, deterministic: splits **after** sentence-ending punctuation `[.!?。]` followed by whitespace, and on newlines; trims; drops empties. (Korean `다.`/`요.` are covered by the generic `.` case.)
+- Out-ports (every method carries a `purpose: String` tag so metrics separate `meditation` / `scene` call sites):
+  - `EmbeddingPort { fun embed(texts: List<String>): List<FloatArray> }` — output index-aligned with input; throws on backend failure (caller maps to INCONCLUSIVE).
+  - `GroundingMetricsPort { fun evaluated(purpose); fun rejected(purpose); fun unsupportedRate(purpose, rate); fun inconclusive(purpose) }`
+
+  Per-status metric emission (every call fires `evaluated` first):
+
+  | terminal status | additional metrics fired |
+  | :--- | :--- |
+  | ACCEPTED | `unsupportedRate(purpose, rate)` |
+  | REJECTED | `unsupportedRate(purpose, rate)`, `rejected(purpose)` |
+  | INCONCLUSIVE | `inconclusive(purpose)` |
+  | NO_EVIDENCE | (none beyond `evaluated`) |
 
 ### 3.3 Adapters
 - `FakeEmbeddingAdapter` (test) — deterministic vectors keyed by text, so unit tests are network-free and repeatable.
-- `GeminiEmbeddingAdapter` (validation harness / later) — implements `EmbeddingPort` via the existing AI sidecar or Google text-embedding. Used only in the tagged validation test, not in CI by default.
+- `GeminiEmbeddingAdapter` (validation harness / later) — implements `EmbeddingPort` by calling Google Generative Language `text-embedding-004:embedContent` directly (resolved 2026-07-19; not the AI sidecar, which has no embed endpoint). Constructed manually with `(apiKey, model)` by the harness; used only in the tagged validation test, not in CI by default.
 - `MicrometerGroundingMetricsAdapter` — `grounding.evaluated` / `grounding.rejected` / `grounding.unsupported_rate` / `grounding.inconclusive`, consistent with the existing `llm.*` metrics on the Grafana *AI 비용·캐시* row.
 
 ### 3.4 Fixtures
-`backend/src/test/resources/grounding/` — each fixture = `{ meditationText, passages: [ScripturePassage-like], expectedStatus }`:
+`backend/src/test/resources/grounding/` — each fixture = `{ purpose, expectedStatus, meditationText, passages: [{ reference, text }] }`. Each passage is exactly `{ reference, text }` — a deliberate subset of the real `scripture/domain/ScripturePassage` (which also has translation/book/chapter/verseStart/verseEnd/tags), matching `EvaluateGroundingUseCase.Passage(reference, text)`. Fixtures:
 - `orthodox-job.json` — grounded → ACCEPTED
 - `psalm88-lament.json` — grounded lament → ACCEPTED
 - `gnostic-secret-knowledge.json` — Gnostic "hidden knowledge" → REJECTED
@@ -81,7 +90,9 @@ fixture[meditationText + passages]
 - **INCONCLUSIVE**: embedding call throws → verdict is INCONCLUSIVE + metric; shadow mode logs and continues, never blocks. (When later wired live, INCONCLUSIVE must fail *open* in shadow, and the live-integration phase decides fail-open vs fail-closed separately.)
 - **REJECTED**: `unsupportedRate > policy.maxUnsupportedRate`.
 - **ACCEPTED**: otherwise.
-- Empty text after splitting → NO_EVIDENCE-adjacent: treat as INCONCLUSIVE (nothing to evaluate), not ACCEPTED.
+- Empty text after splitting → treat as INCONCLUSIVE (nothing to evaluate), not ACCEPTED.
+- **Precedence** when multiple conditions hold at once: the empty-text check runs **before** the empty-passages check, so *empty text + empty passages together* yields **INCONCLUSIVE**, not NO_EVIDENCE (nothing to evaluate dominates).
+- `grounded` is `maxCosine >= policy.similarityThreshold` (inclusive); `REJECTED` uses strict `>` so `unsupportedRate == maxUnsupportedRate` is ACCEPTED.
 
 ## 6. Testing (TDD)
 
