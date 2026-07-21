@@ -4,10 +4,22 @@
 # 자살예방 임상 권장 패턴 — 신체적 안전 (food/sleep/contact) 우선.
 #
 # Stage 1 MVP. LLM 분기 X. 정적 큐레이션 콘텐츠만.
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준, MVP-JESUS.md §4.3 준용).
+#   왕상 19 — 하나님은 엘리야의 죽음 갈구를 책망하지 않으시고 몸을 먼저 돌보셨다. 세미한 음성(왕상 19:12)은
+#   신비 체험 프레임이 아니라 *말씀으로 찾아오시는 임재* 로만 서술 (뉴에이지 '내면의 소리' 프레임 금지).
+# 배제: 외경·영지주의·뉴에이지 혼합·"기도하면 우울이 낫는다" 식 즉효 프레임.
+#
+# 안전선: R1 — Scene 2 crisis_check + outro 위기 라우팅 (1393).
+#         R3 — 회복 시간표 압박 금지: 두 번 먹고 두 번 잔 후에도 엘리야의 회복은 즉각적이지 않았다.
+#         R4 — Scene 2 (죽기를 간청) 는 죽음 갈구 언어 노출 → trigger_warning + 스킵 대체(몸 돌봄 씬).
+#         R5 — ai_assist_footer 항상 노출 (정적 콘텐츠에도 UI 일관성 유지).
 
 character: elijah
 title: 로뎀나무 아래 — 먼저 먹고 자도 됩니다
 target_user: recovery
+# AI 보조 — 본문은 성경 참조. Stage 1 은 정적 콘텐츠뿐이나 footer 는 UI 일관성 위해 유지.
+ai_assist_footer: "AI 보조 — 본문은 성경 참조"
 scenes:
   - id: 1
     title: 갈멜산의 승리 후 도망
@@ -17,6 +29,7 @@ scenes:
     extras:
       anchor: 번아웃·소진
       static_text: "엘리야는 *바알 선지자 450명을 이긴 직후* 도망쳤습니다. *승리 직후의 우울* 은 임상에서 흔한 패턴입니다. *큰 일 후의 텅 빈 자리* 가 실재합니다."
+      skippable_after_sec: 3   # safety — skip 옵션 (users.skip_intro_silence)
     next: 2
 
   - id: 2
@@ -29,7 +42,13 @@ scenes:
       anchor: 죽음 갈구의 정당성
       static_text: "엘리야의 기도: ''여호와여 이제 됐습니다. 내 생명을 거두소서.'' 신은 이 기도에 *책망* 하지 않으셨습니다. *죽음 갈구가 말해진 것 자체* 가 회복의 첫 단계입니다."
       reflection_prompt: "당신도 이런 마음이 들었던 순간이 있다면 — 그 마음을 *부끄럽게* 여기지 않는 자리가 여기에 있습니다."
-      crisis_check: true   # 이 화면에서 사용자가 동의 못 하면 즉시 위기 자원
+      crisis_check: true   # R1 — 이 화면에서 사용자가 동의 못 하면 즉시 위기 자원
+      language_note: "R 가드 — 이 씬은 죽음 갈구를 *허락된 언어* 로 다루되 낭만화하지 않는다. 지금 실제로 그 마음이 크다면 본문보다 1393 연결이 우선이다 (crisis_check 게이트)."
+    trigger_warning:
+      level: medium
+      content: ["death_wish"]
+      consent_card_id: "elijah_scene2_deathwish_warning"
+      skip_alternative_scene_id: 3
     next: 3
 
   - id: 3
@@ -63,6 +82,7 @@ scenes:
         - "오늘 잠시라도 미소가 나왔던 순간"
         - "30초간 마음이 평온했던 자리"
         - "전화를 받을지 망설였던 마음 — 받아도 안 받아도 정당한 선택"
+      framing_note: "R/신학 가드 — '세미한 음성' 은 내면 신비 체험이 아니라 말씀으로 찾아오시는 임재로 서술 (왕상 19:12-13). 회복 신호를 '반드시 찾아내라' 는 과제로 만들지 않는다."
     next: 5
 
   - id: 5
@@ -75,6 +95,13 @@ scenes:
     extras:
       anchor: 비-고립
       static_text: "신의 마지막 말씀: 7000명이 남았다. 우리는 생각보다 덜 혼자입니다."
-      crisis_reminder: "1393."
+      timeline_note: "R3 가드 — 엘리야의 회복은 먹고 잔 뒤에도 즉각적이지 않았다 (그 후에도 '나만 남았다' 고 두 번 말한다, 왕상 19:10·14). 회복 속도에 시간표를 강요하지 않는다."
+      recovery_keys:
+        EXHAUSTED: elijah.recovery.food_and_sleep
+        SAD:       elijah.recovery.not_rebuked
+        ANXIOUS:   elijah.recovery.still_small_voice
+        LONELY:    elijah.recovery.seven_thousand
+        CONFUSED:  elijah.recovery.what_are_you_doing_here
+      crisis_reminder: "1393."   # R1 — 위기 감지 시 즉시 위기 자원 연결
       next_scene_suggestion: "시편 88 — 답 없는 시편, 어둠으로 끝나는 자리"
     next: null

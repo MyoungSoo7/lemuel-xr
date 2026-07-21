@@ -1,9 +1,23 @@
 # 모세 미션 시나리오 — 떨기나무 앞에서. MVP-MOSES.md 설계 기반.
 # 핵심 감정 anchor: 두려움 · 부름 · 떨림 · 책임 · 신뢰.
 # 6 Scene · 6~8분.
+#
+# 핵심 메시지: 무자격감·변명·떨림은 부름을 취소시키지 않는다 — "내가 반드시 너와 함께 있으리라" (출 3:12).
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준, MVP-JESUS.md §4.3 준용).
+#   소명 교리 — 부르심의 근거는 사람의 자격이 아니라 하나님의 동행 약속(출 3:12).
+# 배제: 외경·영지주의·뉴에이지 혼합·"큰 믿음 = 큰 성취" 프레임.
+#
+# 안전선: 소명 압박 금지 — "부름" 을 '지금 당장 큰 일을 해내라' 는 성취 압박으로 서술하지 않는다.
+#         변명 카드(Scene 3)는 죄책 목록이 아니라 *정직한 고백* 의 자리다.
+#         R2 — 광야 40년을 '성공 전 필수 훈련 코스' 로 미화하지 않는다.
+#         R1 — outro 위기 라우팅. R5 — ai_assist_footer 항상 노출.
 
 character: moses
 title: 떨기나무 앞에서
+target_user: general
+# AI 보조 — 본문은 성경 참조. Scene 4 realtime_llm 응답 포함 모든 LLM 텍스트에 필수.
+ai_assist_footer: "AI 보조 — 본문은 성경 참조"
 scenes:
   - id: 1
     title: 광야의 침묵
@@ -50,6 +64,7 @@ scenes:
         all_throw:  moses.s3.outcome.all_throw
         all_heart:  moses.s3.outcome.all_heart
         mixed:      moses.s3.outcome.mixed
+      excuse_note: "R 가드 — 변명을 '던지지 못함'(가슴에 가져감)은 실패가 아니다. 모세의 다섯 변명은 책망이 아니라 대화로 응답받았다. 무자격감을 *말해도 되는* 자리가 이 씬의 목적이다."
     next: 4
 
   - id: 4
@@ -66,6 +81,7 @@ scenes:
         - { id: with_aaron,     label: "아론을 본다 (동행)" }
       realtime_llm: true
       hapticHint: { intensity: 0.7, pattern: PULSE_HARD, channel: BOTH, fallback: { audioCueId: tremor-deep } }
+      hesitation_note: "R 가드 — 망설임(hesitate)과 도움 청함(with_aaron)은 '덜 믿음' 이 아니다. 아론의 동행 자체가 하나님의 배려였다 (출 4:14-16). 혼자 해내라는 압박을 서사에 싣지 않는다."
     next: 5
 
   - id: 5
@@ -79,6 +95,7 @@ scenes:
       steps:
         - { id: lift_staff, label: "지팡이를 들고 손을 뻗는다" }
       one_action_only: true
+      teaching_note: "\"너희는 두려워하지 말고 가만히 서서 여호와께서 오늘 너희를 위하여 행하시는 구원을 보라\" (출 14:13) — 이 씬의 한 동작은 성취가 아니라 신뢰의 표현이다."
     next: 6
 
   - id: 6
@@ -91,9 +108,14 @@ scenes:
     value_prompt: "모세의 광야 40년은 *기다림* 의 시간이었습니다. 오늘 *전도서 한 절* — 인생의 계절을 인정하는 시 — 을 읽어보세요."
     extras:
       anchor: 안식·동반
+      static_monologue: "\"내가 반드시 너와 함께 있으리라\" (출 3:12). 부르심의 근거는 모세의 자격이 아니라 이 약속이었습니다. 오늘 무자격감이 크다면 — 그 감정은 모세의 감정이기도 했습니다."
+      suffering_note: "R2 가드 — 광야 40년을 '지도자가 되기 위한 필수 코스' 로 미화하지 않는다. 기다림의 의미화는 회고적이며, 현재의 정체·지연을 견디라는 강요가 아니다."
       recovery_keys:
-        ANXIOUS: moses.recovery.fear
-        LONELY:  moses.recovery.aloneness
+        ANXIOUS:   moses.recovery.fear
+        LONELY:    moses.recovery.aloneness
         EXHAUSTED: moses.recovery.wilderness40
-        SAD: moses.recovery.companion
+        SAD:       moses.recovery.companion
+        CONFUSED:  moses.recovery.who_am_i
+      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      next_scene_suggestion: "트랙 A — 전도서 '인생의 계절' 카드 또는 시편 90 (모세의 시)"
     next: null

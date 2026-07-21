@@ -7,10 +7,23 @@
 # Active crisis 사용자는 EmotionController 의 CrisisLockout 이 진입 차단.
 #
 # 임상 자문 영입 후 추가 양식 (사용자의 비탄 작성, AI 친구의 응답) 검토 예정.
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준, MVP-JESUS.md §4.3 준용).
+#   욥기 — 인과응보 신학(친구들의 "네 죄 때문이다")을 하나님이 직접 책망하심 (욥 42:7).
+#   고난의 원인을 특정인의 죄로 단정하는 서술 금지. 하나님의 응답은 설명이 아니라 임재(욥 38~42).
+# 배제: 외경·영지주의·뉴에이지 혼합·"고난 = 축복의 전조" 번영 프레임.
+#
+# 안전선: R2 — Theme 5 (고통과 진리) 는 고난 의미화 필수 footer 대상. outro 에 suffering_footer 명시.
+#         R3 — "결국 갑절로 회복됐다"(욥 42:10) 를 회복 보장 서사로 쓰지 않는다. 이 시나리오는 의도적으로
+#              갑절 회복이 아니라 *만남* 에서 멈춘다.
+#         R4 — Scene 2 (태어난 날 저주) 는 죽음 갈구 인접 언어 → trigger_warning + 스킵 대체.
+#         R1 — outro 위기 라우팅. R5 — ai_assist_footer 항상 노출.
 
 character: job
 title: 너의 비탄은 부끄러운 것이 아니다
 target_user: recovery
+# AI 보조 — 본문은 성경 참조. Stage 1 은 정적 콘텐츠뿐이나 footer 는 UI 일관성 위해 유지.
+ai_assist_footer: "AI 보조 — 본문은 성경 참조"
 scenes:
   - id: 1
     title: 침묵의 7일
@@ -35,6 +48,12 @@ scenes:
       static_text: "욥은 *침묵을 깨고* 자기 태어난 날을 저주합니다. 신은 욥의 이 외침을 책망하지 않으셨습니다. *비탄을 말할 자유* 가 신앙 안에 있습니다."
       additional_refs: ["job-3:11", "job-6:8"]
       reflection_prompt: "당신이 지금 *말할 수 없었던* 외침이 있다면, 한 단어라도 떠올려 보세요. 화면에 적을 필요 없습니다. 단지 *떠올리는 것* 만으로 욥의 자리에 한 발 다가갑니다."
+      language_note: "R 가드 — 비탄의 언어를 *허락* 하되 낭만화하지 않는다. 지금 실제로 죽음 생각이 크다면 본문보다 1393 연결이 우선이다."
+    trigger_warning:
+      level: medium
+      content: ["death_wish", "birth_lament"]
+      consent_card_id: "job_scene2_lament_warning"
+      skip_alternative_scene_id: 3
     next: 3
 
   - id: 3
@@ -53,6 +72,7 @@ scenes:
             response: "그 자각이 욥의 친구들이 끝까지 못 한 것입니다. 다음에 누군가 곁에 있을 때, *침묵* 의 선택지가 있다는 것을 기억해주세요." }
         - { id: not_sure,        label: "잘 모르겠다",
             response: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다." }
+      theology_note: "신학 가드 — 고난의 원인을 당사자의 죄로 단정하는 인과응보 서술은 하나님이 직접 책망하신 것 (욥 42:7). 어떤 분기에서도 '네 탓' 프레임 금지."
     next: 4
 
   - id: 4
@@ -77,6 +97,14 @@ scenes:
     extras:
       anchor: 만남으로서의 회복
       static_text: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다."
+      restoration_note: "R3 가드 — 욥 42:10 의 '갑절 회복' 을 이 시나리오의 결말로 쓰지 않는다 (회복 보장 서사 금지). 결말은 의도적으로 *답 없는 만남* 에서 멈춘다."
+      suffering_footer: "이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요."   # R2 필수 footer (Theme 5)
+      recovery_keys:
+        SAD:      job.recovery.lament_permitted
+        CONFUSED: job.recovery.question_book
+        LONELY:   job.recovery.silent_presence
+        ANGRY:    job.recovery.honest_cry
+        EXHAUSTED: job.recovery.seven_days_silence
       crisis_reminder: "지금 이 순간이 무겁다면, 1393."
       next_scene_suggestion: "엘리야 — 죽기를 갈망한 후 천사가 음식과 잠을 주신 이야기"
     next: null
