@@ -43,7 +43,7 @@ environment:
     - id: scene3_r2_footer
       position: top_right
       style: small_persistent
-      text_ko: "이 미션은 자발적 부름 앞 망설임을 다룹니다. '나는 못 한다' 가 '나는 가치 없다' 로 미끄러지지 않도록, 능력 평가 ≠ 인격 평가 를 기억해 주세요. 위기 시 1577-0199 / 1393"
+      text_ko: "이 미션은 자발적 부름 앞 망설임을 다룹니다. '나는 못 한다' 가 '나는 가치 없다' 로 미끄러지지 않도록, 능력 평가 ≠ 인격 평가 를 기억해 주세요. 위기 시 {{crisis_resources.default}}"
     - id: scene3_r3_one_card_enough
       position: top_right_secondary
       style: small_persistent
@@ -56,7 +56,7 @@ environment:
     - id: scene3_footer_persistent
       position: bottom_left
       style: small_persistent
-      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 npcs:
   - id: moses_self
@@ -389,7 +389,7 @@ safety_gates:
     note: "본문 인용 (출 4:1 '믿지 아니하면') 은 source=scripture_quote 로 분류, 차단 없이 footer + 위기 자원 카드만 동반"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: moses_scene4
 transition:

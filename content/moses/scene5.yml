@@ -49,7 +49,7 @@ environment:
     - id: scene5_footer_persistent
       position: bottom_left
       style: small_persistent
-      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 npcs:
   - id: moses_self
@@ -166,7 +166,7 @@ safety_gates:
     description: "AI 음성 opt-out 사용자도 텍스트 자막은 동일. 환경 사운드는 AI 아님 (3D 오디오 공간감 유지)"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: moses_scene6
 transition:

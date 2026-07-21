@@ -183,7 +183,7 @@ safety_gates:
     description: "불꽃 안 직접적 인격 표현 회피 (theology-tone §1) — 추상적 빛 + 절제된 내레이터 톤"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: moses_scene3
 transition:

@@ -184,7 +184,7 @@ safety_gates:
     description: "가족 모욕이 형제 비교 트라우마 사용자에게 자극될 수 있음 — 진입 2초 뒤 우상단 건너뛰기 버튼 (3초 페이드인)"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: david_scene3
 transition:

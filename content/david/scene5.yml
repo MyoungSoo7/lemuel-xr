@@ -220,7 +220,7 @@ safety_gates:
     description: "화면 살짝 흔들림은 강도 토글 off 시 비활성 — 트라우마 사용자 보호"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: david_scene6
 transition:

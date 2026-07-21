@@ -35,11 +35,11 @@ environment:
     - id: scene1_r2_footer
       position: top_right
       style: small_persistent
-      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 가정·종교·직장에서 떠밀리는 의무가 아닙니다. 위기 시 1577-0199 / 1393"
+      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 가정·종교·직장에서 떠밀리는 의무가 아닙니다. 위기 시 {{crisis_resources.default}}"
     - id: scene1_footer_persistent
       position: bottom_left
       style: small_persistent
-      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
     - id: scene1_skip_button
       position: bottom_left_right_offset
       style: faint_appears_after_5s
@@ -146,7 +146,7 @@ safety_gates:
     description: "AI 음성 0건 (자막 only) — opt-out 사용자도 동일 경험"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: moses_scene2
 transition:

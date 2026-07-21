@@ -36,7 +36,7 @@ environment:
     - id: scene1_r2_footer
       position: bottom_left
       style: small_persistent
-      text_ko: "믿음과 능력은 적이 아니다 | AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+      text_ko: "믿음과 능력은 적이 아니다 | AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 npcs:
   - id: david_self
@@ -178,7 +178,7 @@ safety_gates:
     description: "AI 보조 footer 영구 노출, opt-out 시 시편 본문 텍스트는 동일 노출 (TTS 만 비활성)"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: david_scene2
 transition:

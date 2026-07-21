@@ -34,7 +34,7 @@ environment:
     - id: scene3_r2_footer
       position: top_right
       style: small_persistent
-      text_ko: "이 묵상은 자기 정체성을 지키는 자유를 다룹니다. 남이 주는 역할을 거부하는 결정이 가정폭력·종교적 학대 상황의 견딤을 강요하는 메시지가 아닙니다. 안전이 우선입니다. 위기 시 1577-0199 / 1393"
+      text_ko: "이 묵상은 자기 정체성을 지키는 자유를 다룹니다. 남이 주는 역할을 거부하는 결정이 가정폭력·종교적 학대 상황의 견딤을 강요하는 메시지가 아닙니다. 안전이 우선입니다. 위기 시 {{crisis_resources.default}}"
     - id: scene3_r2_footer_bottom
       position: bottom_left
       style: small_persistent
@@ -212,7 +212,7 @@ safety_gates:
     description: "갑옷 거절이 디폴트지만 수용도 정당한 선택 — 단일 정답 금지"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: david_scene4
 transition:

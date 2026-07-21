@@ -115,7 +115,7 @@ safety_gates:
     description: "AI 보조 footer 영구 노출, opt-out 시에도 TTS 사전 캐시 재생 가능"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: joseph_scene2
 transition:

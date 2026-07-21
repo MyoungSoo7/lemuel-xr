@@ -89,7 +89,7 @@ safety_gates:
     description: "AI opt-out 사용자에게도 본문 텍스트는 동일 노출, TTS 음성만 비활성"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: null
 transition_to_outro: true

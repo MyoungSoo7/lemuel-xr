@@ -37,11 +37,11 @@ environment:
     - id: scene4_r2_footer
       position: top_right
       style: small_persistent
-      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 시각적 변형은 상징입니다. 당신의 몸이 변해야 한다는 메시지가 아닙니다. 위기 시 1577-0199 / 1393"
+      text_ko: "이 묵상은 자발적 부름 앞 망설임을 다룹니다. 시각적 변형은 상징입니다. 당신의 몸이 변해야 한다는 메시지가 아닙니다. 위기 시 {{crisis_resources.default}}"
     - id: scene4_footer_persistent
       position: bottom_left
       style: small_persistent
-      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+      text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 npcs:
   - id: moses_self
@@ -274,7 +274,7 @@ safety_gates:
     description: "AI opt-out 사용자도 텍스트 자막 동일 노출, TTS 음성만 비활성"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: moses_scene5
 transition:

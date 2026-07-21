@@ -162,7 +162,7 @@ safety_gates:
     description: "침묵 (욥 2:13) 정당한 반응 — TRACK-A-5 욥기 연결"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: joseph_scene5
 transition:

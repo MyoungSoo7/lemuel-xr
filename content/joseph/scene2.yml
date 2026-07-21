@@ -135,7 +135,7 @@ safety_gates:
     description: "선택 C 의 '오늘 백성이 조금 더 배고프겠지만' 은 자기비난 톤 차단 — 책임 인식 톤"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: joseph_scene3
 transition:

@@ -267,7 +267,7 @@ safety_gates:
     note_ko: "Scene 4 의 돌 선택 단계에서 음성 입력 기능 활성 시 적용"
   - id: footer_persistent
     enforced_at: always
-    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 1577-0199"
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"
 
 next_scene_id: david_scene5
 transition:
