@@ -1,0 +1,205 @@
+# Scene 5 — 재정향: "하나님을 경외하라" (75초, 단순함·안착) ★ 핵심 인터랙션 #2 — 내려놓기 (비강제)
+# ⚠️ R3 핵심: 재정향 압박 0건 — '경외'를 도덕 명령·숙제로 만들지 않음. 내려놓기 비강제(on_timeout 20초 treat_as_complete, 결정 E).
+# ⚠️ 내려놓기 오브젝트는 경로 의존 3종(결정 A): 왕관(Scene1 부담)·칼(Scene3 판결의 무게)·보물(Scene4 허무).
+#     Scene4 skip 시 왕관·칼만 / Scene3 skip·미완주(이탈·R1 인터럽트) 시 칼 대신 판결 두루마리(S3). 어느 경로든 Scene 5 완결.
+# ⚠️ R5: default_path=static_curation + llm_optin_only=true — opt-out 사용자도 동일 서사 완결.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 수기 seed(독립 채점 0.82 통과) 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+
+scene_id: solomon_scene5
+scene_name: fear_god_reorientation
+mission_id: solomon
+version: 1.0.0
+duration_seconds_target: 75
+
+environment:
+  space_id: gibeon_altar_dawn_return
+  background_model: env_gibeon_altar_dawn      # Scene 1 공간 재사용, 빛만 새벽으로 — 처음 구하던 자리로 돌아옴(수미상관)
+  lighting:
+    type: pre_dawn_soft_warmth
+    color_temperature_kelvin: 3200
+    gentle_volumetric_light: true
+  ambient_sound:
+    - id: dawn_birds_sparse
+      gain_db: -26
+      spatial: true
+    - id: low_harp_drone
+      gain_db: -26
+      spatial: false
+    - id: ember_settle_soft
+      gain_db: -24
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: solomon_old_self
+    voice_id: solomon_old_v1
+    position: [0.0, 1.65, 0.0]
+
+conditional_assets:      # 결정 A — 경로 의존 내려놓기 오브젝트
+  - asset: model_crown
+    condition: always
+    meaning_ko: "왕관 — Scene 1 의 부담"
+  - asset: model_judgment_sword
+    condition: scene3_completed      # '완주'만 칼 — skip·미완주 등 그 외 전부 두루마리 폴백 (S3)
+    meaning_ko: "칼 — Scene 3 판결의 무게"
+  - asset: model_judgment_scroll
+    condition: scene3_skipped_or_incomplete
+    meaning_ko: "판결 두루마리 — 칼 시각 트리거 회피 대체 (scene3 skip·미완주 사용자)"
+    note: "Scene 3 '진입 후 미완주'(이탈·R1 인터럽트 후 재방문) 케이스의 기본값 = 두루마리 폴백 (S3) — 고통으로 이탈한 사용자에게 칼 재노출 방지. 기존 skip→두루마리 배선은 불변."
+  - asset: model_treasure_pile
+    condition: scene4_visited
+    meaning_ko: "보물 — Scene 4 의 허무. Scene 4 skip 시 미등장"
+
+narration_blocks:
+  - id: nb_s5_return
+    speaker: narrator
+    text_ko: "왕은 처음 구하던 자리로 돌아왔다. 제단의 불씨가 아직 남아 있었다."
+    audio_clip_id: aud_s5_return_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s5_conclusion
+    speaker: solomon_old_inner
+    text_ko: "일의 결국을 다 들었으니 하나님을 경외하고 그의 명령들을 지킬지어다 이것이 모든 사람의 본분이니라 (전도서 12:13)"
+    audio_clip_id: aud_s5_conclusion_ko
+    start_at_seconds: 10.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+    note: "재정향의 본문 — 채움의 목록이 아니라 방향 한 줄. 명령 톤이 아닌 안착 톤으로 낭독."
+  - id: nb_s5_laydown_invitation
+    speaker: system
+    text_ko: "손에 들려 있던 것들을 제단 앞에 내려놓아도 좋다. 내려놓지 않아도 괜찮다. 이 자리는 시험이 아니다."
+    audio_clip_id: aud_s5_invitation_ko
+    start_at_seconds: 24.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    note: "R3 — 내려놓기는 초대이지 요구가 아님. '내려놓지 않아도 괜찮다' 명시."
+  - id: nb_s5_reorientation_message
+    speaker: system
+    text_ko: ""      # hevel_label × faith_tone 정적 매트릭스 주입 (MVP-SOLOMON-CONTENT §6, 9조합 사전 큐레이션)
+    audio_clip_id: null
+    start_at_seconds: 52.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    default_path: static_curation
+    default_text_ko: "가장 많이 가진 왕이 마지막에 남긴 말은 하나뿐이었다 — 하나님을 경외하라. (전도서 12:13)"
+    llm_optin_only: true              # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
+    llm_prompt_key_map:
+      emptiness: "solomon_s5_reorientation_emptiness"
+      restlessness: "solomon_s5_reorientation_restlessness"
+      loss_of_meaning: "solomon_s5_reorientation_loss_of_meaning"
+    conditional_softening_ref: F66_reorientation_state_gate
+
+interactions:
+  - id: ix_s5_lay_down_optional
+    type: grab_and_place
+    target_assets: [model_crown, model_judgment_sword, model_judgment_scroll, model_treasure_pile, socket_altar_front]
+    gesture: grab_and_place
+    presentation:
+      optional: true
+      objects_resolved_by: conditional_assets
+      per_object_placement: true       # 하나만 내려놓아도, 셋 다 내려놓아도, 하나도 안 내려놓아도 모두 완주
+    haptic:
+      intensity: 0.25
+      duration_ms: 250
+      release_softness: high
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 20
+        on_timeout: treat_as_complete
+        description: "내려놓기 대기 20초 경과 시 완주 처리 (결정 E). 재촉 프롬프트 없음 — 침묵 대기만."
+      - rule: track_micro_signals
+        records: [objects_laid_down, time_to_first_laydown_seconds]
+        note: "내려놓은 목록·망설임 시간 = 서사적 미세 신호 (임상 진단 아님)."
+
+branches:
+  - id: br_s5_reorientation_message
+    triggered_by_event: [scene_enter]
+    decision_key: reorientation_key
+    backend_endpoint: "POST /api/game/solomon/complete"
+    body_template:
+      hevel_label: "{{from_scene4_or_null}}"
+      entry_emotion: "{{emotion_logs.latest}}"
+      faith_tone: "{{users.faith_tone}}"
+      objects_laid_down: "{{list}}"
+    routes:
+      - when: { hevel_label: emptiness }
+        reorientation_text_ko: "다 가진 뒤에도 비어 있던 왕이 마지막에 남긴 말은 '더 가지라'가 아니었다. 하나님을 경외하라 — 채움이 아니라 방향이었다."
+      - when: { hevel_label: restlessness }
+        reorientation_text_ko: "쌓는 손을 잠시 멈춰도 된다. 해 아래 수고보다 먼저, 너를 지으신 분 앞에 서는 자리가 있다."
+      - when: { hevel_label: loss_of_meaning }
+        reorientation_text_ko: "의미를 다 알 수 없어도 된다. 전도서는 답을 다 주지 않고, 경외라는 출발점 하나를 준다."
+      - when: { hevel_label: null }
+        reorientation_text_ko: "가장 많이 가진 왕이 마지막에 남긴 말은 하나뿐이었다 — 하나님을 경외하라. (전도서 12:13)"
+        note: "Scene 4 skip 또는 라벨 미선택 경로 — 기본 정적 문구로 동일하게 완결 (결정 A·R4)."
+    note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9 사전 큐레이션 (MVP-SOLOMON-CONTENT §6). 위 문구는 balanced 기본값."
+
+safety_gates:
+  - id: R3_no_reorientation_pressure
+    enforced_at: always
+    description: "'경외'를 도덕 명령·숙제·회복 과제로 만들지 않음. 내려놓기 비강제, 재촉 프롬프트 0건. '내려놓지 않아도 괜찮다' 명시."
+    lint_forbidden_tokens: ["이제 깨달았으니", "다시 열심히", "허무를 극복", "믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르"]
+  - id: R3_no_instrumentalization
+    enforced_at: always
+    description: "'허무를 느꼈으니 이제 바르게 살아라'류 교훈화 차단 — 재정향은 결론 본문(전 12:13)의 안착 톤으로만."
+  - id: F66_reorientation_state_gate
+    enforced_at: before_scene_enter
+    description: "F-6.6 조건부 완화 — 취약 상태 이력 사용자에게 재정향 문구가 압박으로 읽히지 않도록 자동 소프트닝 또는 스킵."
+    trigger_conditions:
+      - source: safety_alerts
+        rule: "severity='high' 이력 존재 (user_id 기준, category 무관)"
+      - source: emotion_logs
+        rule: "최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)"
+    on_trigger:
+      action: soften_or_skip
+      affected_blocks: [nb_s5_reorientation_message]
+      soften: "재정향 어휘를 '오늘은 여기 있는 것으로 충분' 위로로 완화. 내려놓기 인터랙션은 유지(비강제)."
+      skip: "상태가 특히 무거우면 재정향 문구 스킵, 본문(전 12:13) 자막과 고요만 노출."
+      note: "임상 판정 아님 — 서사 톤 자동 완화. 판정 로직은 백엔드 소관, 본 선언은 콘텐츠 게이트 계약."
+  - id: R5_ai_optout_respected
+    enforced_at: br_s5_reorientation_message
+    description: "AI 응답은 opt-in 예외 경로(기본 OFF). 기본 경로 = 본문 한 줄 + faith_tone×hevel_label 정적 큐레이션. opt-out 도 동일 서사 완결."
+  - id: R1_death_preference_scope_exclusion
+    enforced_at: always
+    description: "죽음선호 구절(전도서 4장 초반 류) 인용·각색·암시 전면 금지 — 미션 전체 범위 제외."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null      # 미션 종료 → 메인 복귀 (또는 트랙 A 전도서 Theme 3 bridge 제안)
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.2
+  fade_in_seconds: 1.0
+
+bridge:
+  offer_track_a: true
+  prompt_ko: "이 시간을 기록하시겠어요?"
+  yes_route: "GET /api/track-a/ecclesiastes-bridge?theme=3"    # Track A Theme 3 — 전도서와 인생 (허무·공허)
+  no_route: main_menu
+
+recovery_metric_dimensions:
+  spiritual: ["경외로의 재정향", "선물로 받은 지혜", "본분의 단순함"]
+  emotional: ["공허의 정직한 인정", "내려놓음의 홀가분함", "공감받음"]
+  rational: ["성취와 의미의 구분", "쌓기와 멈춤의 재구성", "가치 재정렬"]
+
+theology_footer_refs:
+  - citation_id: S2_candidate
+    source: "전도서 12:13 결론 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "전도서의 결론은 허무의 부정이 아니라 허무 곁의 방향 제시 — '경외'는 압박이 아닌 안착(R3의 신학적 뿌리)."
+    anchor_block: nb_s5_conclusion
+  - scripture_refs:
+      - ref: "전도서 12:13"
+        translation: krv
+        anchor_block: nb_s5_conclusion
+  - disputed_points:
+      - "솔로몬 말년 타락(왕상 11)과 구원 여부 논쟁 — 본 미션 범위 제외를 정직하게 scoping. 미션은 왕상 3·10 + 전도서 성찰 축만 다루며, 말년 서사를 미화·은폐하지 않고 '다루지 않음'을 명시."
+      - "재정향(전 12:13)이 '도덕 명령 압박'으로 읽힐 위험 — R3 로 차단, 내려놓기 비강제·안착 톤."
+    handling: "범위 제외는 은폐가 아니라 정직한 scoping — MVP 문서 §12.6 에 전체 목록. 경외 = 숙제가 아니라 방향."

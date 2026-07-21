@@ -1,0 +1,116 @@
+# Scene 2 — 꿈에 응답하신 하나님 (45초, 수용됨 — 구하지 않은 것까지)
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 수기 seed(독립 채점 0.82 통과) 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 하나님 형상 배제 — 꿈 속 음성(dream_voice_v1)만. 책망 없음 — 구함이 기뻐 받아들여지는 장면.
+
+scene_id: solomon_scene2
+scene_name: dream_answer
+mission_id: solomon
+version: 1.0.0
+duration_seconds_target: 45
+
+environment:
+  space_id: gibeon_dream_space
+  background_model: env_gibeon_dream_soft_light
+  lighting:
+    type: dream_soft_volumetric
+    color_temperature_kelvin: 3400
+    gentle_volumetric_light: true
+  ambient_sound:
+    - id: low_harp_drone
+      gain_db: -26
+      spatial: false
+    - id: dream_air_shimmer
+      gain_db: -28
+      spatial: false
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: dream_voice
+    voice_id: dream_voice_v1
+    position: [0.0, 1.8, 0.4]
+    visual_traits: [no_form_light_only]
+    note: "하나님의 꿈 속 음성 — 형상 없음, 부드러운 빛과 소리로만 (실사·형상 배제)."
+  - id: solomon_self
+    voice_id: solomon_young_v1
+    position: [0.0, 1.65, 0.0]
+
+narration_blocks:
+  - id: nb_s2_dream_intro
+    speaker: narrator
+    text_ko: "기브온에서 밤에 여호와께서 꿈에 솔로몬에게 나타나셨다. (열왕기상 3:5, 요약)"
+    audio_clip_id: aud_s2_dream_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s2_answer_pleased
+    speaker: dream_voice
+    text_ko: "네가 이것을 구하도다 자기를 위하여 장수하기를 구하지 아니하며 부도 구하지 아니하며 자기 원수의 생명을 멸하기도 구하지 아니하고 오직 송사를 듣고 분별하는 지혜를 구하였으니 (열왕기상 3:11)"
+    verbatim_note: "개역개정 원문 대조 완료(2026-07-22, 대한성서공회) — 어미 변경 없는 verbatim (T4)."
+    audio_clip_id: aud_s2_answer_pleased_ko
+    start_at_seconds: 10.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+  - id: nb_s2_wisdom_given
+    speaker: dream_voice
+    text_ko: "내가 네 말대로 하여 네게 지혜롭고 총명한 마음을 주노니 (열왕기상 3:12)"
+    audio_clip_id: aud_s2_wisdom_given_ko
+    start_at_seconds: 23.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s2_beyond_asking
+    speaker: dream_voice
+    text_ko: "내가 또 네가 구하지 아니한 부귀와 영광도 네게 주노니 (열왕기상 3:13)"
+    audio_clip_id: aud_s2_beyond_asking_ko
+    start_at_seconds: 33.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "부·영광 = 하나님이 덤으로 주신 것. Scene 4 허무와의 대비 축 — 소유 자체는 죄악시하지 않음(신학 가드)."
+
+interactions:
+  - id: ix_s2_receive_light
+    type: auto_proceed
+    presentation:
+      description: "부드러운 빛이 사용자 손에 잠시 머무는 연출 — 받는 자의 자세. 입력 요구 없음."
+    validation_rules:
+      - rule: auto_proceed
+        description: "결정 없음 — 수용됨의 체험만."
+
+branches: []      # 결정 분기 없음 — 응답은 성취가 아니라 선물.
+
+safety_gates:
+  - id: no_rebuke_in_answer
+    enforced_at: always
+    description: "이 Scene 에 책망·조건 제시 연출 0건 — 구함이 기뻐 받아들여지는 톤만. (왕상 3:14 조건절은 disputed 로 이관, 연출 생략)"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "허무 가스라이팅(R2)·재정향 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패."
+    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르", "이제 깨달았으니", "다시 열심히", "허무를 극복"]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: solomon_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+  note: "Scene 3 진입 직전 R4 mid 강도 동의 게이트 (scene3.yml 참조)."
+
+theology_footer_refs:
+  - citation_id: S1_candidate
+    source: "왕상 3:10~14 응답 서사 — 확정 서지 미확보(드릴다운 필요)"
+    note: "구하지 않은 것까지 주시는 하나님 — 그러나 Scene 4 는 그 '덤'의 꼭대기에서도 공허가 온다는 정직한 후속."
+    anchor_block: nb_s2_beyond_asking
+  - disputed_points:
+      - "왕상 3:14 조건절('네가 네 아버지 다윗이 행함 같이 … 행하면') — 말년 불순종(왕상 11)과의 연결 해석. 본 미션 범위 제외 scoping 과 함께 정직 명시."
+    handling: "조건절 연출 생략(범위 제외). 말년 타락 논쟁은 scene5 disputed 및 MVP 문서 §12.6 에서 scoping."

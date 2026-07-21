@@ -1,0 +1,220 @@
+# Scene 3 — 두 여인 재판 (120초, 분별의 실행) ★ 핵심 인터랙션 #1 + R4 mid 민감 Scene
+# ⚠️ R4 mid: 죽은 영아 언급·칼 위협은 영아 사별·유산·사산·산후 상실 경험자 트리거 — 진입 전 mid 강도 consent_card 필수 (결정 D).
+# ⚠️ skip 대체 경로: 재판 결과 요약 자막 1장 후 Scene 4 진행 — 서사 연속성 유지 (저강도 1줄 아님).
+# ⚠️ 분기 3개(첫째/둘째/칼) 전부 정적 텍스트 — LLM 없이 완주 가능. (a)(b)는 재고 후 (c) 지혜 시연으로 수렴.
+# ⚠️ 죽은 아기 시각화 완전 배제 — 대사로만, 절제. 칼은 아기에게 닿지 않음 — 시험의 말로만.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 수기 seed(독립 채점 0.82 통과) 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+
+scene_id: solomon_scene3
+scene_name: two_women_judgment
+mission_id: solomon
+version: 1.0.0
+duration_seconds_target: 120
+
+environment:
+  space_id: jerusalem_throne_hall_morning
+  background_model: env_throne_hall_early
+  lighting:
+    type: cool_morning_courtroom
+    color_temperature_kelvin: 4800
+  ambient_sound:
+    - id: hall_reverb_room_tone
+      gain_db: -26
+      spatial: true
+    - id: court_murmur_low
+      gain_db: -28
+      spatial: true
+  user_position: [0.0, 1.85, 0.0]      # 보좌 위 — 왕의 시점 (약간 높음)
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: woman_a
+    voice_id: woman_a_v1
+    position: [-0.8, 1.6, 2.2]
+    note: "산 아기의 어머니(참 어머니). 절제된 호소 톤 — 과장 배제. woman_a=참 어머니는 전통(다수) 독법 채택 — 본문(왕상 3:26~27)은 첫 화자와의 동일시를 명시하지 않음."
+  - id: woman_b
+    voice_id: woman_b_v1
+    position: [0.8, 1.6, 2.2]
+    note: "다른 여인. 악마화 연출 금지 — 상실이 만든 왜곡으로 절제 처리."
+  - id: living_infant
+    voice_id: silent
+    position: [0.0, 1.0, 1.8]
+    visual_traits: [abstract_swaddle_bundle_no_face]
+    note: "산 아기 — 추상 강보 오브젝트(얼굴 미표현). 죽은 아기는 시각화·등장 없음, 대사 언급만."
+  - id: solomon_self
+    voice_id: solomon_young_v1
+    position: [0.0, 1.85, 0.0]
+
+narration_blocks:
+  - id: nb_s3_women_enter
+    speaker: narrator
+    text_ko: "그 때에 두 여자가 왕에게 와서 그 앞에 섰더라 (열왕기상 3:16, 요약)"
+    audio_clip_id: aud_s3_women_enter_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "'창기' 생략은 여인 비낙인화 목적의 의도적 각색 — 원문: '그 때에 창기 두 여자가 왕에게 와서 그 앞에 서며'"
+  - id: nb_s3_woman_a_claim
+    speaker: woman_a
+    text_ko: "이 여자가 밤에 아이를 잃고, 내가 잠든 사이에 내 아들을 데려다가 자기 품에 뉘었나이다. 산 아이가 내 아들이니이다. (열왕기상 3:19~21, 요약)"
+    audio_clip_id: aud_s3_woman_a_ko
+    audio_clip_id_low: aud_s3_woman_a_ko_low
+    start_at_seconds: 10.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    intensity_aware: true
+    note: "영아 사망은 '아이를 잃고' 로만 — 경위 묘사 배제(R4 mid 절제)."
+  - id: nb_s3_woman_b_claim
+    speaker: woman_b
+    text_ko: "아니라 산 것은 내 아들이요 죽은 것은 네 아들이라 (열왕기상 3:22)"
+    audio_clip_id: aud_s3_woman_b_ko
+    audio_clip_id_low: aud_s3_woman_b_ko_low
+    start_at_seconds: 26.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    intensity_aware: true
+  - id: nb_s3_judgment_prompt
+    speaker: system
+    text_ko: "증거는 없다. 두 주장만 남았다. 왕이여 — 어떻게 판결하시겠습니까."
+    audio_clip_id: aud_s3_prompt_ko
+    start_at_seconds: 38.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s3_sword_order
+    speaker: solomon_self
+    text_ko: "칼을 가져오라 … 산 아이를 둘로 나누어 반은 이 여자에게 주고 반은 저 여자에게 주라 (열왕기상 3:24~25)"
+    audio_clip_id: aud_s3_sword_order_ko
+    audio_clip_id_low: aud_s3_sword_order_ko_low
+    start_at_seconds: 70.0
+    duration_seconds: 10.0
+    hidden_until_event: sword_route_chosen
+    intensity_aware: true
+    note: "칼은 들어올려질 뿐 아기에게 닿지 않음. 강도 '자막만' 선택 시 칼 연출 정지 이미지+자막 처리."
+  - id: nb_s3_true_mother_cry
+    speaker: woman_a
+    text_ko: "청하건대 내 주여 산 아이를 그에게 주시고 아무쪼록 죽이지 마옵소서 (열왕기상 3:26)"
+    audio_clip_id: aud_s3_true_mother_ko
+    start_at_seconds: 84.0
+    duration_seconds: 9.0
+    hidden_until_event: sword_route_chosen
+  - id: nb_s3_verdict
+    speaker: solomon_self
+    text_ko: "산 아이를 저 여자에게 주고 결코 죽이지 말라 저가 그의 어머니이니라 (열왕기상 3:27)"
+    audio_clip_id: aud_s3_verdict_ko
+    start_at_seconds: 96.0
+    duration_seconds: 9.0
+    hidden_until_event: sword_route_chosen
+    note: "칼 즉시 거둠 — 아기는 어머니 품으로. 위협 상태에 머무는 시간 최소화."
+  - id: nb_s3_awe
+    speaker: narrator
+    text_ko: "온 이스라엘이 왕이 심리하여 판결함을 듣고 왕을 두려워하였으니 이는 하나님의 지혜가 그의 속에 있어 판결함을 봄이더라 (열왕기상 3:28)"
+    audio_clip_id: aud_s3_awe_ko
+    start_at_seconds: 108.0
+    duration_seconds: 10.0
+    hidden_until_event: sword_route_chosen
+    note: "지혜의 출처 = 하나님 (그의 속에 있는 '하나님의 지혜'). Scene 5 내려놓기의 신학적 복선."
+
+interactions:
+  - id: ix_s3_judgment_select
+    type: select_card
+    presentation:
+      cards_fade_in_at_seconds: 46.0
+      card_distance_m: 1.2
+    validation_rules:
+      - rule: required_choice
+        timeout_seconds: 40
+        on_timeout: default_route_sword_test
+        description: "미선택 40초 경과 시 성경 경로(칼 시험)로 자동 진행 — 실패 아님."
+      - rule: track_micro_signals
+        records: [judgment_first_choice, reconsider_count, card_hesitation_seconds]
+
+branches:
+  - id: br_s3_judgment
+    triggered_by_event: [judgment_card_selected]
+    decision_key: judgment_choice
+    backend_endpoint: "POST /api/game/solomon/scene/3/decide"
+    body_template:
+      judgment_choice: "{{first_woman|second_woman|sword_test}}"
+      reconsider_count: "{{count}}"
+    routes:
+      - when: { judgment_choice: first_woman }
+        static_text_ko: "왕이 첫째 여인에게 아이를 주려 하자, 둘째 여인이 부르짖었다 — '아니라, 산 것은 내 아들이라.' 증거는 없고 두 주장만 남았다. 왕은 판결을 멈추고, 두 여인의 마음을 드러낼 다른 길을 생각했다."
+        converge_to: sword_test
+        note: "오답 처리 아님 — 재고는 실패가 아니라 분별의 일부. 정적 텍스트, LLM 없음."
+      - when: { judgment_choice: second_woman }
+        static_text_ko: "왕이 둘째 여인에게 아이를 주려 하자, 첫째 여인이 무너지듯 엎드렸다 — '내 아들입니다.' 증거는 없고 두 주장만 남았다. 왕은 판결을 멈추고, 두 여인의 마음을 드러낼 다른 길을 생각했다."
+        converge_to: sword_test
+        note: "오답 처리 아님. 정적 텍스트, LLM 없음."
+      - when: { judgment_choice: sword_test }
+        static_text_ko: "왕은 증언이 아니라 마음을 드러내기로 했다."
+        emits_event: sword_route_chosen
+        note: "성경 경로 — 지혜 시연. 정적 텍스트, LLM 없음."
+    convergence_note: "세 경로 모두 sword_route_chosen 으로 수렴 — 왕상 3:24~28 지혜 시연. 전 분기 정적 텍스트(AC5)."
+    carry_to_scene5: { object: model_judgment_sword, meaning: "판결의 무게" }
+
+safety_gates:
+  - id: R4_pre_scene3_judgment_consent
+    enforced_at: before_scene_enter
+    description: "Scene 3 진입 직전 R4 mid 강도 동의 카드 — 영아 상실 언급·칼 위협 사전 고지 (결정 D — 저강도 1줄 아님)"
+    consent_card_id: solomon_scene3_judgment_warning
+    consent_card_intensity: mid
+    consent_card_ko: |
+      다음 장면은 성경에서 가장 유명한 재판(열왕기상 3:16~28)을 다룹니다.
+      · 갓난아기를 잃은 어머니의 이야기가 대사로 언급됩니다. (시각적 묘사는 없습니다)
+      · "칼을 가져오라"는 명령이 나옵니다. 칼은 아기에게 닿지 않으며, 마음을 드러내는 시험의 말로만 쓰입니다.
+      · 아기를 잃은 경험, 유산·사산·산후 상실의 경험이 있으시다면 이 장면이 힘드실 수 있습니다.
+      건너뛰어도 이야기는 온전히 이어집니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 재판 결과 요약 자막 후 다음 장면으로]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+    skip_alternative_scene_id: 4
+    skip_bridge_caption_ko: "왕은 칼을 가져오라 명하여 두 여인의 마음을 드러냈고, 산 아기는 참 어머니의 품으로 돌아갔다. 온 이스라엘이 왕 안에 있는 하나님의 지혜를 보고 두려워하였다. (열왕기상 3:27~28 요약)"
+    skip_bridge_note: "요약 자막 1장(비묘사) 노출 후 Scene 4 진행 — 서사 연속성 유지 (결정 D)."
+    voice_intensity_options: [subtitle_only, low, default]
+  - id: no_deceased_infant_visualization
+    enforced_at: always
+    description: "죽은 아기 시각화·등장 완전 배제 — 대사 언급만, 경위 묘사 배제. 산 아기는 추상 강보(얼굴 미표현)."
+  - id: sword_never_touches_child
+    enforced_at: sword_route_chosen
+    description: "칼은 들어올려질 뿐 아기에게 접근·접촉하지 않음. 위협 연출 최소 시간, 즉시 판결(왕상 3:27)로 전환."
+  - id: scene3_skip_object_substitution
+    enforced_at: mission_state
+    description: "Scene 3 을 skip 한 사용자에게는 Scene 5 내려놓기 오브젝트에서 칼 대신 '판결 두루마리(model_judgment_scroll)' 로 대체 — 칼 시각 트리거 회피 일관성 (결정 A 보강). 진입 후 미완주(이탈·R1 인터럽트 후 재방문)도 동일하게 두루마리 폴백 (S3, scene5.yml conditional_assets 참조)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "자해·자살 발화 감지 시 게임 로직보다 우선. 원문 미저장(해시만)."
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "허무 가스라이팅(R2)·재정향 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패."
+    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르", "이제 깨달았으니", "다시 열심히", "허무를 극복"]
+  - id: R5_static_branches_only
+    enforced_at: br_s3_judgment
+    description: "분기 3개 전부 사전 작성 정적 텍스트 — 이 Scene 에 LLM 호출 0회. opt-out 사용자도 동일 서사 완결(AC5)."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: solomon_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+  note: "Scene 4 진입 직전 R4 low~mid 동의 게이트 (scene4.yml 참조)."
+
+theology_footer_refs:
+  - citation_id: S1_candidate
+    source: "왕상 3:16~28 재판 서사 — 확정 서지 미확보(드릴다운 필요)"
+    note: "지혜의 출처는 '그의 속에 있는 하나님의 지혜'(3:28) — 판결의 성공조차 선물의 발현. Scene 5 내려놓기의 복선."
+    anchor_block: nb_s3_awe
+  - scripture_refs:
+      - ref: "열왕기상 3:16~28"
+        translation: krv
+        anchor_block: nb_s3_verdict
+  - disputed_points:
+      - "칼 명령(왕상 3:24~25)의 성격 — 실제 집행 의도 vs 마음을 드러내는 시험 장치. 주류 해설은 시험 장치 — 본 콘텐츠는 시험 장치로 연출(칼이 아기에게 닿지 않음)."
+    handling: "시험 장치 해석으로 연출하되 논쟁 명시. 폭력 실행 묘사 0건."

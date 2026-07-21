@@ -1,0 +1,133 @@
+# Scene 1 — 기브온의 일천번제 (60초, 젊은 왕의 부담 + "듣는 마음을 주소서")
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 수기 seed(독립 채점 0.82 통과) 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 제물 올리기는 비핵심 도입 연출(서사 상태 불변) — 핵심 인터랙션 아님, 구현 optional (결정 B).
+# ⚠️ R1 미션 범위: 죽음선호 구절(전도서 4장 초반 류) 인용·각색·암시 전면 금지 — 전 Scene 공통.
+
+scene_id: solomon_scene1
+scene_name: gibeon_offering_and_request
+mission_id: solomon
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: gibeon_high_place_night
+  background_model: env_gibeon_altar_night
+  lighting:
+    type: warm_firelight_under_stars
+    color_temperature_kelvin: 2600
+    altar_fire_glow: true
+  ambient_sound:
+    - id: altar_fire_crackle_loop
+      gain_db: -18
+      spatial: true
+    - id: night_insects_distant
+      gain_db: -26
+      spatial: true
+    - id: low_wind_highland
+      gain_db: -24
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: solomon_self
+    voice_id: solomon_young_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 솔로몬 — first-person, 음성은 내면 독백만. 젊은 왕의 부담 톤."
+
+narration_blocks:
+  - id: nb_s1_intro
+    speaker: narrator
+    text_ko: "다윗의 아들, 젊은 왕이 기브온 산당에 올라 일천 번제를 드렸다. (열왕기상 3:4, 요약)"
+    audio_clip_id: aud_s1_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+  - id: nb_s1_crown_weight
+    speaker: solomon_inner
+    text_ko: "아버지의 자리는 크고, 나는 작다. 이 왕관은 왜 이렇게 무거운가."
+    audio_clip_id: aud_s1_crown_weight_ko
+    start_at_seconds: 12.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "왕관 = 부담의 상징 오브젝트. Scene 5 내려놓기 후보 #1 (결정 A — 어느 경로든 등장)."
+  - id: nb_s1_small_child
+    speaker: solomon_inner
+    text_ko: "종은 작은 아이라 출입할 줄을 알지 못하나이다 (열왕기상 3:7, 발췌·요약)"
+    adaptation_note: "원문 어미는 '알지 못하고' — 독백 종결 어미로 각색, 표기로 명시 (T4)."
+    audio_clip_id: aud_s1_small_child_ko
+    start_at_seconds: 30.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s1_request
+    speaker: solomon_inner
+    text_ko: "듣는 마음을 종에게 주사 주의 백성을 재판하여 선악을 분별하게 하옵소서 (열왕기상 3:9)"
+    audio_clip_id: aud_s1_request_ko
+    start_at_seconds: 44.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "지혜 = 구함의 대상, 하나님의 선물 — 인간 성취 아님 (신학 가드)."
+
+interactions:
+  - id: ix_s1_place_offering
+    type: grab_and_place
+    target_assets: [model_offering_bundle, socket_altar_top]
+    gesture: grab_and_place
+    presentation:
+      narrative_state_invariant: true      # 결정 B — 서사 상태 불변, 비핵심 도입 연출
+      implementation_optional: true        # 구현 생략 가능 (자동 연출 대체 허용)
+    haptic:
+      intensity: 0.25
+      duration_ms: 200
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 25
+        on_timeout: auto_advance
+        voice_prompt_id: aud_s1_prompt_offering
+        voice_prompt_max_repeat: 1
+      - rule: track_micro_signals
+        records: [offering_placed]
+        note: "기록만 — 서사 분기·평가에 사용하지 않음."
+
+branches: []      # Scene 1 결정 분기 없음 — 부담과 구함의 체험만.
+
+safety_gates:
+  - id: R4_pre_scene0_consent_required
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 미션 동의 게이트 — 성취 뒤의 공허·재판 장면 포함 사전 고지 + 위기 자원 {{crisis_resources.default}}"
+  - id: R1_death_preference_scope_exclusion
+    enforced_at: always
+    description: "죽음선호 구절(전도서 4장 초반 류) 인용·각색·암시 전면 금지 — 미션 전체 범위 제외 (기계 검증: 해당 구절 참조 문자열 0건)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "자해·자살 발화 감지 시 게임 로직보다 우선. safety_alerts 원문 미저장(해시만), category=suicidal_ideation_semantic."
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "허무 가스라이팅(R2)·재정향 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패."
+    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르", "이제 깨달았으니", "다시 열심히", "허무를 극복"]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path=static_curation 은 미션 공통."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: solomon_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: S1_candidate
+    source: "왕상 3 지혜 간구 서사 — 확정 서지 미확보(드릴다운 필요)"
+    note: "지혜는 구함의 대상(선물)이지 성취가 아님. '작은 아이' 자기 인식 = 부담의 정직한 인정."
+    anchor_block: nb_s1_request
+  - disputed_points:
+      - "산당 일천번제(왕상 3:3~4) — 산당 제사 문제. 성전 건축 전 과도기라는 주류 해설 병기, 정죄·미화 모두 회피."
+    handling: "과도기 해설 병기. Scene 1 은 부담·구함의 정서에 집중, 산당 신학 논쟁은 disputed 로만 명시."

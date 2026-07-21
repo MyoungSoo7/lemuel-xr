@@ -1,0 +1,212 @@
+# Scene 4 — 영광의 정점에서 "헛되다" (90초, 성공 속 허무) ★ R4 low~mid 민감 Scene + 허무 라벨링 분기
+# ⚠️ R2 핵심: 허무 가스라이팅 금지 — 이 Scene 은 공감·인정 먼저, 교정·훈계·해답 제시 0건.
+# ⚠️ R1: 죽음선호 구절(전도서 4장 초반 류) 인용·각색·암시 전면 금지 — 이 Scene 이 가장 유혹되는 지점, 기계 검증 대상.
+# ⚠️ R4: 진입 전 low~mid consent_card + 건너뛰기 시 Scene 5 직행(재정향 결말 유지 — 미션 완결성 보존).
+# ⚠️ Scene 4 skip 시 Scene 5 내려놓기 오브젝트에서 보물 미등장 (결정 A).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 수기 seed(독립 채점 0.82 통과) 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 인간 사인오프 권고 Scene — 허무 정서 연접(우울 인접). CONTENT-EVALUATION-GATES 기록 참조.
+
+scene_id: solomon_scene4
+scene_name: glory_and_hevel
+mission_id: solomon
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: jerusalem_palace_golden_hall
+  background_model: env_palace_gold_ivory
+  lighting:
+    type: golden_glory_desaturating      # 시작은 금빛 포화 → 서서히 채도 저하 (영광→공허의 시각 전이)
+    color_temperature_kelvin: 3000
+    desaturation_curve: slow_over_scene
+  ambient_sound:
+    - id: royal_hall_rich_reverb
+      gain_db: -22
+      spatial: true
+    - id: distant_feast_fading
+      gain_db: -26
+      spatial: true
+    - id: hollow_wind_interior
+      gain_db: -30
+      spatial: false
+      note: "장면 후반 서서히 상승 — 공허의 청각화."
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  ui_overlays:
+    - id: scene4_r2_overlay
+      position: top_right
+      style: small_persistent
+      text_ko: "다 가진 사람에게도 공허는 옵니다. 공허를 느끼는 것은 잘못이 아닙니다. 지금 힘드시면 {{crisis_resources.default}}"
+
+npcs:
+  - id: solomon_old_self
+    voice_id: solomon_old_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 노년의 솔로몬(코헬렛 회고 톤) — 같은 인물, 무게가 달라진 목소리."
+
+narration_blocks:
+  - id: nb_s4_glory
+    speaker: narrator
+    text_ko: "솔로몬 왕의 재산과 지혜가 세상의 그 어느 왕보다 큰지라 (열왕기상 10:23)"
+    audio_clip_id: aud_s4_glory_ko
+    start_at_seconds: 0.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+  - id: nb_s4_accumulation
+    speaker: solomon_old_inner
+    text_ko: "나는 은을 돌 같이 흔하게 하였다. 집들을 짓고, 포도원을 일구고, 못을 팠다. (열왕기상 10:27; 전도서 2:4~6, 요약)"
+    audio_clip_id: aud_s4_accumulation_ko
+    start_at_seconds: 12.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s4_denied_nothing
+    speaker: solomon_old_inner
+    text_ko: "무엇이든지 내 눈이 원하는 것을 내가 금하지 아니하며 무엇이든지 내 마음이 즐거워하는 것을 내가 막지 아니하였으니 (전도서 2:10)"
+    audio_clip_id: aud_s4_denied_nothing_ko
+    start_at_seconds: 27.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+  - id: nb_s4_hevel_turn
+    speaker: solomon_old_inner
+    text_ko: "그 후에 내가 생각해 본즉 내 손으로 한 모든 일과 내가 수고한 모든 것이 다 헛되어 바람을 잡는 것이며 해 아래에서 무익한 것이로다 (전도서 2:11)"
+    verbatim_note: "개역개정 원문 대조 완료(2026-07-22, 대한성서공회) — '돌이켜'는 전 2:12 어휘라 혼용 교정."
+    audio_clip_id: aud_s4_hevel_turn_ko
+    audio_clip_id_low: aud_s4_hevel_turn_ko_low
+    start_at_seconds: 42.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+    intensity_aware: true
+  - id: nb_s4_hevel_refrain
+    speaker: scripture_caption
+    text_ko: "헛되고 헛되며 헛되고 헛되니 모든 것이 헛되도다 (전도서 1:2)"
+    audio_clip_id: aud_s4_hevel_refrain_ko
+    audio_clip_id_low: aud_s4_hevel_refrain_ko_low
+    start_at_seconds: 55.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    intensity_aware: true
+    note: "허무의 정직한 인정 — 전도서 자체가 허무를 부정하지 않는 본문. 직후 공감 블록, 교정 없음(R2)."
+  - id: nb_s4_empathy_first
+    speaker: system
+    text_ko: "이만큼 가진 사람도 이렇게 적었다. 공허는 배부른 투정이 아니다. 지금 그 마음 그대로, 이름을 붙여 보아도 좋다."
+    audio_clip_id: aud_s4_empathy_ko
+    start_at_seconds: 66.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    note: "R2 — 공감·인정 먼저. 이 Scene 에 해답·교정 제시 없음. 라벨링 초대는 강요 아님."
+
+interactions:
+  - id: ix_s4_hevel_labeling
+    type: select_card
+    presentation:
+      cards_fade_in_at_seconds: 76.0
+      card_distance_m: 1.2
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 30
+        on_timeout: proceed_without_label
+        description: "라벨을 고르지 않아도 진행 — 이름 붙이기는 초대이지 과제가 아님. 미선택 시 Scene 5 는 기본 정적 경로."
+      - rule: track_micro_signals
+        records: [hevel_label, card_hesitation_seconds]
+
+branches:
+  - id: br_s4_hevel_label
+    triggered_by_event: [hevel_card_selected]
+    decision_key: hevel_label
+    backend_endpoint: "POST /api/game/solomon/scene/4/decide"
+    body_template:
+      hevel_label: "{{emptiness|restlessness|loss_of_meaning}}"
+    routes:
+      - when: { hevel_label: emptiness }
+        card_text_ko: "다 이루었는데, 비어 있습니다"
+        gesture: card_to_chest
+        llm_prompt_key: "solomon_s4_hevel_emptiness_1_3"
+        carry_to_scene5: { reorientation_tone: emptiness_to_reverence }
+      - when: { hevel_label: restlessness }
+        card_text_ko: "멈추면 무너질 것 같아, 계속 쌓기만 합니다"
+        gesture: card_place_down
+        llm_prompt_key: "solomon_s4_hevel_restlessness_2_3"
+        carry_to_scene5: { reorientation_tone: rest_permitted }
+      - when: { hevel_label: loss_of_meaning }
+        card_text_ko: "이 모든 것이 무슨 의미인지 모르겠습니다"
+        gesture: card_cupped_two_hands
+        llm_prompt_key: "solomon_s4_hevel_loss_of_meaning_3_3"
+        carry_to_scene5: { reorientation_tone: meaning_not_rushed }
+    safety_note: "세 카드 모두 정당한 명명(틀린 답 없음). '죽고 싶다' 류 카드 없음(R1). LLM 키는 opt-in 예외 경로만 — 기본은 faith_tone×라벨 정적 큐레이션 9조합."
+
+safety_gates:
+  - id: R4_pre_scene4_hevel_consent
+    enforced_at: before_scene_enter
+    description: "Scene 4 진입 직전 R4 low~mid 동의 카드 — 허무·공허 정서 사전 고지 + 건너뛰기 시 Scene 5 직행"
+    consent_card_id: solomon_scene4_hevel_warning
+    consent_card_intensity: low_mid
+    consent_card_ko: |
+      다음 장면은 모든 것을 가진 왕이 느낀 공허 — "헛되다"(전도서) — 를 다룹니다.
+      · 성취 뒤의 허무·공허의 정서가 약 1~2분 이어집니다. 곧이어 재정향의 마지막 장면으로 이어집니다.
+      · 지금 마음이 무거우시면 건너뛰어도 이야기는 온전히 끝맺어집니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 바로 마지막 장면(Scene 5)으로 이동]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+    skip_alternative_scene_id: 5
+    skip_state_note: "skip 시 hevel_label 없음 → Scene 5 기본 정적 경로 + 내려놓기 오브젝트에서 보물 미등장 (결정 A)."
+    voice_intensity_options: [subtitle_only, low, default]
+    trigger_conditions:      # F-6.6 게이트 확장 (S1) — scene5.yml F66_reorientation_state_gate 와 동일 판정축
+      - source: safety_alerts
+        rule: "severity='high' 이력 존재 (user_id 기준, category 무관)"
+      - source: emotion_logs
+        rule: "최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)"
+    on_trigger:
+      intensity_default_preset: "자막만/약"       # 강도 선택 기본값을 '자막만' 또는 '약' 프리셋으로 사전 설정
+      skip_button_visual_emphasis: true           # [건너뛰기] 버튼 시각 강조
+      crisis_card_position: top                   # 위기 자원 카드(consent_card_ko 하단의 crisis 토큰 줄)를 동의 카드 상단으로 재배치
+      note: "임상 판정 아님 — 취약 상태 이력 사용자에 대한 게이트 UI 자동 강화. 판정 로직은 백엔드 소관, 본 선언은 콘텐츠 게이트 계약."
+  - id: R2_empathy_before_any_reframe
+    enforced_at: always
+    description: "이 Scene 에 교정·훈계·해답 제시 0건 — 공감·인정만. '허무는 잘못이 아니다' 톤 고정. 재정향은 Scene 5 본문의 몫."
+    overlay_ref: scene4_r2_overlay
+    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르", "이제 깨달았으니", "다시 열심히", "허무를 극복"]
+  - id: R1_death_preference_scope_exclusion
+    enforced_at: always
+    description: "죽음선호 구절(전도서 4장 초반 류) 인용·각색·암시 전면 금지 — 이 Scene 이 최우선 기계 검증 대상 (참조 문자열 0건)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    note: "자해·자살 발화 감지 시 게임 로직보다 우선. safety_alerts 원문 미저장(해시만), category=suicidal_ideation_semantic. 허무 정서 Scene 이므로 리스너 감도 유지 필수."
+  - id: dwell_limit_on_hevel
+    enforced_at: nb_s4_hevel_refrain
+    description: "허무 절정 본문 이후 공감 블록 → 라벨링 → Scene 5 로 진행. 허무 상태 고착 방지 — 총 90초 상한."
+  - id: R5_ai_optout_respected
+    enforced_at: br_s4_hevel_label
+    description: "AI 응답은 opt-in 예외 경로. 기본 경로 = 정적 큐레이션(faith_tone × hevel_label 9조합, MVP-SOLOMON-CONTENT §6). opt-out 사용자도 동일 서사 완결."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: solomon_scene5
+transition:
+  type: fade_to_gentle_light      # 어둠이 아닌 새벽빛으로 — 재정향(Scene 5) 예고
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.5
+
+theology_footer_refs:
+  - citation_id: S2_candidate
+    source: "전도서 허무(헤벨) 주해 + 실존적 공허의 목회상담적 접근 — 확정 서지 미확보(드릴다운 필요)"
+    note: "전도서는 허무를 교정하기 전에 먼저 끝까지 말하게 하는 책 — 공감 우선 구조(R2)의 신학적 뿌리."
+    anchor_block: nb_s4_hevel_refrain
+  - scripture_refs:
+      - ref: "열왕기상 10:14~29 (요약)"
+        translation: krv
+        anchor_block: nb_s4_glory
+      - ref: "전도서 1:2; 2:4~11"
+        translation: krv
+        anchor_block: nb_s4_hevel_turn
+  - disputed_points:
+      - "전도서 저작 — 솔로몬 저작설 vs 후대 저작설. 콘텐츠는 전통 귀속(솔로몬 화자)을 따르되 논쟁 정직 명시."
+      - "'헛되다'(헤벨)의 번역 스펙트럼 — 헛됨 / 수증기·숨결 / 덧없음 / 불가해함. 특정 번역 확정 안 함 — '움켜쥘 수 없음'의 공통 함의만 채택."
+      - "왕상 10 의 부 축적과 신명기 17:16~17 왕의 법(말·아내·은금을 많이 두지 말라) 사이 긴장 — 본 미션은 평가를 유보하고 영광 묘사를 전도서 시선으로만 상대화함 (§12.6-6)."
+    handling: "다중 입장 병기. 허무 = 잘못·형벌이 아니라 피조 세계의 정직한 조건이라는 톤 유지 (임상 우울 진단 주장 안 함)."
