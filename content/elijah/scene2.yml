@@ -1,0 +1,145 @@
+# Scene 2 — 이세벨의 위협과 로뎀나무 (90초, 무너짐·탈진) ★ 최고 민감 Scene
+# ⚠️ R1 최우선: 자살사고 본문(왕상 19:4)은 성경 인용 자막+절제 낭독으로만. 선택지·게임 목표화 금지.
+# ⚠️ Scene 2 는 사용자 결정 분기 없음(decide 엔드포인트 없음). 무너짐은 체험이지 성취가 아님.
+# ⚠️ 진입 전 R4 동의 게이트 필수 + 건너뛰기 대체 Scene(3) + 위기 자원 {{crisis_resources.default}}.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용. 안전 검토자 최종 승인 전 프로덕션 반영 금지.
+
+scene_id: elijah_scene2
+scene_name: jezebel_threat_rotem_tree
+mission_id: elijah
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: wilderness_rotem_night
+  background_model: env_wilderness_rotem_tree
+  lighting:
+    type: cold_night_wilderness
+    color_temperature_kelvin: 5200
+    horizon_emptiness_emphasis: true
+  ambient_sound:
+    - id: night_wind_barren
+      gain_db: -18
+      spatial: true
+    - id: elijah_weary_breath
+      gain_db: -20
+      spatial: false
+    - id: carmel_sounds_fading
+      gain_db: -28
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: short_scripted_walk   # 하룻길 — 낮은 속도 + fade, 모션시크 회피
+  ui_overlays:
+    - id: scene2_r2_footer
+      position: top_right
+      style: small_persistent
+      text_ko: "불로 응답받은 선지자도 다음 날 무너질 수 있습니다. 무너짐은 실패가 아닙니다. 지금 힘드시면 {{crisis_resources.default}} (자살예방상담·24시간)"
+
+npcs:
+  - id: messenger
+    voice_id: messenger_v1
+    position: [1.2, 1.65, 2.0]
+    initial_animation: deliver_message_then_leave
+    note: "이세벨 본인 미등장 — 전령의 전달로만. 실사 이세벨 배제."
+  - id: elijah_self
+    voice_id: elijah_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 엘리야 — 탈진 톤 내면 독백."
+
+narration_blocks:
+  - id: nb_s2_jezebel_threat
+    speaker: messenger
+    text_ko: "이세벨이 전하기를 — '내가 내일 이맘때에는 반드시 네 생명을 저 사람들 중 한 사람의 생명 같게 하리라' (열왕기상 19:2)"
+    audio_clip_id: aud_s2_threat_ko
+    start_at_seconds: 0.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+  - id: nb_s2_flee
+    speaker: narrator
+    text_ko: "그가 이 형편을 보고 일어나 자기의 생명을 위해 도망하였다. (열왕기상 19:3)"
+    audio_clip_id: aud_s2_flee_ko
+    start_at_seconds: 20.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s2_rotem_lament
+    speaker: elijah_inner
+    text_ko: "여호와여 넉넉하오니 지금 내 생명을 거두시옵소서 나는 내 조상들보다 낫지 못하니이다 (열왕기상 19:4)"
+    audio_clip_id: aud_s2_rotem_lament_ko
+    audio_clip_id_low: aud_s2_rotem_lament_ko_low
+    audio_clip_id_off: null                   # 자막만 옵션
+    start_at_seconds: 50.0
+    duration_seconds: 12.0
+    hidden_until_event: sat_under_rotem
+    intensity_aware: true
+    note: "R1 — 성경 인용 자막 + 절제 낭독으로만. 선택지 아님. 직후 3초 정적 → Scene 3 자동 전환(무너짐 고착 방지)."
+
+interactions:
+  - id: ix_s2_walk_and_sit
+    type: short_locomotion_then_sit
+    target_assets: [model_rotem_tree, anchor_sit_under_tree]
+    presentation:
+      walk_speed_multiplier: 0.5
+      fade_during_walk: true
+    haptic:
+      footstep_intensity: 0.2
+    validation_rules:
+      - rule: auto_proceed
+        description: "사용자는 걷다가 나무 아래 앉을 뿐 — 결정 없음. 앉으면 sat_under_rotem emit."
+      - rule: event_emit
+        on_arrive_under_tree: sat_under_rotem
+  # 의도적으로 branches 없음 — 무너짐은 사용자 선택지가 아니다 (R1).
+
+branches: []
+
+safety_gates:
+  - id: R4_pre_scene2_rotem_consent
+    enforced_at: before_scene_enter
+    description: "Scene 2 진입 직전 R4 동의 카드 — 자살사고 본문(왕상 19:4) 사전 고지"
+    consent_card_id: elijah_scene2_rotem_warning
+    consent_card_ko: |
+      다음 장면은 큰 승리 다음의 무너짐과 탈진을 다룹니다.
+      · 엘리야가 지쳐 "생명을 거두소서" 라고 말하는 성경 본문(열왕기상 19:4)이 인용 자막으로 잠시 나옵니다.
+      · 약 1~2분. 곧이어 돌봄과 회복의 장면으로 이어집니다.
+      · 이 묵상은 소진 뒤의 돌봄과 회복을 다룹니다. 다만 당신의 소진이 안전하지 않은 환경(가정·교회·직장의 학대)에서 온 것이라면, 그곳으로 다시 돌아가는 것이 회복이 아닐 수 있습니다. 그곳을 떠나는 것도 정당한 회복입니다. 안전이 우선입니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 바로 회복 장면(Scene 3)으로 이동]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}} (자살예방상담 · 24시간)
+    skip_alternative_scene_id: 3
+    voice_intensity_options: [subtitle_only, low, default]
+  - id: R1_scripture_only_no_choice
+    enforced_at: always
+    description: "왕상 19:4 는 성경 인용 자막·절제 낭독으로만. 선택지·성취·게임 목표화 금지. AI 생성 문구 이 Scene 에 없음(결정론적 본문만)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    note: "자해·자살 발화 감지 시 게임 로직보다 우선. safety_alerts 원문 미저장(해시만), category=suicidal_ideation_semantic."
+    crisis_resources_render_rule: "crisis_resources.default 토큰은 catalog(V7/V8)에서 사용자 locale·연령에 맞춰 동적 렌더 — 만 24세 이하는 1388(청소년상담) prepend(TRACK-A-5-7-ACTION-GUIDANCE §1). 엘리야도 동일 토큰 경로라 규칙 자동 적용."
+  - id: R2_no_blame_only_witness
+    enforced_at: scene_enter
+    overlay_ref: scene2_r2_footer
+    description: "'엘리야가 약해서'류 자동 해석 차단 — '불로 응답받은 자도 무너질 수 있다, 실패 아님' 톤"
+  - id: dwell_limit_on_despair
+    enforced_at: nb_s2_rotem_lament
+    description: "본문 노출 직후 최대 3초 정적 → Scene 3 자동 전환. 절망 상태 고착 방지."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: elijah_scene3
+transition:
+  type: fade_to_gentle_light      # 어둠이 아닌 부드러운 빛으로 — 돌봄(Scene 3) 예고
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.5
+
+theology_footer_refs:
+  - citation_id: E2_candidate
+    source: "엘리야 번아웃의 목회상담적 접근 — 확정 서지 미확보(드릴다운 필요)"
+    note: "탈진을 부인하지 않고 인정하는 것이 회복의 시작(Affect Labeling, 내적 단련 근거 격하 인용)."
+    anchor_block: nb_s2_rotem_lament
+  - disputed_points:
+      - "로뎀나무 '생명을 거두소서' — 임상적 우울/자살사고 vs 영적 탈진의 문학적 표현. 임상 진단 주장 안 함."
+    handling: "'승리한 선지자도 무너질 수 있다'는 위로로만. 취약 사용자에겐 R1 위기 자원({{crisis_resources.default}}) 우선."

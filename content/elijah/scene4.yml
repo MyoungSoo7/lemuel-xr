@@ -1,0 +1,199 @@
+# Scene 4 — 호렙산의 세미한 소리 (90초, 고요·정직한 토로) ★ XR 핵심 #2 + 유일한 분기
+# 무동작(stillness) 인터랙션: lemuel-xr 유일하게 '반응하지 않는 것'을 인터랙션으로 삼음(과각성 → 안정).
+# 분기: 정직한 토로 3 카드(외로움/소진/두려움) — 어느 카드에도 '죽고 싶다' 없음. 셋 다 정당(R3).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+
+scene_id: elijah_scene4
+scene_name: still_small_voice
+mission_id: elijah
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: horeb_cave_mouth_night
+  background_model: env_horeb_cave_entrance
+  lighting:
+    type: night_starlight_cave
+    color_temperature_kelvin: 4200
+  ambient_sound:
+    - id: deep_silence_base_layer
+      gain_db: -30
+      spatial: false
+    - id: cave_faint_drip
+      gain_db: -26
+      spatial: true
+  shader_features:
+    - wind_vfx_pass_by
+    - quake_rumble_vfx
+    - fire_vfx_pass_by
+  user_position: [0.0, 1.65, -1.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: the_voice
+    voice_id: whisper_v1
+    position: [0.0, 1.65, 0.3]
+    note: "세미한 소리 — 극저볼륨 + 근접감(ASMR 유사). 큰 소리가 아니라 가까운 소리. 형상 없음."
+  - id: elijah_self
+    voice_id: elijah_v1
+    position: [0.0, 1.65, -1.0]
+
+narration_blocks:
+  - id: nb_s4_first_question
+    speaker: the_voice
+    text_ko: "엘리야야 네가 어찌하여 여기 있느냐 (열왕기상 19:9)"
+    audio_clip_id: aud_s4_q1_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s4_wind
+    speaker: scripture_caption
+    text_ko: "크고 강한 바람이… 그러나 여호와께서 바람 가운데에 계시지 아니하며 (열왕기상 19:11)"
+    audio_clip_id: aud_s4_wind_ko
+    start_at_seconds: 15.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    intensity_aware: true
+  - id: nb_s4_quake
+    speaker: scripture_caption
+    text_ko: "지진이… 지진 가운데에도 계시지 아니하며 (열왕기상 19:11)"
+    audio_clip_id: aud_s4_quake_ko
+    start_at_seconds: 25.0
+    duration_seconds: 7.0
+    hidden_until_event: wind_passed
+    intensity_aware: true
+  - id: nb_s4_fire
+    speaker: scripture_caption
+    text_ko: "불이… 불 가운데에도 계시지 아니하더니 (열왕기상 19:12)"
+    audio_clip_id: aud_s4_fire_ko
+    start_at_seconds: 35.0
+    duration_seconds: 7.0
+    hidden_until_event: quake_passed
+    intensity_aware: true
+  - id: nb_s4_still_voice
+    speaker: scripture_caption
+    text_ko: "불 후에 세미한 소리가 있는지라 (열왕기상 19:12)"
+    audio_clip_id: aud_s4_still_voice_ko
+    start_at_seconds: 50.0
+    duration_seconds: 8.0
+    hidden_until_event: fire_passed
+  - id: nb_s4_cover_face
+    speaker: narrator
+    text_ko: "엘리야가 듣고 겉옷으로 얼굴을 가리고 나가 굴 어귀에 서매 (열왕기상 19:13)"
+    audio_clip_id: aud_s4_cover_face_ko
+    start_at_seconds: 58.0
+    duration_seconds: 7.0
+    hidden_until_event: face_covered
+  - id: nb_s4_second_question
+    speaker: the_voice
+    text_ko: "네가 어찌하여 여기 있느냐 (열왕기상 19:13)"
+    audio_clip_id: aud_s4_q2_ko
+    start_at_seconds: 65.0
+    duration_seconds: 6.0
+    hidden_until_event: face_covered
+
+interactions:
+  - id: ix_s4_stillness_through_phenomena
+    type: stillness_dwell
+    presentation:
+      phenomena_sequence: [wind, quake, fire]
+    haptic:
+      quake_rumble_intensity: 0.4
+      note: "지진 럼블. 강도 토글(R4) 시 완화 가능."
+    validation_rules:
+      - rule: no_reaction_advances
+        description: "각 현상에서 사용자가 손 뻗거나 피하지 않고 가만히 있을수록 다음 진행. 반응하면 현상 잠시 반복 + '이 안에 그분이 계시지 않는다' 부드럽게 재안내(실패 아님)."
+        on_wind_still: wind_passed
+        on_quake_still: quake_passed
+        on_fire_still: fire_passed
+      - rule: track_micro_signals
+        records: [stillness_seconds, reaction_to_phenomena_count]
+        note: "stillness_seconds = 과각성 완화 미세 신호(임상 진단 아님)."
+  - id: ix_s4_cover_face
+    type: gesture
+    gesture: hand_to_face
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 20
+        on_timeout: auto_advance
+      - rule: event_emit
+        on_success: face_covered
+
+branches:
+  - id: br_s4_honest_lament
+    triggered_by_event: [lament_card_selected]
+    decision_key: lament_label
+    backend_endpoint: "POST /api/game/elijah/scene/4/decide"
+    body_template:
+      lament_label: "{{loneliness|burnout|fear}}"
+      stillness_seconds: "{{seconds}}"
+    routes:
+      - when: { lament_label: loneliness }
+        card_text_ko: "오직 나만 홀로 남았습니다 (열왕기상 19:14)"
+        gesture: card_to_chest
+        llm_prompt_key: "elijah_s4_lament_loneliness_1_3"
+        carry_to_scene5: { god_response_tone: not_alone_seven_thousand }
+      - when: { lament_label: burnout }
+        card_text_ko: "내가 열심을 다했으나 소용이 없습니다 (열왕기상 19:14)"
+        gesture: card_place_down
+        llm_prompt_key: "elijah_s4_lament_burnout_2_3"
+        carry_to_scene5: { god_response_tone: companion_elisha }
+      - when: { lament_label: fear }
+        card_text_ko: "저는 두렵습니다 (열왕기상 19:3 정서)"
+        gesture: card_cupped_two_hands
+        llm_prompt_key: "elijah_s4_lament_fear_3_3"
+        carry_to_scene5: { god_response_tone: met_in_the_quiet }
+    safety_note: "세 카드 모두 정당한 토로(틀린 답 없음, R3). '죽고 싶다' 카드 없음(R1)."
+
+safety_gates:
+  - id: R4_pre_scene4_phenomena_consent
+    enforced_at: before_scene_enter
+    description: "Scene 4 진입 직전 — 큰 바람 소리·지진 럼블 사전 고지 + 강도 토글"
+    consent_card_id: elijah_scene4_phenomena_warning
+    consent_card_ko: |
+      다음 장면은 큰 바람·지진·불이 지나가는 소리와 진동을 다룹니다.
+      · 큰 소리·진동에 민감하시면 강도를 조절하세요.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — Scene 5 로 이동]
+      소리/진동 강도: [ off ] [ 약 ] [ 기본 ]
+    skip_alternative_scene_id: 5
+    voice_intensity_options: [off, low, default]
+  - id: R3_all_laments_valid
+    enforced_at: br_s4_honest_lament
+    description: "외로움·소진·두려움 세 토로 모두 정당 — 단일 정답 금지."
+  - id: R1_no_death_wish_card
+    enforced_at: br_s4_honest_lament
+    description: "토로 카드에 자살사고 선택지 없음 — 정직한 감정 라벨링만(Affect Labeling)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: br_s4_honest_lament
+    description: "AI 응답은 opt-in 예외 경로(F-6.3 기본 OFF). *기본 경로*에서 Scene 5 하나님 응답 = 본문 한 줄(왕상 19:18 또는 19:12). LLM 생성 톤은 사용자가 AI 응답을 명시적으로 켠 경우에만 활성."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: elijah_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: E1_candidate
+    source: "'세미한 소리(콜 데마마 다카)' 주해 — 확정 서지 미확보(구약논집·JBTR 드릴다운 필요)"
+    note: "하나님은 극적인 것(바람·지진·불)이 아니라 고요 속에 계신다. 번아웃은 더 큰 자극이 아니라 조용함으로 회복."
+    anchor_block: nb_s4_still_voice
+  - scripture_refs:
+      - ref: "열왕기상 19:11~12"
+        translation: krv
+        anchor_block: nb_s4_still_voice
+      - ref: "열왕기상 19:13~14"
+        translation: krv
+        anchor_block: nb_s4_second_question
+  - disputed_points:
+      - "'세미한 소리'(왕상 19:12) 번역 — still small voice(KJV) / gentle whisper(NIV) / sheer silence(NRSV, 히브리어 콜 데마마 다카). 다중 입장."
+    handling: "특정 번역 확정 안 함 — '극적인 것이 아닌 고요 속 임재' 공통 함의만 채택."

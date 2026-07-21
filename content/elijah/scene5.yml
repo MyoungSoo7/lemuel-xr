@@ -1,0 +1,186 @@
+# Scene 5 — 다시 걸음 + 회복 메시지 (45초, 혼자가 아님) ★
+# ⚠️ R3 핵심: '빨리 회복해 다시 사역하라' 압박 0건. 사명은 혼자 지는 것 → 나누는 것(엘리사). 겉옷 던지기(수락) 강제 아님.
+# ⚠️ R3 lint: 텍스트 풀에 '다시 이겨라/빨리 회복/사역으로 돌아가라' 어휘 있으면 빌드 실패.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+
+scene_id: elijah_scene5
+scene_name: recommission_and_recovery
+mission_id: elijah
+version: 1.0.0
+duration_seconds_target: 45
+
+environment:
+  space_id: horeb_cave_mouth_dawn
+  background_model: env_horeb_cave_entrance
+  lighting:
+    type: pre_dawn_with_distant_lights
+    color_temperature_kelvin: 3400
+  ambient_sound:
+    - id: low_drone_settle
+      gain_db: -26
+      spatial: false
+    - id: still_voice_continues
+      gain_db: -30
+      spatial: false
+    - id: warm_chime_lights_ignite
+      gain_db: -22
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: the_voice
+    voice_id: whisper_v1
+    position: [0.0, 1.65, 0.3]
+  - id: elisha
+    voice_id: silent
+    position: [3.0, 1.65, 6.0]
+    initial_animation: distant_plowing_idle
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "엘리사 얼굴 디테일 최소 — 동행의 상징."
+  - id: seven_thousand_lights
+    voice_id: silent
+    count: 40
+    formation: scattered_far_horizon
+    initial_animation: fade_in_small_lights
+    note: "칠천 명 상징 — 어둠 속 작은 불빛 여럿. '나만 남았다'에 대한 응답."
+
+narration_blocks:
+  - id: nb_s5_god_response
+    speaker: the_voice
+    text_ko: ""      # lament_label 에 따라 런타임 주입 (LLM cache) / opt-out 시 본문 한 줄
+    audio_clip_id: null
+    start_at_seconds: 0.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    # F-6.3 opt-out 기본 ON: 정적 큐레이션(본문 한 줄)이 *기본 경로*. LLM 생성은 사용자가 명시적으로 켠 경우에만 쓰는 *opt-in 예외 경로*(fallback 아님).
+    default_path: static_curation
+    default_text_ko: "그러나 내가 이스라엘 가운데에 칠천 명을 남기리니 다 바알에게 무릎을 꿇지 아니하였느니라 (열왕기상 19:18)"
+    llm_optin_only: true              # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
+    llm_prompt_key_map:
+      loneliness: "elijah_s5_god_response_loneliness"
+      burnout: "elijah_s5_god_response_burnout"
+      fear: "elijah_s5_god_response_fear"
+    conditional_softening_ref: F66_recovery_state_gate   # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
+  - id: nb_s5_mantle_caption
+    speaker: scripture_caption
+    text_ko: "엘리야가 그리로부터 떠나 … 겉옷을 그의 위에 던지니라 (열왕기상 19:19)"
+    audio_clip_id: aud_s5_mantle_ko
+    start_at_seconds: 18.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s5_recovery_message
+    speaker: system
+    text_ko: ""      # 진입 감정 × lament_label × faith_tone 매칭 (§6 매트릭스)
+    audio_clip_id: null
+    start_at_seconds: 30.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    recovery_matrix_ref: elijah_recovery_matrix
+    conditional_softening_ref: F66_recovery_state_gate   # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
+
+interactions:
+  - id: ix_s5_throw_mantle_optional
+    type: grab_and_throw
+    target_assets: [model_mantle, target_elisha]
+    gesture: two_handed_throw       # 다윗 sling throw 재사용
+    presentation:
+      optional: true
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 15
+        on_timeout: treat_as_complete
+        description: "겉옷을 던지지 않고 지나가도 완주로 처리 — 사명 수락은 강제 아님(R3)."
+      - rule: track_micro_signals
+        records: [mantle_thrown]
+
+branches:
+  - id: br_s5_recovery_message
+    triggered_by_event: [scene_enter]
+    decision_key: recovery_key
+    backend_endpoint: "POST /api/game/elijah/complete"
+    body_template:
+      lament_label: "{{from_scene4}}"
+      entry_emotion: "{{emotion_logs.latest}}"
+      faith_tone: "{{users.faith_tone}}"
+      mantle_thrown: "{{true|false}}"
+    routes:
+      - when: { lament_label: loneliness }
+        recovery_text_ko: "너만 남은 것이 아니었다. 보이지 않는 곳에 칠천이 무릎 꿇지 않고 있었다."
+      - when: { lament_label: burnout }
+        recovery_text_ko: "네 열심이 헛되지 않았다. 다만 지금은 걸을 사람 하나를 곁에 두는 때다."
+      - when: { lament_label: fear }
+        recovery_text_ko: "바람도 지진도 불도 아니었다. 하나님은 가장 조용한 곳에서 너를 만나셨다."
+    note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9 사전 캐싱 (MVP-ELIJAH-CONTENT §6)."
+
+safety_gates:
+  - id: R3_no_recovery_pressure
+    enforced_at: always
+    description: "'다시 이겨라/빨리 회복/사역 복귀' 어휘 0건. '오늘은 먹고 잔 것으로 충분' 기본. 사명 = 나누는 것(엘리사)."
+    lint_forbidden_tokens: ["다시 이겨", "빨리 회복", "사역으로 돌아가", "이제 다시 싸워"]
+  - id: R3_no_instrumentalization
+    enforced_at: always
+    description: "'하나님이 너를 도구로 다시 쓰신다'류 도구화 차단 → '너의 걸음에 동행을 주셨다' 주체성·관계 톤."
+  - id: F66_recovery_state_gate
+    enforced_at: before_scene_enter
+    description: "F-6.6 조건부 완화 — 취약 상태 이력 사용자에게 재사명/회복 문구가 '빨리 복귀하라' 압박으로 읽히지 않도록 자동 소프트닝 또는 스킵. R3 의 상태조건 배선."
+    trigger_conditions:                # OR 조건 (하나라도 참이면 발동)
+      - source: safety_alerts
+        rule: "severity='high' 이력 존재 (user_id 기준, category 무관)"
+      - source: emotion_logs
+        rule: "최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)"
+    on_trigger:
+      action: soften_or_skip
+      affected_blocks: [nb_s5_god_response, nb_s5_recovery_message]
+      soften: "재사명(왕상 19:15~16) 초대 어휘 제거 → '오늘은 먹고 잔 것으로 충분' + '나만 남지 않았다'(칠천 명) 위로에만 머묾. 겉옷 던지기 인터랙션 자동 숨김."
+      skip: "상태가 특히 무거우면 사명 부여 문구 전체 스킵, 회복 위로 문구만 노출."
+      note: "임상 판정 아님 — 서사 톤 자동 완화. 판정·완화 로직은 백엔드 소관, 본 선언은 콘텐츠 게이트 계약."
+  - id: R5_ai_optout_respected
+    enforced_at: br_s5_recovery_message
+    description: "AI 응답은 opt-in 예외 경로(F-6.3 기본 OFF). *기본 경로*에서 하나님 응답=본문 한 줄, 회복 문구=faith_tone×lament_label 정적 큐레이션. 사용자가 AI 응답을 명시적으로 켠 경우에만 LLM 생성 톤 적용(진입 감정 분기 포함)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null      # 미션 종료 → 메인 복귀 (또는 트랙 A 시편 42 bridge 제안)
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.2
+  fade_in_seconds: 1.0
+
+bridge:
+  offer_track_a: true
+  prompt_ko: "이 시간을 기록하시겠어요?"
+  yes_route: "GET /api/track-a/psalm-bridge?psalm=42"    # 시편 42편 '내 영혼아 어찌하여 낙심하며'
+  no_route: main_menu
+
+recovery_metric_dimensions:
+  spiritual: ["고요 속 임재", "혼자가 아님", "탄식도 기도"]
+  emotional: ["돌봄받음", "정직한 토로", "안도·연결감"]
+  rational: ["회복의 순서 재구성", "쉼의 정당성", "나누는 사명"]
+
+theology_footer_refs:
+  - citation_id: E1_candidate
+    source: "왕상 19:18 칠천 명 남기심 — 확정 서지 미확보(드릴다운 필요)"
+    note: "'나만 남았다'는 거짓말이다 — 보이지 않을 뿐 무릎 꿇지 않은 자들이 있다. R3(회복 압박 금지)의 신학적 뿌리."
+    anchor_block: nb_s5_god_response
+  - scripture_refs:
+      - ref: "열왕기상 19:15~16"
+        translation: krv
+        anchor_block: nb_s5_god_response
+      - ref: "열왕기상 19:18"
+        translation: krv
+        anchor_block: nb_s5_god_response
+      - ref: "열왕기상 19:19"
+        translation: krv
+        anchor_block: nb_s5_mantle_caption
+  - disputed_points:
+      - "재사명(왕상 19:15~16)이 '회복 후 즉시 복귀 압박'으로 읽힐 위험."
+      - "하사엘·예후 기름부음(왕상 19:15~16)은 심판 대행자 위임 — MVP 는 이 폭력적 심판 부분을 바알 선지자 처형(18:40) 배제와 동일 급으로 *의도적으로 범위 축소*. Scene 5 는 엘리사 기름부음(동행·계승)만 다루고 하사엘·예후(심판 집행)는 서사에서 제외."
+      - "(낮은 우선순위) '여호와의 사자'(왕상 19:5,7)의 신원 — 창조된 천사설 vs 신현/기독현현(Christophany) 해석 전통이 갈림."
+    handling: "R3 — '함께 걸을 엘리사'를 강조해 혼자 지는 사명 → 나누는 사명으로 재구성. 심판 대행(하사엘·예후)은 MVP 범위 밖(폭력·트라우마 회피, 18:40 배제와 동급). '여호와의 사자' 신원은 특정 입장 확정 안 함 — 천사는 추상 광휘로만 표현(실사·형상 배제)."

@@ -1,0 +1,131 @@
+# Scene 3 — 천사의 떡과 물, 그리고 잠 (90초, 돌봄받음·허락된 안식) ★ 게임의 심장
+# ⚠️ R2 핵심: 하나님(천사)은 '왜 도망쳤느냐'를 먼저 묻지 않으신다. 떡·물·잠이 먼저. 이 Scene 에 질책·평가·요구 0건.
+# ⚠️ R2 lint: 텍스트 풀에 '왜/너 때문에/믿음이' 등 책망 어휘 있으면 빌드 실패.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+
+scene_id: elijah_scene3
+scene_name: angel_bread_and_sleep
+mission_id: elijah
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: wilderness_rotem_dawn
+  background_model: env_wilderness_rotem_tree   # Scene 2 와 동일 공간, 빛만 변화
+  lighting:
+    type: soft_dawn_warmth
+    color_temperature_kelvin: 3000
+    gentle_volumetric_light: true
+  ambient_sound:
+    - id: low_harp_drone
+      gain_db: -24
+      spatial: false
+    - id: gentle_breath_rest
+      gain_db: -22
+      spatial: false
+    - id: water_poured_soft
+      gain_db: -22
+      spatial: true
+  user_position: [0.0, 1.20, 0.0]      # 나무 아래 앉은 낮은 시점 유지
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: angel
+    voice_id: angel_v1
+    position: [0.6, 1.4, 1.2]
+    initial_animation: gentle_presence_glow
+    visual_traits: [abstract_radiance_no_face, warm_volumetric]
+    note: "천사 실사 형상 배제 — 추상 광휘 + 소리로만. 우상·과잉 시각화 차단."
+
+narration_blocks:
+  - id: nb_s3_arise_eat_1
+    speaker: angel
+    text_ko: "일어나서 먹으라 (열왕기상 19:5)"
+    audio_clip_id: aud_s3_arise_eat_1_ko
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+  - id: nb_s3_arise_eat_2
+    speaker: angel
+    text_ko: "일어나 먹으라 네가 갈 길을 다 가지 못할까 하노라 (열왕기상 19:7)"
+    audio_clip_id: aud_s3_arise_eat_2_ko
+    start_at_seconds: 50.0
+    duration_seconds: 8.0
+    hidden_until_event: first_rest_done
+    note: "두 번째 깨움 — 회복은 한 번에 끝나지 않는다. 재촉이 아닌 다독임."
+  - id: nb_s3_strength_of_food
+    speaker: narrator
+    text_ko: "그가 일어나 먹고 마시고 그 음식물의 힘을 의지하여 사십 주 사십 야를 갔다. (열왕기상 19:8, 요약)"
+    audio_clip_id: aud_s3_strength_ko
+    start_at_seconds: 75.0
+    duration_seconds: 12.0
+    hidden_until_event: second_meal_done
+
+interactions:
+  - id: ix_s3_eat_drink_rest
+    type: grab_eat_drink_rest_cycle
+    target_assets: [model_coal_bread, model_water_jug]
+    presentation:
+      cycle_repeat_target: 2
+    haptic:
+      warmth_intensity: 0.25
+      warmth_duration_ms: 400
+      note: "따뜻한 떡의 온기 시뮬레이션 (지속 낮은 진동). 햅틱 없으면 부드러운 시각광 대체."
+    sub_interactions:
+      - id: grab_bread
+        gesture: grab
+        emits_event: bread_in_hand
+      - id: eat_bread
+        gesture: hand_to_mouth
+        emits_event: bread_eaten
+      - id: drink_water
+        gesture: jug_to_mouth
+        emits_event: water_drunk
+      - id: lie_down_rest
+        gesture: idle_or_lie
+        emits_event: first_rest_done
+        on_second_cycle: second_meal_done
+    validation_rules:
+      - rule: no_pressure_optional
+        timeout_seconds: 30
+        on_timeout: gentle_reprompt_once_then_treat_as_eaten
+        description: "강제 없음 — 안 먹고 시간 지나면 부드럽게 한 번 더 권함(재촉 아님), 그래도 안 먹으면 먹은 것으로 처리."
+      - rule: track_micro_signals
+        records: [time_to_first_bite_seconds]
+        note: "먹기까지 망설인 시간 = '쉼에 대한 죄책감' 미세 신호 (임상 진단 아님, 서사 신호)."
+
+branches: []      # 결정 분기 없음 — 오직 먹고 자는 것만. 평가·요구 없음(R2).
+
+safety_gates:
+  - id: R2_care_before_correction
+    enforced_at: always
+    description: "하나님은 책망을 먼저 하지 않으심 — 떡·물·잠이 먼저(왕상 19:5~7). Scene 3 에 질책·평가·요구 0건."
+    lint_forbidden_tokens: ["왜 도망", "믿음이 부족", "너 때문", "정신 차려", "다시 일어나 싸워"]
+  - id: R3_rest_is_valid
+    enforced_at: always
+    description: "쉼은 게으름이 아니라 '갈 길을 위한 준비'(19:7). 회복 압박 톤 0건."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: elijah_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: E2_candidate
+    source: "번아웃 회복의 생리적 안정 우선성 — 서지 드릴다운 필요(내적 단련 근거 격하 인용)"
+    note: "과각성 상태에서 수면·영양이 인지적 재구성보다 선행. Scene 3 이 교훈 없이 먹고 자는 것만으로 구성됨."
+    anchor_block: nb_s3_arise_eat_2
+  - disputed_points: []
+    handling: "천사 형상 추상 광휘로 처리(실사 배제). 분쟁 지점 없음."

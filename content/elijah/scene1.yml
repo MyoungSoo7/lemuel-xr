@@ -1,0 +1,122 @@
+# Scene 1 — 갈멜산의 불 (60초, 물 붓기 + 불의 응답 / 승리의 절정 + 소진 복선)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — ouroboros interview 대체 수기 seed 기반. lemuel-theology-reviewer + lemuel-mental-health-safety 사후 검토 필요.
+# ⚠️ 폭력 배제: 바알 선지자 처형(왕상 18:40) 미포함 — 불의 응답까지만.
+
+scene_id: elijah_scene1
+scene_name: carmel_fire
+mission_id: elijah
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: carmel_summit_evening
+  background_model: env_carmel_altar_evening
+  lighting:
+    type: dry_dusk_after_drought
+    color_temperature_kelvin: 3200
+    dust_haze_emphasis: true
+  ambient_sound:
+    - id: low_wind_summit_loop
+      gain_db: -18
+      spatial: true
+    - id: distant_crowd_murmur_soft
+      gain_db: -26
+      spatial: true
+    - id: water_pour_lr
+      gain_db: -20
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: elijah_self
+    voice_id: elijah_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 엘리야 — first-person, 음성은 내면 독백만"
+
+narration_blocks:
+  - id: nb_s1_intro_drought
+    speaker: narrator
+    text_ko: "삼 년 동안 하늘이 닫혔다. 한 사람이 갈멜산에 제단을 다시 쌓고, 젖은 나무 위에 물을 부었다 — 세 번."
+    audio_clip_id: aud_s1_intro_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s1_fire_response
+    speaker: scripture_caption
+    text_ko: "이에 여호와의 불이 내려서 번제물과 나무와 돌과 흙을 태우고 또 도랑의 물을 핥은지라 (열왕기상 18:38)"
+    audio_clip_id: aud_s1_fire_caption_ko
+    start_at_seconds: 40.0
+    duration_seconds: 10.0
+    hidden_until_event: water_poured_thrice
+  - id: nb_s1_elijah_inner_hollow
+    speaker: elijah_inner
+    text_ko: "응답하셨다. 온 백성이 엎드렸다. … 그런데 왜 나는 이렇게 비어 있는가."
+    audio_clip_id: aud_s1_elijah_inner_ko
+    start_at_seconds: 50.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    note: "번아웃 복선 — 성취 직후의 공허. Scene 2 하강의 서사적 다리."
+
+interactions:
+  - id: ix_s1_pour_water
+    type: grab_and_pour
+    target_assets: [model_water_jar, socket_altar_trench]
+    gesture: grab_and_tilt
+    presentation:
+      pour_repeat_target: 3
+    haptic:
+      intensity: 0.3
+      duration_ms: 150
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 40
+        on_timeout: auto_advance
+        voice_prompt_id: aud_s1_prompt_pour
+        voice_prompt_max_repeat: 1
+      - rule: event_emit
+        on_pour_count_3: water_poured_thrice
+      - rule: track_micro_signals
+        records: [water_pour_count]
+
+branches: []
+
+safety_gates:
+  - id: R4_pre_scene0_consent_required
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 동의 게이트 (번아웃·탈진·회복 서사 사전 고지 + 위기 자원 {{crisis_resources.default}})"
+  - id: fire_impact_intensity_toggle
+    enforced_at: scene_enter
+    description: "불 임팩트 소리·번쩍임 강도 토글 (off/약/강) — 큰 소리·섬광 민감 사용자 보호"
+    options: [off, low, high]
+  - id: violence_exclusion_baal_prophets
+    enforced_at: always
+    description: "바알 선지자 처형(왕상 18:40) 완전 배제 — Scene 1 은 불의 응답까지만"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "AI 보조 footer 영구, opt-out 시에도 TTS 사전 캐시 재생 가능"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: elijah_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: E1_candidate
+    source: "열왕기상 18~19 로뎀나무 서사 — 확정 서지 미확보(드릴다운 필요)"
+    note: "물 붓기=인간의 준비 / 불=하나님의 몫 구분. '다 맡기고 아무것도 안 함' 아닌 '준비하되 응답은 하나님께'."
+    anchor_block: nb_s1_fire_response
+  - disputed_points:
+      - baal_prophets_execution_out_of_scope
+    handling: "왕상 18:40 처형 본문은 MVP 범위 밖 — 폭력·트라우마 회피. Scene 1 은 불 응답까지만."
