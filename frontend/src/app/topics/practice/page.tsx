@@ -138,7 +138,7 @@ export default function PracticePage() {
 
         {/* 하단 영구 위기 자원 라인 (§9) */}
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
-          위기 시: 1577-0199 (자살예방상담) · 1393 (생명의전화) · 24시간
+          위기 시: 1393 (자살예방상담전화) · 1577-0199 (정신건강위기상담) · 24시간
           <br />
           AI 보조 — storyteller, 본문은 성경 참조. 성경 이외 자료는 사용하지 않습니다.
         </p>
