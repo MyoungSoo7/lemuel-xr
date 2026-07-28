@@ -47,7 +47,15 @@ jobs:
           java-version: 25
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Build + test
+      # 테스트를 실제로 돌린다. 이전에는 `bootJar -x test` 라 스텝 이름과 달리
+      # 한 건도 실행되지 않았고, 통과하는 스위트가 아무 것도 게이트하지 못했다.
+      # Testcontainers 는 ubuntu-latest 에 사전 설치된 Docker 를 쓴다.
+      # ScriptureGroundingValidationTest 는 GEMINI_API_KEY 게이트로 자동 skip.
+      - name: Test
+        working-directory: backend
+        run: gradle --no-daemon test
+
+      - name: Build
         working-directory: backend
         run: gradle --no-daemon bootJar -x test
 
@@ -152,6 +160,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           lfs: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install deps
+        working-directory: frontend
+        run: npm ci
+
+      # 타입 체크만 게이트한다. `npm run lint` 는 Next 16 에서 제거된
+      # `next lint` 를 호출해 현재 깨져 있고, Playwright e2e 는 백엔드가 떠
+      # 있어야 하므로(playwright.config.ts 주석 참조) 별도 작업으로 남긴다.
+      - name: Type check
+        working-directory: frontend
+        run: npm run type-check
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

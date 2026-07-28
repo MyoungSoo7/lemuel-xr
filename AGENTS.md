@@ -24,8 +24,8 @@
 ```bash
 # 백엔드 (Spring Boot 4 + Kotlin, JDK 25 툴체인)
 cd backend
-gradle bootJar -x test         # CI 와 동일 (jar 빌드)
-gradle test                    # 테스트 (JUnit, 61개 .kt 테스트)
+gradle bootJar -x test         # jar 빌드만
+gradle test                    # 테스트 (JUnit + Testcontainers) — CI 가 게이트한다
 gradle build                   # 전체
 
 # AI / TTS 사이드카 (Python)
@@ -39,7 +39,9 @@ cd frontend && npm install && npm run dev
 docker compose up -d
 ```
 
-CI(`.github/workflows/ci.yml`): `changes` → `backend`(`gradle --no-daemon bootJar -x test`) · `tts` · `ai` · `frontend` 병렬. paths-filter 로 변경된 영역만 실행.
+CI(`.github/workflows/ci.yml`): `changes` → `backend`(`gradle --no-daemon test` → `bootJar -x test`) · `tts` · `ai` · `frontend`(`npm ci` → `npm run type-check`) 병렬. paths-filter 로 변경된 영역만 실행.
+
+미게이트(별도 작업): `npm run lint` 는 Next 16 에서 제거된 `next lint` 를 호출해 깨져 있고, Playwright e2e 는 백엔드 기동이 필요해 CI 에 아직 없다.
 
 ---
 
