@@ -6,6 +6,7 @@ import github.lms.lemuel.xr.game.application.port.out.GameSessionPort
 import github.lms.lemuel.xr.game.domain.Character
 import github.lms.lemuel.xr.game.domain.GameSession
 import github.lms.lemuel.xr.game.domain.Scenario
+import github.lms.lemuel.xr.safety.application.CrisisKeywordScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -19,7 +20,14 @@ class CompleteGameSessionUseCaseTest {
 
     private val sessions: GameSessionPort = mock()
     private val scenarios: ScenarioYamlLoader = mock()
-    private val uc = CompleteGameSessionUseCase(sessions, scenarios)
+    // 이 스위트는 완료·valuePrompt 동작만 검증한다. 종료 메시지 위기 스캔은
+    // CompleteGameSessionCrisisScanTest 가 따로 다루므로 여기서는 매칭되지 않는
+    // 패턴을 주입해 기존 검증에 영향이 없게 한다.
+    private val uc = CompleteGameSessionUseCase(
+        sessions, scenarios,
+        CrisisKeywordScanner("(?<suicideIntent>\\bZZZ_NO_MATCH\\b)"),
+        mock(),
+    )
 
     private fun live(id: UUID, character: String?, started: LocalDateTime?): GameSession =
         GameSession.reconstitute(

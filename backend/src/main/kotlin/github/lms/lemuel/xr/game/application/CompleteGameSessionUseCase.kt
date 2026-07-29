@@ -4,6 +4,8 @@ import github.lms.lemuel.xr.common.AppException
 import github.lms.lemuel.xr.common.ErrorCode
 import github.lms.lemuel.xr.game.application.port.out.GameSessionPort
 import github.lms.lemuel.xr.game.domain.Character
+import github.lms.lemuel.xr.safety.application.CrisisKeywordScanner
+import github.lms.lemuel.xr.safety.application.RecordSafetyAlertUseCase
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -20,6 +22,8 @@ import java.util.UUID
 class CompleteGameSessionUseCase(
     private val sessions: GameSessionPort,
     private val scenarios: ScenarioYamlLoader,
+    private val crisisScanner: CrisisKeywordScanner,
+    private val recordSafetyAlert: RecordSafetyAlertUseCase,
 ) {
 
     @Transactional
@@ -31,6 +35,17 @@ class CompleteGameSessionUseCase(
         }
         session.complete(finalOutcome, closingMessage)
         sessions.save(session)
+
+        // R1 — 종료 메시지는 사용자 자유 기록이다. 일기·전도서·실천 경로와 동일하게 스캔한다.
+        // 이 자리가 특히 위험한 이유: 미션의 감정적 정점이고, 절망 서사(요셉의 13년,
+        // 엘리야의 로뎀나무)를 막 통과한 직후 사용자가 *자기 이야기* 를 쓰는 지점이다.
+        //
+        // 저장을 막지는 않는다. 사용자가 쓴 기록을 삼키면 오히려 해롭고, 이미 본인의
+        // 기록이다. 알럿만 남겨 위기 자원 안내가 뜨게 한다.
+        val scan = crisisScanner.scan(closingMessage)
+        if (scan.matched) {
+            recordSafetyAlert.execute(session.userId, null, "game_closing_message", scan)
+        }
 
         // 시나리오의 outro scene 에서 linked_values + value_prompt 추출.
         val vp = extractValuePrompt(session.character)
