@@ -4,6 +4,7 @@ import github.lms.lemuel.xr.ai.application.port.out.LlmCachePort
 import github.lms.lemuel.xr.ai.application.port.out.LlmGenerationPort
 import github.lms.lemuel.xr.ai.application.port.out.LlmMetricsPort
 import github.lms.lemuel.xr.ai.domain.LlmCache
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
@@ -30,6 +31,8 @@ class GenerateLlmResponseUseCase(
     private val metrics: LlmMetricsPort,
     @Value("\${ai.generation.enabled:false}") private val generationEnabled: Boolean,
     @Value("\${ai.generation.disabled-fallback-text:}") private val disabledFallback: String,
+    private val forbiddenTokenScanner: ForbiddenTokenScanner,
+    @Value("\${safety.forbidden-tokens.fallback-text:}") private val forbiddenTokenFallback: String,
 ) {
 
     /**
@@ -59,11 +62,28 @@ class GenerateLlmResponseUseCase(
         val cached = cache.findByCacheKey(key)
         if (cached.isPresent) {
             val hit = cached.get()
+            // 게이트 도입 *이전* 에 캐시된 응답도 검사한다. 캐시를 통과시키면
+            // 오염된 문장이 영구히 살아남아 게이트가 무력해진다.
+            if (forbiddenTokenScanner.scan(hit.response).matched) {
+                return Result(forbiddenTokenFallback, "static", "safety-fallback", false)
+            }
             cache.save(hit.withHit(LocalDateTime.now()))
             metrics.cacheHit(purpose)
             return Result(hit.response, hit.provider, hit.model, true)
         }
-        val fresh = sidecar.generate(purpose, promptKey, variables)
+
+        var fresh = sidecar.generate(purpose, promptKey, variables)
+        if (forbiddenTokenScanner.scan(fresh.text).matched) {
+            // 1차 재생성 — 같은 프롬프트라도 LLM 출력은 매번 다르므로 대개 여기서 풀린다.
+            fresh = sidecar.generate(purpose, promptKey, variables)
+            if (forbiddenTokenScanner.scan(fresh.text).matched) {
+                // 두 번 연속 걸리면 더 시도하지 않는다. 비용·지연도 문제지만,
+                // 프롬프트 자체가 문제일 가능성이 높아 재시도로 풀릴 사안이 아니다.
+                // 오염된 응답은 캐시에 넣지 않는다.
+                return Result(forbiddenTokenFallback, "static", "safety-fallback", false)
+            }
+        }
+
         val entry = LlmCache.freshEntry(
             key, fresh.text, fresh.provider, fresh.model, purpose,
             fresh.promptTokens, fresh.completionTokens, LocalDateTime.now(),
