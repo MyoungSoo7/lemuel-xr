@@ -120,7 +120,13 @@ tasks.named<JacocoReport>("jacocoTestReport") {
 
 // 커버리지 하한. 감으로 정하지 않고 실측값에서 여유를 뺀 래칫이다 —
 // 내려가면 빌드가 깨지고, 올리는 건 이 값만 고치면 된다.
-val coverageMinimum = (project.findProperty("coverageMinimum") as String? ?: "0.0").toBigDecimal()
+//
+// 2026-07-29 CI 실측(Java 25, Testcontainers 포함 전체 스위트):
+//   LINE 98.27% (covered 3796 / missed 67) · BRANCH 86.17% (covered 430 / missed 69)
+// 하한은 각각 95% / 80% — 정상적인 변동은 흡수하되 유의미한 후퇴는 잡는 폭이다.
+// LINE 1%p 는 약 39줄, BRANCH 1%p 는 약 5분기에 해당한다.
+val coverageMinimum = (project.findProperty("coverageMinimum") as String? ?: "0.95").toBigDecimal()
+val coverageBranchMinimum = (project.findProperty("coverageBranchMinimum") as String? ?: "0.80").toBigDecimal()
 
 tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     dependsOn(tasks.named("jacocoTestReport"))
@@ -130,6 +136,11 @@ tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
                 counter = "LINE"
                 value = "COVEREDRATIO"
                 minimum = coverageMinimum
+            }
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = coverageBranchMinimum
             }
         }
     }
