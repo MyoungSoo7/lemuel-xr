@@ -101,7 +101,10 @@ security:
 
 # === 정신건강 안전선 (5개) ===
 safety:
-  crisis-keywords-regex: ${SAFETY_CRISIS_REGEX:(자살|자해|죽고\s?싶|죽어\s?버|뛰어내리)}
+  # 명명 그룹(suicideIntent / selfHarm)이 곧 분류 키다 — CrisisKeywordScanner 가 이걸로
+  # matchedPattern 을 정한다. 그룹 없이 쓰면 crisis_unclassified 로 떨어지되 차단은 유지된다
+  # (분류를 몰라도 통과시키지 않는다). 환경변수로 override 할 때도 그룹명을 지키는 편이 좋다.
+  crisis-keywords-regex: ${SAFETY_CRISIS_REGEX:(?<suicideIntent>자살|죽고\s?싶|죽어\s?버|뛰어내리)|(?<selfHarm>자해)}
   alert-severity-threshold: medium   # 이 이상이면 사용자에게 위기 자원 표시
   show-disclaimer-on-first-entry: true
 

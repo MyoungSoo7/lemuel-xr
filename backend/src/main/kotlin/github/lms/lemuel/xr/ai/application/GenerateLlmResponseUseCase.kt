@@ -29,7 +29,11 @@ class GenerateLlmResponseUseCase(
     private val sidecar: LlmGenerationPort,
     private val keyer: CacheKeyComputer,
     private val metrics: LlmMetricsPort,
-    @Value("\${ai.generation.enabled:false}") private val generationEnabled: Boolean,
+    // 기본값을 두지 않는다 (2026-07-30). 이전에는 여기가 false, application.yml 이 true 라
+    // 두 곳이 서로 다른 말을 했다. 어느 한쪽으로 맞추면 *조용히* 동작이 바뀌는데,
+    // AI 생성 on/off 는 조용히 정해질 사안이 아니다. 설정이 없으면 기동을 실패시켜
+    // 운영자가 명시적으로 정하게 한다. application.yml 이 유일한 출처다.
+    @Value("\${ai.generation.enabled}") private val generationEnabled: Boolean,
     @Value("\${ai.generation.disabled-fallback-text:}") private val disabledFallback: String,
     private val forbiddenTokenScanner: ForbiddenTokenScanner,
     @Value("\${safety.forbidden-tokens.fallback-text:}") private val forbiddenTokenFallback: String,
