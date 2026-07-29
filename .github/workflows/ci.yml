@@ -126,6 +126,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 안전 필터 테스트를 이미지 빌드 *앞* 에 둔다. 깨진 안전 코드를 담은 이미지가
+      # ghcr 로 올라가지 않게 하려면 순서가 이래야 한다.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Test (ai)
+        working-directory: ai
+        run: |
+          pip install -r requirements-dev.txt
+          pytest -q
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 

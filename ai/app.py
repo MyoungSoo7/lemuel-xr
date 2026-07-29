@@ -47,6 +47,29 @@ _SAFE_FALLBACK = (
 )
 
 
+def apply_output_safety(text: str, json_mode: bool) -> tuple[str, Optional[str]]:
+    """
+    출력측 안전 필터를 *모드와 무관하게* 적용한다.
+
+    이전에는 `jsonMode=true` 면 필터를 통째로 건너뛰었다. 주석은 "구조화된 데이터라
+    skip" 이라고 했지만, 구조화됐다는 건 *문자열 값 안에 자연어가 들어 있다* 는 뜻이지
+    자연어가 없다는 뜻이 아니다. JSON 값으로 실려 온 자해 묘사는 그대로 사용자에게 갔다.
+
+    그렇다고 평문 fallback 을 그대로 돌려줄 수는 없다 — 호출자가 json.loads 를 하다
+    깨진다. 그래서 JSON 모드에서는 *유효한 JSON* 형태의 안전 응답을 돌려준다.
+    호출자는 safetyBlocked 로 차단 여부를 알 수 있다.
+    """
+    filtered, blocked = _safety_filter(text)
+    if blocked is None:
+        return (text, None)
+    if json_mode:
+        return (
+            json.dumps({"safetyBlocked": True, "text": _SAFE_FALLBACK}, ensure_ascii=False),
+            blocked,
+        )
+    return (filtered, blocked)
+
+
 def _safety_filter(text: str) -> tuple[str, Optional[str]]:
     """
     LLM 출력 문자열에 트리거 표현이 포함됐는지 검사.
@@ -246,10 +269,9 @@ def ai_generate(req: GenerateRequest) -> GenerateResponse:
             temperature=req.temperature or 0.5,
             json_mode=req.jsonMode or False,
         )
-        # 사후 안전 필터 — JSON 모드 응답은 구조화된 데이터라 skip, 자연어만 검사.
-        text = r["text"]
-        if not (req.jsonMode or False):
-            text, _ = _safety_filter(text)
+        # 사후 안전 필터 — 모드와 무관하게 적용한다. JSON 모드도 문자열 값 안에
+        # 자연어를 담으므로 예외를 두면 그 경로만 무방비가 된다.
+        text, _ = apply_output_safety(r["text"], json_mode=req.jsonMode or False)
         return GenerateResponse(
             text=text,
             provider=r.get("provider", "unknown"),
