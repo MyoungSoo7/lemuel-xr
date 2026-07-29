@@ -117,6 +117,59 @@ tasks.named<JacocoReport>("jacocoTestReport") {
         html.required.set(true)
     }
 }
+
+// 커버리지 하한. 감으로 정하지 않고 실측값에서 여유를 뺀 래칫이다 —
+// 내려가면 빌드가 깨지고, 올리는 건 이 값만 고치면 된다.
+//
+// 2026-07-29 CI 실측(Java 25, Testcontainers 포함 전체 스위트):
+//   LINE 98.27% (covered 3796 / missed 67) · BRANCH 86.17% (covered 430 / missed 69)
+// 하한은 각각 95% / 80% — 정상적인 변동은 흡수하되 유의미한 후퇴는 잡는 폭이다.
+// LINE 1%p 는 약 39줄, BRANCH 1%p 는 약 5분기에 해당한다.
+val coverageMinimum = (project.findProperty("coverageMinimum") as String? ?: "0.95").toBigDecimal()
+val coverageBranchMinimum = (project.findProperty("coverageBranchMinimum") as String? ?: "0.80").toBigDecimal()
+
+tasks.named<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
+    dependsOn(tasks.named("jacocoTestReport"))
+    violationRules {
+        rule {
+            limit {
+                counter = "LINE"
+                value = "COVEREDRATIO"
+                minimum = coverageMinimum
+            }
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = coverageBranchMinimum
+            }
+        }
+    }
+}
+
+// 측정값을 CI 로그에 남긴다. 래칫을 올릴 때 근거가 되고,
+// 게이트가 깨졌을 때 얼마나 모자란지 바로 보인다.
+tasks.register("printCoverage") {
+    dependsOn(tasks.named("jacocoTestReport"))
+    val reportXml = layout.buildDirectory.file("reports/jacoco/test/jacocoTestReport.xml")
+    doLast {
+        val xml = reportXml.get().asFile
+        if (!xml.exists()) {
+            println("coverage: 리포트 없음 ($xml)")
+            return@doLast
+        }
+        // report 루트의 합계 counter 들이 파일 끝에 온다.
+        Regex("""<counter type="(\w+)" missed="(\d+)" covered="(\d+)"/>""")
+            .findAll(xml.readText())
+            .toList()
+            .takeLast(6)
+            .forEach { m ->
+                val (type, missed, covered) = m.destructured
+                val total = missed.toLong() + covered.toLong()
+                val pct = if (total == 0L) 0.0 else covered.toLong() * 100.0 / total
+                println("coverage %-12s %6.2f%%  covered=%s missed=%s".format(type, pct, covered, missed))
+            }
+    }
+}
 tasks.withType<org.gradle.api.tasks.bundling.Jar> {
     manifest {
         attributes("Implementation-Encoding" to "UTF-8")
