@@ -6,6 +6,8 @@ backend/.gradle/
 
 # Python
 tts/__pycache__/
+ai/__pycache__/
+ai/.pytest_cache/
 tts/*.egg-info/
 tts/.venv/
 
