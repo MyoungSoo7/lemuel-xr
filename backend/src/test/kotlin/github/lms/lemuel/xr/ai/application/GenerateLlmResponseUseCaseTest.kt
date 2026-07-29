@@ -4,6 +4,7 @@ import github.lms.lemuel.xr.ai.application.port.out.LlmCachePort
 import github.lms.lemuel.xr.ai.application.port.out.LlmGenerationPort
 import github.lms.lemuel.xr.ai.application.port.out.LlmMetricsPort
 import github.lms.lemuel.xr.ai.domain.LlmCache
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -32,7 +33,13 @@ class GenerateLlmResponseUseCaseTest {
         enabled: Boolean,
         fallback: String,
     ): GenerateLlmResponseUseCase =
-        GenerateLlmResponseUseCase(cache, sidecar, keyer, metrics, enabled, fallback)
+        GenerateLlmResponseUseCase(
+            cache, sidecar, keyer, metrics, enabled, fallback,
+            // 이 스위트는 캐시·비활성화 동작만 검증한다. 금지 토큰 게이트의 동작은
+            // GenerateLlmResponseUseCaseSafetyGateTest 가 따로 다룬다.
+            forbiddenTokenScanner = ForbiddenTokenScanner(emptyList()),
+            forbiddenTokenFallback = "",
+        )
 
     private fun cached(key: String, response: String): LlmCache =
         LlmCache(

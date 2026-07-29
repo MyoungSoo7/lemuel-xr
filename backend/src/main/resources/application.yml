@@ -105,6 +105,24 @@ safety:
   alert-severity-threshold: medium   # 이 이상이면 사용자에게 위기 자원 표시
   show-disclaimer-on-first-entry: true
 
+  # 가스라이팅 금지 토큰 — LLM *출력측* 게이트(enforce).
+  #
+  # 출처는 저작 YAML `content/{인물}/scene*.yml` 의 lint_forbidden_tokens 다.
+  # content/ 는 백엔드 클래스패스가 아니므로 자동 동기화되지 않는다 — 저작 쪽에 토큰을
+  # 추가하면 여기에도 반영해야 한다. 누락 감지는 ForbiddenTokenConfigTest 가 맡는다.
+  #
+  # 금지 이유는 신학이 아니라 정신건강이다. 절망 상태의 사용자에게 책임을 전가하거나
+  # (믿음이 부족/욕심이 많아서) 회복을 압박하는(빨리 회복/다시 일어나 싸워) 표현은
+  # 예방 영적 교육이라는 이 앱의 정체성과 정면으로 충돌한다.
+  forbidden-tokens:
+    list: >-
+      감사가 부족,너 때문,다시 열심히,다시 이겨,다시 일어나 싸워,만족을 모르,
+      믿음이 부족,빨리 회복,사역으로 돌아가,왜 도망,욕심이 많아서,
+      이제 깨달았으니,이제 다시 싸워,정신 차려,허무를 극복
+    # 두 번 연속 걸렸을 때 내보낼 사전 저작 응답. 사용자를 탓하지도, 재촉하지도 않는다.
+    fallback-text: >-
+      지금은 어떤 말도 보태지 않겠습니다. 여기 이대로 머물러도 괜찮습니다.
+
 # === Telegram ChatOps 알람 ===
 chatops:
   telegram:
