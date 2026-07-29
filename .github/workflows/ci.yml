@@ -55,6 +55,20 @@ jobs:
         working-directory: backend
         run: gradle --no-daemon test
 
+      # 커버리지를 로그에 남기고 하한을 강제한다. 하한은 build.gradle.kts 의
+      # coverageMinimum 래칫 — 실측값에서 여유를 뺀 값이라 떨어지면 깨진다.
+      - name: Coverage gate
+        working-directory: backend
+        run: gradle --no-daemon printCoverage jacocoTestCoverageVerification
+
+      - name: Upload coverage report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: backend/build/reports/jacoco/test/html/
+          retention-days: 7
+
       - name: Build
         working-directory: backend
         run: gradle --no-daemon bootJar -x test
