@@ -5,7 +5,6 @@ import github.lms.lemuel.xr.game.application.port.out.AiOptOutPort
 import github.lms.lemuel.xr.game.domain.Character
 import github.lms.lemuel.xr.game.domain.GameSession
 import github.lms.lemuel.xr.game.domain.Scenario
-import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -30,12 +29,11 @@ class ResponseResolverSafetyTest {
     private val llm: GenerateLlmResponseUseCase = mock()
     private val optOut: AiOptOutPort = mock()
 
-    /** 실제 스캐너 — application.yml 목록 중 두 개를 실은 것과 동등한 구성. */
-    private val scanner = ForbiddenTokenScanner(listOf("믿음이 부족", "빨리 회복"))
+    /** 실제 스캐너·집행기 — application.yml 목록 중 두 개를 실은 것과 동등한 구성. */
+    private val fallbackText = SafetyGateFixtures.FALLBACK_TEXT
 
-    private val fallbackText = "지금은 어떤 말도 보태지 않겠습니다. 여기 이대로 머물러도 괜찮습니다."
-
-    private val resolver = ResponseResolver(llm, DecisionKeyExtractor(), optOut, scanner, fallbackText)
+    private val resolver =
+        ResponseResolver(llm, DecisionKeyExtractor(), optOut, SafetyGateFixtures.sanitizer())
 
     private fun scene(id: Int, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =
         Scenario.Scene(id, "장면$id", "interaction", "pick_one", 60, "narr", "ref", llmFlag, id + 1, extras)

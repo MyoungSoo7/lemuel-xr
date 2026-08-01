@@ -5,9 +5,8 @@ import github.lms.lemuel.xr.game.application.port.out.AiOptOutPort
 import github.lms.lemuel.xr.game.domain.Character
 import github.lms.lemuel.xr.game.domain.GameSession
 import github.lms.lemuel.xr.game.domain.Scenario
-import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenSanitizer
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 /**
@@ -22,9 +21,13 @@ import org.springframework.stereotype.Component
  * **R5 안전 제약이 실제로 걸리는 곳이 여기다** — "정적 큐레이션이 기본 경로, LLM 은 명시적 opt-in".
  * 두 게이트를 모두 이 클래스가 진다.
  * 1. [AiOptOutPort] — `users.ai_opt_out=true` 면 realtime Scene 이라도 LLM 을 호출하지 않는다.
- * 2. [ForbiddenTokenScanner] — 정적 텍스트도 LLM 출력과 동일한 금지 토큰 검사를 통과한다.
+ * 2. [ForbiddenTokenSanitizer] — 정적 텍스트도 LLM 출력과 동일한 금지 토큰 검사를 통과한다.
  *
- * safety 컨텍스트의 [ForbiddenTokenScanner] 직접 주입은 `CompleteGameSessionUseCase` 가
+ * 단 **`responseText` 는 이 문장들의 출구 중 하나일 뿐이다.** 같은 `monologues`/`outcomes`/`reactions`
+ * 맵이 [ScenePayloadAssembler] 를 통해 `scenePayload` 로도 나간다. 그래서 게이트는 양쪽에 있고,
+ * 대체 문구는 [ForbiddenTokenSanitizer] 한 곳에서만 온다.
+ *
+ * safety 컨텍스트의 [ForbiddenTokenSanitizer] 직접 주입은 `CompleteGameSessionUseCase` 가
  * `CrisisKeywordScanner`·`RecordSafetyAlertUseCase` 를 직접 참조하는 것과 같은 관행이다.
  * 반면 사용자 조회는 auth 의 영속 세부를 끌어오므로 [AiOptOutPort] 뒤로 격리했다
  * ([github.lms.lemuel.xr.game.application.port.out.CrisisContactPort] 와 같은 모양).
@@ -34,8 +37,7 @@ class ResponseResolver(
     private val llm: GenerateLlmResponseUseCase,
     private val keyExtractor: DecisionKeyExtractor,
     private val aiOptOut: AiOptOutPort,
-    private val forbiddenTokenScanner: ForbiddenTokenScanner,
-    @Value("\${safety.forbidden-tokens.fallback-text:}") private val forbiddenTokenFallback: String,
+    private val forbiddenTokens: ForbiddenTokenSanitizer,
 ) {
 
     /** Phase 2-B realtime LLM 우선, 실패/정적 Scene 은 yml fallback. */
@@ -116,24 +118,15 @@ class ResponseResolver(
     /**
      * 정적 큐레이션 텍스트의 금지 토큰 게이트.
      *
-     * [GenerateLlmResponseUseCase] 와 *같은* 대체 문구(`safety.forbidden-tokens.fallback-text`)를 쓴다 —
-     * 사용자 입장에서 두 경로는 구분되지 않아야 한다. 다만 재시도는 없다: LLM 은 같은 프롬프트로 다시 뽑으면
-     * 다른 문장이 나오지만 yml 텍스트는 몇 번을 읽어도 같은 문장이다.
+     * 집행은 [ForbiddenTokenSanitizer] 에 위임한다 — 같은 문장이 `scenePayload` 로도 나가므로
+     * ([ScenePayloadAssembler]) 두 출구가 *같은* 대체 문구를 내야 하고, 그건 대체 문구를
+     * 공유 협력자 한 곳에 두어야 구조적으로 보장된다.
      *
-     * 걸린 사실은 warn 으로 남긴다. 런타임 대체는 사용자를 지키는 것이지 저작 결함을 지우는 것이 아니며,
-     * 저작자가 yml 을 고쳐야 로그가 사라진다.
+     * 재시도는 없다: LLM 은 같은 프롬프트로 다시 뽑으면 다른 문장이 나오지만
+     * yml 텍스트는 몇 번을 읽어도 같은 문장이다.
      */
-    private fun gate(text: String, scene: Scenario.Scene, decisionKey: String): String {
-        val scan = forbiddenTokenScanner.scan(text)
-        if (!scan.matched) {
-            return text
-        }
-        log.warn(
-            "정적 큐레이션 텍스트에 금지 토큰 — 대체 문구로 교체. scene={} decision={} token={}",
-            scene.id, decisionKey, scan.matchedToken,
-        )
-        return forbiddenTokenFallback
-    }
+    private fun gate(text: String, scene: Scenario.Scene, decisionKey: String): String =
+        forbiddenTokens.sanitizeText(text, "responseText/scene ${scene.id}/$decisionKey")
 
     companion object {
         private val log = LoggerFactory.getLogger(ResponseResolver::class.java)

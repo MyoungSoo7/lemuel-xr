@@ -41,7 +41,8 @@ class CompleteGameSessionCrisisScanTest {
     private val scenarios: ScenarioYamlLoader = mock()
     private val safetyAlerts: RecordSafetyAlertUseCase = mock()
 
-    private val useCase = CompleteGameSessionUseCase(sessions, scenarios, scanner, safetyAlerts)
+    private val useCase =
+        CompleteGameSessionUseCase(sessions, scenarios, scanner, safetyAlerts, SafetyGateFixtures.sanitizer())
 
     private fun session(): GameSession {
         val id = UUID.randomUUID()

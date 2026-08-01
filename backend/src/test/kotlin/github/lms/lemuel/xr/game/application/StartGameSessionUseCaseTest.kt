@@ -17,7 +17,8 @@ class StartGameSessionUseCaseTest {
 
     private val sessions: GameSessionPort = mock()
     private val loader: ScenarioYamlLoader = mock()
-    private val payloads = ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" })
+    private val payloads =
+        ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }, SafetyGateFixtures.sanitizer())
     private val uc = StartGameSessionUseCase(sessions, loader, payloads)
 
     private fun scene(

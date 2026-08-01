@@ -5,6 +5,7 @@ import github.lms.lemuel.xr.common.ErrorCode
 import github.lms.lemuel.xr.game.application.port.out.GameSessionPort
 import github.lms.lemuel.xr.game.domain.Character
 import github.lms.lemuel.xr.safety.application.CrisisKeywordScanner
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenSanitizer
 import github.lms.lemuel.xr.safety.application.RecordSafetyAlertUseCase
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -24,6 +25,7 @@ class CompleteGameSessionUseCase(
     private val scenarios: ScenarioYamlLoader,
     private val crisisScanner: CrisisKeywordScanner,
     private val recordSafetyAlert: RecordSafetyAlertUseCase,
+    private val forbiddenTokens: ForbiddenTokenSanitizer,
 ) {
 
     @Transactional
@@ -68,7 +70,14 @@ class CompleteGameSessionUseCase(
             } else {
                 emptyList()
             }
-            ValuePrompt(values, prompt?.toString(), characterStr)
+            // `value_prompt` 는 ScenePayloadAssembler 를 우회해 곧장 `/complete` 응답으로 나가는
+            // *사용자 노출 문장* 이다. 우회한다는 사실 자체는 예전부터 문서화돼 있었지만 위기 토큰 관점뿐이었고,
+            // 금지 토큰 게이트는 아무도 걸지 않았다. 여기서 건다.
+            // (위기 토큰 치환은 여전히 이 경로에 없다 — ScenarioHotlineRatchetTest 가 저작 시점에 막는다.)
+            val message = prompt?.toString()?.let {
+                forbiddenTokens.sanitizeText(it, "valuePrompt/$characterStr")
+            }
+            ValuePrompt(values, message, characterStr)
         } catch (ex: Exception) {
             null
         }
