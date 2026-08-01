@@ -40,6 +40,154 @@ class ScenarioYamlLoaderTest {
         assertThat(loaded).isGreaterThanOrEqualTo(5)
     }
 
+    /**
+     * 회귀 방지 — Character enum 에 값을 추가하고 yml 을 빠뜨리면 런타임에 조용히 사라진다.
+     * ScenarioYamlLoader.loadAll() 은 리소스가 없으면 warn 로그만 남기고 넘어가기 때문에
+     * (솔로몬이 설계 완료 후에도 배선되지 않았던 원인) 이 테스트가 유일한 게이트다.
+     */
+    @Test
+    fun `모든 Character 에 시나리오 yml 이 존재하고 로드된다`() {
+        val missing = Character.entries.filter {
+            ScenarioYamlLoaderTest::class.java.classLoader
+                .getResource("scenarios/${it.dbValue}.yml") == null
+        }
+        assertThat(missing)
+            .describedAs("scenarios/{dbValue}.yml 누락 — enum 추가 시 yml 도 함께 추가해야 한다")
+            .isEmpty()
+
+        for (c in Character.entries) {
+            val s = loader.forCharacter(c)   // 파싱 실패 시 캐시 미적재 → AppException
+            assertThat(s.character)
+                .describedAs("%s — yml 의 character 필드가 dbValue 와 일치해야 한다", c)
+                .isEqualTo(c.dbValue)
+            assertThat(s.title).describedAs("%s — title", c).isNotBlank()
+        }
+    }
+
+    /**
+     * next 체인 무결성 — 마지막 씬만 next: null, 나머지는 실재하는 scene id 를 가리킨다.
+     * id 중복·자기참조·끊긴 링크를 전 인물에 대해 한 번에 잡는다.
+     */
+    @Test
+    fun `모든 시나리오의 next 체인이 무결하다`() {
+        for (c in Character.entries) {
+            val s = loader.forCharacter(c)
+            val ids = s.scenes.map { it.id }
+
+            assertThat(s.scenes).describedAs("%s — scene 최소 1개", c).isNotEmpty()
+            assertThat(ids).describedAs("%s — scene id 중복", c).doesNotHaveDuplicates()
+            assertThat(s.totalScenes()).isEqualTo(ids.size)
+
+            val terminals = s.scenes.filter { it.next == null }
+            assertThat(terminals).describedAs("%s — next: null 인 종료 씬은 정확히 1개", c).hasSize(1)
+            assertThat(terminals.single().id)
+                .describedAs("%s — 종료 씬은 마지막 씬이어야 한다", c)
+                .isEqualTo(s.scenes.last().id)
+            assertThat(terminals.single().type).describedAs("%s — 종료 씬 type", c).isEqualTo("outro")
+
+            for (scene in s.scenes) {
+                val next = scene.next ?: continue
+                assertThat(ids)
+                    .describedAs("%s scene %d — next=%d 가 실재하지 않는 id", c, scene.id, next)
+                    .contains(next)
+                assertThat(next).describedAs("%s scene %d — 자기 참조", c, scene.id).isNotEqualTo(scene.id)
+                // scene(next) 가 예외 없이 조회되는지까지 확인
+                assertThat(s.scene(next).id).isEqualTo(next)
+            }
+
+            // trigger_warning 의 skip 경로도 실재하는 씬을 가리켜야 한다 (R4 우회 경로 무결성)
+            for (scene in s.scenes) {
+                @Suppress("UNCHECKED_CAST")
+                val tw = scene.extras?.get("trigger_warning") as? Map<String, Any?> ?: continue
+                val skipTo = tw["skip_alternative_scene_id"] as? Int ?: continue
+                assertThat(ids)
+                    .describedAs("%s scene %d — skip_alternative_scene_id=%d 미존재", c, scene.id, skipTo)
+                    .contains(skipTo)
+                assertThat(skipTo)
+                    .describedAs("%s scene %d — skip 경로가 트리거 씬 자신 또는 그 이전을 가리킨다", c, scene.id)
+                    .isGreaterThan(scene.id)
+            }
+        }
+    }
+
+    @Test
+    fun `solomon 시나리오 구조 — 5 scene · R4 게이트 2곳 · 9조합 재정향`() {
+        val s = loader.forCharacter(Character.SOLOMON)
+        assertThat(s.character).isEqualTo("solomon")
+        assertThat(s.title).isEqualTo("해 아래, 빈 손")
+        assertThat(s.totalScenes()).isEqualTo(5)
+
+        // R4 동의 게이트 — Scene 3(mid) · Scene 4(low~mid) 두 곳. skip 경로가 트리거를 실제로 회피한다.
+        val gated = s.scenes.filter { it.extras?.containsKey("trigger_warning") == true }.map { it.id }
+        assertThat(gated).containsExactly(3, 4)
+
+        @Suppress("UNCHECKED_CAST")
+        val tw3 = s.scene(3).extras!!["trigger_warning"] as Map<String, Any?>
+        assertThat(tw3["level"]).isEqualTo("medium")
+        assertThat(tw3["content"] as List<*>).contains("infant_loss")
+        assertThat(tw3["skip_alternative_scene_id"]).isEqualTo(4)   // 재판 요약 자막 후 Scene 4
+        // skip 경로가 트리거(칼·영아 상실)를 실제로 회피하는지 — 대체 자막이 씬 안에 있어야 한다.
+        assertThat(inner(s.scene(3))).containsKey("skip_summary_caption")
+
+        @Suppress("UNCHECKED_CAST")
+        val tw4 = s.scene(4).extras!!["trigger_warning"] as Map<String, Any?>
+        assertThat(tw4["skip_alternative_scene_id"]).isEqualTo(5)   // Scene 5 직행 (마지막 씬)
+        assertThat(s.scenes.last().id).isEqualTo(5)
+
+        // Scene 5 — hevel_label 3 × faith_tone 3 = 9 조합 + 라벨 없음 default.
+        @Suppress("UNCHECKED_CAST")
+        val matrix = inner(s.scene(5))["reorientation_texts"] as Map<String, Any?>
+        assertThat(matrix).containsOnlyKeys("emptiness", "restlessness", "loss_of_meaning", "default")
+        var combos = 0
+        for (label in listOf("emptiness", "restlessness", "loss_of_meaning")) {
+            @Suppress("UNCHECKED_CAST")
+            val byTone = matrix[label] as Map<String, Any?>
+            assertThat(byTone).containsOnlyKeys("strong", "balanced", "soft")
+            byTone.values.forEach { assertThat(it as String).isNotBlank() }
+            combos += byTone.size
+        }
+        assertThat(combos).isEqualTo(9)
+        assertThat(matrix["default"] as String).isNotBlank()
+
+        // Scene 4 의 허무 라벨 3종이 Scene 5 매트릭스 키와 정확히 일치해야 한다 (배선 무결성).
+        @Suppress("UNCHECKED_CAST")
+        val labels = (inner(s.scene(4))["options"] as List<Map<String, Any?>>).map { it["id"] }
+        assertThat(labels).containsExactlyInAnyOrder("emptiness", "restlessness", "loss_of_meaning")
+    }
+
+    /**
+     * R1 — 솔로몬 본문에는 자살사고가 없다. 전도서 4장 초반 죽음선호 구절의 인용·각색·암시 전면 금지.
+     * 위기 전화번호 하드코딩도 금지 (토큰 리졸버 도입 전까지 필드 자체를 두지 않는다).
+     */
+    @Test
+    fun `solomon yml 은 죽음선호 구절과 하드코딩 위기번호를 포함하지 않는다`() {
+        val raw = ScenarioYamlLoaderTest::class.java.classLoader
+            .getResourceAsStream("scenarios/solomon.yml")!!
+            .readBytes().toString(Charsets.UTF_8)
+
+        val forbidden = listOf(
+            "1393", "109", "1577-0199",                        // 위기 전화번호 하드코딩
+            "죽는 날", "죽은 자", "출생하지", "태어나지 아니",      // 전 4:2~3 죽음선호 어구
+            "죽고 싶", "사라지고 싶", "생명을 거두",
+        )
+        for (token in forbidden) {
+            assertThat(raw).describedAs("solomon.yml 금칙 문자열: %s", token).doesNotContain(token)
+        }
+        // crisis_reminder 는 토큰 리졸버(#18) 도입 전까지 필드 자체를 두지 않는다.
+        val outro = loader.forCharacter(Character.SOLOMON).scene(5)
+        assertThat(inner(outro)).doesNotContainKey("crisis_reminder")
+        assertThat(outro.extras).doesNotContainKey("crisis_reminder")
+    }
+
+    /**
+     * yml 의 `extras:` 블록은 로더가 표준필드를 걷어낸 뒤 `extras["extras"]` 로 한 겹 더 들어간다.
+     * (표준필드 목록에 "extras" 가 없기 때문 — 기존 로더 동작 그대로.)
+     */
+    private fun inner(scene: github.lms.lemuel.xr.game.domain.Scenario.Scene): Map<String, Any?> {
+        @Suppress("UNCHECKED_CAST")
+        return scene.extras?.get("extras") as? Map<String, Any?> ?: emptyMap()
+    }
+
     @Test
     fun `joseph 시나리오 구조`() {
         val s = loader.forCharacter(Character.JOSEPH)
