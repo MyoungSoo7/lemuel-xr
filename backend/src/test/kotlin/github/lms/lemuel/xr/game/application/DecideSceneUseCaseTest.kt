@@ -9,6 +9,7 @@ import github.lms.lemuel.xr.game.domain.Character
 import github.lms.lemuel.xr.game.domain.GameDecision
 import github.lms.lemuel.xr.game.domain.GameSession
 import github.lms.lemuel.xr.game.domain.Scenario
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -31,7 +32,11 @@ class DecideSceneUseCaseTest {
     // ResponseResolver 는 실제 협력자(real) — LLM 클라이언트만 mock, 키 추출은 진짜 로직.
     private val uc: DecideSceneUseCase = DecideSceneUseCase(
         sessions, decisions, loader,
-        ResponseResolver(llm, DecisionKeyExtractor()),
+        // AiOptOutPort mock 은 기본값 false(=opt-out 아님) — 종전 거동 그대로 LLM 경로가 살아있다.
+        ResponseResolver(
+            llm, DecisionKeyExtractor(), mock(),
+            ForbiddenTokenScanner(listOf("믿음이 부족", "빨리 회복")), "안전 대체 문장",
+        ),
         // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환까지 통과하는지 함께 본다.
         ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }),
     )

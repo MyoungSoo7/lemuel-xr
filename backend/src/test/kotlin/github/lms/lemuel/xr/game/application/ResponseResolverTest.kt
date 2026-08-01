@@ -1,7 +1,9 @@
 package github.lms.lemuel.xr.game.application
 
 import github.lms.lemuel.xr.ai.application.GenerateLlmResponseUseCase
+import github.lms.lemuel.xr.game.application.port.out.AiOptOutPort
 import github.lms.lemuel.xr.game.domain.Scenario
+import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -13,7 +15,11 @@ import org.mockito.kotlin.mock
 class ResponseResolverTest {
 
     private val llm: GenerateLlmResponseUseCase = mock()
-    private val resolver = ResponseResolver(llm, DecisionKeyExtractor())
+    private val optOut: AiOptOutPort = mock()
+    private val resolver = ResponseResolver(
+        llm, DecisionKeyExtractor(), optOut,
+        ForbiddenTokenScanner(listOf("믿음이 부족", "빨리 회복")), "안전 대체 문장",
+    )
 
     private fun scene(id: Int, next: Int?, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =
         Scenario.Scene(
