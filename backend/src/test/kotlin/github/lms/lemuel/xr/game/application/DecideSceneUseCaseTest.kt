@@ -31,9 +31,10 @@ class DecideSceneUseCaseTest {
     // ResponseResolver 는 실제 협력자(real) — LLM 클라이언트만 mock, 키 추출은 진짜 로직.
     private val uc: DecideSceneUseCase = DecideSceneUseCase(
         sessions, decisions, loader,
-        ResponseResolver(llm, DecisionKeyExtractor()),
-        // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환까지 통과하는지 함께 본다.
-        ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }),
+        // AiOptOutPort mock 은 기본값 false(=opt-out 아님) — 종전 거동 그대로 LLM 경로가 살아있다.
+        ResponseResolver(llm, DecisionKeyExtractor(), mock(), SafetyGateFixtures.sanitizer()),
+        // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환·금지 토큰 게이트까지 통과하는지 함께 본다.
+        ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }, SafetyGateFixtures.sanitizer()),
     )
 
     private fun scene(id: Int, next: Int?, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =

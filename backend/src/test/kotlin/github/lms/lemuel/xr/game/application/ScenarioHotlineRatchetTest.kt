@@ -96,13 +96,19 @@ class ScenarioHotlineRatchetTest {
 
     @Test
     fun `ScenePayloadAssembler 를 우회하는 키에는 위기 토큰을 두지 않는다`() {
-        // 회귀 가드 — 이 키들의 값은 ScenePayloadAssembler(=치환 지점)를 통과하지 않고
-        // 클라이언트로 나간다:
+        // 회귀 가드 — 이 키들의 값은 ScenePayloadAssembler(=위기 토큰 치환 지점)를 통과하지 않는
+        // 사본으로도 클라이언트에 나간다:
         //   value_prompt · linked_values → CompleteGameSessionUseCase → GameController.complete()
         //   monologues · outcomes · reactions → ResponseResolver → DecideSceneUseCase.responseText
         // 지금은 이 키들에 토큰이 없어서 실제 누출은 없다. 누가 여기에 토큰을 넣는 순간
         // 사용자는 치환되지 않은 `{{crisis_resources.default}}` 원문을 읽게 된다 —
         // 조용한 누출 대신 빨간 빌드로 바꾼다.
+        //
+        // ⚠️ 이 테스트가 보는 것은 *위기 토큰* 뿐이다. 같은 구조(어셈블러 우회)가 *금지 토큰* 에서도
+        // 그대로 성립했고 그쪽은 오래 비어 있었다 — 2026-08-02 에 세 출구 모두에 게이트를 걸어 닫았다
+        // (ScenePayloadForbiddenTokenGateTest · ResponseResolverSafetyTest ·
+        //  CompleteGameSessionUseCaseTest.`valuePrompt 메시지도 금지 토큰 게이트를 통과한다`).
+        // 새 출구를 만들 때는 두 축을 모두 확인할 것.
         val offenders = mutableListOf<String>()
 
         for (file in scenarioFiles()) {
@@ -191,7 +197,17 @@ class ScenarioHotlineRatchetTest {
          */
         private val PHONE_SHAPED = Regex("""\d{3,4}-\d{3,4}(-\d{4})?|1\d{3}""")
 
-        /** ScenePayloadAssembler(치환 지점)를 통과하지 않고 클라이언트로 나가는 yml 키. */
+        /**
+         * ScenePayloadAssembler(=위기 토큰 *치환* 지점)를 통과하지 않고 클라이언트로 나가는 yml 키.
+         *
+         * ⚠️ 이 목록은 **위기 토큰 치환 기준** 이다. 금지 토큰 게이트의 우회 목록과 혼동하지 말 것 —
+         * 금지 토큰은 세 출구(`responseText`·`scenePayload`·`valuePrompt`)에 모두 걸려 있어 우회가 없다.
+         *
+         * `monologues`·`outcomes`·`reactions` 는 여기 있지만 실제로는 **두 경로로 나간다**:
+         * ResponseResolver 의 `responseText`(치환 없음)와 ScenePayloadAssembler 의 `scenePayload`
+         * (extras 통째 복사 → 치환 있음). 즉 이 키들은 치환되는 사본과 안 되는 사본이 동시에 존재한다.
+         * 그래서 여전히 우회 키로 남긴다 — 한쪽만 치환되는 것은 안전하지 않다.
+         */
         private val BYPASS_KEYS = setOf(
             "value_prompt",
             "linked_values",

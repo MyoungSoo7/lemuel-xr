@@ -27,6 +27,7 @@ class CompleteGameSessionUseCaseTest {
         sessions, scenarios,
         CrisisKeywordScanner("(?<suicideIntent>\\bZZZ_NO_MATCH\\b)"),
         mock(),
+        SafetyGateFixtures.sanitizer(),
     )
 
     private fun live(id: UUID, character: String?, started: LocalDateTime?): GameSession =
@@ -79,6 +80,36 @@ class CompleteGameSessionUseCaseTest {
         assertThat(r.valuePrompt).isNotNull()
         assertThat(r.valuePrompt!!.suggestedValueIds).containsExactly(1, 2, 7)
         assertThat(r.valuePrompt!!.message).isEqualTo("오늘 3줄 일기")
+        assertThat(r.valuePrompt!!.linkedCharacter).isEqualTo("joseph")
+    }
+
+    @Test
+    fun `valuePrompt 메시지도 금지 토큰 게이트를 통과한다`() {
+        // `value_prompt` 는 ScenePayloadAssembler 를 우회해 곧장 /complete 응답으로 나가는
+        // 사용자 노출 문장이다. 우회 목록에 있다는 사실은 예전부터 적혀 있었지만 위기 토큰 관점뿐이었고,
+        // 금지 토큰은 아무도 안 봤다. 세션의 감정적 정점에서 나가는 문장이라 특히 위험하다.
+        val sid = UUID.randomUUID()
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(live(sid, "joseph", LocalDateTime.now())))
+        whenever(scenarios.forCharacter(Character.JOSEPH)).thenReturn(
+            Scenario(
+                "joseph", "곡식 7년",
+                listOf(
+                    outro(
+                        null,
+                        mapOf(
+                            "linked_values" to listOf(1),
+                            "value_prompt" to "믿음이 부족해서 그런 일을 겪은 겁니다",
+                        ),
+                    ),
+                ),
+            ),
+        )
+
+        val r = uc.execute(sid, "out", null)
+
+        assertThat(r.valuePrompt!!.message).isEqualTo(SafetyGateFixtures.FALLBACK_TEXT)
+        // 게이트는 문장만 바꾼다 — 구조는 그대로다.
+        assertThat(r.valuePrompt!!.suggestedValueIds).containsExactly(1)
         assertThat(r.valuePrompt!!.linkedCharacter).isEqualTo("joseph")
     }
 
