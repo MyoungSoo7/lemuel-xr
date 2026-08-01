@@ -122,6 +122,10 @@ safety_gates:
     enforced_at: scene_enter
     overlay_ref: scene2_r2_footer
     description: "'엘리야가 약해서'류 자동 해석 차단 — '불로 응답받은 자도 무너질 수 있다, 실패 아님' 톤"
+    # 무너짐의 원인을 사용자 자신의 결함으로 귀속시키는 3대 축(믿음·기도·의지) + 무자격 형태.
+    # '~해서' 인과 어미까지 포함해 *귀책* 문장만 잡는다 — "믿음이 약해도 괜찮습니다" 같은
+    # 정당한 위로는 통과시키기 위해서다(과차단 방지).
+    lint_forbidden_tokens: ["믿음이 약해서", "기도가 부족해서", "의지가 약해서", "약해서 무너"]
   - id: dwell_limit_on_despair
     enforced_at: nb_s2_rotem_lament
     description: "본문 노출 직후 최대 3초 정적 → Scene 3 자동 전환. 절망 상태 고착 방지."

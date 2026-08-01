@@ -109,7 +109,10 @@ safety_gates:
   - id: R2_R3_lint_forbidden
     enforced_at: always
     description: "허무 가스라이팅(R2)·재정향 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패."
-    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "만족을 모르", "이제 깨달았으니", "다시 열심히", "허무를 극복"]
+    # 높임·활용 변이형 포함. 한글은 선어말 '-시-'가 다음 음절에 합쳐져 표층형이 바뀐다
+    # ("욕심이 많아서"→"많으셔서", "이제 깨달았으니"→"깨달으셨으니"). 어간까지만 끊고
+    # 접두('이제')를 떼어 변이를 흡수한다. '깨달았으'가 '이제 깨달았으니'를 포섭한다.
+    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "욕심이 많으셔", "욕심이 많으시", "만족을 모르", "깨달았으", "깨달으셨으", "다시 열심히", "허무를 극복"]
   - id: R5_ai_optout_respected
     enforced_at: always
     description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path=static_curation 은 미션 공통."
