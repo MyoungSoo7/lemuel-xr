@@ -178,6 +178,29 @@ class GameWebIT : IntegrationTestBase() {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `outro 위기 문구는 토큰이 아니라 실제 번호로 나간다`() {
+        // 시나리오 yml 은 {{crisis_resources.default}} 토큰만 갖는다. 치환이 끊기면
+        // 위기 상태의 사용자가 토큰 원문을 읽게 된다 — 낡은 번호보다 나쁜 결과다.
+        for (c in listOf("elijah", "job")) {
+            val started = start(c, "emotional")
+            val sid = UUID.fromString(started["sessionId"] as String)
+
+            // Scene 4 결정 → 다음 payload 가 crisis_reminder 를 가진 outro(Scene 5).
+            val decide = authed().post().uri("/api/game/{c}/{sid}/decide", c, sid)
+                .body(mapOf("sceneId" to 4, "decision" to mapOf("value" to "next")))
+                .retrieve().body(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})!!
+
+            val payload = decide["scenePayload"] as Map<String, Any?>
+            val extras = payload["extras"] as Map<String, Any?>
+            assertThat(extras["crisis_reminder"].toString())
+                .`as`("character %s", c)
+                .doesNotContain("{{")
+                .contains("109")
+        }
+    }
+
+    @Test
     fun `미인증 start 거부`() {
         try {
             client().post().uri("/api/game/joseph/start").body(mapOf("mode" to "emotional"))

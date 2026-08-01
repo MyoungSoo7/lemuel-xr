@@ -13,6 +13,11 @@
 #         R2 — 광야 40년을 '성공 전 필수 훈련 코스' 로 미화하지 않는다.
 #         R1 — outro 위기 라우팅. R5 — ai_assist_footer 항상 노출.
 
+# 위기 연락처는 하드코딩하지 않는다 — `{{crisis_resources.default}}` 토큰만 쓴다.
+# ScenePayloadAssembler → CrisisTokenResolver 가 crisis_resources 정본(우선순위 1위 활성 전화)으로
+# 치환한다. 번호를 yml 에 직접 적으면 정책 개정(예: 2024-01-01 자살예방 상담 109 통합) 때
+# 낡은 번호가 위기 카피에 그대로 남는다. ScenarioHotlineRatchetTest 가 이를 강제한다.
+
 character: moses
 title: 떨기나무 앞에서
 target_user: general
@@ -116,6 +121,6 @@ scenes:
         EXHAUSTED: moses.recovery.wilderness40
         SAD:       moses.recovery.companion
         CONFUSED:  moses.recovery.who_am_i
-      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      crisis_reminder: "{{crisis_resources.default}}."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
       next_scene_suggestion: "트랙 A — 전도서 '인생의 계절' 카드 또는 시편 90 (모세의 시)"
     next: null

@@ -94,7 +94,7 @@
 미션 변경과 무관하게 깔리는 안전선. 코드상 `safety` 컨텍스트 + `common/web` 필터에 구현.
 
 1. **Disclaimer Gate** — *치료 도구 아님 / 예방 영적 교육* 고지.
-2. **CrisisLockout** — `safety/application/CrisisKeywordScanner` 가 위기 키워드 매칭 시 1393 즉시 전달, `SafetyAlert` 기록 + Micrometer 메트릭.
+2. **CrisisLockout** — `safety/application/CrisisKeywordScanner` 가 위기 키워드 매칭 시 109 즉시 전달, `SafetyAlert` 기록 + Micrometer 메트릭.
 3. **AI 라벨링** — 모든 LLM 응답에 *AI 보조 — 본문은 성경 참조*.
 4. **ResponseHeaderFilter** — 응답에 `X-Lemuel-Disclaimer: not-medical-device` 헤더.
 

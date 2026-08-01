@@ -85,7 +85,7 @@ export default function EcclesiastesPage() {
 
         {/* 하단 영구 위기 자원 + AI footer */}
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
-          위기 시: 1393 (자살예방상담전화) · 1577-0199 (정신건강위기상담) · 24시간
+          위기 시: 109 (자살예방 상담전화) · 1577-0199 (정신건강위기상담) · 24시간
           <br />
           {data?.aiFooter ??
             "AI 보조 — 본문은 성경 참조. 전도서와 관련 성구 외 자료는 사용하지 않습니다."}
@@ -238,7 +238,7 @@ function ReflectionSection({
             전도서의 &ldquo;헛됨&rdquo;은 인생을 포기하라는 말이 아닙니다. 지금 마음이 많이
             힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
           </p>
-          <p className="text-xs text-red-300 mt-2 font-mono">1577-0199 · 1393 (24시간)</p>
+          <p className="text-xs text-red-300 mt-2 font-mono">109 · 1577-0199 (24시간)</p>
           <Link
             href="/topics/practice"
             className="inline-block mt-2 text-xs text-[var(--color-primary)] hover:underline"

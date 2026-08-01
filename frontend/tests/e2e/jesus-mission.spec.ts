@@ -71,7 +71,7 @@ test.describe("Jesus 7-Scene mission (capstone)", () => {
     const outro = await page.locator("main").innerText();
     expect(outro.length).toBeGreaterThan(20);
     // R1 — 위기 라우팅 안내가 outro 에 노출된다
-    await expect(page.getByText(/1393/).first()).toBeVisible();
+    await expect(page.getByText(/109/).first()).toBeVisible();
 
     await page.getByRole("button", { name: /미션 완료/ }).click();
     await page.waitForURL((url) => url.pathname === "/", { timeout: 15_000 });

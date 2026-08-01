@@ -10,10 +10,15 @@
 #   신비 체험 프레임이 아니라 *말씀으로 찾아오시는 임재* 로만 서술 (뉴에이지 '내면의 소리' 프레임 금지).
 # 배제: 외경·영지주의·뉴에이지 혼합·"기도하면 우울이 낫는다" 식 즉효 프레임.
 #
-# 안전선: R1 — Scene 2 crisis_check + outro 위기 라우팅 (1393).
+# 안전선: R1 — Scene 2 crisis_check + outro 위기 라우팅 (자살예방 상담 109 — crisis_resources 정본에서 주입).
 #         R3 — 회복 시간표 압박 금지: 두 번 먹고 두 번 잔 후에도 엘리야의 회복은 즉각적이지 않았다.
 #         R4 — Scene 2 (죽기를 간청) 는 죽음 갈구 언어 노출 → trigger_warning + 스킵 대체(몸 돌봄 씬).
 #         R5 — ai_assist_footer 항상 노출 (정적 콘텐츠에도 UI 일관성 유지).
+
+# 위기 연락처는 하드코딩하지 않는다 — `{{crisis_resources.default}}` 토큰만 쓴다.
+# ScenePayloadAssembler → CrisisTokenResolver 가 crisis_resources 정본(우선순위 1위 활성 전화)으로
+# 치환한다. 번호를 yml 에 직접 적으면 정책 개정(예: 2024-01-01 자살예방 상담 109 통합) 때
+# 낡은 번호가 위기 카피에 그대로 남는다. ScenarioHotlineRatchetTest 가 이를 강제한다.
 
 character: elijah
 title: 로뎀나무 아래 — 먼저 먹고 자도 됩니다
@@ -43,7 +48,7 @@ scenes:
       static_text: "엘리야의 기도: ''여호와여 이제 됐습니다. 내 생명을 거두소서.'' 신은 이 기도에 *책망* 하지 않으셨습니다. *죽음 갈구가 말해진 것 자체* 가 회복의 첫 단계입니다."
       reflection_prompt: "당신도 이런 마음이 들었던 순간이 있다면 — 그 마음을 *부끄럽게* 여기지 않는 자리가 여기에 있습니다."
       crisis_check: true   # R1 — 이 화면에서 사용자가 동의 못 하면 즉시 위기 자원
-      language_note: "R 가드 — 이 씬은 죽음 갈구를 *허락된 언어* 로 다루되 낭만화하지 않는다. 지금 실제로 그 마음이 크다면 본문보다 1393 연결이 우선이다 (crisis_check 게이트)."
+      language_note: "R 가드 — 이 씬은 죽음 갈구를 *허락된 언어* 로 다루되 낭만화하지 않는다. 지금 실제로 그 마음이 크다면 본문보다 {{crisis_resources.default}} 연결이 우선이다 (crisis_check 게이트)."
     trigger_warning:
       level: medium
       content: ["death_wish"]
@@ -102,6 +107,6 @@ scenes:
         ANXIOUS:   elijah.recovery.still_small_voice
         LONELY:    elijah.recovery.seven_thousand
         CONFUSED:  elijah.recovery.what_are_you_doing_here
-      crisis_reminder: "1393."   # R1 — 위기 감지 시 즉시 위기 자원 연결
+      crisis_reminder: "{{crisis_resources.default}}."   # R1 — 위기 감지 시 즉시 위기 자원 연결
       next_scene_suggestion: "시편 88 — 답 없는 시편, 어둠으로 끝나는 자리"
     next: null

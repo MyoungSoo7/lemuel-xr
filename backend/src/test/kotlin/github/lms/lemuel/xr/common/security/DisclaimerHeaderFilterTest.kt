@@ -22,7 +22,7 @@ class DisclaimerHeaderFilterTest {
         filter.doFilter(req, res, chain)
 
         verify(res).setHeader("X-Lemuel-Disclaimer", "not-medical-device")
-        verify(res).setHeader("X-Lemuel-Crisis-Hotline-KR", "1393")
+        verify(res).setHeader("X-Lemuel-Crisis-Hotline-KR", "109")
         verify(res).setHeader("X-Lemuel-Disclaimer-Version", "1.0")
         verify(chain).doFilter(req, res)
     }

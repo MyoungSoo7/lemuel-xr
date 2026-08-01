@@ -146,7 +146,7 @@ class DisclaimerGateFilterTest {
 
         verify(res).setStatus(451)
         verify(res).setHeader("X-Lemuel-Disclaimer-Required", "true")
-        verify(res).setHeader("X-Lemuel-Crisis-Hotline-KR", "1393")
+        verify(res).setHeader("X-Lemuel-Crisis-Hotline-KR", "109")
         verify(chain, never()).doFilter(any(), any())
         assertThat(body.toString()).contains("E_DISCLAIMER_REQUIRED")
     }

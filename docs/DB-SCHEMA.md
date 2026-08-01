@@ -8,14 +8,14 @@
 
 ## 0. 설계 원칙
 
-| 원칙 | 적용 |
-|---|---|
-| **익명 우선** | guest user 가 1차 — 모든 PII 는 옵션 |
-| **헥사고날 분리** | 도메인 (게임/일기/시편/안전) 별 스키마 분리, FK 최소화 |
-| **JSONB 적극** | Scene 결정 같은 *분기 데이터* 는 JSONB 로 — 캐릭터 추가 시 ALTER 무 |
-| **벡터 분리** | scripture 임베딩은 pgvector 또는 Pinecone (대용량 시) |
-| **삭제 가능** | 사용자가 *모든 데이터 삭제* 요청 가능 (GDPR/개인정보보호법) |
-| **암호화** | 일기·시편 본문은 *pgcrypto* 로 row-level 암호화 |
+| 원칙              | 적용                                                                |
+| ----------------- | ------------------------------------------------------------------- |
+| **익명 우선**     | guest user 가 1차 — 모든 PII 는 옵션                                |
+| **헥사고날 분리** | 도메인 (게임/일기/시편/안전) 별 스키마 분리, FK 최소화              |
+| **JSONB 적극**    | Scene 결정 같은 _분기 데이터_ 는 JSONB 로 — 캐릭터 추가 시 ALTER 무 |
+| **벡터 분리**     | scripture 임베딩은 pgvector 또는 Pinecone (대용량 시)               |
+| **삭제 가능**     | 사용자가 _모든 데이터 삭제_ 요청 가능 (GDPR/개인정보보호법)         |
+| **암호화**        | 일기·시편 본문은 _pgcrypto_ 로 row-level 암호화                     |
 
 ---
 
@@ -54,6 +54,7 @@
 ## 2. IDENTITY — 사용자·세션
 
 ### `users`
+
 ```sql
 CREATE TABLE users (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -86,6 +87,7 @@ CREATE INDEX idx_users_active ON users(created_at) WHERE deleted_at IS NULL;
 ```
 
 ### `devices`
+
 ```sql
 -- 디바이스별 게스트 ID 추적 — 같은 디바이스의 사용자 연속성
 CREATE TABLE devices (
@@ -103,6 +105,7 @@ CREATE UNIQUE INDEX idx_devices_fingerprint ON devices(device_fingerprint);
 ```
 
 ### `app_sessions`
+
 ```sql
 -- 사용자 앱 진입~종료 세션 (게임 세션과 다름)
 CREATE TABLE app_sessions (
@@ -131,6 +134,7 @@ CREATE INDEX idx_app_sessions_user ON app_sessions(user_id, started_at DESC);
 ## 3. EMOTION — 감정 입력 + 3차원 모드
 
 ### `emotion_logs`
+
 ```sql
 CREATE TABLE emotion_logs (
     id              BIGSERIAL PRIMARY KEY,
@@ -161,6 +165,7 @@ CREATE INDEX idx_emotion_logs_classified ON emotion_logs(classified_emotion);
 ```
 
 ### `recovery_metrics` — 자체 회복 지표 (PHQ-9 류 진단 도구 대체)
+
 ```sql
 CREATE TABLE recovery_metrics (
     id              BIGSERIAL PRIMARY KEY,
@@ -191,6 +196,7 @@ CREATE INDEX idx_recovery_user_date ON recovery_metrics(user_id, metric_date DES
 ## 4. GAME — 트랙 B 4 인물
 
 ### `game_sessions`
+
 ```sql
 CREATE TABLE game_sessions (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -220,6 +226,7 @@ CREATE INDEX idx_game_sessions_character ON game_sessions(character, completed_a
 ```
 
 ### `game_decisions` — Scene 별 사용자 선택 기록
+
 ```sql
 -- Scene 결정을 *flat 테이블* 로 풀어 분석 용이
 CREATE TABLE game_decisions (
@@ -251,7 +258,8 @@ CREATE INDEX idx_game_decisions_pattern ON game_decisions((decision->>'save_rati
     WHERE scene_name = 'storage_decision';
 ```
 
-### `scene_views` — 사용자가 *각 Scene 에서 보낸 시간*
+### `scene_views` — 사용자가 _각 Scene 에서 보낸 시간_
+
 ```sql
 -- A/B 테스트 + UX 분석용
 CREATE TABLE scene_views (
@@ -276,6 +284,7 @@ CREATE TABLE scene_views (
 ## 5. CONTENT — 트랙 A (Theme 1~7)
 
 ### `diary_entries` — Theme 1
+
 ```sql
 CREATE TABLE diary_entries (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -306,6 +315,7 @@ CREATE INDEX idx_diary_user_time ON diary_entries(user_id, created_at DESC);
 ```
 
 ### `user_psalms` — Theme 4 (사용자 작성 시편)
+
 ```sql
 CREATE TABLE user_psalms (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -326,6 +336,7 @@ CREATE INDEX idx_user_psalms_user ON user_psalms(user_id, created_at DESC);
 ```
 
 ### `proverbs_interactions` — Theme 2
+
 ```sql
 CREATE TABLE proverbs_interactions (
     id              BIGSERIAL PRIMARY KEY,
@@ -346,6 +357,7 @@ CREATE TABLE proverbs_interactions (
 ```
 
 ### `ecclesiastes_views` — Theme 3 (전도서 사용 기록)
+
 ```sql
 CREATE TABLE ecclesiastes_views (
     id              BIGSERIAL PRIMARY KEY,
@@ -368,6 +380,7 @@ CREATE TABLE ecclesiastes_views (
 ## 6. SCRIPTURE — 성경 본문 + 임베딩
 
 ### `scripture_passages`
+
 ```sql
 CREATE TABLE scripture_passages (
     id              BIGSERIAL PRIMARY KEY,
@@ -395,6 +408,7 @@ CREATE INDEX idx_scripture_character ON scripture_passages USING GIN(character_t
 ```
 
 ### `scripture_embeddings` (pgvector)
+
 ```sql
 CREATE EXTENSION IF NOT EXISTS vector;
 
@@ -411,13 +425,14 @@ CREATE INDEX idx_scripture_embeddings_hnsw ON scripture_embeddings
     WITH (m = 16, ef_construction = 64);
 ```
 
-→ *대용량 확장 시* Pinecone 으로 이전 가능 (외부 vector DB).
+→ _대용량 확장 시_ Pinecone 으로 이전 가능 (외부 vector DB).
 
 ---
 
 ## 7. SAFETY — 정신건강 안전장치
 
 ### `safety_alerts` — 위험 신호 감지 로그
+
 ```sql
 CREATE TABLE safety_alerts (
     id              BIGSERIAL PRIMARY KEY,
@@ -443,6 +458,7 @@ CREATE INDEX idx_safety_user_severity ON safety_alerts(user_id, severity, create
 ```
 
 ### `crisis_resources` — 위기 자원 카탈로그
+
 ```sql
 CREATE TABLE crisis_resources (
     id              SERIAL PRIMARY KEY,
@@ -454,19 +470,28 @@ CREATE TABLE crisis_resources (
     region          VARCHAR(50)   -- '한국' | '전세계'
 );
 
--- 시드 데이터 (Flyway V8) — {{crisis_resources.default}} 토큰 = 첫 행(자살예방 상담전화 109):
--- ('자살예방 상담전화', '109', NULL, 'ko', '24/7', '한국'),   -- DEFAULT (2024 통합 정번호, 구 1393·1577-0199 대체)
--- ('정신건강위기상담(구 번호·보조)', '1577-0199', NULL, 'ko', '24/7', '한국'),
--- ('자살예방상담(구 번호·보조)', '1393', NULL, 'ko', '24/7', '한국'),
+-- 시드 데이터 (실구현: V7__safety_domain.sql + V20260802031449__crisis_resource_109_canonical.sql)
+-- {{crisis_resources.default}} 토큰 = region/locale 별 우선순위 1위 *활성 전화* 자원 = 109.
+-- ('자살예방 상담전화', '109', NULL, 'ko', '24/7', '한국'),          -- DEFAULT · priority 1 (2024-01-01 통합 정번호)
+-- ('정신건강위기상담전화', '1577-0199', NULL, 'ko', '24/7', '한국'),  -- 폐지 아님 — 정신건강 상담 담당
+-- ('자살예방상담(구 번호·보조)', '1393', NULL, 'ko', '24/7', '한국'), -- 정번호 지위만 상실 (불통 아님) · priority 6
 -- ('청소년전화 1388', '1388', 'https://www.cyber1388.kr', 'ko', '24/7', '한국'),   -- 만 9~24세: default 앞에 prepend 렌더
 -- ('생명의전화', '1588-9191', 'https://www.lifeline.or.kr', 'ko', '24/7', '한국')
 ```
+
+> **번호 정본 (2026-08-02 교정)** — 2024-01-01 부로 분산돼 있던 자살예방 상담전화가 **109** 로 통합됐다
+> ([보건복지부 보도자료](https://www.mohw.go.kr/board.es?act=view&bid=0027&cg_code=&list_no=1479607&mid=a10503000000&tag=)).
+> 통합된 것은 _자살예방 상담 기능_ 뿐이다 — 정신건강상담전화(1577-0199)·청소년전화(1388)·여성긴급전화(1366) 등은
+> 종전과 같이 본연의 역할에 따라 담당 분야 상담을 계속 수행한다
+> ([보건복지상담센터 FAQ](https://www.129.go.kr/109)). 1393 이 _불통_ 이라는 근거는 어느 출처에도 없으므로
+> 시드에서 삭제하지 않고 `구 번호·보조` 로 강등만 한다.
 
 ---
 
 ## 8. THEOLOGY — 콘텐츠 검증
 
 ### `content_versions`
+
 ```sql
 -- AI 생성 묵상문·시편 등 *공개 콘텐츠* 의 버전 관리
 CREATE TABLE content_versions (
@@ -491,6 +516,7 @@ CREATE INDEX idx_content_versions_scope ON content_versions(scope, status);
 ```
 
 ### `theology_reviews`
+
 ```sql
 CREATE TABLE theology_reviews (
     id              BIGSERIAL PRIMARY KEY,
@@ -510,6 +536,7 @@ CREATE TABLE theology_reviews (
 ## 9. AI — LLM 캐시·비용
 
 ### `llm_cache`
+
 ```sql
 CREATE TABLE llm_cache (
     cache_key       VARCHAR(255) PRIMARY KEY,
@@ -535,6 +562,7 @@ CREATE INDEX idx_llm_cache_hits ON llm_cache(hit_count DESC);
 ```
 
 ### `llm_usage` — 비용 추적
+
 ```sql
 CREATE TABLE llm_usage (
     id              BIGSERIAL PRIMARY KEY,
@@ -570,20 +598,20 @@ CREATE INDEX idx_llm_usage_daily_date ON llm_usage_daily(date DESC);
 
 ## 10. Flyway 마이그레이션 순서
 
-| 버전 | 내용 | 의존성 |
-|---|---|---|
-| **V1** | `users`, `devices`, `app_sessions` | (none) |
-| **V2** | `emotion_logs`, `recovery_metrics` | V1 |
-| **V3** | `scripture_passages` + pgvector extension | (none) |
-| **V4** | `scripture_embeddings` | V3 |
-| **V5** | `game_sessions`, `game_decisions`, `scene_views` | V1, V2 |
-| **V6** | `diary_entries`, `user_psalms`, `proverbs_interactions`, `ecclesiastes_views` | V1 |
-| **V7** | `safety_alerts`, `crisis_resources` + 시드 | V1 |
-| **V8** | `content_versions`, `theology_reviews` | (none) |
-| **V9** | `llm_cache`, `llm_usage` | V1 |
-| **V10** | 성경 본문 시드 (창세기 41~50 / 출 3~14 / 삼상 16~17 + 시 23 / 마태~요한 핵심) | V3 |
-| **V11** | 분석용 인덱스 + materialized views | All |
-| **V12** | pgcrypto 적용 (diary·user_psalms) | V6 |
+| 버전    | 내용                                                                          | 의존성 |
+| ------- | ----------------------------------------------------------------------------- | ------ |
+| **V1**  | `users`, `devices`, `app_sessions`                                            | (none) |
+| **V2**  | `emotion_logs`, `recovery_metrics`                                            | V1     |
+| **V3**  | `scripture_passages` + pgvector extension                                     | (none) |
+| **V4**  | `scripture_embeddings`                                                        | V3     |
+| **V5**  | `game_sessions`, `game_decisions`, `scene_views`                              | V1, V2 |
+| **V6**  | `diary_entries`, `user_psalms`, `proverbs_interactions`, `ecclesiastes_views` | V1     |
+| **V7**  | `safety_alerts`, `crisis_resources` + 시드                                    | V1     |
+| **V8**  | `content_versions`, `theology_reviews`                                        | (none) |
+| **V9**  | `llm_cache`, `llm_usage`                                                      | V1     |
+| **V10** | 성경 본문 시드 (창세기 41~50 / 출 3~14 / 삼상 16~17 + 시 23 / 마태~요한 핵심) | V3     |
+| **V11** | 분석용 인덱스 + materialized views                                            | All    |
+| **V12** | pgcrypto 적용 (diary·user_psalms)                                             | V6     |
 
 ---
 
@@ -591,13 +619,13 @@ CREATE INDEX idx_llm_usage_daily_date ON llm_usage_daily(date DESC);
 
 ### 자주 쓰일 쿼리 패턴
 
-| 쿼리 | 최적화 |
-|---|---|
-| *최근 30일 사용자의 감정 분포* | `idx_emotion_logs_user_time` + 부분 인덱스 |
-| *Scene 결정 분포 (요셉 Scene 2 의 1/3 vs 1/5 vs 1/2)* | `idx_game_decisions_pattern` (expression index) |
-| *Pinecone 대체 — 성경 의미 검색* | HNSW vector index |
-| *위험 사용자 알람* | `idx_safety_user_severity` + 트리거 |
-| *비용 모니터링* | `llm_usage_daily` materialized view (cron 1h refresh) |
+| 쿼리                                                  | 최적화                                                |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| _최근 30일 사용자의 감정 분포_                        | `idx_emotion_logs_user_time` + 부분 인덱스            |
+| _Scene 결정 분포 (요셉 Scene 2 의 1/3 vs 1/5 vs 1/2)_ | `idx_game_decisions_pattern` (expression index)       |
+| _Pinecone 대체 — 성경 의미 검색_                      | HNSW vector index                                     |
+| _위험 사용자 알람_                                    | `idx_safety_user_severity` + 트리거                   |
+| _비용 모니터링_                                       | `llm_usage_daily` materialized view (cron 1h refresh) |
 
 ### 파티셔닝 (Phase 3 — 사용자 1만+ 시)
 
@@ -615,15 +643,15 @@ CREATE TABLE emotion_logs_2026_06 PARTITION OF emotion_logs
 
 ### 12.1 PII 분류
 
-| 컬럼 | 분류 | 처리 |
-|---|---|---|
-| `users.external_id` (OAuth sub) | PII (Identifier) | 해시 저장 권장 |
-| `diary_entries.body` | PII Sensitive (내면 정보) | pgcrypto 암호화 권장 |
-| `user_psalms.raw_text` | PII Sensitive | pgcrypto 권장 |
-| `emotion_logs.raw_text` | PII Sensitive | pgcrypto 권장 |
-| `safety_alerts.snippet` | PII Sensitive | pgcrypto 필수 |
-| 게임 결정 (`game_decisions`) | 비-PII | 평문 OK |
-| 성경 본문 | 공개 | 평문 |
+| 컬럼                            | 분류                      | 처리                 |
+| ------------------------------- | ------------------------- | -------------------- |
+| `users.external_id` (OAuth sub) | PII (Identifier)          | 해시 저장 권장       |
+| `diary_entries.body`            | PII Sensitive (내면 정보) | pgcrypto 암호화 권장 |
+| `user_psalms.raw_text`          | PII Sensitive             | pgcrypto 권장        |
+| `emotion_logs.raw_text`         | PII Sensitive             | pgcrypto 권장        |
+| `safety_alerts.snippet`         | PII Sensitive             | pgcrypto 필수        |
+| 게임 결정 (`game_decisions`)    | 비-PII                    | 평문 OK              |
+| 성경 본문                       | 공개                      | 평문                 |
 
 ### 12.2 사용자 삭제 (GDPR / 한국 개인정보보호법)
 
@@ -643,13 +671,13 @@ COMMIT;
 
 ### 12.3 보존 정책
 
-| 데이터 | 기본 보존 | 사용자 옵션 |
-|---|---|---|
-| 일기·시편 | 90 일 | 30/90/180/365일 / 영구 |
-| 감정 로그 | 90 일 | 같음 |
-| 게임 결정 | 1년 (분석용) | 30일 까지 단축 가능 |
-| 안전 알람 | 1년 (책임 추적) | 단축 불가 |
-| LLM 캐시 | 영구 (콘텐츠 추적) | 사용자 무관 |
+| 데이터    | 기본 보존          | 사용자 옵션            |
+| --------- | ------------------ | ---------------------- |
+| 일기·시편 | 90 일              | 30/90/180/365일 / 영구 |
+| 감정 로그 | 90 일              | 같음                   |
+| 게임 결정 | 1년 (분석용)       | 30일 까지 단축 가능    |
+| 안전 알람 | 1년 (책임 추적)    | 단축 불가              |
+| LLM 캐시  | 영구 (콘텐츠 추적) | 사용자 무관            |
 
 자동 삭제: `pg_cron` 으로 매일 새벽 만료 데이터 cleanup.
 
@@ -657,53 +685,59 @@ COMMIT;
 
 ## 13. 캐릭터별 game_decisions 의 schema 예시
 
-각 캐릭터 Scene 결정은 JSONB 라 자유 — 단 *분석 편의* 위해 패턴 통일.
+각 캐릭터 Scene 결정은 JSONB 라 자유 — 단 _분석 편의_ 위해 패턴 통일.
 
 ### 요셉
+
 ```json
 {
-  "scene1": {"viewed_dream": true},
-  "scene2": {"save_ratio": "1/3"},
-  "scene3": {"distribution": ["farmer","immigrant","trader","farmer","farmer"]},
-  "scene4": {"reveal_choice": "test_first"},
-  "scene5": {"closing_emotion_match": "unburdening"}
+  "scene1": { "viewed_dream": true },
+  "scene2": { "save_ratio": "1/3" },
+  "scene3": {
+    "distribution": ["farmer", "immigrant", "trader", "farmer", "farmer"]
+  },
+  "scene4": { "reveal_choice": "test_first" },
+  "scene5": { "closing_emotion_match": "unburdening" }
 }
 ```
 
 ### 모세
+
 ```json
 {
-  "scene1": {"silence_duration_seconds": 40, "skipped": false},
-  "scene2": {"approached_bush": true, "removed_shoes": true},
-  "scene3": {"cards": ["throw","heart","throw","throw","heart"]},
-  "scene4": {"action": "with_aaron", "hesitation_seconds": 3.2},
-  "scene5": {"reached_hand": true}
+  "scene1": { "silence_duration_seconds": 40, "skipped": false },
+  "scene2": { "approached_bush": true, "removed_shoes": true },
+  "scene3": { "cards": ["throw", "heart", "throw", "throw", "heart"] },
+  "scene4": { "action": "with_aaron", "hesitation_seconds": 3.2 },
+  "scene5": { "reached_hand": true }
 }
 ```
 
 ### 다윗
+
 ```json
 {
-  "scene1": {"psalm_lines_touched": 12},
-  "scene2": {"reaction": "silence"},
-  "scene3": {"tried_armor": true, "removed_steps": 3},
+  "scene1": { "psalm_lines_touched": 12 },
+  "scene2": { "reaction": "silence" },
+  "scene3": { "tried_armor": true, "removed_steps": 3 },
   "scene4": {
-    "stones": ["fear","loneliness","prayer","trust","humiliation"],
-    "order": [1,3,5,4,2],
+    "stones": ["fear", "loneliness", "prayer", "trust", "humiliation"],
+    "order": [1, 3, 5, 4, 2],
     "last_stone": "humiliation"
   },
-  "scene5": {"sling_rotation_speed": "moderate", "released_at_seconds": 5.8}
+  "scene5": { "sling_rotation_speed": "moderate", "released_at_seconds": 5.8 }
 }
 ```
 
 ### 예수 (godjinho 가 설계 — 예시)
+
 ```json
 {
-  "scene1": {"cup": "drink", "delay_seconds": 4.2},
-  "scene2": {"feet_washed": true},
-  "scene3": {"silence_before_pilate": true},
-  "scene4": {"viewed_cross": true, "duration_seconds": 60},
-  "scene5": {"resurrection_acknowledged": true}
+  "scene1": { "cup": "drink", "delay_seconds": 4.2 },
+  "scene2": { "feet_washed": true },
+  "scene3": { "silence_before_pilate": true },
+  "scene4": { "viewed_cross": true, "duration_seconds": 60 },
+  "scene5": { "resurrection_acknowledged": true }
 }
 ```
 
@@ -711,7 +745,8 @@ COMMIT;
 
 ## 14. 분석용 쿼리 예시
 
-### *사용자의 30일 회복 추이*
+### _사용자의 30일 회복 추이_
+
 ```sql
 SELECT
     metric_date,
@@ -724,7 +759,8 @@ WHERE user_id = $user_id
 ORDER BY metric_date;
 ```
 
-### *요셉 Scene 2 의 가장 인기있는 저장 비율*
+### _요셉 Scene 2 의 가장 인기있는 저장 비율_
+
 ```sql
 SELECT
     decision->>'save_ratio' as save_ratio,
@@ -735,7 +771,8 @@ GROUP BY decision->>'save_ratio'
 ORDER BY count DESC;
 ```
 
-### *3차원 진입 모드별 미션 완료율*
+### _3차원 진입 모드별 미션 완료율_
+
 ```sql
 SELECT
     chosen_dimension,
@@ -747,7 +784,8 @@ WHERE chosen_dimension IS NOT NULL
 GROUP BY chosen_dimension, character;
 ```
 
-### *위험 신호 발생 후 7일 내 추적*
+### _위험 신호 발생 후 7일 내 추적_
+
 ```sql
 SELECT
     sa.user_id,
@@ -782,16 +820,16 @@ WHERE sa.severity IN ('high', 'critical');
 
 ---
 
-## 16. 의도적으로 *지금 빼놓은* 것
+## 16. 의도적으로 _지금 빼놓은_ 것
 
-| 항목 | 보류 이유 | 언제 추가 |
-|---|---|---|
-| 결제·구독 (`subscriptions`) | Phase 3 수익화 시 | V13+ |
-| 다국어 (`translations`) | MVP 한국어만 | Phase 3 |
-| 소셜 (익명 기도 매칭) | Phase 3 | V14+ |
-| 푸시 알림 토큰 | OAuth 도입과 함께 | V13 |
-| B2B (교회 단체) | Phase 4 | 별도 schema |
+| 항목                        | 보류 이유         | 언제 추가   |
+| --------------------------- | ----------------- | ----------- |
+| 결제·구독 (`subscriptions`) | Phase 3 수익화 시 | V13+        |
+| 다국어 (`translations`)     | MVP 한국어만      | Phase 3     |
+| 소셜 (익명 기도 매칭)       | Phase 3           | V14+        |
+| 푸시 알림 토큰              | OAuth 도입과 함께 | V13         |
+| B2B (교회 단체)             | Phase 4           | 별도 schema |
 
 ---
 
-> **TL;DR** — 8개 도메인 × 약 20개 테이블 × Flyway V1~V12. JSONB 적극 사용해 *캐릭터 추가 시 ALTER 0*. pgcrypto 로 일기 암호화, pg_cron 으로 보존 정책 자동화, pgvector 로 성경 의미 검색. 사용자 1만 명까진 PostgreSQL 단독으로 충분.
+> **TL;DR** — 8개 도메인 × 약 20개 테이블 × Flyway V1~V12. JSONB 적극 사용해 _캐릭터 추가 시 ALTER 0_. pgcrypto 로 일기 암호화, pg_cron 으로 보존 정책 자동화, pgvector 로 성경 의미 검색. 사용자 1만 명까진 PostgreSQL 단독으로 충분.

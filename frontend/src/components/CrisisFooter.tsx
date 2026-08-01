@@ -13,6 +13,11 @@ import { useState } from "react";
  *     완전 비표시는 불가능.
  *   - fixed bottom — 모든 페이지 위에 떠있음.
  *   - 모바일·데스크톱·VR 브라우저 모두 가시.
+ *
+ * 번호 정본 (2026-08-02 교정): 자살예방 상담은 2024-01-01 자로 **109** 로 통합됐다
+ * (보건복지부 "분산된 자살예방 상담전화 1월 1일부터 '109'로 통합 운영").
+ * 구 번호 1393 은 정번호가 아니다. 1577-0199(정신건강)·129(보건복지)·생명의전화는
+ * 폐지되지 않았고 각자 담당 분야 상담을 계속하므로 그대로 둔다.
  */
 export function CrisisFooter() {
   const [expanded, setExpanded] = useState(false);
@@ -31,8 +36,8 @@ export function CrisisFooter() {
       >
         <span className="text-amber-400">●</span>
         <span className="font-medium">
-          위기 상태라면 — <a href="tel:1393" className="underline font-bold">1393</a>{" "}
-          자살예방상담전화 (24시간, 무료)
+          위기 상태라면 — <a href="tel:109" className="underline font-bold">109</a>{" "}
+          자살예방 상담전화 (24시간, 무료)
         </span>
         <span className="text-amber-400/60 text-xs">
           {expanded ? "▲" : "▼"}
@@ -47,7 +52,7 @@ export function CrisisFooter() {
           </p>
           <ul className="space-y-1 pl-4">
             <li>
-              <a href="tel:1393" className="underline">1393</a> — 자살예방상담전화 (24시간 무료, 전화)
+              <a href="tel:109" className="underline">109</a> — 자살예방 상담전화 (24시간 무료, 전화)
             </li>
             <li>
               <a href="tel:1577-0199" className="underline">1577-0199</a> — 정신건강위기상담전화 (24시간 무료)

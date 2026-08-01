@@ -13,6 +13,11 @@
 #         R4 — Scene 5 (골리앗) 폭력 묘사 → trigger_warning + 스킵 대체. Scene 2 가족 모욕 → skip 옵션.
 #         R1 — outro 위기 라우팅. R5 — ai_assist_footer 항상 노출.
 
+# 위기 연락처는 하드코딩하지 않는다 — `{{crisis_resources.default}}` 토큰만 쓴다.
+# ScenePayloadAssembler → CrisisTokenResolver 가 crisis_resources 정본(우선순위 1위 활성 전화)으로
+# 치환한다. 번호를 yml 에 직접 적으면 정책 개정(예: 2024-01-01 자살예방 상담 109 통합) 때
+# 낡은 번호가 위기 카피에 그대로 남는다. ScenarioHotlineRatchetTest 가 이를 강제한다.
+
 character: david
 title: 다섯 개의 돌
 target_user: general
@@ -131,6 +136,6 @@ scenes:
         LONELY:     david.recovery.psalm_companion
         ANGRY:      david.recovery.eliav_silenced
         EXHAUSTED:  david.recovery.small_active
-      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      crisis_reminder: "{{crisis_resources.default}}."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
       next_scene_suggestion: "트랙 A — 1번 일기(솔직한 한 줄) 또는 시편 감정 카드"
     next: null

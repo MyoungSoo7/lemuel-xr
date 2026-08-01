@@ -55,7 +55,7 @@ class AuthController(
     }
 
     /**
-     * "치료 도구가 아닙니다 + 1393 + AI 라벨링" 동의 endpoint.
+     * "치료 도구가 아닙니다 + 109 + AI 라벨링" 동의 endpoint.
      * 모든 콘텐츠 endpoint 는 DisclaimerGateFilter 가 이 동의 후에만 통과시킴.
      */
     @PostMapping("/api/auth/accept-disclaimer")

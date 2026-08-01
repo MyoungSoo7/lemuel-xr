@@ -40,7 +40,7 @@ import {
  *    jesus.yml Scene 5 trigger_warning(level medium, [suffering, death]) 을 프론트가 소비하는 지점.
  *  · R3 — Scene 6 부활을 "너도 부활/극복하라" 로 틀지 않는다. *이름이 불린다* 는 수동 은혜만.
  *  · R2 — Scene 5 겟세마네 흔들림 = 믿음의 결함 아님. 고난 미화 X.
- *  · R1 — Scene 7 outro 에 위기 라우팅(1393·1577-0199) + 일기·트랙 A 안내.
+ *  · R1 — Scene 7 outro 에 위기 라우팅(109·1577-0199) + 일기·트랙 A 안내.
  *  · R5 — 모든 echo/outro 에 "AI 보조 — 본문은 성경 참조" footer.
  */
 type Scene = JosephStartResponse;

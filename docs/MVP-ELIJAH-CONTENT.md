@@ -78,7 +78,7 @@ AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 109
 ```
 
 → R5 + theology-tone 7번 + R1(109) 항상 충족. *AI 는 치료자/자살예방 전문가가 아닌 이야기 안내자 — 위기 영역은 외부 자원으로 즉시 연결*.
-> (참고: 코드베이스 기존 footer 는 `1393`. 본 미션 seed 는 통합 번호 `109`(2024~) 를 명시 — 운영 시 catalog `crisis_resources.default` 로 단일화 권장.)
+> (2026-08-02 해소: 코드베이스 footer 도 `109` 로 교정됐고, 런타임 시나리오는 `{{crisis_resources.default}}` 토큰만 쓴다 — 실제 번호는 `crisis_resources` 정본에서 주입된다.)
 
 ### 0.6 엘리야 미션 *전체* 톤 정책 (R2/R3 사전 가드)
 

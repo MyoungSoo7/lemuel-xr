@@ -87,11 +87,11 @@ CI(`.github/workflows/ci.yml`): `changes` → `backend`(`gradle --no-daemon test
 
 미션·톤 변경과 무관하게 항상 가동되는 4-layer:
 1. Disclaimer Gate (*치료 도구 아님 / 예방 영적 교육*).
-2. CrisisLockout — 위기 키워드 → 1393 즉시 전달 (`safety/application/CrisisKeywordScanner`).
+2. CrisisLockout — 위기 키워드 → 109 즉시 전달 (`safety/application/CrisisKeywordScanner`).
 3. AI 라벨링 — 모든 LLM 응답에 *AI 보조 — 본문은 성경 참조*.
 4. `X-Lemuel-Disclaimer: not-medical-device` 응답 헤더.
 
-**금지 어휘/행위**: 치료·진단·상담·처방·의료 권고, 자살 사고에 대한 직접 조언. 이 영역은 앱이 담당하지 않는다(1393·전문가).
+**금지 어휘/행위**: 치료·진단·상담·처방·의료 권고, 자살 사고에 대한 직접 조언. 이 영역은 앱이 담당하지 않는다(109·전문가).
 
 ---
 

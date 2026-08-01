@@ -84,7 +84,7 @@ namespace Lemuel
                         err => _status = "다운로드 일부 실패 (R2 미배포면 정상): " + err));
                 }
                 GUILayout.EndHorizontal();
-                GUILayout.Label("위기 시 1577-0199 자살예방 · 1393 생명의전화 · 24시간");
+                GUILayout.Label("위기 시 109 자살예방 · 1577-0199 정신건강상담 · 24시간");
             }
         }
     }

@@ -82,7 +82,7 @@ export default function ProverbsThemePage() {
 
         {/* 하단 영구 위기 자원 + AI footer */}
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
-          위기 시: 1393 (자살예방상담전화) · 1577-0199 (정신건강위기상담) · 24시간
+          위기 시: 109 (자살예방 상담전화) · 1577-0199 (정신건강위기상담) · 24시간
           <br />
           {data?.aiFooter ??
             "AI 보조 — 본문은 성경 참조. 잠언(성경) 외 자료는 사용하지 않습니다."}

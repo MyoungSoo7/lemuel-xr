@@ -15,6 +15,11 @@
 #         R5 AI 보조 footer("AI 보조 — 본문은 성경 참조") 항상 노출.
 # 개혁주의 정통성과 R1~R5 정신건강 안전선은 양립 — 형벌 대속 확정이 고난 미화/회복 강요 근거가 되어선 안 됨.
 
+# 위기 연락처는 하드코딩하지 않는다 — `{{crisis_resources.default}}` 토큰만 쓴다.
+# ScenePayloadAssembler → CrisisTokenResolver 가 crisis_resources 정본(우선순위 1위 활성 전화)으로
+# 치환한다. 번호를 yml 에 직접 적으면 정책 개정(예: 2024-01-01 자살예방 상담 109 통합) 때
+# 낡은 번호가 위기 카피에 그대로 남는다. ScenarioHotlineRatchetTest 가 이를 강제한다.
+
 character: jesus
 title: 길이요 진리요 생명
 target_user: general
@@ -137,6 +142,6 @@ scenes:
         EXHAUSTED:  jesus.recovery.living_water
         SAD:        jesus.recovery.he_wept
         CONFUSED:   jesus.recovery.the_way
-      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      crisis_reminder: "{{crisis_resources.default}}."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
       next_scene_suggestion: "트랙 A — 시편 22 (버림받음의 부르짖음) 또는 1번 일기·묵상"
     next: null

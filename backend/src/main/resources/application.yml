@@ -23,7 +23,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate    # Flyway 가 진실. JPA 는 검증만.
+      ddl-auto: validate # Flyway 가 진실. JPA 는 검증만.
     properties:
       hibernate:
         default_schema: public
@@ -57,7 +57,7 @@ ai:
   # 임상·치료 영역 X → AI 생성 활성화 default. Prompt guard 가 *큐티 톤* 강제.
   generation:
     enabled: ${AI_GENERATION_ENABLED:true}
-    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 위기 시 1393 (자살예방상담전화)."
+    disabled-fallback-text: "지금은 정해진 묵상문만 안내드려요. 위기 시 109 (자살예방 상담전화)."
     # Prompt 톤 가이드 — Python AI 사이드카가 system prompt 에 prepend.
     tone-guidance: |
       당신은 *영적 비상 대비 훈련* 가이드입니다. 큐티(QT)와 같은 *일상 영적 양식* 톤으로 응답하세요.
@@ -105,8 +105,15 @@ safety:
   # matchedPattern 을 정한다. 그룹 없이 쓰면 crisis_unclassified 로 떨어지되 차단은 유지된다
   # (분류를 몰라도 통과시키지 않는다). 환경변수로 override 할 때도 그룹명을 지키는 편이 좋다.
   crisis-keywords-regex: ${SAFETY_CRISIS_REGEX:(?<suicideIntent>자살|죽고\s?싶|죽어\s?버|뛰어내리)|(?<selfHarm>자해)}
-  alert-severity-threshold: medium   # 이 이상이면 사용자에게 위기 자원 표시
+  alert-severity-threshold: medium # 이 이상이면 사용자에게 위기 자원 표시
   show-disclaimer-on-first-entry: true
+
+  crisis:
+    # 시나리오 yml 의 `{{crisis_resources.default}}` 치환 실패 시 쓰는 *최후* 대체값.
+    # 정본은 DB `crisis_resources` 의 region/locale 별 우선순위 1위 활성 전화 자원이다
+    # (V20260802031449 — 2024-01-01 보건복지부 자살예방 상담 109 통합).
+    # DB 가 죽어도 위기 카피에 원시 토큰이 노출되는 것만은 막는 안전망 — 비워 두지 말 것.
+    default-contact: ${SAFETY_CRISIS_DEFAULT_CONTACT:109}
 
   # 가스라이팅 금지 토큰 — LLM *출력측* 게이트(enforce).
   #

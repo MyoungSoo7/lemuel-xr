@@ -46,7 +46,7 @@ class EmotionController(
                     null, null, null,
                     CrisisLockoutDto(
                         true, r.crisisSeverity, r.crisisResources,
-                        "지금 이 순간 당신과 함께 있는 사람이 있습니다. 1393 (자살예방상담전화) 또는 위 자원으로 연결됩니다.",
+                        "지금 이 순간 당신과 함께 있는 사람이 있습니다. 109 (자살예방 상담전화) 또는 위 자원으로 연결됩니다.",
                     ),
                 ),
             )

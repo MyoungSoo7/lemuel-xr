@@ -137,7 +137,7 @@ export default function TopicsPage() {
           <p className="text-[10px] text-[var(--color-warm)]/30 mt-4 leading-relaxed">
             * 본문 인용: 현대인의 성경 (생명의말씀사) — MVP 비공개 테스터 fair use.
             <br />
-            ** 위기 시 1393 (자살예방상담전화 24시간)
+            ** 위기 시 109 (자살예방 상담전화 24시간)
           </p>
         </section>
 
