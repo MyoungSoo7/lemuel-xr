@@ -15,6 +15,13 @@ class CharacterTest {
         assertThat(Character.from("moses")).isEqualTo(Character.MOSES)
         assertThat(Character.from("david")).isEqualTo(Character.DAVID)
         assertThat(Character.from("jesus")).isEqualTo(Character.JESUS)
+        assertThat(Character.from("solomon")).isEqualTo(Character.SOLOMON)
+    }
+
+    @Test
+    fun `dbValue 는 enum 이름의 lowercase 이며 중복이 없다`() {
+        assertThat(Character.entries.map { it.dbValue }).doesNotHaveDuplicates()
+        Character.entries.forEach { assertThat(it.dbValue).isEqualTo(it.name.lowercase()) }
     }
 
     @Test
