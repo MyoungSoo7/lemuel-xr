@@ -1,0 +1,4 @@
+gate: G8
+expect: FAIL
+reason_contains: "R5 기본 경로 미확정"
+planted: "llm_optin_only 키는 있는데 값이 false — 키 존재만 보는 게이트는 여기서 초록이 된다(⑲)"

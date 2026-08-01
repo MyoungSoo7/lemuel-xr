@@ -1,0 +1,24 @@
+# 솔로몬 (Theme 13) — 머지된 baseline. 토큰 7종을 5개 Scene 에 미러링한다.
+# 엘리야 설정과 같은 단서: seed 층 입력이 없으므로 해당 게이트는 BLOCKED(판정 불가)다.
+character: solomon
+ruleset: newchar-v5
+scene_count: 5
+
+docs:
+  mvp: docs/MVP-SOLOMON.md
+  content: docs/MVP-SOLOMON-CONTENT.md
+doc_min_lines:
+  mvp: 450
+  content: 550
+
+# content/solomon/scene*.yml 의 R2_R3_lint_forbidden / R3_no_reorientation_pressure 실측 7종
+forbidden:
+  - "이제 깨달았으니"
+  - "다시 열심히"
+  - "허무를 극복"
+  - "믿음이 부족"
+  - "감사가 부족"
+  - "욕심이 많아서"
+  - "만족을 모르"
+
+test_identifier: "솔로몬"

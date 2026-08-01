@@ -1,0 +1,41 @@
+# 엘리야 (Theme 12) — 머지된 baseline. 토큰 규약(§5)을 따르는 두 인물 중 하나.
+#
+# ⚠️ 이 설정은 seed 산출물이 아니라 **머지된 콘텐츠에서 실측해 역산한 것**이다.
+#    seed 층 입력(배제 문자열 표·verses.txt·POLITE_EVASIVE·token_examples)은 존재하지 않는다.
+#    그래서 해당 게이트는 BLOCKED 로 나온다 — 이건 "통과"가 아니라 "판정 불가"다.
+character: elijah
+ruleset: newchar-v5 # 토큰 규약 이후 인물 — 면제 없음
+scene_count: 5
+
+docs:
+  mvp: docs/MVP-ELIJAH.md
+  content: docs/MVP-ELIJAH-CONTENT.md
+doc_min_lines:
+  mvp: 450
+  content: 550
+
+# content/elijah/scene3.yml, scene5.yml 의 lint_forbidden_tokens 합집합 실측 9종
+forbidden:
+  - "왜 도망"
+  - "믿음이 부족"
+  - "너 때문"
+  - "정신 차려"
+  - "다시 일어나 싸워"
+  - "다시 이겨"
+  - "빨리 회복"
+  - "사역으로 돌아가"
+  - "이제 다시 싸워"
+
+# §5(c) — ForbiddenTokenConfigTest.kt 는 인물 식별자를 **한국어**로 남긴다(`// 엘리야`).
+test_identifier: "엘리야"
+
+# ── 미정의 = BLOCKED (판정 불가). 없는 것을 있는 척하지 않는다 ──────────────
+# verses_file:            (없음) → G0b BLOCKED
+# exclusions:             (없음) → G0b/G0e/G9/G9d BLOCKED
+#     ㉝ 이후 형식: 원소마다 `value` + `scope`(verse_ref|verse_text|content_leaf) + `expect`.
+#     scope 는 필수이고 기본값이 없다 — 어느 텍스트에 대고 재는지가 선언의 일부다.
+# token_examples:         (없음) → G0c BLOCKED
+# token_examples_declared:(없음) → G0c BLOCKED  (㉞ — 선언 개수 없이는 원소 소실을 못 잡는다)
+# polite_evasive:         (없음) → G0d BLOCKED  ← ★★★ 가 지적한 바로 그 커버리지 공백
+# trigger_scenes:         (없음) → G7 BLOCKED   (실제 R4 동의 Scene 은 2·4)
+# crisis_reminder_scenes: (없음) → G3d BLOCKED  (㉑ — 라이브 레포에 이 키 0개, README 참조)

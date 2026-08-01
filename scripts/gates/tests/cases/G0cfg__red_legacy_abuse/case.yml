@@ -1,0 +1,8 @@
+gate: G0cfg
+expect: FAIL
+reason_contains: "면제 불가"
+planted: "신규 인물이 ruleset: legacy-baseline 을 선언해 게이트를 통째로 면제하려는 시도"
+delta_check: false
+delta_note: "legacy 선언 자체가 신규 인물 규약 게이트 14개를 BLOCKED 로 만든다 — 델타 비교 대상이 아니다"
+config_patch:
+  ruleset: legacy-baseline

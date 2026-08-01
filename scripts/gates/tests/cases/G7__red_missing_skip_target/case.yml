@@ -1,0 +1,4 @@
+gate: G7
+expect: FAIL
+reason_contains: "skip_alternative_scene_id"
+planted: "R4 트리거 Scene 에서 건너뛰기 대체 Scene 제거"

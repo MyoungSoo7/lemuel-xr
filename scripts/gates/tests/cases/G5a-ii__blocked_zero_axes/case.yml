@@ -1,0 +1,6 @@
+gate: G5a-ii
+expect: BLOCKED
+reason_contains: "R2/R3 축 0개"
+planted: "R2/R3 축을 전부 제거 — 공집합 전칭명제가 초록으로 인쇄되면 안 된다(⑳)"
+delta_check: false
+delta_note: "축을 전부 없애면 G5a-i·G5d·G5e 도 함께 판정 불가/실패가 된다 — 델타 비교 대상이 아니다"

@@ -1,0 +1,69 @@
+# 게이트 러너 자체 테스트의 **GREEN 기준선**.
+# 이 설정 + base/ 트리로 27개 게이트가 전부 PASS 여야 한다.
+# 하나라도 BLOCKED 면 그 게이트의 RED 픽스처는 "판정 불가"를 "잡았다"로 오독하게 된다.
+character: testchar
+ruleset: newchar-v5
+scene_count: 5
+
+docs:
+  mvp: docs/MVP-TESTCHAR.md
+  content: docs/MVP-TESTCHAR-CONTENT.md
+doc_min_lines:
+  mvp: 40
+  content: 40
+
+verses_file: docs/verses-testchar.txt
+
+forbidden:
+  - "너 때문"
+  - "믿음이 부족"
+  - "왜 도망"
+  - "정신 차려"
+  - "빨리 회복"
+  - "다시 이겨"
+  - "사역으로 돌아가"
+  - "이제 다시 싸워"
+
+# ㉝ — 배제 선언은 `scope:` 로 **어느 텍스트에 대고 재는지**까지 말해야 한다.
+#      기본값 없음. 누락은 G0cfg FAIL + 배제 게이트 BLOCKED.
+exclusions:
+  # 본문 열(cut -f2-) 에 대고 잰다
+  - value: "기손 시내로 내려다가"
+    scope: verse_text
+    expect: excluded_only
+  - value: "하사엘의 칼을 피하는"
+    scope: verse_text
+    expect: excluded_only
+  # 참조 열(cut -f1) 에 대고 잰다 — 본문 열에 대고 찾으면 원리상 영원히 0건이다
+  - value: "왕상18:40"
+    scope: verse_ref
+    expect: excluded_only
+  # 산출물 leaf 에 대고 잰다 — verses 파일로는 판정할 수 없다(G9 담당)
+  - value: "갈멜산 대결"
+    scope: content_leaf
+    expect: absent
+  - value: "심판 대행자"
+    scope: content_leaf
+    expect: absent
+
+# ㉞ — 선언 개수와 실제 원소 수가 어긋나면 FAIL. 기본값 없음.
+token_examples_declared: 3
+token_examples:
+  - token: "너 때문"
+    example: "이게 다 너 때문이야"
+  - token: "믿음이 부족"
+    example: "믿음이 부족해서 그런 거야"
+  - token: "빨리 회복"
+    example: "빨리 회복해서 다시 일해"
+
+polite_evasive:
+  - "혹시 믿음이 부족해서 그런 건 아닐까요?"
+  - "이제 그만 빨리 회복하시는 게 좋겠어요."
+  - "왜 도망치셨는지 여쭤봐도 될까요?"
+
+trigger_scenes: [2, 4]
+crisis_reminder_scenes: [3]
+
+test_identifier: "테스트인물"
+application_yml: backend/src/main/resources/application.yml
+forbidden_token_test: backend/src/test/kotlin/github/lms/lemuel/xr/safety/application/ForbiddenTokenConfigTest.kt

@@ -1,0 +1,8 @@
+gate: G0c
+expect: FAIL
+reason_contains: "토큰이 예문을 못 잡음"
+planted: "토큰이 자기 위험 예문을 못 잡는 쌍"
+config_patch:
+  token_examples:
+    - token: "너 때문"
+      example: "이게 다 네 탓이야"

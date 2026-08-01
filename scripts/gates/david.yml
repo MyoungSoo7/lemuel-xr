@@ -1,0 +1,14 @@
+# david — 토큰 규약(§5(a))·5-Scene 규약(§8-2)·상시 R1 리스너(§4 R1) **도입 이전**에 머지된 인물.
+# 그래서 ruleset: legacy-baseline. 이 값은 스크립트 소스의 LEGACY_BASELINE 집합에
+# 이름이 있어야만 허용된다(G0cfg). 신규 인물은 이 줄을 써도 즉시 FAIL 한다.
+# legacy 게이트 결과는 PASS 가 아니라 BLOCKED(판정 유보)로 나온다. 부채는 --strict 로 본다.
+character: david
+ruleset: legacy-baseline
+scene_count: 6
+
+docs:
+  mvp: docs/MVP-DAVID.md
+  content: docs/MVP-DAVID-CONTENT.md
+doc_min_lines:
+  mvp: 450
+  content: 550

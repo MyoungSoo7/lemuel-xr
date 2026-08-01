@@ -1,0 +1,4 @@
+gate: G0b
+expect: FAIL
+reason_contains: "사용장 참조(라벨) 열에 존재(과차단)"
+planted: "㉝ 재현 — 배제 선언한 절 참조가 USED 구간에 등장. 본문 열에만 대고 재면 원리상 영원히 0건이다"

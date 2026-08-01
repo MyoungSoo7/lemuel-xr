@@ -1,0 +1,4 @@
+gate: G2
+expect: FAIL
+reason_contains: "R1_voice_self_harm_listener 부재"
+planted: "Scene 3 에서 상시 음성 리스너 제거 — 폐기된 '-eq 5' 기준으론 안 잡히는 위치"

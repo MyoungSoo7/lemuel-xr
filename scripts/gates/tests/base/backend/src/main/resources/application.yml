@@ -1,0 +1,7 @@
+safety:
+  crisis:
+    default-contact: ${SAFETY_CRISIS_DEFAULT_CONTACT:109}
+  forbidden-tokens:
+    list: >-
+      너 때문,믿음이 부족,왜 도망,정신 차려,
+      빨리 회복,다시 이겨,사역으로 돌아가,이제 다시 싸워

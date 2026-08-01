@@ -1,0 +1,28 @@
+# Scene 4 — 탄식 라벨링 + R4 동의 (픽스처)
+scene_id: testchar_scene4
+mission_id: testchar
+consent_card_id: card_testchar_s4_consent
+skip_alternative_scene_id: testchar_scene5
+narration_blocks:
+  - id: nb_s4_lament
+    speaker: system
+    text_ko: ""
+    default_path: static_curation
+    default_text_ko: "무엇이 가장 무거우신가요."
+    llm_optin_only: true
+branches:
+  - id: br_s4_lament
+    decision_key: lament_label
+    routes:
+      - when: { lament_label: loneliness }
+        next_scene_id: testchar_scene5
+      - when: { lament_label: burnout }
+        next_scene_id: testchar_scene5
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

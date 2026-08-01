@@ -1,0 +1,4 @@
+gate: G5a-ii
+expect: FAIL
+reason_contains: "토큰 0종"
+planted: "R3 축을 선언만 하고 토큰도 structural_check 도 없음 — 엘리야/솔로몬 실측 결함과 동형"

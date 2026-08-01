@@ -1,0 +1,4 @@
+gate: G3
+expect: PASS
+planted: "각주에 '신학논단 제109호, pp.109~135' — 상담 전화번호가 아니라 서지 권호·쪽수"
+green_proves: "라이브 실측 false red 재현. content/david/scene5.yml:233 이 정확히 이 형태였고 게이트가 red 를 냈다. 콘텐츠가 아니라 게이트를 고쳤다는 증거."

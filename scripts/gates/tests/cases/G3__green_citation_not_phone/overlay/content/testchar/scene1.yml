@@ -1,0 +1,16 @@
+# Scene 1 — 도입 (픽스처)
+scene_id: testchar_scene1
+mission_id: testchar
+narration_blocks:
+  - id: nb_s1_open
+    speaker: scripture_caption
+    text_ko: "그가 한 노간주 나무 아래에 앉아서 (테스트 본문 1)"
+    source: "장석정 (2022). 다시 보기. 신학논단 제109호, pp.109~135."
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

@@ -1,0 +1,4 @@
+gate: G9d
+expect: FAIL
+reason_contains: "마커 없는 배제 문자열"
+planted: "문서가 §7-2 마커 없이 배제 문자열을 인용"

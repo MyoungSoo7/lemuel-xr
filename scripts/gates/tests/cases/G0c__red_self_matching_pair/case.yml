@@ -1,0 +1,12 @@
+gate: G0c
+expect: FAIL
+reason_contains: "자기매칭"
+planted: "㉞ — 토큰과 예문이 같은 문자열. `case \"$ex\" in *\"$tok\"*)` 가 자기 자신에 매칭돼 무조건 통과한다"
+config_patch:
+  token_examples:
+    - token: "너 때문"
+      example: "이게 다 너 때문이야"
+    - token: "믿음이 부족"
+      example: "믿음이 부족"
+    - token: "빨리 회복"
+      example: "빨리 회복해서 다시 일해"

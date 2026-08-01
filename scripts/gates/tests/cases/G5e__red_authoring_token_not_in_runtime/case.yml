@@ -1,0 +1,5 @@
+gate: G5e
+expect: FAIL
+reason_contains: "런타임 목록에 없다"
+planted: "저작 Scene 의 축에만 토큰을 추가하고 application.yml 엔 안 옮김 — 그 토큰의 런타임 방어는 0"
+green_proves: "설정 목록(G5b)은 그대로라 G5b 는 통과한다. 두 게이트가 서로 다른 것을 잰다는 증거."

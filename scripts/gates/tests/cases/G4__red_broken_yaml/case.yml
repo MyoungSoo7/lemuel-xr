@@ -1,0 +1,6 @@
+gate: G4
+expect: FAIL
+reason_contains: "파싱 실패"
+planted: "scene2 에 들여쓰기가 깨진 YAML"
+delta_check: false
+delta_note: "파싱 불가 파일은 파서를 쓰는 모든 게이트에 전파된다 — 델타 비교 대상이 아니다"

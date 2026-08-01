@@ -1,0 +1,4 @@
+gate: G6d
+expect: FAIL
+reason_contains: "마커 없는 토큰 인용"
+planted: "문서가 §5-2 마커 없이 금지 토큰을 인용"

@@ -1,0 +1,4 @@
+gate: G5d
+expect: FAIL
+reason_contains: "밖에 있다"
+planted: "lint_forbidden_tokens 를 최상위에 둠 — 다니엘·야곱 seed 가 실제로 쓴 그 형태(㉗)"

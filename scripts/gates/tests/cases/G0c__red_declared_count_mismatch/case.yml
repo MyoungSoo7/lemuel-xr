@@ -1,0 +1,10 @@
+gate: G0c
+expect: FAIL
+reason_contains: "선언 개수"
+planted: "㉞ — 33종을 검사한다고 선언해 놓고 실제 원소는 2개. 줄여 적는 순간 원소가 사라진다"
+config_patch:
+  token_examples:
+    - token: "너 때문"
+      example: "이게 다 너 때문이야"
+    - token: "믿음이 부족"
+      example: "믿음이 부족해서 그런 거야"

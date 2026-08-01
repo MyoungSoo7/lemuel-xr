@@ -1,0 +1,4 @@
+gate: G5c
+expect: FAIL
+reason_contains: "같은 라인에 있는 항목이 없다"
+planted: "테스트 파일에 인물 식별자만 있고 그 줄에 인물 토큰이 없음"

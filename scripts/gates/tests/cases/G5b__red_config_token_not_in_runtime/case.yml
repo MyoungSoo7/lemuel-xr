@@ -1,0 +1,15 @@
+gate: G5b
+expect: FAIL
+reason_contains: "application.yml"
+planted: "설정 목록에만 있고 런타임 목록에 없는 토큰 1개"
+config_patch:
+  forbidden:
+    - "너 때문"
+    - "믿음이 부족"
+    - "왜 도망"
+    - "정신 차려"
+    - "빨리 회복"
+    - "다시 이겨"
+    - "사역으로 돌아가"
+    - "이제 다시 싸워"
+    - "런타임미반영토큰"

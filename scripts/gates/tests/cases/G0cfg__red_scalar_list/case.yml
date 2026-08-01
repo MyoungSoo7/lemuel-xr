@@ -1,0 +1,8 @@
+gate: G0cfg
+expect: FAIL
+reason_contains: "⑨"
+planted: "trigger_scenes 를 배열이 아닌 스칼라 '2 4' 로 선언(야곱·베드로가 실제로 낸 결함)"
+also_nonpass: [G7]
+also_nonpass_note: "G7 은 이 입력으로 순회할 수 없으므로 BLOCKED 가 정답이다 — PASS 가 아니다"
+config_patch:
+  trigger_scenes: "2 4"

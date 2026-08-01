@@ -1,0 +1,6 @@
+gate: G0d
+expect: BLOCKED
+reason_contains: "순회 0회"
+planted: "polite_evasive 를 빈 배열로 — 공집합 전칭명제를 '충족'으로 인쇄하면 안 된다(㉒)"
+config_patch:
+  polite_evasive: []

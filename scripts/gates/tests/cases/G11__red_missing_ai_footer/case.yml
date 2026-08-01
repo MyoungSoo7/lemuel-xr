@@ -1,0 +1,4 @@
+gate: G11
+expect: FAIL
+reason_contains: "푸터 값 부재"
+planted: "Scene 2 에서 AI 고지 푸터 문구 제거(㉖ — 규약이 요구하는데 게이트가 없던 항목)"
