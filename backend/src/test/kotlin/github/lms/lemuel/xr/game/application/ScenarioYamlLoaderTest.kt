@@ -157,7 +157,12 @@ class ScenarioYamlLoaderTest {
 
     /**
      * R1 — 솔로몬 본문에는 자살사고가 없다. 전도서 4장 초반 죽음선호 구절의 인용·각색·암시 전면 금지.
-     * 위기 전화번호 하드코딩도 금지 (토큰 리졸버 도입 전까지 필드 자체를 두지 않는다).
+     * 위기 전화번호 하드코딩도 금지 — 번호가 아니라 [CrisisTokenResolver.TOKEN] 만 둔다.
+     *
+     * `crisis_reminder` 는 *있어야* 한다. 이 PR 최초 작성 시점에는 토큰 리졸버가 없어 필드를
+     * 비워 뒀고 이 테스트도 부재를 단언했지만, #18 이 리졸버와 정본 카탈로그를 들여왔다.
+     * Scene 4(허무)는 이 미션에서 R1 감도가 가장 높은 씬이라 outro 와 함께 위기 자원을 노출한다 —
+     * 씬 자체가 위기 문구 없이 배포되는 것이 원래 이 필드를 비워 둔 것보다 큰 구멍이다.
      */
     @Test
     fun `solomon yml 은 죽음선호 구절과 하드코딩 위기번호를 포함하지 않는다`() {
@@ -173,10 +178,24 @@ class ScenarioYamlLoaderTest {
         for (token in forbidden) {
             assertThat(raw).describedAs("solomon.yml 금칙 문자열: %s", token).doesNotContain(token)
         }
-        // crisis_reminder 는 토큰 리졸버(#18) 도입 전까지 필드 자체를 두지 않는다.
-        val outro = loader.forCharacter(Character.SOLOMON).scene(5)
-        assertThat(inner(outro)).doesNotContainKey("crisis_reminder")
-        assertThat(outro.extras).doesNotContainKey("crisis_reminder")
+    }
+
+    /** R1 — 위기 자원은 outro 와 Scene 4(허무)에 토큰으로 존재한다. 번호는 런타임에 주입된다. */
+    @Test
+    fun `solomon 의 위기 문구는 토큰으로만 존재한다`() {
+        val s = loader.forCharacter(Character.SOLOMON)
+
+        for (sceneId in listOf(4, 5)) {
+            val reminder = inner(s.scene(sceneId))["crisis_reminder"] as? String
+            assertThat(reminder)
+                .describedAs("Scene %d 에 crisis_reminder 가 있어야 한다 (R1)", sceneId)
+                .isNotNull()
+            assertThat(reminder!!).contains(CrisisTokenResolver.TOKEN)
+            // 토큰을 걷어낸 나머지에 숫자가 남아 있으면 번호 하드코딩이다 (ScenarioHotlineRatchetTest 와 동일 규칙).
+            assertThat(reminder.replace(CrisisTokenResolver.TOKEN, "").filter { it.isDigit() })
+                .describedAs("위기 문구에는 토큰 외 숫자가 없어야 한다 — Scene %d", sceneId)
+                .isEmpty()
+        }
     }
 
     /**
