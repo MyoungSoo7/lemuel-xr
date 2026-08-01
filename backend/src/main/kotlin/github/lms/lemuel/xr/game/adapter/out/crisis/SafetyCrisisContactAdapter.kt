@@ -23,6 +23,15 @@ class SafetyCrisisContactAdapter(
     @Value("\${safety.crisis.default-contact:109}") private val fallbackContact: String,
 ) : CrisisContactPort {
 
+    init {
+        // [CrisisContactPort] 계약("절대 빈 문자열을 주지 않는다")의 마지막 근거가 이 값이다.
+        // 빈 값으로 설정되면 DB 조회가 실패한 순간 위기 문구가 "." 한 글자로 렌더된다 —
+        // 조용히 무너지느니 부팅을 실패시킨다.
+        require(fallbackContact.isNotBlank()) {
+            "safety.crisis.default-contact 가 비어 있다 — 위기 연락처 fail-safe 대체값은 비울 수 없다."
+        }
+    }
+
     override fun defaultContact(region: String, locale: String): String {
         val looked = try {
             crisisResources.execute(region, locale)

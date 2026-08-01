@@ -3,6 +3,7 @@ package github.lms.lemuel.xr.game.adapter.out.crisis
 import github.lms.lemuel.xr.safety.application.GetCrisisResourcesUseCase
 import github.lms.lemuel.xr.safety.domain.CrisisResource
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -78,5 +79,16 @@ class SafetyCrisisContactAdapterTest {
         whenever(uc.execute(any(), any())).thenReturn(emptyList())
 
         assertThat(other.defaultContact("US", "en-US")).isEqualTo("988")
+    }
+
+    @Test
+    fun `대체값이 비어 있으면 부팅에서 즉시 실패한다`() {
+        // 계약("절대 빈 문자열을 주지 않는다")의 마지막 근거가 이 설정값이다.
+        // 빈 값이면 DB 장애 시 위기 문구가 "." 한 글자로 렌더된다 — 조용한 퇴화 대신 기동 실패.
+        for (blank in listOf("", "   ")) {
+            assertThatThrownBy { SafetyCrisisContactAdapter(uc, blank) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+                .hasMessageContaining("safety.crisis.default-contact")
+        }
     }
 }
