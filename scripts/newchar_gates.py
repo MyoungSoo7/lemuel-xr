@@ -61,6 +61,29 @@ FAIL = "FAIL"
 BLOCKED = "BLOCKED"
 
 # ──────────────────────────────────────────────────────────────────────────────
+# 공백 정규화 — **출처: backend/src/main/kotlin/.../safety/application/ForbiddenTokenScanner.kt**
+#
+#     private fun normalize(s: String): String = s.trim().replace(WHITESPACE, " ")
+#     val WHITESPACE = Regex("\\s+")
+#     ... 토큰과 본문을 **둘 다** 정규화한 뒤 indexOf 한다.
+#
+# 게이트가 이 의미론과 어긋나면 두 방향으로 다 틀린다:
+#   ① 게이트가 더 엄격 → **false red**. 실제로는 차단되는 올바른 선언이 red 가 되고,
+#      자연스러운 수리가 "게이트를 느슨하게" 라서 다음 라운드에 vacuous green 이 된다.
+#   ② 게이트가 더 느슨 → **vacuous green**. 런타임은 잡는데 게이트가 못 잡는다. 더 나쁘다.
+# 실측 ②(이 러너에 실제로 있던 구멍, 수정 전):
+#   - YAML **리터럴 블록 스칼라** `|` 는 파서가 줄바꿈을 보존한다.
+#     `hole_probe_ko: |\n  이제 그만 앓고 빨리\n  회복해서 다시 일해` → G6 PASS(구멍).
+#     접힘 스칼라 `>-` 는 파서가 먼저 접어서 무사했다 — 그래서 `>-` 만 보면 안전해 보인다.
+#   - 마크다운을 줄 단위로 읽는 G6d/G9d 는 금지구가 줄바꿈을 건너면 못 잡았다 → PASS(구멍).
+# 그래서 매칭하는 모든 지점이 이 함수 하나를 통과한다.
+_WS = re.compile(r"\s+")
+
+
+def norm_ws(s: str) -> str:
+    return _WS.sub(" ", str(s).strip())
+
+# ──────────────────────────────────────────────────────────────────────────────
 # legacy 면제 — **스크립트 소스에 하드코딩한다. 설정 파일로 못 켠다.**
 #
 # 왜 설정 파일이 아닌가: 게이트를 끄는 스위치를 설정 파일에 두면 designer 가 초록으로
@@ -700,14 +723,19 @@ def g0c(c: Ctx) -> Result:
         if tok in ("…", "...") or ex in ("…", "..."):
             bad.append(f"[{i}] 축약기호가 토큰/예문에 그대로 남아 있다: {tok!r} ← {ex!r}")
             continue
-        if tok.strip() == ex.strip():
+        # ㊱ — 포함/자기매칭 **둘 다** 실 스캐너와 같은 정규화 후에 판정한다.
+        #   자기매칭을 strip 비교로만 하면 `"빨리 회복"` vs `"빨리  회복"`(두 칸)이
+        #   자기매칭으로 안 걸리고 엉뚱하게 "토큰이 예문을 못 잡음" 으로 잡힌다 —
+        #   FAIL 이라 안전해 보이지만 **진단이 틀린 red** 다.
+        ntok, nex = norm_ws(tok), norm_ws(ex)
+        if ntok == nex:
             bad.append(
-                f"[{i}] 자기매칭: 토큰과 예문이 같은 문자열이다 {tok!r} — "
+                f"[{i}] 자기매칭: 공백 정규화하면 토큰과 예문이 같은 문자열이다 {tok!r} ← {ex!r} — "
                 f"무조건 통과한다. 예문은 토큰을 **포함한 다른 문장**이어야 한다(㉞)"
             )
             continue
-        if tok not in ex:
-            bad.append(f"토큰이 예문을 못 잡음: {tok!r} ← {ex!r}")
+        if ntok not in nex:
+            bad.append(f"토큰이 예문을 못 잡음: {tok!r} ← {ex!r} (공백 정규화 후 비교)")
     if bad:
         return fail("G0c", f"{len(bad)}건", bad)
     return ok("G0c", f"선언 {declared}쌍 = 실제 {len(pairs)}쌍, 전부 토큰이 예문을 잡음")
@@ -987,7 +1015,10 @@ def g5b(c: Ctx) -> Result:
     live = _appyml_tokens(c)
     if not live:
         raise GateBlocked("application.yml 의 safety.forbidden-tokens.list 가 비었다")
-    missing = [str(t) for t in toks if str(t) not in live]
+    # 런타임은 토큰도 정규화해 보관한다(ForbiddenTokenScanner.normalizedTokens) —
+    # 공백 수만 다른 같은 토큰을 "미반영"으로 읽으면 false red 다
+    nlive = {norm_ws(t) for t in live}
+    missing = [str(t) for t in toks if norm_ws(t) not in nlive]
     if missing:
         return fail(
             "G5b",
@@ -1039,16 +1070,22 @@ def _scan_scene_values(c: Ctx, needles: list[str]) -> list[str]:
     는 키 1줄만 걷어내고 블록 리스트 항목 N줄을 남긴다(★★). 그러면 designer 가 초록으로
     가는 가장 쉬운 길이 "scene yml 에서 안전 토큰을 지우는 것" 이 되고,
     게이트가 안전 저하에 보상을 주게 된다.
+
+    ⚠️ 매칭은 **공백 정규화 후** 한다(norm_ws — 출처 ForbiddenTokenScanner). 리터럴 블록
+    스칼라 `|` 는 파서가 줄바꿈을 보존하므로 원문 그대로 비교하면 `빨리\\n회복` 을 놓친다.
+    런타임은 정규화 후 indexOf 라 그걸 잡는다 — 게이트만 못 잡으면 vacuous green 이다.
     """
     nonuser = set(c.cfg.get("nonuser_keys") or NONUSER_KEYS)
+    nneedles = [(n, norm_ws(n)) for n in needles]
     hits = []
     for f in c.require_scenes():
         for line, key, val in scalar_nodes(f):
             if key in nonuser:
                 continue
-            for n in needles:
-                if n in val:
-                    hits.append(f"{c.rel(f)}:{line}: [{n}] ({key}) {val.strip()[:90]}")
+            nval = norm_ws(val)
+            for orig, nn in nneedles:
+                if nn and nn in nval:
+                    hits.append(f"{c.rel(f)}:{line}: [{orig}] ({key}) {nval[:90]}")
     return hits
 
 
@@ -1060,17 +1097,63 @@ def _scan_docs(c: Ctx, needles: list[str], doc_marker: str) -> list[str]:
     여기서 red 가 되는데, 그건 *안전 위반이 아니라 마커 규율 부채* 다.
     그래서 이 스캔은 G6/G9 가 아니라 **별도 게이트 id(G6d/G9d)** 로 보고한다 —
     같은 red 라도 원인이 오귀속되면 안 된다(⑫ 가 지적한 그 병리).
+
+    ⚠️ **줄 단위로 읽지 않는다.** 실측(수정 전): 문서에서 금지구가 줄바꿈을 건너면
+    (`… 빨리\\n회복해서 …`) 줄 단위 스캔은 못 잡고 G6d 가 PASS 였다. 런타임 스캐너는
+    공백을 접고 보므로 같은 문장을 잡는다 — 게이트만 못 잡는 **vacuous green** 이다.
+    그래서 유지되는 줄들을 이어붙여 정규화한 뒤 검색하고, 매치 위치를 원래 줄 번호로 되돌린다.
+
+    이어붙이면 새 위험이 생긴다: 건너뛴 줄(마커)이나 빈 줄을 사이에 두고 우연히 어구가
+    이어져 **없던 매치가 생기는** 것. 그래서 연속되지 않은 줄 사이에는 매치 불가 구분자를
+    넣는다. 빈 줄(마크다운 문단 경계)도 같은 이유로 끊는다 — 문단을 건너뛴 어구는 어구가 아니다.
     """
+    SEP = "\x00"  # 어떤 needle 에도 나타나지 않는 문자 — 여기서 매칭이 끊긴다
+    nneedles = [(n, norm_ws(n)) for n in needles]
     hits = []
     for p in c.doc_paths():
         if not os.path.exists(p):
             raise GateBlocked(f"타겟 부재: {c.rel(p)}")
+        chars: list[str] = []
+        owner: list[int] = []  # chars[i] 가 온 원래 줄 번호(1-based)
+        prev_kept = -2
+        prev_space = True
         for idx, line in enumerate(read_lines(p)):
-            if doc_marker and doc_marker in line:
+            skip = (doc_marker and doc_marker in line) or not line.strip()
+            if skip:
+                prev_kept = -2
                 continue
-            for n in needles:
-                if n in line:
-                    hits.append(f"{c.rel(p)}:{idx + 1}: [{n}] {line.strip()[:90]}")
+            if idx != prev_kept + 1 and chars:
+                chars.append(SEP)
+                owner.append(idx + 1)
+                prev_space = True
+            prev_kept = idx
+            for ch in line:
+                if ch.isspace():
+                    if prev_space:
+                        continue
+                    chars.append(" ")
+                    owner.append(idx + 1)
+                    prev_space = True
+                else:
+                    chars.append(ch)
+                    owner.append(idx + 1)
+                    prev_space = False
+            # 줄 경계는 공백 1개 — 런타임 정규화와 같은 취급
+            if not prev_space:
+                chars.append(" ")
+                owner.append(idx + 1)
+                prev_space = True
+        blob = "".join(chars)
+        for orig, nn in nneedles:
+            if not nn:
+                continue
+            start = blob.find(nn)
+            while start >= 0:
+                ln = owner[start]
+                span = blob[start : start + len(nn)]
+                multi = "" if owner[min(start + len(nn) - 1, len(owner) - 1)] == ln else " (줄바꿈 넘김)"
+                hits.append(f"{c.rel(p)}:{ln}: [{orig}]{multi} {span[:90]}")
+                start = blob.find(nn, start + 1)
     return hits
 
 
@@ -1255,7 +1338,8 @@ def g5e(c: Ctx) -> Result:
     live = _appyml_tokens(c)
     if not live:
         raise GateBlocked("application.yml 의 safety.forbidden-tokens.list 가 비었다")
-    missing = sorted(t for t in union if t not in live)
+    nlive = {norm_ws(t) for t in live}  # 런타임 토큰도 정규화 보관 — G5b 주석 참조
+    missing = sorted(t for t in union if norm_ws(t) not in nlive)
     if missing:
         return fail(
             "G5e",

@@ -1,0 +1,4 @@
+gate: G6
+expect: FAIL
+reason_contains: "렌더 leaf 에 금지 문구"
+planted: "리터럴 블록 스칼라 `|` 는 파서가 줄바꿈을 보존한다 — 원문 비교로는 '빨리\\n회복' 을 놓쳤다(실측 vacuous green). 접힘 `>-` 만 보면 안전해 보인다"

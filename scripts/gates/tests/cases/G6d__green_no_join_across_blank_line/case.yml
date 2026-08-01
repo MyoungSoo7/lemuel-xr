@@ -1,0 +1,3 @@
+gate: G6d
+expect: PASS
+planted: "빈 줄(문단 경계)을 사이에 두고 어구 조각이 이어짐 — 이어붙이기 수정이 **없던 매치**를 만들면 여기서 false red 가 난다"

@@ -63,6 +63,41 @@ scripts/gates/tests/run.sh                                    # 게이트 자신
 높임형 커버리지 공백을 재는 건 G0d 다 — 그래서 `polite_evasive` 가 비면 PASS 가 아니라
 BLOCKED 다. "제품 말투로 쓴 위험 문장을 하나도 안 넣었다"는 건 판정 불가지 통과가 아니다.
 
+## ㊱ 매칭 의미론은 실 스캐너와 **같아야** 한다
+
+정본은 `backend/src/main/kotlin/.../safety/application/ForbiddenTokenScanner.kt` 다.
+
+```kotlin
+private fun normalize(s: String): String = s.trim().replace(WHITESPACE, " ")  // \s+ → " "
+// 토큰과 본문을 **둘 다** 정규화한 뒤 indexOf
+```
+
+게이트가 이 의미론에서 벗어나면 두 방향으로 다 틀린다.
+
+| 어긋난 방향          | 증상          | 왜 위험한가                                                                                               |
+| -------------------- | ------------- | --------------------------------------------------------------------------------------------------------- |
+| 게이트가 더 **엄격** | false red     | 올바른 선언이 red 가 되고, 자연스러운 수리가 "게이트를 느슨하게" 라서 다음 라운드에 vacuous green 이 된다 |
+| 게이트가 더 **느슨** | vacuous green | 런타임은 잡는데 게이트가 못 잡는다. **더 나쁘다**                                                         |
+
+그래서 정규화 함수는 `norm_ws()` **한 곳**에만 정의하고, 매칭하는 모든 지점이 그걸 통과한다
+(G0c 포함/자기매칭 · G6/G9 leaf 스캔 · G6d/G9d 문서 스캔 · G5b/G5e 토큰 목록 대조).
+
+실측된 어긋남 3건:
+
+1. **G0c false red** — `token: "빨리 회복"` / `example: "…빨리\n회복해서…"`. 원문 `in` 은 못
+   잡아 red, 실 스캐너는 잡는다. 올바른 선언이 red 였다.
+2. **G6 vacuous green** — YAML **리터럴 블록 스칼라** `|` 는 파서가 줄바꿈을 보존한다.
+   `text_ko: |\n  …빨리\n  회복해서…` 가 PASS 였다. 접힘 스칼라 `>-` 는 파서가 먼저 접으므로
+   무사하다 — **`>-` 만 시험하면 안전해 보인다.**
+3. **G6d/G9d vacuous green** — 마크다운을 줄 단위로 읽어, 금지구가 줄바꿈을 건너면 못 잡았다.
+   지금은 유지되는 줄들을 이어붙여 정규화한 뒤 검색하고 매치 위치를 원래 줄 번호로 되돌린다.
+   이어붙이기가 **없던 매치**를 만들지 않도록 건너뛴 줄(마커)과 빈 줄(문단 경계)에는 구분자를
+   넣어 매칭을 끊는다. 그 대조군이 `G6d__green_no_join_across_blank_line` 이다.
+
+자기매칭 검사도 정규화 후에 한다. `strip` 비교만 하면 `"빨리 회복"` vs `"빨리  회복"` 이
+자기매칭으로 안 걸리고 "토큰이 예문을 못 잡음" 이라는 **틀린 진단**으로 잡힌다 — FAIL 이라
+결과는 안전하지만 사람이 읽는 이유가 틀리다.
+
 ## 내려야 했던 판단 4건 (근거와 함께 기록)
 
 ### 1. G3d(위기 리마인더)는 **신규 인물에만** 적용한다
@@ -192,10 +227,20 @@ zsh 에서 안 일어난다(⑬). 전부 셸 이식성 함정이고, **순수 py
      불가피한 경우만 `delta_check: false` + `delta_note` 로 명시 면제한다(2건).
 - `expect: BLOCKED` 케이스로 "빈 순회는 BLOCKED" 가 실제로 그렇게 나오는지도 검사한다.
 
-테스트 자체가 초록인지 확인하려면 게이트를 일부러 망가뜨려 보면 된다(변이 검사 6건 실측):
+### G1b 의 스코프 — **마지막 Scene 한정**
+
+G1b 는 `content/{인물}/scene{마지막}.yml` 의 라우팅에만 null 폴백을 요구한다. 중간 Scene
+(예: scene4)도 null 폴백이 없지만 거긴 fall-through 해도 다음 Scene 이 받는다. 마지막
+Scene 은 받아 줄 다음이 없어서 R4 스킵 사용자가 마무리 없이 끝난다 — 그래서 거기만 건다.
+좁은 스코프인 걸 알고 좁혔다. 중간 Scene 의 폴백 부재를 red 로 보고 싶으면 별도 게이트다.
+
+테스트 자체가 초록인지 확인하려면 게이트를 일부러 망가뜨려 보면 된다(변이 검사 9건 실측):
 `G5a-ii` 의 축 0개 BLOCKED 제거 → 해당 케이스 실패 /
 `G3d` 를 파서 대신 텍스트 검색으로 → 해당 케이스 실패 /
 `G6` 를 leaf 대신 줄 단위로 → base 기준선이 즉시 깨짐 /
 `G0b` 의 verse_ref 를 본문 열에 대고 재게 → `G0b__red_verse_ref_in_used_label` 만 PASS 로 뒤집힘(㉝ 재현) /
 `scope` 에 기본값 부여 → `G0cfg__red_exclusion_scope_missing` 실패 /
-`token_examples_declared` 대조 생략 → `G0c__red_declared_count_mismatch` 실패.
+`token_examples_declared` 대조 생략 → `G0c__red_declared_count_mismatch` 실패 /
+G0c 를 원문 비교로 회귀 → 케이스 2건 실패(GREEN 줄바꿈 + 공백 자기매칭) /
+leaf 스캔을 원문 비교로 회귀 → `G6__red_token_across_literal_block_newline` 실패 /
+문서 스캔의 줄 결합 제거 → `G6d__red_token_across_doc_linebreak` 실패.

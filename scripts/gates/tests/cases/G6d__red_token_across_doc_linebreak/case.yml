@@ -1,0 +1,4 @@
+gate: G6d
+expect: FAIL
+reason_contains: "줄바꿈 넘김"
+planted: "문서에서 금지구가 줄바꿈을 건넘 — 줄 단위 스캔은 못 잡았다(실측 vacuous green). 런타임 스캐너는 공백을 접고 보므로 잡는다"
