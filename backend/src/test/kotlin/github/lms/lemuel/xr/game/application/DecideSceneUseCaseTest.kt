@@ -32,6 +32,8 @@ class DecideSceneUseCaseTest {
     private val uc: DecideSceneUseCase = DecideSceneUseCase(
         sessions, decisions, loader,
         ResponseResolver(llm, DecisionKeyExtractor()),
+        // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환까지 통과하는지 함께 본다.
+        ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }),
     )
 
     private fun scene(id: Int, next: Int?, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =

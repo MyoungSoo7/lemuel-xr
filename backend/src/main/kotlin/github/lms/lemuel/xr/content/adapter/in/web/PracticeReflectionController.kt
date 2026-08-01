@@ -27,7 +27,7 @@ import java.time.LocalDateTime
  * 안전선 (R1~R5):
  * - R1 — 사용자 자유 기록(situation)을 CrisisKeywordScanner 로 스캔.
  *   자해·자살 키워드 매칭 시 RecordSafetyAlertUseCase 로 safety_alert INSERT +
- *   위기 자원(1393 등) 반환. 응답 crisis.routed=true → 프론트가 일기(#1)/위기 카드로 라우팅.
+ *   위기 자원(109 등) 반환. 응답 crisis.routed=true → 프론트가 일기(#1)/위기 카드로 라우팅.
  *   법적 의무 — 완화·제거 금지.
  * - R2 — 응답 safetyFooter 로 피해 상황 보호 문구 항상 동반.
  * - footer — "AI 보조 — 본문은 성경 참조" (성경 외 근거 없음).

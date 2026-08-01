@@ -19,7 +19,7 @@
 | ✅ 영적 단련 / 예방 교육 / 큐티 / 회복탄력성 빌더 | ❌ 의료 진단 / 치료 / 임상 도구 / 위기 개입 |
 
 - **타겟 사용자**: 누구나 — 내일 절망을 만날 수 있는 모든 사람. 우울증 환자 한정 아님.
-- **위기 영역은 앱이 담당하지 않음** — 1393(자살예방상담)·전문가에게 즉시 이관.
+- **위기 영역은 앱이 담당하지 않음** — 109(자살예방 상담)·전문가에게 즉시 이관.
 
 ---
 
@@ -109,7 +109,7 @@
 
 ### 7.1 4-layer 안전 아키텍처
 1. **Disclaimer Gate** — *치료 도구 아님 / 예방 영적 교육* 고지.
-2. **CrisisLockout** — 위기 키워드 매칭 시 1393 으로 즉시 전달 (`safety` 컨텍스트 `CrisisKeywordScanner`).
+2. **CrisisLockout** — 위기 키워드 매칭 시 109 으로 즉시 전달 (`safety` 컨텍스트 `CrisisKeywordScanner`).
 3. **AI 라벨링** — 모든 LLM 응답에 *AI 보조 — 본문은 성경 참조* 표시.
 4. **ResponseHeaderFilter** — `X-Lemuel-Disclaimer: not-medical-device`.
 

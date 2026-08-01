@@ -17,7 +17,8 @@ class StartGameSessionUseCaseTest {
 
     private val sessions: GameSessionPort = mock()
     private val loader: ScenarioYamlLoader = mock()
-    private val uc = StartGameSessionUseCase(sessions, loader)
+    private val payloads = ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" })
+    private val uc = StartGameSessionUseCase(sessions, loader, payloads)
 
     private fun scene(
         id: Int,
@@ -74,12 +75,12 @@ class StartGameSessionUseCaseTest {
     }
 
     @Test
-    fun `buildScenePayload 는 null 필드 생략하고 realtimeLlm 추가`() {
+    fun `ScenePayloadAssembler 는 null 필드 생략하고 realtimeLlm 추가`() {
         val scenario = Scenario(
             "moses", "광야",
             listOf(scene(1, "interaction", null, null, true, null)),
         )
-        val p = StartGameSessionUseCase.buildScenePayload(scenario, 1)
+        val p = payloads.build(scenario, 1)
         assertThat(p).containsEntry("sceneId", 1)
             .containsEntry("type", "interaction")
             .containsEntry("realtimeLlm", true)
@@ -90,12 +91,12 @@ class StartGameSessionUseCaseTest {
     }
 
     @Test
-    fun `buildScenePayload realtimeLlm false 면 키 없음`() {
+    fun `ScenePayloadAssembler realtimeLlm false 면 키 없음`() {
         val scenario = Scenario(
             "david", "시편",
             listOf(scene(1, "cinematic", "distribute", 2, false, emptyMap())),
         )
-        val p = StartGameSessionUseCase.buildScenePayload(scenario, 1)
+        val p = payloads.build(scenario, 1)
         assertThat(p).doesNotContainKey("realtimeLlm")
         assertThat(p).containsEntry("interaction", "distribute")
     }

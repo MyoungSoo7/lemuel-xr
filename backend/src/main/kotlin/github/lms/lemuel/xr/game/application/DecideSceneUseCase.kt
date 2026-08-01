@@ -19,6 +19,7 @@ class DecideSceneUseCase(
     private val loader: ScenarioYamlLoader,
     /** Phase 2-B — Scene.realtimeLlm=true 일 때 realtime LLM, 없으면 정적 fallback 을 골라주는 전략. */
     private val responseResolver: ResponseResolver,
+    private val payloads: ScenePayloadAssembler,
 ) {
 
     @Transactional
@@ -36,7 +37,7 @@ class DecideSceneUseCase(
         val nextPayload: Map<String, Any?> = if (next == null) {
             mapOf("type" to "end")
         } else {
-            StartGameSessionUseCase.buildScenePayload(scenario, next)
+            payloads.build(scenario, next)
         }
 
         // 직전 결정에 대한 응답 텍스트 — realtime LLM vs 정적 lookup 은 ResponseResolver 가 결정.

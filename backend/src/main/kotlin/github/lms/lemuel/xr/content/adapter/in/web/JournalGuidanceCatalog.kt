@@ -173,7 +173,7 @@ object JournalGuidanceCatalog {
 
     /** 위기 신호 시 프론트가 일기(#1)/위기 카드로 라우팅하도록 동반하는 상담 자원 문구. */
     val CRISIS_RESOURCES: List<Map<String, Any?>> = listOf(
-        mapOf("name" to "자살예방상담전화", "contactType" to "phone", "contactValue" to "1393", "hours" to "24시간"),
+        mapOf("name" to "자살예방 상담전화", "contactType" to "phone", "contactValue" to "109", "hours" to "24시간"),
         mapOf("name" to "정신건강위기상담전화", "contactType" to "phone", "contactValue" to "1577-0199", "hours" to "24시간"),
     )
 }

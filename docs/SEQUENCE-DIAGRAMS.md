@@ -236,7 +236,7 @@ sequenceDiagram
         API->>Admin: 비동기 알림 (severity=high 일 때만)
         API-->>UC: { blocked: true, crisisResources: [...] }
         UC->>UC: 일반 흐름 중단 — 위기 자원 카드 노출
-        Note over UC: 1577-0199 자살예방상담전화<br/>한국심리상담센터<br/>1393 자살예방상담전화
+        Note over UC: 109 자살예방 상담전화<br/>1577-0199 정신건강상담전화<br/>한국심리상담센터
         alt 사용자가 "상담 연결" 탭
             UC->>UC: 전화 앱 또는 웹 링크 열기
             UC->>API: POST /api/safety/escalations { resource: 'kosp_1577' }

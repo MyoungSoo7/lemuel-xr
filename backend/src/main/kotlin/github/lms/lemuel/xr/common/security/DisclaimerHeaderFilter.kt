@@ -20,7 +20,7 @@ class DisclaimerHeaderFilter : OncePerRequestFilter() {
     override fun doFilterInternal(req: HttpServletRequest, res: HttpServletResponse, chain: FilterChain) {
         // 응답 commit 전에 헤더 박음.
         res.setHeader("X-Lemuel-Disclaimer", "not-medical-device")
-        res.setHeader("X-Lemuel-Crisis-Hotline-KR", "1393")
+        res.setHeader("X-Lemuel-Crisis-Hotline-KR", "109")
         res.setHeader("X-Lemuel-Disclaimer-Version", "1.0")
         chain.doFilter(req, res)
     }

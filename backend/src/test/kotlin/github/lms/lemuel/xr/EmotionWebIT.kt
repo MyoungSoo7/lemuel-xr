@@ -105,7 +105,7 @@ class EmotionWebIT : IntegrationTestBase() {
         assertThat(lockout).isNotNull()
         assertThat(lockout).containsEntry("required", true)
         assertThat(lockout).containsEntry("severity", "high")
-        assertThat(lockout["gentleMessage"].toString()).contains("1393")
+        assertThat(lockout["gentleMessage"].toString()).contains("109")
     }
 
     @Test

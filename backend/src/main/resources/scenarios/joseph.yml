@@ -15,6 +15,11 @@
 #         R4 — Scene 4 (형제 재회) 는 가족 배신 트라우마 자극 가능 → trigger_warning + 스킵 대체.
 #         R1 — outro 에 위기 라우팅. R5 — ai_assist_footer 항상 노출.
 
+# 위기 연락처는 하드코딩하지 않는다 — `{{crisis_resources.default}}` 토큰만 쓴다.
+# ScenePayloadAssembler → CrisisTokenResolver 가 crisis_resources 정본(우선순위 1위 활성 전화)으로
+# 치환한다. 번호를 yml 에 직접 적으면 정책 개정(예: 2024-01-01 자살예방 상담 109 통합) 때
+# 낡은 번호가 위기 카피에 그대로 남는다. ScenarioHotlineRatchetTest 가 이를 강제한다.
+
 character: joseph
 title: 곡식 7년
 target_user: general
@@ -120,6 +125,6 @@ scenes:
         LONELY:     joseph.recovery.prison_faithfulness
         EXHAUSTED:  joseph.recovery.small_daily
         CONFUSED:   joseph.recovery.providence_later
-      crisis_reminder: "1393."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
+      crisis_reminder: "{{crisis_resources.default}}."   # R1 — 위기 감지 시 1번 정적 콘텐츠(일기+상담)로 라우팅
       next_scene_suggestion: "트랙 A — 1번 일기·묵상 (3줄 일기) 또는 잠언 신중함 카드"
     next: null

@@ -46,7 +46,7 @@ class ClassifyAndRecommendUseCaseTest {
     fun `위기 키워드 매칭시 AI 분류 건너뛰고 crisis 응답`() {
         val scan = CrisisKeywordScanner.ScanResult(true, "suicide_intent", "high", "hash")
         whenever(scanner.scan(any())).thenReturn(scan)
-        val resources: List<Map<String, Any?>> = listOf(mapOf("name" to "1393"))
+        val resources: List<Map<String, Any?>> = listOf(mapOf("name" to "109"))
         whenever(safetyAlert.execute(eq(userId), isNull(), eq("emotion_text"), eq(scan)))
             .thenReturn(RecordSafetyAlertUseCase.Result(true, 42L, resources))
 

@@ -1108,7 +1108,7 @@ Vision Pro 클라이언트는 `fallback.audioCueId` 의 짧은 사운드를 spat
 1. **AI 생성 출력 자동 라벨링** — 모든 LLM 응답에 `_aiGenerated: true` + `_generationModel: "gemini-1.5-flash"` 메타. 클라이언트 UI 에 *"AI 보조"* 표시 의무.
 2. **클라이언트 프로파일 헤더** — `X-Client-Profile: meta` | `apple` | `google` — store 별 *콘텐츠 강도 다이얼*. 예: Apple 빌드는 Scene 5 골리앗 무너지는 효과 강도 -1 단계, *"위협적 음성"* 사전 경고 + 자체 toggle off 가능.
 3. **사용자 신고 endpoint** — `POST /api/safety/report` (콘텐츠·AI 응답·시각 효과). Store 심사 대비 즉시 응답 가능 시스템 보유.
-4. **Mental health disclaimer 자동 노출** — 사용자 첫 진입 시 *"이 앱은 의료·심리치료를 대체하지 않습니다. 위기 시 1393 (한국 자살예방상담전화)"* 화면. 첫 진입 기록 user 테이블에.
+4. **Mental health disclaimer 자동 노출** — 사용자 첫 진입 시 *"이 앱은 의료·심리치료를 대체하지 않습니다. 위기 시 109 (한국 자살예방 상담전화)"* 화면. 첫 진입 기록 user 테이블에.
 
 ### 13.8 Cross-Device Session Continuity (Phase 2)
 
@@ -1234,7 +1234,7 @@ V5  content_tracks_a               → pgcrypto + diary_entries, user_psalms,
 V6  scripture_embeddings           → pgvector + scripture_embeddings (HNSW 인덱스),
                                      scripture_passages.theme_tags / character_tags
 V7  safety_domain                  → safety_alerts (위기 키워드 매칭), crisis_resources
-                                     (자살예방상담전화 1393, 정신건강상담 1577-0199,
+                                     (자살예방 상담전화 109, 정신건강상담 1577-0199,
                                      청소년 1388, 생명의전화 1588-9191 시드됨)
 V8  theology_domain                → content_versions (draft/review/approved/published/archived),
                                      theology_reviews (reviewer · decision · concern_tags)

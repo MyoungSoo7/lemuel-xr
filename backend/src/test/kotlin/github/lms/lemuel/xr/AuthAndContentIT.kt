@@ -53,12 +53,12 @@ class AuthAndContentIT : IntegrationTestBase() {
         assertThat(topicList).hasSize(7)
         assertThat(topics.toString()).contains("일기와 묵상").contains("사람을 두려워하지 않는 것")
 
-        // 4. /api/safety/crisis-resources — V7 시드
+        // 4. /api/safety/crisis-resources — V7 시드 + V20260802031449 (109 정번호 교정)
         val crisis = rest.get().uri("/api/safety/crisis-resources?region=KR&locale=ko-KR")
             .retrieve().body(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})!!
         val resources = crisis["resources"] as List<*>
         assertThat(resources).hasSizeGreaterThanOrEqualTo(4)
-        assertThat(resources.toString()).contains("1393").contains("자살예방")
+        assertThat(resources.toString()).contains("109").contains("자살예방")
 
         // 5. /api/scripture/gen-45:5 — V2 시드
         val scripture = rest.get().uri("/api/scripture/gen-45:5")

@@ -38,10 +38,10 @@ class TestSafetyFilterCore:
         assert blocked is not None
 
     def test_자살예방_같은_안전한_합성어는_통과한다(self):
-        text, blocked = app._safety_filter("자살예방상담전화 1393 으로 연락하세요.")
+        text, blocked = app._safety_filter("자살예방 상담전화 109 로 연락하세요.")
 
         assert blocked is None
-        assert "1393" in text
+        assert "109" in text
 
 
 class TestJsonModeSafety:
@@ -62,7 +62,7 @@ class TestJsonModeSafety:
         # 평문 fallback 을 그대로 주면 호출자의 json.loads 가 깨진다.
         parsed = json.loads(text)
         assert parsed["safetyBlocked"] is True
-        assert "1393" in parsed["text"]
+        assert "109" in parsed["text"]
 
     def test_json_모드_안전한_응답은_원본_그대로(self):
         payload = json.dumps({"meditation": "오늘은 쉬어도 괜찮습니다"}, ensure_ascii=False)

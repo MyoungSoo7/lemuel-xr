@@ -233,7 +233,7 @@ class ContentWebIT : IntegrationTestBase() {
         assertThat(crisis).containsEntry("routed", true)
         val resources = crisis["resources"] as List<Map<String, Any>>
         assertThat(resources).isNotEmpty()
-        assertThat(resources.toString()).contains("1393")
+        assertThat(resources.toString()).contains("109")
     }
 
     // ─────────────────────────────── ProverbsController ───────────────────────────────
