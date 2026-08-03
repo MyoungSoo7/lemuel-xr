@@ -1,0 +1,4 @@
+gate: G0b
+expect: FAIL
+reason_contains: "사용장 본문 열에 존재(과차단)"
+planted: "배제 선언한 본문 조각이 사용 중인 장에도 있음 — 자기 콘텐츠를 과차단한다"

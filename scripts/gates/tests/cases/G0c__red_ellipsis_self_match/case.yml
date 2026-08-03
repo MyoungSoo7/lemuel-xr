@@ -1,0 +1,8 @@
+gate: G0c
+expect: FAIL
+reason_contains: "축약기호"
+planted: "표에서 옮길 때 남은 축약기호 '…' — 자기 자신과 매치돼 게이트가 무력화된다"
+config_patch:
+  token_examples:
+    - token: "…"
+      example: "…"

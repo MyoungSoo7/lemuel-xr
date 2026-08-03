@@ -1,0 +1,21 @@
+# Scene 2 — R4 동의 게이트가 붙는 Scene (픽스처)
+scene_id: testchar_scene2
+mission_id: testchar
+consent_card_id: card_testchar_s2_consent
+skip_alternative_scene_id: testchar_scene3
+narration_blocks:
+  - id: nb_s2_body
+    speaker: scripture_caption
+    text_ko: "바알의 선지자를 기손 시내로 내려다가 거기서 죽이니라"
+safety_gates:
+  - id: R2_no_blame_only_witness
+    enforced_at: always
+    description: "책망 어휘 0건 — 아래 목록이 집행 수단이다."
+    lint_forbidden_tokens: ["너 때문", "믿음이 부족", "왜 도망", "정신 차려"]
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

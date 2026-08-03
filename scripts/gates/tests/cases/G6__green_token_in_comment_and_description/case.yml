@@ -1,0 +1,4 @@
+gate: G6
+expect: PASS
+planted: "주석 + description 에 금지 토큰을 인용 — 둘 다 렌더되지 않는다"
+green_proves: "이 GREEN 이 없으면 base 의 G6 초록은 '토큰이 아예 어디에도 없어서' 일 수 있다(vacuous). 인용이 실재하는데도 통과함을 보인다."

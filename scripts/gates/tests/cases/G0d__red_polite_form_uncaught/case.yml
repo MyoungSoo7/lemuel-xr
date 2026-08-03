@@ -1,0 +1,8 @@
+gate: G0d
+expect: FAIL
+reason_contains: "미포착"
+planted: "제품 말투(높임형) 위험 문장 '정신 차리세요' — 반말 토큰 '정신 차려' 로는 안 걸린다(★★★ 재현)"
+config_patch:
+  polite_evasive:
+    - "혹시 믿음이 부족해서 그런 건 아닐까요?"
+    - "이제 그만 정신 차리시고 일어나셔야죠."

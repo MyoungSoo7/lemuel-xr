@@ -1,0 +1,11 @@
+# 다른 인물의 라이브 콘텐츠 — G0e 과차단 사전 스캔용 코퍼스
+scene_id: decoy_scene1
+mission_id: decoy
+narration_blocks:
+  - id: nb_d1
+    speaker: scripture_caption
+    text_ko: "그가 나를 푸른 풀밭에 누이시며 쉴 만한 물 가로 인도하시는도다"
+safety_gates:
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 위기 시 {{crisis_resources.default}}"

@@ -1,0 +1,4 @@
+gate: G5a-i
+expect: FAIL
+reason_contains: "합집합 5종"
+planted: "Scene 5 축의 토큰을 4→1 종으로 축소 — 축은 비지 않아 G5a-ii 는 통과, 합집합만 하한 미달"

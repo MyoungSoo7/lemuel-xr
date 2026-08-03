@@ -1,0 +1,18 @@
+gate: G0e
+expect: FAIL
+reason_contains: "과차단"
+planted: "2글자 배제 문자열 '누이' — 다른 인물의 멀쩡한 시편 자막을 친다(㉓ 실측 재현)"
+config_patch:
+  exclusions:
+    - value: "기손 시내로 내려다가"
+      scope: verse_text
+      expect: excluded_only
+    - value: "하사엘의 칼을 피하는"
+      scope: verse_text
+      expect: excluded_only
+    - value: "왕상18:40"
+      scope: verse_ref
+      expect: excluded_only
+    - value: "누이"
+      scope: verse_text
+      expect: excluded_only

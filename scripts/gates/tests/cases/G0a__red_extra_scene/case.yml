@@ -1,0 +1,4 @@
+gate: G0a
+expect: FAIL
+reason_contains: "6개"
+planted: "scene6.yml 추가 — 5-Scene 을 전제한 게이트가 조용히 어긋나는 상태"

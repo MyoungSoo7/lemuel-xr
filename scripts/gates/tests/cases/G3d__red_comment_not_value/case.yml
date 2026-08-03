@@ -1,0 +1,4 @@
+gate: G3d
+expect: FAIL
+reason_contains: "파서가 본 키/id"
+planted: "crisis_reminder 를 주석으로만 남김 — grep -q 면 통과하는 ⑱ 정확 재현"

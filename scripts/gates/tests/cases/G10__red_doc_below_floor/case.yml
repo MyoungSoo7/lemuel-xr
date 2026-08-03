@@ -1,0 +1,4 @@
+gate: G10
+expect: FAIL
+reason_contains: "분량 하한 미달"
+planted: "MVP 문서를 하한 미만으로 축약"

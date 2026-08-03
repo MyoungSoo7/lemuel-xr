@@ -1,0 +1,4 @@
+gate: G3b
+expect: FAIL
+reason_contains: "위기 표면이 없다"
+planted: "Scene 1~4 에서 위기 자원 참조 제거 — 표면이 1개만 남는다"

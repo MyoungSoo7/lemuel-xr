@@ -1,0 +1,4 @@
+gate: G0b
+expect: FAIL
+reason_contains: "배제장 본문 열에 부재"
+planted: "배제 본문 조각이 배제 장에 실재하지 않음 — 영원히 0건을 뱉는 가짜 게이트"

@@ -1,0 +1,4 @@
+gate: G3
+expect: FAIL
+reason_contains: "하드코딩"
+planted: "문서에 위기 번호 109 하드코딩"

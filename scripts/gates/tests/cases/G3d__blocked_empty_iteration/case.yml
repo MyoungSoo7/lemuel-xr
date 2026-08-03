@@ -1,0 +1,6 @@
+gate: G3d
+expect: BLOCKED
+reason_contains: "순회 0회"
+planted: "crisis_reminder_scenes 빈 배열 — 순회 0회를 통과로 읽지 않는다(㉒ 일반화)"
+config_patch:
+  crisis_reminder_scenes: []

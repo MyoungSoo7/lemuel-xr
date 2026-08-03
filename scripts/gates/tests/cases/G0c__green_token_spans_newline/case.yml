@@ -1,0 +1,13 @@
+gate: G0c
+expect: PASS
+planted: "㊱ — 예문에서 토큰이 줄바꿈을 건넘. 실 스캐너(normalize 후 indexOf)는 잡으므로 올바른 선언이다. red 가 되면 false red"
+config_patch:
+  token_examples:
+    - token: "너 때문"
+      example: "이게 다 너 때문이야"
+    - token: "믿음이 부족"
+      example: "믿음이 부족해서 그런 거야"
+    - token: "빨리 회복"
+      example: |
+        이제 그만 앓고 빨리
+        회복해서 다시 일해

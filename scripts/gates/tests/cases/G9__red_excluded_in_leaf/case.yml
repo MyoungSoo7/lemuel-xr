@@ -1,0 +1,4 @@
+gate: G9
+expect: FAIL
+reason_contains: "렌더 leaf 에 배제 문자열"
+planted: "배제한 장의 본문 조각이 렌더 leaf 에 등장"

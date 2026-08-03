@@ -1,0 +1,20 @@
+# Scene 3 — 쉼 (픽스처). 위기 리마인더 리터럴 키가 여기 있다.
+scene_id: testchar_scene3
+mission_id: testchar
+narration_blocks:
+  - id: nb_s3_rest
+    speaker: system
+    text_ko: "오늘은 먹고 잔 것으로 충분합니다."
+safety_gates:
+  - id: crisis_reminder
+    enforced_at: mid_scene
+  - id: R3_rest_is_valid
+    enforced_at: always
+    enforcement: structural
+    structural_check: "Scene 3 에는 목표·과업 인터랙션 노드가 0개여야 한다(구조 검사)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할"

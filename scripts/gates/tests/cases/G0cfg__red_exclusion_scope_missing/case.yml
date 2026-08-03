@@ -1,0 +1,12 @@
+gate: G0cfg
+expect: FAIL
+reason_contains: "`scope` 누락"
+planted: "㉝ — 배제 선언에 scope 를 안 적음. 기본값을 주면 '본문 열에 참조 표기를 대고 찾는' 결함이 그대로 재발한다"
+also_nonpass: [G0b, G0e, G9, G9d]
+config_patch:
+  exclusions:
+    - value: "기손 시내로 내려다가"
+      scope: verse_text
+      expect: excluded_only
+    - value: "왕상18:40"
+      expect: excluded_only

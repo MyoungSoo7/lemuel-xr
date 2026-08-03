@@ -1,0 +1,4 @@
+gate: G3c
+expect: FAIL
+reason_contains: "crisis_resources.default 값 부재"
+planted: "마지막 Scene(이탈 지점)에서만 위기 자원 참조 제거 — G3b 는 여전히 통과한다"

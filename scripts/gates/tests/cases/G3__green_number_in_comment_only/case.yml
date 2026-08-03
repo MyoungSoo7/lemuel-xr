@@ -1,0 +1,4 @@
+gate: G3
+expect: PASS
+planted: "주석에만 109 를 적은 Scene — 렌더되지 않으므로 red 가 되면 안 된다"
+green_proves: "줄 단위 grep 이면 여기서 false red 가 난다. 파서 leaf 판정이라 통과한다."

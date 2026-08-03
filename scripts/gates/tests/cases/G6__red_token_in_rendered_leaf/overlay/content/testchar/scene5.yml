@@ -1,0 +1,31 @@
+# Scene 5 — 회복 (픽스처)
+# ⚠️ R3 lint: 텍스트 풀에 '다시 이겨라/빨리 회복/사역으로 돌아가라' 어휘 있으면 빌드 실패.
+#    ↑ 이 주석은 **금지 토큰을 인용**한다. 파서가 값으로 보지 않으므로 G6 는 여기 걸리면 안 된다.
+scene_id: testchar_scene5
+mission_id: testchar
+narration_blocks:
+  - id: nb_s5_close
+    speaker: the_voice
+    text_ko: ""
+    default_path: static_curation
+    default_text_ko: "빨리 회복해서 다시 걸으세요."
+branches:
+  - id: br_s5_recovery
+    decision_key: recovery_key
+    routes:
+      - when: { lament_label: loneliness }
+        recovery_text_ko: "보이지 않는 곳에 함께 걷는 이들이 있었습니다."
+      - when: { lament_label: null }
+        recovery_text_ko: "여기까지 온 것으로 충분합니다."
+safety_gates:
+  - id: R3_no_recovery_pressure
+    enforced_at: always
+    description: "'다시 이겨라/빨리 회복/사역으로 돌아가' 어휘 0건. ← 게이트 자신을 서술하는 노드다."
+    lint_forbidden_tokens: ["빨리 회복", "다시 이겨", "사역으로 돌아가", "이제 다시 싸워"]
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

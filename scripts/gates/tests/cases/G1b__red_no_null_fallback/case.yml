@@ -1,0 +1,4 @@
+gate: G1b
+expect: FAIL
+reason_contains: "null 폴백이 없다"
+planted: "마지막 Scene 라우팅에서 null 폴백 제거 — R4 스킵 사용자가 마무리 없이 끝난다"

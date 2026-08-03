@@ -1,0 +1,4 @@
+gate: G6
+expect: FAIL
+reason_contains: "렌더 leaf 에 금지 문구"
+planted: "사용자에게 렌더되는 default_text_ko 에 금지 토큰 '빨리 회복' 삽입"
