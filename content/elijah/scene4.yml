@@ -128,6 +128,11 @@ branches:
     body_template:
       lament_label: "{{loneliness|burnout|fear}}"
       stillness_seconds: "{{seconds}}"
+    # R5(F-6.3) 기계 판독 선언 — 아래 R5_ai_optout_respected 가 산문으로만 말하던 것을 값으로 못박는다.
+    # 각 route 의 card_text_ko 는 사전 작성 본문이고, llm_prompt_key 는 사용자가 AI 응답을
+    # 명시적으로 켠 경우에만 쓰이는 opt-in 예외 경로다(fallback 아님).
+    default_path: static_curation
+    llm_optin_only: true
     routes:
       - when: { lament_label: loneliness }
         card_text_ko: "오직 나만 홀로 남았습니다 (열왕기상 19:14)"

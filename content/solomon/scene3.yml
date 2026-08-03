@@ -25,7 +25,7 @@ environment:
     - id: court_murmur_low
       gain_db: -28
       spatial: true
-  user_position: [0.0, 1.85, 0.0]      # 보좌 위 — 왕의 시점 (약간 높음)
+  user_position: [0.0, 1.85, 0.0] # 보좌 위 — 왕의 시점 (약간 높음)
   user_facing: [0.0, 0.0, 1.0]
   camera_locomotion: disabled
 
@@ -128,7 +128,8 @@ interactions:
         on_timeout: default_route_sword_test
         description: "미선택 40초 경과 시 성경 경로(칼 시험)로 자동 진행 — 실패 아님."
       - rule: track_micro_signals
-        records: [judgment_first_choice, reconsider_count, card_hesitation_seconds]
+        records:
+          [judgment_first_choice, reconsider_count, card_hesitation_seconds]
 
 branches:
   - id: br_s3_judgment
@@ -138,6 +139,9 @@ branches:
     body_template:
       judgment_choice: "{{first_woman|second_woman|sword_test}}"
       reconsider_count: "{{count}}"
+    # R5 기계 판독 선언 — 아래 R5_static_branches_only 가 산문으로만 말하던 것을 값으로 못박는다.
+    # 이 Scene 은 세 route 전부 static_text_ko 라 LLM 호출이 0회다(llm_prompt_key 없음).
+    default_path: static_curation
     routes:
       - when: { judgment_choice: first_woman }
         static_text_ko: "왕이 첫째 여인에게 아이를 주려 하자, 둘째 여인이 부르짖었다 — '아니라, 산 것은 내 아들이라.' 증거는 없고 두 주장만 남았다. 왕은 판결을 멈추고, 두 여인의 마음을 드러낼 다른 길을 생각했다."
@@ -202,7 +206,19 @@ safety_gates:
     #    솔로몬 scene5 의 R3_no_instrumentalization 에서 '깨달았으면' 을 삭제한 것도
     #    같은 이유다 — '깨달았으' 가 포섭한다. 두 삭제 모두 ForbiddenTokenConfigTest 의
     #    mustBlock 문장으로 커버리지가 유지됨을 검증한다.
-    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "욕심이 많으셔", "욕심이 많으시", "만족을 모르", "깨달았으", "깨달으셨으", "다시 열심히", "허무를 극복"]
+    lint_forbidden_tokens:
+      [
+        "믿음이 부족",
+        "감사가 부족",
+        "욕심이 많아서",
+        "욕심이 많으셔",
+        "욕심이 많으시",
+        "만족을 모르",
+        "깨달았으",
+        "깨달으셨으",
+        "다시 열심히",
+        "허무를 극복",
+      ]
   - id: R5_static_branches_only
     enforced_at: br_s3_judgment
     description: "분기 3개 전부 사전 작성 정적 텍스트 — 이 Scene 에 LLM 호출 0회. opt-out 사용자도 동일 서사 완결(AC5)."

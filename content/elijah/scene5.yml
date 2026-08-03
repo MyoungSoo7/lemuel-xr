@@ -49,7 +49,7 @@ npcs:
 narration_blocks:
   - id: nb_s5_god_response
     speaker: the_voice
-    text_ko: ""      # lament_label 에 따라 런타임 주입 (LLM cache) / opt-out 시 본문 한 줄
+    text_ko: "" # lament_label 에 따라 런타임 주입 (LLM cache) / opt-out 시 본문 한 줄
     audio_clip_id: null
     start_at_seconds: 0.0
     duration_seconds: 14.0
@@ -57,12 +57,12 @@ narration_blocks:
     # F-6.3 opt-out 기본 ON: 정적 큐레이션(본문 한 줄)이 *기본 경로*. LLM 생성은 사용자가 명시적으로 켠 경우에만 쓰는 *opt-in 예외 경로*(fallback 아님).
     default_path: static_curation
     default_text_ko: "그러나 내가 이스라엘 가운데에 칠천 명을 남기리니 다 바알에게 무릎을 꿇지 아니하였느니라 (열왕기상 19:18)"
-    llm_optin_only: true              # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
+    llm_optin_only: true # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
     llm_prompt_key_map:
       loneliness: "elijah_s5_god_response_loneliness"
       burnout: "elijah_s5_god_response_burnout"
       fear: "elijah_s5_god_response_fear"
-    conditional_softening_ref: F66_recovery_state_gate   # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
+    conditional_softening_ref: F66_recovery_state_gate # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
   - id: nb_s5_mantle_caption
     speaker: scripture_caption
     text_ko: "엘리야가 그리로부터 떠나 … 겉옷을 그의 위에 던지니라 (열왕기상 19:19)"
@@ -72,19 +72,19 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s5_recovery_message
     speaker: system
-    text_ko: ""      # 진입 감정 × lament_label × faith_tone 매칭 (§6 매트릭스)
+    text_ko: "" # 진입 감정 × lament_label × faith_tone 매칭 (§6 매트릭스)
     audio_clip_id: null
     start_at_seconds: 30.0
     duration_seconds: 12.0
     hidden_until_event: null
     recovery_matrix_ref: elijah_recovery_matrix
-    conditional_softening_ref: F66_recovery_state_gate   # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
+    conditional_softening_ref: F66_recovery_state_gate # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
 
 interactions:
   - id: ix_s5_throw_mantle_optional
     type: grab_and_throw
     target_assets: [model_mantle, target_elisha]
-    gesture: two_handed_throw       # 다윗 sling throw 재사용
+    gesture: two_handed_throw # 다윗 sling throw 재사용
     presentation:
       optional: true
     validation_rules:
@@ -112,6 +112,13 @@ branches:
         recovery_text_ko: "네 열심이 헛되지 않았다. 다만 지금은 걸을 사람 하나를 곁에 두는 때다."
       - when: { lament_label: fear }
         recovery_text_ko: "바람도 지진도 불도 아니었다. 하나님은 가장 조용한 곳에서 너를 만나셨다."
+      - when: { lament_label: null }
+        recovery_text_ko: "먼저 먹고 자게 하신 밤이 있었다. 그 뒤에도 그는 같은 말을 두 번 했고, 하나님은 그 시간을 재촉하지 않으셨다."
+        note: >-
+          Scene 4 skip(R4) 또는 라벨 미선택 경로 — 기본 정적 문구로 동일하게 완결.
+          런타임(backend/src/main/resources/scenarios/elijah.yml scene 5)은 lament 분기 없이
+          항상 정적 outro 를 렌더하므로 skip 사용자도 마무리 문구를 받는다. 이 라우트는 저작
+          정본을 그 실제 동작에 맞춰 명시한 것이다(문구는 R3 축 — 회복에 시간표를 붙이지 않음).
     note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9 사전 캐싱 (MVP-ELIJAH-CONTENT §6)."
 
 safety_gates:
@@ -120,7 +127,19 @@ safety_gates:
     description: "'다시 이겨라/빨리 회복/사역 복귀' 어휘 0건. '오늘은 먹고 잔 것으로 충분' 기본. 사명 = 나누는 것(엘리사)."
     # S3 와 같은 이유로 명령형 높임 어미를 따로 잡는다('다시 이겨'⊅"다시 이기세요").
     # 어간형('다시 이기')은 "다시 이기려 애쓰지 않으셔도 됩니다"를 삼켜서 쓰지 않는다.
-    lint_forbidden_tokens: ["다시 이겨", "이기세", "이기십", "이기셔야", "빨리 회복", "사역으로 돌아가", "이제 다시 싸워", "싸우세", "싸우십", "싸우셔야"]
+    lint_forbidden_tokens:
+      [
+        "다시 이겨",
+        "이기세",
+        "이기십",
+        "이기셔야",
+        "빨리 회복",
+        "사역으로 돌아가",
+        "이제 다시 싸워",
+        "싸우세",
+        "싸우십",
+        "싸우셔야",
+      ]
   - id: R3_no_instrumentalization
     enforced_at: always
     description: "'하나님이 너를 도구로 다시 쓰신다'류 도구화 차단 → '너의 걸음에 동행을 주셨다' 주체성·관계 톤."
@@ -134,11 +153,29 @@ safety_gates:
     # 그래서 긍정 계속형(-시/-으/-는/-을/-아)을 붙여 부정형과 갈라낸다.
     # '쓰시려고'·'일꾼으로 세우'는 부정형("세우지 않으십니다")이 자연스러운 사목 문장이
     # 아니라 그대로 둔다. '쓸모없다'류는 정당한 감정 표현이므로 토큰에 넣지 않는다.
-    lint_forbidden_tokens: ["도구로 쓰시", "도구로 쓰신", "도구로 쓰실", "도구로 쓰려", "도구로 쓰는", "도구로 삼으", "도구로 삼는", "도구로 삼아", "도구로 삼을", "도구로 다시", "쓰임받으", "쓰임받는", "쓰임받을", "쓰임받아", "쓰시려고", "일꾼으로 세우"]
+    lint_forbidden_tokens:
+      [
+        "도구로 쓰시",
+        "도구로 쓰신",
+        "도구로 쓰실",
+        "도구로 쓰려",
+        "도구로 쓰는",
+        "도구로 삼으",
+        "도구로 삼는",
+        "도구로 삼아",
+        "도구로 삼을",
+        "도구로 다시",
+        "쓰임받으",
+        "쓰임받는",
+        "쓰임받을",
+        "쓰임받아",
+        "쓰시려고",
+        "일꾼으로 세우",
+      ]
   - id: F66_recovery_state_gate
     enforced_at: before_scene_enter
     description: "F-6.6 조건부 완화 — 취약 상태 이력 사용자에게 재사명/회복 문구가 '빨리 복귀하라' 압박으로 읽히지 않도록 자동 소프트닝 또는 스킵. R3 의 상태조건 배선."
-    trigger_conditions:                # OR 조건 (하나라도 참이면 발동)
+    trigger_conditions: # OR 조건 (하나라도 참이면 발동)
       - source: safety_alerts
         rule: "severity='high' 이력 존재 (user_id 기준, category 무관)"
       - source: emotion_logs
@@ -160,7 +197,7 @@ safety_gates:
     enforced_at: always
     text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
 
-next_scene_id: null      # 미션 종료 → 메인 복귀 (또는 트랙 A 시편 42 bridge 제안)
+next_scene_id: null # 미션 종료 → 메인 복귀 (또는 트랙 A 시편 42 bridge 제안)
 transition:
   type: fade_to_black
   fade_out_seconds: 1.2
@@ -169,7 +206,7 @@ transition:
 bridge:
   offer_track_a: true
   prompt_ko: "이 시간을 기록하시겠어요?"
-  yes_route: "GET /api/track-a/psalm-bridge?psalm=42"    # 시편 42편 '내 영혼아 어찌하여 낙심하며'
+  yes_route: "GET /api/track-a/psalm-bridge?psalm=42" # 시편 42편 '내 영혼아 어찌하여 낙심하며'
   no_route: main_menu
 
 recovery_metric_dimensions:
