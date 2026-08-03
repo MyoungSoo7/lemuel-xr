@@ -57,6 +57,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "길이요 진리요 생명 — 네 구원을 감싸는 정점",
     active: true,
   },
+  {
+    href: "/solomon",
+    name: "Solomon",
+    korean: "솔로몬",
+    tagline: "해 아래, 빈 손 — 공허는 채움이 아니라 방향을 묻는 신호다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -85,7 +92,8 @@ export default function HomePage() {
           </p>
           <p className="mt-3 text-[var(--color-warm)]/40 text-xs">
             큐티가 일상 영적 양식, 민방위교육이 비상 대비 훈련이라면 — Lemuel XR
-            은 *절망 비상* 에 대비하는 영적 단련 프로그램입니다.<br />
+            은 *절망 비상* 에 대비하는 영적 단련 프로그램입니다.
+            <br />
             의료·임상 도구가 아닙니다. 위기 신호 시 109 · 1577-0199 (24시간).
           </p>
         </header>
@@ -147,7 +155,8 @@ export default function HomePage() {
                     </span>
                   </p>
                   <p className="text-xs text-[var(--color-warm)]/60 mt-1">
-                    매일 5분 — 가치를 정의하고, 실천을 기록하고, 습관으로 새깁니다.
+                    매일 5분 — 가치를 정의하고, 실천을 기록하고, 습관으로
+                    새깁니다.
                   </p>
                 </Link>
                 <Link
@@ -161,7 +170,8 @@ export default function HomePage() {
                     </span>
                   </p>
                   <p className="text-xs text-[var(--color-warm)]/60 mt-1">
-                    일기 · 잠언 · 전도서 · 시편 · 고통(욥) · 마음지키기 · 사람두려워하지않기 — 매일 한 카드.
+                    일기 · 잠언 · 전도서 · 시편 · 고통(욥) · 마음지키기 ·
+                    사람두려워하지않기 — 매일 한 카드.
                   </p>
                 </Link>
               </div>
@@ -184,7 +194,9 @@ export default function HomePage() {
                         {m.korean}
                       </span>
                     </p>
-                    <p className="text-xs text-[var(--color-warm)]/60 mt-1">{m.tagline}</p>
+                    <p className="text-xs text-[var(--color-warm)]/60 mt-1">
+                      {m.tagline}
+                    </p>
                   </Link>
                 ))}
               </div>
@@ -195,9 +207,12 @@ export default function HomePage() {
         {result && (
           <section className="mt-10 space-y-6">
             <div className="rounded-lg border border-[var(--color-primary)]/30 px-5 py-4">
-              <p className="text-xs text-[var(--color-warm)]/60 mb-1">분류 결과</p>
+              <p className="text-xs text-[var(--color-warm)]/60 mb-1">
+                분류 결과
+              </p>
               <p className="text-2xl font-bold">
-                {EMOTION_LABEL[result.primary.emotion] ?? result.primary.emotion}
+                {EMOTION_LABEL[result.primary.emotion] ??
+                  result.primary.emotion}
                 <span className="ml-2 text-sm text-[var(--color-warm)]/60">
                   ({Math.round(result.primary.confidence * 100)}% 신뢰도)
                 </span>
@@ -211,8 +226,16 @@ export default function HomePage() {
                 </h2>
                 <div className="grid grid-cols-2 gap-3">
                   {result.recommendations.trackB.map((c) => {
-                    const ACTIVE = new Set(["joseph", "moses", "david", "jesus"]);
-                    const href = ACTIVE.has(c.character) ? `/${c.character}` : "#";
+                    const ACTIVE = new Set([
+                      "joseph",
+                      "moses",
+                      "david",
+                      "jesus",
+                      "solomon",
+                    ]);
+                    const href = ACTIVE.has(c.character)
+                      ? `/${c.character}`
+                      : "#";
                     const phase2 = !ACTIVE.has(c.character);
                     return (
                       <Link

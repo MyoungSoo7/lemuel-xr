@@ -13,7 +13,9 @@ export interface JosephStartResponse {
   responseText?: string | null;
 }
 
-export async function startJoseph(deviceType = "web"): Promise<JosephStartResponse> {
+export async function startJoseph(
+  deviceType = "web",
+): Promise<JosephStartResponse> {
   const res = await api.post<JosephStartResponse>("/api/game/joseph/start", {
     userId: null,
     deviceType,
@@ -35,7 +37,9 @@ export async function decideJoseph(
   decision: unknown,
 ): Promise<JosephStartResponse> {
   const wrapped =
-    typeof decision === "string" ? { value: decision } : (decision as Record<string, unknown>);
+    typeof decision === "string"
+      ? { value: decision }
+      : (decision as Record<string, unknown>);
   const res = await api.post<JosephStartResponse>(
     `/api/game/joseph/${sessionId}/decide`,
     { sceneId, decision: wrapped },
@@ -47,17 +51,21 @@ export async function completeJoseph(sessionId: string, finalOutcome: string) {
   await api.post(`/api/game/joseph/${sessionId}/complete`, { finalOutcome });
 }
 
-/** B — Joseph 외 인물 ({moses,david,jesus}) 의 동일 흐름 generic helper. */
-export type MissionCharacter = "joseph" | "moses" | "david" | "jesus";
+/** B — Joseph 외 인물 ({moses,david,jesus,solomon}) 의 동일 흐름 generic helper. */
+export type MissionCharacter =
+  "joseph" | "moses" | "david" | "jesus" | "solomon";
 
 export async function startMission(
   character: MissionCharacter,
   deviceType = "web",
 ): Promise<JosephStartResponse> {
-  const res = await api.post<JosephStartResponse>(`/api/game/${character}/start`, {
-    userId: null,
-    deviceType,
-  });
+  const res = await api.post<JosephStartResponse>(
+    `/api/game/${character}/start`,
+    {
+      userId: null,
+      deviceType,
+    },
+  );
   return res.data;
 }
 
@@ -68,7 +76,9 @@ export async function decideMission(
   decision: unknown,
 ): Promise<JosephStartResponse> {
   const wrapped =
-    typeof decision === "string" ? { value: decision } : (decision as Record<string, unknown>);
+    typeof decision === "string"
+      ? { value: decision }
+      : (decision as Record<string, unknown>);
   const res = await api.post<JosephStartResponse>(
     `/api/game/${character}/${sessionId}/decide`,
     { sceneId, decision: wrapped },
@@ -81,5 +91,7 @@ export async function completeMission(
   sessionId: string,
   finalOutcome: string,
 ) {
-  await api.post(`/api/game/${character}/${sessionId}/complete`, { finalOutcome });
+  await api.post(`/api/game/${character}/${sessionId}/complete`, {
+    finalOutcome,
+  });
 }
