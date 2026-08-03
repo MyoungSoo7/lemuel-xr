@@ -1,0 +1,4 @@
+gate: G6
+expect: FAIL
+reason_contains: "렌더 leaf 에 금지 문구"
+planted: "렌더 leaf 에 '빨리 회복하지 않으면 안 됩니다' — 부정이 두 번 겹쳐 뜻은 압박 그대로다"

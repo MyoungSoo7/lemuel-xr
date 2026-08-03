@@ -1,0 +1,33 @@
+# Scene 5 — 회복 (픽스처)
+# 양보 부정 면제가 *부정이면 무조건 통과* 로 넓어지면 여기가 초록이 된다.
+# '-지 않으면 안 된다' 는 이중부정이라 의미가 "반드시 해야 한다" 다 — 면제 조건이
+# '부정' 이 아니라 '부정 + 양보 어미 -도' 인 이유가 이 케이스다.
+scene_id: testchar_scene5
+mission_id: testchar
+narration_blocks:
+  - id: nb_s5_close
+    speaker: the_voice
+    text_ko: ""
+    default_path: static_curation
+    default_text_ko: "빨리 회복하지 않으면 안 됩니다."
+branches:
+  - id: br_s5_recovery
+    decision_key: recovery_key
+    routes:
+      - when: { lament_label: loneliness }
+        recovery_text_ko: "보이지 않는 곳에 함께 걷는 이들이 있었습니다."
+      - when: { lament_label: null }
+        recovery_text_ko: "여기까지 온 것으로 충분합니다."
+safety_gates:
+  - id: R3_no_recovery_pressure
+    enforced_at: always
+    description: "'다시 이겨라/빨리 회복/사역으로 돌아가' 어휘 0건. ← 게이트 자신을 서술하는 노드다."
+    lint_forbidden_tokens:
+      ["빨리 회복", "다시 이겨", "사역으로 돌아가", "이제 다시 싸워"]
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

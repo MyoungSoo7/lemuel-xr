@@ -83,6 +83,38 @@ _WS = re.compile(r"\s+")
 def norm_ws(s: str) -> str:
     return _WS.sub(" ", str(s).strip())
 
+
+# 양보 부정 면제 — **런타임 ForbiddenTokenScanner.CONCESSIVE_NEGATION 의 거울이다.**
+#
+# 한국어는 부정이 어간 뒤에 `-지 않/못` 으로 붙어서, 어간에서 끊은 토큰(`빨리 회복`)은
+# 그 축의 정당한 위로("빨리 회복하지 않아도 됩니다")까지 반드시 삼킨다. 런타임이 그걸
+# 면제하므로 게이트도 같이 면제해야 한다 — 게이트가 런타임보다 **느슨하면** vacuous green
+# 이고, **엄격하면** false red 다. 둘 다 게이트를 못 믿게 만든다.
+#
+# 부정만으로 면제하지 않고 양보 어미 `-도` 까지 요구하는 이유는 런타임 쪽 주석 참조
+# (`-지 않으면 안 된다` 는 이중부정이라 뜻이 압박 그대로다).
+_CONCESSIVE_NEGATION = re.compile(r"[가-힣]{0,3}지\s?(?:않|못)[가-힣]{0,3}도")
+_CONCESSIVE_LOOKAHEAD = 12
+
+
+def violation_index(haystack: str, needle: str) -> int:
+    """정규화된 `haystack` 에서 양보 부정으로 면제되지 *않는* 첫 `needle` 위치. 없으면 -1.
+
+    같은 토큰이 한 문장에 두 번 나오면 앞이 면제돼도 뒤가 위반일 수 있으므로 이어서 찾는다.
+    """
+    if not needle:
+        return -1
+    frm = 0
+    while True:
+        at = haystack.find(needle, frm)
+        if at < 0:
+            return -1
+        end = at + len(needle)
+        if not _CONCESSIVE_NEGATION.match(haystack, end, end + _CONCESSIVE_LOOKAHEAD):
+            return at
+        frm = at + 1
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # legacy 면제 — **스크립트 소스에 하드코딩한다. 설정 파일로 못 켠다.**
 #
@@ -1113,7 +1145,7 @@ def _scan_scene_values(c: Ctx, needles: list[str]) -> list[str]:
                 continue
             nval = norm_ws(val)
             for orig, nn in nneedles:
-                if nn and nn in nval:
+                if violation_index(nval, nn) >= 0:
                     hits.append(f"{c.rel(f)}:{line}: [{orig}] ({key}) {nval[:90]}")
     return hits
 
@@ -1178,6 +1210,12 @@ def _scan_docs(c: Ctx, needles: list[str], doc_marker: str) -> list[str]:
                 continue
             start = blob.find(nn)
             while start >= 0:
+                # 런타임이 면제하는 양보 부정은 문서에서도 마커 없이 쓸 수 있어야 한다 —
+                # "빨리 회복하지 않아도 됩니다" 는 토큰 인용이 아니라 문서 자신의 말이다.
+                end = start + len(nn)
+                if _CONCESSIVE_NEGATION.match(blob, end, end + _CONCESSIVE_LOOKAHEAD):
+                    start = blob.find(nn, start + 1)
+                    continue
                 ln = owner[start]
                 span = blob[start : start + len(nn)]
                 multi = "" if owner[min(start + len(nn) - 1, len(owner) - 1)] == ln else " (줄바꿈 넘김)"
