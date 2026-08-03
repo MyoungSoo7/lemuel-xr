@@ -1,0 +1,198 @@
+# Scene 1 — 이름 없는 민족 (60초, 은폐 위에 조서가 내려앉는다) ⚠️ R4 Pre-Scene 0 동의 게이트
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — scratchpad/seed-ESTHER.md v5-b 기반 수기 크리스탈라이즈. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 전 프로덕션 반영 금지. §4-3 R2/R3 safety_gates 항목은 인간 사인오프 전(seed §7-3 8항).
+# ⚠️ 배제: 에스더서 1장 와스디 폐위·2장 후궁 징집 서사 전면 배제(seed §2-2 (A)(B)). 본 Scene 은
+#   에스더 2:10 · 3:8 · 3:9 · 3:13 만 다룬다. 집단 학살 조서 전문(3:13)은 R4 동의 시에만 노출.
+# ⚠️ 이 미션의 축 = 드러낼 것인가 / 언제 어떻게 드러낼 것인가. "타협 없이 지켰다"류(다니엘 축) 오염 금지(seed §0).
+# ⚠️ 하만을 만화적 악당으로 그리지 않는다 — 3:8 은 관료 언어 전문 인용, 생략 금지(seed §11).
+
+scene_id: esther_scene1
+scene_name: a_people_unnamed
+mission_id: esther
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: susa_palace_audience_hall
+  background_model: env_susa_audience_hall
+  lighting:
+    type: cold_formal_daylight
+    color_temperature_kelvin: 4500
+    bureaucratic_stillness_emphasis: true
+  ambient_sound:
+    - id: hall_reverb_room_tone
+      gain_db: -26
+      spatial: true
+    - id: scroll_paper_rustle
+      gain_db: -22
+      spatial: true
+    - id: distant_scribe_murmur
+      gain_db: -30
+      spatial: true
+  user_position: [0.0, 1.6, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: esther_self
+    voice_id: esther_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 에스더 — 1인칭. 내면 독백만, 3인칭 서술 금지."
+  - id: haman
+    voice_id: haman_v1
+    position: [1.5, 1.7, 5.0]
+    initial_animation: read_from_scroll
+    visual_traits: [distant_silhouette, back_or_side_facing]
+    note:
+      "3:8-9 발화자. 알현실 단상 위·사용자에게서 먼 거리(등을 보이거나 측면). 얼굴 클로즈업 금지.
+      만화적 악당 연기 금지(seed §11) — 서류를 읽는 관료 톤."
+
+narration_blocks:
+  - id: nb_s1_concealment
+    speaker: scripture_caption
+    text_ko: "에스더가 자기의 민족과 종족을 말하지 아니하니 이는 모르드개가 명령하여 말하지 말라 하였음이라 (에스더 2:10)"
+    audio_clip_id: aud_s1_concealment_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note:
+      "은폐는 이 미션 축의 출발점(seed §1-2) — 2:20 은 어순이 반대라 중복 인용하지 않는다.
+      두 절 모두 배제 대상은 아니나 2:20 은 사용하지 않는다."
+  - id: nb_s1_haman_accusation
+    speaker: haman
+    text_ko: "하만이 아하수에로 왕에게 아뢰되 한 민족이 왕의 나라 각 지방 백성 중에 흩어져 거하는데 그 법률이 만민의 것과 달라서 왕의 법률을 지키지 아니하오니 용납하는 것이 왕에게 무익하니이다 (에스더 3:8)"
+    audio_clip_id: aud_s1_haman_accusation_ko
+    start_at_seconds: 12.0
+    duration_seconds: 20.0
+    hidden_until_event: null
+    note:
+      "관료 언어 전문 — 생략부호로 자르지 않는다(seed §11). '법을 안 지킨다'는 혐의 진술이
+      이 장면의 날카로움 — 소수자 배제가 행정 합리성의 언어로 발화된다. 2:10 → 3:8 순서로
+      '내가 숨긴 그것이 지금 고발당하고 있다'를 성립시킨다(seed §1-2)."
+  - id: nb_s1_haman_bribe
+    speaker: haman
+    text_ko: "왕이 옳게 여기시거든 조서를 내려 그들을 진멸하소서 내가 은 일만 달란트를 왕의 일을 맡은 자의 손에 맡겨 왕의 금고에 드리리이다 하니 (에스더 3:9)"
+    audio_clip_id: aud_s1_haman_bribe_ko
+    start_at_seconds: 32.0
+    duration_seconds: 12.0
+    hidden_until_event: consent_accepted
+    note: "R4 동의 사용자에게만 노출. consent_skipped 사용자는 이 블록을 보지 않고 nb_s1_alt_summary 로 대체."
+  - id: nb_s1_edict_full
+    speaker: scripture_caption
+    text_ko: "이에 그 조서를 역졸에게 맡겨 왕의 각 지방에 보내니 열두째 달 곧 아달월 십삼일 하루 동안에 모든 유다인을 젊은이 늙은이 어린이 여인들을 막론하고 죽이고 도륙하고 진멸하고 또 그 재산을 탈취하라 하였고 (에스더 3:13)"
+    audio_clip_id: aud_s1_edict_full_ko
+    start_at_seconds: 44.0
+    duration_seconds: 14.0
+    hidden_until_event: consent_accepted
+    intensity_aware: true
+    note:
+      "R4 동의 사용자에게만 노출. 아동 포함 집단 학살 조서 전문 — dwell_limit_on_edict 적용(아래
+      safety_gates). 절 노출 직후 최대 3초 정적 후 Scene 2 자동 전환."
+  - id: nb_s1_alt_summary
+    speaker: narrator
+    text_ko: "한 민족 전체를 없애라는 조서가 온 지방에 내려졌다."
+    audio_clip_id: aud_s1_alt_summary_ko
+    start_at_seconds: 32.0
+    duration_seconds: 5.0
+    hidden_until_event: consent_skipped
+    note:
+      "R4 스킵 사용자용 대체 라우트 s1_alt_summary. 3:13 전문 낭독 없음 — 요약 자막 1장뿐.
+      뒤이어 정적 3초(route_duration_seconds: 40 내역 = 2:10 12초 + 3:8 20초 + 요약 5초 + 정적 3초)."
+
+interactions:
+  - id: ix_s1_witness_only
+    type: auto_proceed
+    presentation:
+      description: "사용자는 조작 없이 자막·낭독을 지켜본다 — 이 Scene 의 유일한 인터랙션은 청취다."
+    validation_rules:
+      - rule: auto_proceed
+        description: "결정 없음 — Scene 1 은 branches: [] (seed §3 표: 선택 0개 / 라우팅 0개)."
+
+branches: []
+
+safety_gates:
+  - id: R4_pre_scene0_consent_required # 엘리야 scene1.yml:88 과 동일 id 형식
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 동의 게이트 — 집단 학살 조서(에스더 3:13)·민족 말살 위협 사전 고지 + 위기 자원 {{crisis_resources.default}}"
+    consent_card_id: esther_scene1_edict_warning
+    consent_card_ko: |
+      다음 장면은 한 민족 전체를 없애라는 국가 조서를 다룹니다.
+      · 조서 본문(에스더 3:13)에는 어린이와 여인을 포함해 죽이라는 표현이 인용 자막으로 잠시 나옵니다.
+      · 약 1분. 곧이어 그 소식을 들은 사람들의 장면으로 이어집니다.
+      · 이 묵상은 정체를 드러낼 것인가를 다룹니다. 드러내는 것이 정답인 묵상이 아닙니다.
+        드러내지 않기로 하는 것도 이 묵상 안에서 온전한 선택입니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 조서 낭독 없이 요약으로]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+    skip_alternative_scene_id: 1 # ⚠️ 6번째 파일 금지(COMMON v3 §8-2) — 같은 파일 안의 라우트
+    skip_alternative_route_id: s1_alt_summary
+    skip_summary_subtitle: true
+    voice_intensity_options: [subtitle_only, low, default]
+    route_duration_seconds_skip: 40 # 2:10 12초 + 3:8 20초 + 요약 5초 + 정적 3초 (seed §3-3)
+  - id: dwell_limit_on_edict
+    enforced_at: nb_s1_edict_full
+    description:
+      "3:13 조서 낭독 직후 최대 3초 정적 → Scene 2 자동 전환. 화면 체류로 고착시키지 않는다
+      (엘리야 dwell_limit_on_despair, content/elijah/scene2.yml:125 컨벤션 승계)."
+    dwell_limit_seconds: 3
+    on_expire: auto_advance_next_scene
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    on_detect:
+      1_pause: true # Scene 진행 즉시 정지 (타이머·낭독·인터랙션 전부)
+      2_fade: fade_to_black_0_8s
+      3_card_ko: |
+        잠시 멈췄습니다.
+        지금 힘드시다면 혼자 두지 않으려 합니다.
+        {{crisis_resources.default}}
+        (이 묵상은 언제든 여기서 끝내도 됩니다.)
+        [계속하기]  [오늘은 여기까지]
+      4_resume: restart_current_scene # 진행 손실 없음
+      5_exit: end_session_gracefully
+    storage: hash_only # 평문 미저장. category=suicidal_ideation_semantic
+  # ⚠️ 판단 근거(초안 — 인간 검토 대상): 이 Scene 에는 lint_forbidden_tokens 블록을 두지 않는다.
+  # seed §4-3 이 "COMMON v5 는 lint_forbidden_tokens 의 배치를 safety_gates[].id 가 R2_*·R3_* 인
+  # 항목 아래로만 제한했다(㉗)"고 명시하고, 그 §4-3 표는 R2_*/R3_* 게이트가 실제로 존재하는
+  # Scene 을 3·5 로만 한정한다(항목 수 5, 토큰 블록 수 3). Scene 1 에는 R2_*/R3_* 게이트가 없으므로
+  # 토큰 블록을 두면 seed 의 명시적 배치 규칙을 벗어난다 — task 절대규칙 3의 "각 scene yml 에 둔다"는
+  # 문구와는 표면적으로 어긋나 보이지만, seed 자체가 "발명하지 말고 그대로 옮기라"고 지정한 §4-3 표를
+  # 우선한다. 최종 보고서에 이 판단을 명시한다.
+  - id: crisis_reminder # G3b — 5개 Scene 전부
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 지금 힘드시면 {{crisis_resources.default}}"
+  - id: no_haman_caricature
+    enforced_at: always
+    description:
+      "하만을 만화적 악당으로 그리지 않는다(seed §11). 3:8 은 관료 언어 전문 인용 — 생략 금지.
+      조소·광기 연기 금지. voice_id haman_v1 은 관료적 냉정, 음고 변화 최소."
+  - id: no_group_2_conscription_content
+    enforced_at: always
+    description:
+      "에스더 1장 와스디 폐위·2장 후궁 징집 서사 전면 배제(seed §2-2 (A)(B) — 신규 배제).
+      2:10 만 사용, 2:1-9·2:11-19·2:21-23 은 어떤 형태로도 렌더하지 않는다."
+
+next_scene_id: esther_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: ES1_candidate
+    source: "Jon D. Levenson, Esther: A Commentary (OTL, 1997) — 본문 fetch 미완, 서지 수준 기술만(docs/THEOLOGY-REFERENCES.md 참조 예정)"
+    note:
+      "하나님이 이름으로 등장하지 않는 책(DP1) — 내레이션은 하나님을 화자로 세우지 않는다.
+      자막은 §1 대조표(seed) 절만 사용."
+    anchor_block: nb_s1_concealment
+  - disputed_points:
+      - "DP1 — 에스더서에 '하나님'이 한 번도 등장하지 않는다: 섭리를 감춰진 방식으로 서술한 책인가,
+        세속 궁정 설화인가. 본문에 없는 신적 대사를 창작하지 않는 쪽으로 처리."
+      - "DP6 — 에스더 2장 후궁 징집 서사를 본문이 승인하는가: 판정과 무관하게 배제(트리거 강도만으로
+        충분). 배제 사실을 명시한다."
+    handling: "DP1 — 확정 서술하지 않는다. DP6 — 완전 배제, 2:10 만 인용."

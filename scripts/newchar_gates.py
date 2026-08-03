@@ -284,33 +284,59 @@ NONUSER_KEYS = frozenset(
     }
 )
 
+# 서브트리 단위 카브아웃 — **키 이름이 아니라 부위** 로 면제한다.
+#
+# `theology_footer_refs` 는 신학 검토자용 주석 블록이다(citation_id·source·note·
+# anchor_block·handling·disputed_points[].summary). 실측: 이 키들은 라이브 레포에서
+# 100% 이 블록 아래에만 있고, 정본인 ContentSafetyGateEnforcementTest.kt 의
+# 사용자 노출 정의(`*_ko` + static_text + reflection_prompt)에도 들지 않는다.
+#
+# 검토자 주석은 **금지 토큰을 인용해야 한다** — "'의심하면 책망받는다' 로 단순화하지
+# 않는다" 가 그 블록이 존재하는 이유다. 인용을 위반으로 세면 designer 가 초록으로 가는
+# 가장 싼 길이 *검토 주석을 지우는 것* 이 되고, 게이트가 안전 저하에 보상을 준다(★★).
+#
+# 단, 이 블록 아래라도 `*_ko` 는 **면제하지 않는다.** 실측으로 raw_text_ko·note_ko·ko
+# 가 여기 있고, 그건 렌더될 수 있는 한국어 본문이다. 부위로 좁히되 렌더 가능성은 남긴다.
+NONUSER_SUBTREES = frozenset({"theology_footer_refs"})
 
-def scalar_nodes(path: str) -> list[tuple[int, str, str]]:
-    """(1-based 줄번호, 직속 매핑 키, 스칼라 값) — **파서가 본 값만.**
+
+def _in_nonuser_subtree(key: str, anc: tuple[str, ...], subtrees: set) -> bool:
+    """조상 경로가 검토자 주석 서브트리에 들어 있고, 그 leaf 가 `*_ko` 가 아닌가."""
+    if key.endswith("_ko"):
+        return False
+    return any(a in subtrees for a in anc)
+
+
+def scalar_nodes(path: str) -> list[tuple[int, str, str, tuple[str, ...]]]:
+    """(1-based 줄번호, 직속 매핑 키, 스칼라 값, 조상 키 경로) — **파서가 본 값만.**
 
     YAML 주석은 애초에 결과에 없다. G3b/G3c/G3d 가 주석을 값으로 오인해 뚫린
-    ⑤⑱ 의 재발을 스캔 게이트에서도 구조적으로 불가능하게 만든다."""
+    ⑤⑱ 의 재발을 스캔 게이트에서도 구조적으로 불가능하게 만든다.
+
+    조상 경로를 같이 내보내는 이유: 키 이름만으로는 카브아웃을 **부위로** 좁힐 수 없다.
+    `summary` 라는 이름 하나를 전역 면제하면 나중에 렌더되는 곳에 같은 이름이 생겨도
+    조용히 면제된다. 경로가 있으면 "theology_footer_refs **아래의**" 로 붙일 수 있다."""
     try:
         with open(path, encoding="utf-8") as fh:
             root = yaml.compose(fh)
     except Exception:
         return []
-    out: list[tuple[int, str, str]] = []
+    out: list[tuple[int, str, str, tuple[str, ...]]] = []
 
-    def walk(n: Any, key: str) -> None:
+    def walk(n: Any, key: str, anc: tuple[str, ...]) -> None:
         if isinstance(n, yaml.MappingNode):
             for k, v in n.value:
                 kn = k.value if isinstance(k, yaml.ScalarNode) else key
-                walk(v, str(kn))
+                walk(v, str(kn), anc + (str(kn),))
         elif isinstance(n, yaml.SequenceNode):
             for v in n.value:
-                walk(v, key)
+                walk(v, key, anc)
         elif isinstance(n, yaml.ScalarNode):
             if n.value is not None:
-                out.append((n.start_mark.line + 1, key, str(n.value)))
+                out.append((n.start_mark.line + 1, key, str(n.value), anc))
 
     if root is not None:
-        walk(root, "")
+        walk(root, "", ())
     return out
 
 
@@ -834,7 +860,7 @@ def g3(c: Ctx) -> Result:
     hits = []
     for path in c.require_scenes():
         # YAML 은 **값 노드만** — 주석에 적힌 번호는 렌더되지 않는다(⑤ 원칙의 일관 적용)
-        for line, key, val in scalar_nodes(path):
+        for line, key, val, _anc in scalar_nodes(path):
             if CRISIS_TOKEN in val:
                 continue
             if any(not _is_citation(val, m.start(), m.end()) for m in pat.finditer(val)):
@@ -1076,11 +1102,14 @@ def _scan_scene_values(c: Ctx, needles: list[str]) -> list[str]:
     런타임은 정규화 후 indexOf 라 그걸 잡는다 — 게이트만 못 잡으면 vacuous green 이다.
     """
     nonuser = set(c.cfg.get("nonuser_keys") or NONUSER_KEYS)
+    subtrees = set(c.cfg.get("nonuser_subtrees") or NONUSER_SUBTREES)
     nneedles = [(n, norm_ws(n)) for n in needles]
     hits = []
     for f in c.require_scenes():
-        for line, key, val in scalar_nodes(f):
+        for line, key, val, anc in scalar_nodes(f):
             if key in nonuser:
+                continue
+            if _in_nonuser_subtree(key, anc, subtrees):
                 continue
             nval = norm_ws(val)
             for orig, nn in nneedles:

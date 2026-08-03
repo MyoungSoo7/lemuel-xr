@@ -1,0 +1,386 @@
+# Scene 5 — 안 뜰 → 금 규 → 세 번의 물음 → 청원 (90초, 라우팅 1개 — 사용자 선택 0개) ★ 최종 Scene
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene5-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — scratchpad/seed-ESTHER.md v5-b 기반 수기 크리스탈라이즈. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 전 프로덕션 반영 금지. §4-3 R2/R3 safety_gates 항목은 인간 사인오프 전(seed §7-3 8항 — 확정 아님).
+# ⚠️ 이 Scene 은 branches: [] 가 아니다 — scene_enter 로 자동 라우팅되는 마무리 문구 분기가 있다
+#   (COMMON v3 §8-1, seed §5-1). 사용자에게 노출되는 선택지는 여전히 0개다.
+# ⚠️ 왕의 세 번의 물음(5:3/5:6/7:2)은 같은 관용구를 기계적으로 반복 렌더한다 — 단계적 개시가
+#   본문 증거임을 보여준다(seed §3-2). 두 번의 미룸은 실패가 아니다 — "드디어"·"마침내"·
+#   "용기를 내어" 류를 어디에도 쓰지 않는다.
+# ⚠️ next_scene_id: null — 미션 종료. {{crisis_resources.default}} 배치 지점 #2(마지막 Scene,
+#   G3c 가 이 파일만 별도로 본다, seed §4-0 표).
+
+scene_id: esther_scene5
+scene_name: inner_court_the_golden_scepter_and_the_petition
+mission_id: esther
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: susa_palace_inner_court_and_throne_hall
+  background_model: env_susa_inner_court_throne
+  lighting:
+    type: royal_formal_daylight_shift_to_banquet_warm
+    color_temperature_kelvin: 4000
+  ambient_sound:
+    - id: court_hush
+      gain_db: -28
+      spatial: true
+    - id: banquet_distant_murmur
+      gain_db: -26
+      spatial: true
+  user_position: [0.0, 1.6, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: enabled_forward_only
+  note: "camera_locomotion 은 안 뜰 진입 인터랙션(ix_s5_enter_inner_court)에 한해 전진/후퇴만 허용."
+
+npcs:
+  - id: esther_self
+    voice_id: esther_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 에스더 — 1인칭. 내면 독백만, 3인칭 서술 금지."
+  - id: ahasuerus
+    voice_id: ahasuerus_v1
+    position: [0.0, 1.8, 8.0]
+    initial_animation: seated_throne_scepter_extended
+    note:
+      "5:3 / 5:6 / 7:2 세 번의 물음. 변덕과 무관심 톤 — 세 번 모두 같은 관용구를 기계적으로
+      반복한다는 점이 연출의 핵심(seed §3-2). 로맨스 연출 즉시 반려(seed §11)."
+  - id: haman
+    voice_id: silent
+    position: null
+    note: "7:6 지목 시점에 haman 은 미등장 — 자막만(seed §3-2 표 78-86초 구간)."
+
+narration_blocks:
+  - id: nb_s5_enter_court
+    speaker: scripture_caption
+    text_ko: "제삼일에 에스더가 왕후의 예복을 입고 왕궁 안 뜰 곧 어전 맞은편에 서니 왕이 어전에서 전 문을 대하여 왕좌에 앉았다가 (에스더 5:1)"
+    audio_clip_id: aud_s5_enter_court_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s5_scepter_extended
+    speaker: scripture_caption
+    text_ko: "왕후 에스더가 뜰에 선 것을 본즉 매우 사랑스러우므로 손에 잡았던 금 규를 그에게 내미니 에스더가 가까이 가서 금 규 끝을 만진지라 (에스더 5:2)"
+    audio_clip_id: aud_s5_scepter_extended_ko
+    start_at_seconds: 10.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    dwell_limit_exempt: true # 이 정적은 사용자가 통제하는 시간 — dwell_limit 대상 아님(seed §4-0/§6 항목1)
+  - id: nb_s5_first_question_5_3
+    speaker: ahasuerus
+    text_ko: "왕이 이르되 왕후 에스더여 그대의 소원이 무엇이며 요구가 무엇이냐 나라의 절반이라도 그대에게 주겠노라 하니 (에스더 5:3)"
+    audio_clip_id: aud_s5_first_question_5_3_ko
+    start_at_seconds: 20.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "왕의 첫 번째 물음."
+  - id: nb_s5_first_delay_5_4
+    speaker: scripture_caption
+    text_ko: "에스더가 이르되 오늘 내가 왕을 위하여 잔치를 베풀었사오니 왕이 좋게 여기시거든 하만과 함께 오소서 하니 (에스더 5:4)"
+    audio_clip_id: aud_s5_first_delay_5_4_ko
+    start_at_seconds: 30.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note:
+      "에스더의 첫 번째 미룸 — 소원 대신 잔치 초대. 실패가 아니다. 부정적 음향·조명 변화
+      넣지 않는다(seed §3-2)."
+  - id: nb_s5_second_question_5_6
+    speaker: ahasuerus
+    text_ko: "잔치의 술을 마실 때에 왕이 에스더에게 이르되 그대의 소청이 무엇이뇨 곧 허락하겠노라 그대의 요구가 무엇이뇨 나라의 절반이라 할지라도 시행하겠노라 하니 (에스더 5:6)"
+    audio_clip_id: aud_s5_second_question_5_6_ko
+    start_at_seconds: 38.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    render_position_ref: nb_s5_first_question_5_3 # 같은 위치·같은 서체로 반복 렌더 — "같은 질문이 또 왔다"(seed §3-2)
+    note: "왕의 두 번째 물음 — 5:3 과 거의 같은 문장."
+  - id: nb_s5_second_delay_5_8
+    speaker: scripture_caption
+    text_ko: "내가 만일 왕의 목전에서 은혜를 입었고 왕이 내 소청을 허락하시며 내 요구를 시행하시기를 좋게 여기시면 내가 왕과 하만을 위하여 베푸는 잔치에 또 오소서 내일은 왕의 말씀대로 하리이다 하니라 (에스더 5:8)"
+    audio_clip_id: aud_s5_second_delay_5_8_ko
+    start_at_seconds: 46.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "에스더의 두 번째 미룸. 직후 화면 2초 암전(하룻밤 경과, seed §3-2)."
+  - id: nb_s5_night_passes
+    speaker: narrator
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 54.0
+    duration_seconds: 2.0
+    hidden_until_event: null
+    blackout: true
+    note: "하룻밤 경과를 나타내는 2초 암전. dwell_limit 대상 아님(고정 연출 시간)."
+  - id: nb_s5_third_question_7_2
+    speaker: ahasuerus
+    text_ko: "왕이 이 둘째 날 잔치에 술을 마실 때에 다시 에스더에게 물어 이르되 왕후 에스더여 그대의 소청이 무엇이냐 곧 허락하겠노라 그대의 요구가 무엇이냐 곧 나라의 절반이라 할지라도 시행하겠노라 (에스더 7:2)"
+    audio_clip_id: aud_s5_third_question_7_2_ko
+    start_at_seconds: 56.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+    note: "왕의 세 번째 물음."
+  - id: nb_s5_disclosure_7_3_4
+    speaker: scripture_caption
+    text_ko: "왕후 에스더가 대답하여 이르되 왕이여 내가 만일 왕의 목전에서 은혜를 입었으며 왕이 좋게 여기시면 내 소청대로 내 생명을 내게 주시고 내 요구대로 내 민족을 내게 주소서 나와 내 민족이 팔려서 죽임과 도륙함과 진멸함을 당하게 되었나이다 만일 우리가 노비로 팔렸더라면 내가 잠잠하였으리이다 그래도 대적이 왕의 손해를 보충하지 못하였으리이다 하니 (에스더 7:3-4)"
+    audio_clip_id: aud_s5_disclosure_7_3_4_ko
+    start_at_seconds: 62.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    note:
+      "개시. 여기서 처음으로 '내 민족'이 발화된다(seed §3-2). '드디어'·'마침내'·'용기를 내어'
+      류를 쓰지 않는다."
+  - id: nb_s5_haman_named_7_6
+    speaker: scripture_caption
+    text_ko: "에스더가 이르되 대적과 원수는 이 악한 하만이니이다 하니 하만이 왕과 왕후 앞에서 두려워하거늘 (에스더 7:6)"
+    audio_clip_id: aud_s5_haman_named_7_6_ko
+    start_at_seconds: 78.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note:
+      "지목. haman 미등장 — 자막만(seed §3-2). 이후 처형·굴욕 연출(에 7:7-10, 에 6장)로
+      이어가지 않는다 — 전면 배제 대상(seed §2-2 (C)(D))."
+  - id: nb_s5_closing_scripture_8_6
+    speaker: scripture_caption
+    text_ko: "내가 어찌 내 민족이 화 당함을 차마 보며 내 친척의 멸망함을 차마 보리이까 하니 (에스더 8:6)"
+    audio_clip_id: aud_s5_closing_scripture_8_6_ko
+    start_at_seconds: 86.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+    note:
+      "마무리 인용 → carry_to_scene5 문구로 전환(seed §3-2). 반격 조서(8:7-17)·부림절 보복(9장)
+      으로 이어가지 않는다 — 전면 배제 대상(seed §2-2 (E)(F))."
+
+interactions:
+  - id: ix_s5_enter_inner_court
+    type: forward_step_reversible
+    presentation:
+      description:
+        "안 뜰로 들어서는 비버튼·전진 이동(seed §6 항목 1, 5:1). 문지방을 넘는 한 걸음.
+        되돌아 나올 수 있게 만든다 — 몇 번 물러나도 실패 처리하지 않는다(R3)."
+    validation_rules:
+      - rule: reversible_no_failure
+        description: "몇 번을 물러나도 실패로 기록하지 않는다."
+      - rule: static_wait_for_scepter
+        description:
+          "넘어선 뒤 금 규가 내밀어지기까지의 정지(5:2)를 짧게 둔다 — 이 정적이
+          인터랙션의 알맹이다. dwell_limit 대상 아님. 사용자가 통제하는 시간이다."
+
+branches:
+  - id: br_s5_closing_message
+    triggered_by_event: [scene_enter] # 사용자 선택 아님 — 진입 시 자동
+    decision_key: disclose_label
+    backend_endpoint: "POST /api/game/esther/complete"
+    default_path: static_curation # R5 — 정적이 기본
+    llm_optin_only: true
+    body_template:
+      disclose_label: "{{from_scene3}}"
+      faith_tone: "{{users.faith_tone}}"
+    routes:
+      - when: { disclose_label: nondisclosure } # faith_tone 3단 × static_text_ko 3종
+        static_text_ko:
+          strong: "에스더는 삼십 일을 부름 없이 지냈습니다. 그 삼십 일에도 하나님은 그 궁 안에 계셨습니다. 말하지 않기로 한 당신 곁에도 계십니다. 곁에 계시는 일에는 기한이 없습니다."
+          balanced: "에스더는 삼십 일 동안 부름을 받지 못했습니다. 말하지 않는 시간은 실패의 다른 이름이 아닙니다. 말하지 않기로 한 것은 당신이 당신을 지킨 방식이고, 그 방식에 유효기간을 두지 않아도 됩니다."
+          soft: "말하지 않기로 하셨군요. 그 선택은 그대로 괜찮습니다. 오늘 이후로도 말하지 않기로 하신다면, 그것도 그대로 괜찮습니다."
+      - when: { disclose_label: gather_first }
+        static_text_ko:
+          strong: "에스더는 혼자 나아가지 않았습니다. 수산의 사람들이 함께 사흘을 지켰습니다. 하나님은 한 사람에게만 계시지 않고 그 사흘을 함께 지킨 모두에게 계셨습니다."
+          balanced: "에스더가 가장 먼저 한 일은 말하는 것이 아니라 사람을 모으는 것이었습니다. 혼자 감당하지 않기로 한 것도 본문이 하는 일입니다."
+          soft: "먼저 곁에 있을 사람을 떠올리셨군요. 혼자 하지 않기로 하는 것도 하나의 온전한 방식입니다."
+      - when: { disclose_label: speak_now }
+        static_text_ko:
+          strong: "에스더가 안 뜰에 섰을 때, 금 규가 내밀어질지는 아무도 알지 못했습니다. 그 알 수 없음 한가운데에 하나님이 계셨습니다. 오늘 말하기로 한 당신의 자리에도 계십니다."
+          balanced: "에스더는 왕이 세 번 물은 뒤에야 말했습니다. 말하기로 한 오늘의 당신도, 속도를 스스로 정할 수 있습니다."
+          soft: "오늘 말하기로 하셨군요. 그 말이 어디까지 닿을지는 지금 알 수 없습니다. 그래도 당신이 정한 일입니다."
+      - when: { disclose_label: null } # ← R4 스킵·중도 이탈로 라벨 없이 도착한 사용자. 필수 폴백(G1b)
+        static_text_ko:
+          all: "에스더서는 '누가 알겠느냐'는 물음으로 남습니다. 답을 고르지 않고 여기까지 온 것도 이 묵상의 온전한 끝입니다. 오늘 여기까지 오신 것으로 충분합니다."
+        note:
+          "3단으로 쪼개지 않는다 — 라벨 없는 사용자에게 faith_tone 만으로 임재 강도를 조절할
+          근거가 없다(seed §5-2 null 폴백 항)."
+    note:
+      "faith_tone(strong/balanced/soft) × 4 라벨(3종 + null 폴백) 사전 캐싱 후보 — null 은
+      1문안 고정이라 실질 9+1 패턴. 라우트 순서도 nondisclosure 를 맨 앞에 둔다(seed §5-0 3항)."
+
+safety_gates:
+  - id: R3_no_courage_pressure_in_endings
+    enforced_at: br_s5_closing_message
+    description:
+      "개시를 정답으로 만들어 은폐 중인 사용자를 비겁으로 남기지 않는다(seed §4-2).
+      9(+1) 마무리 문구 전량은 정적 경로 — 명령형·권유형 동사, 시간 유예('언젠가는'·'아직'),
+      개시 정답화가 없다(seed §5-2). '아직'·'당분간' 은 일반어라 토큰 등록하지 않는다 — 이는
+      §7-3 사람 검토 항목이며 아직 확정되지 않았다."
+    # 목록은 scene3.yml 의 두 게이트와 문자 그대로 동일하다(seed §7-0-1 정본 사본, 39종 → 70종).
+    # 감사 이력·어미 처리 근거는 scene3.yml 의 R2_calling_not_asserted_from_4_14 위 주석 ①~⑤ 참조.
+    # 이 Scene 이 특히 민감한 이유: 9(+1) 마무리 문구가 사용자가 마지막으로 읽는 문장이라
+    # 오차단이 곧 "위로 대신 fallback-text" 로 나타난다. 실제로 감사 전 목록은 이 파일의 soft
+    # 문구가 하려는 말("용기를 내지 않아도 됩니다" 류)을 자기 게이트로 막고 있었다.
+    lint_forbidden_tokens:
+      - "용기를 내세"
+      - "용기를 내십"
+      - "용기를 내셔야"
+      - "용기를 내야 합"
+      - "용기를 내야죠"
+      - "용기를 낼"
+      - "용기를 냈"
+      - "용기 내어"
+      - "침묵하면 안"
+      - "숨는 건 비겁"
+      - "너 아니면"
+      - "아니면 아무도"
+      - "만이 할 수 있"
+      - "이 때를 위해"
+      - "예비된 자리"
+      - "이 자리에 있는 이유"
+      - "왕후로 세운 이유"
+      - "있는 데는 이유가"
+      - "된 데는 이유가"
+      - "미모로"
+      - "에도 뜻이 있"
+      - "자리에 뜻이"
+      - "우연이 아"
+      - "우연히 그"
+      - "우연히 두"
+      - "이 고난은 뜻이"
+      - "이 고난은 의미가"
+      - "이 고난은 이유가"
+      - "거저 주어진 자리가 아"
+      - "거저 주어진 게 아"
+      - "거저 주어진 것이 아"
+      - "그냥 주어진 게 아"
+      - "괜히 주어진 게 아"
+      - "그냥 주어진 것이 아"
+      - "괜히 주어진 것이 아"
+      - "말해야 합니다"
+      - "말해야죠"
+      - "말해야 하지"
+      - "말해야 해"
+      - "말해야 할 때"
+      - "말해야 할 사람"
+      - "입을 여세"
+      - "입을 여십"
+      - "입을 여셔야"
+      - "입을 열어야 합"
+      - "입을 열어야죠"
+      - "입을 열 때입"
+      - "입을 열 때가"
+      - "언젠가는 말하게"
+      - "언젠가는 말해야"
+      - "언젠간 말하게"
+      - "언젠간 말해야"
+      - "언젠가는 드러나"
+      - "결국은 말하게"
+      - "결국은 말해야"
+      - "결국엔 말하게"
+      - "결국엔 말해야"
+      - "결국은 드러나"
+      - "두려움을 넘어야 합"
+      - "두려움을 넘어야죠"
+      - "두려움을 넘으세"
+      - "두려움을 넘으십"
+      - "두려움을 넘어서면"
+      - "타협 없이 지켜야 합"
+      - "타협 없이 지켜야죠"
+      - "타협 없이 지키세"
+      - "타협 없이 지킨"
+      - "후회가 될"
+      - "후회하게 되"
+      - "후회하게 됩"
+  - id: no_user_state_assertion
+    enforced_at: br_s5_closing_message
+    description:
+      "⚠️ v3 삭제 사유 승계(seed §5-2-a) — 사용자의 상태(안전하다·괜찮다·이젠 두렵지
+      않다)를 단정하지 않는다. '당신은 지금 안전한 자리에 있고' 류 문장을 두지 않는다. 대신
+      사용자의 선택을 인정한다 — 괜찮은 것은 자리가 아니라 선택이다. 이 규칙은 COMMON 게이트가
+      기계적으로 잡지 못하는 정적 경로 규칙이라 lemuel-mental-health-safety 명시 검토 대상이다
+      (seed §7-3 목록 6번)."
+  - id: no_execution_or_revenge_scenes
+    enforced_at: always
+    description:
+      "하만 처형 연출(에 7:7-10)·에 6장 굴욕 반전·반격 조서(에 8:7-17)·부림절 보복
+      살육(에 9장) 전면 배제(seed §2-2 (C)(D)(E)(F)). Scene 은 8:6 인용으로 끝난다."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    on_detect:
+      1_pause: true
+      2_fade: fade_to_black_0_8s
+      3_card_ko: |
+        잠시 멈췄습니다.
+        지금 힘드시다면 혼자 두지 않으려 합니다.
+        {{crisis_resources.default}}
+        (이 묵상은 언제든 여기서 끝내도 됩니다.)
+        [계속하기]  [오늘은 여기까지]
+      4_resume: restart_current_scene
+      5_exit: end_session_gracefully
+    storage: hash_only
+  - id: crisis_reminder # G3b — 5개 Scene 전부. §4-0 표 #2: 마지막 Scene — G3c 가 이 파일만 별도 확인
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 | 지금 힘드시면 {{crisis_resources.default}}"
+  - id: no_romance_framing
+    enforced_at: always
+    description: "ahasuerus 와의 상호작용을 로맨스로 연출하지 않는다 — 즉시 반려 대상(seed §11)."
+
+next_scene_id: null # 미션 종료 — Scene 5 는 최종 Scene(seed §3 표)
+transition:
+  type: fade_to_gentle_light
+  fade_out_seconds: 1.5
+  fade_in_seconds: 1.0
+
+bridge:
+  offer_track_a: true
+  prompt_ko: "이 시간을 기록하시겠어요?"
+  yes_route: "GET /api/track-a/psalm-bridge?psalm=27" # 시편 27편 — 확정 서지 미확보, 인간 검토 대상(§7-3)
+  no_route: main_menu
+
+recovery_metric_dimensions:
+  spiritual: ["감춰진 임재", "물음으로 남는 소명", "함께 지킨 사흘"]
+  emotional: ["선택의 존중", "미룸의 정당함", "혼자가 아닌 결정"]
+  rational:
+    ["단계적 개시의 구조", "위험 판단의 자기 결정권", "정답 없는 결말의 수용"]
+
+theology_footer_refs:
+  - citation_id: ES1_candidate
+    source: "Jon D. Levenson, Esther: A Commentary (OTL, 1997) — 본문 fetch 미완, 서지 수준 기술만(docs/THEOLOGY-REFERENCES.md 참조 예정)"
+    note: "왕의 세 번의 물음과 에스더의 두 번의 미룸 — 단계적 개시가 본문의 구조 자체다."
+    anchor_block: nb_s5_first_question_5_3
+  - scripture_refs:
+      - ref: "에스더 5:1"
+        translation: krv
+        anchor_block: nb_s5_enter_court
+      - ref: "에스더 5:2"
+        translation: krv
+        anchor_block: nb_s5_scepter_extended
+      - ref: "에스더 5:3"
+        translation: krv
+        anchor_block: nb_s5_first_question_5_3
+      - ref: "에스더 5:4"
+        translation: krv
+        anchor_block: nb_s5_first_delay_5_4
+      - ref: "에스더 5:6"
+        translation: krv
+        anchor_block: nb_s5_second_question_5_6
+      - ref: "에스더 5:8"
+        translation: krv
+        anchor_block: nb_s5_second_delay_5_8
+      - ref: "에스더 7:2"
+        translation: krv
+        anchor_block: nb_s5_third_question_7_2
+      - ref: "에스더 7:3-4"
+        translation: krv
+        anchor_block: nb_s5_disclosure_7_3_4
+      - ref: "에스더 7:6"
+        translation: krv
+        anchor_block: nb_s5_haman_named_7_6
+      - ref: "에스더 8:6"
+        translation: krv
+        anchor_block: nb_s5_closing_scripture_8_6
+  - disputed_points:
+      - "DP1-ext — (seed §9 DP1 의 Scene 5 적용) 왕의 '변덕'을 우연의 연속으로 읽을 것인가,
+        감춰진 섭리의 도구로 읽을 것인가: 확정하지 않는다 — 반복되는 관용구 연출로만 제시,
+        해석은 사용자에게 남긴다. ⚠️ 이 항목에 이전에 'DP5' 라벨을 잘못 붙였었다 — seed §9 의
+        DP5 는 MT/LXX 정경성 쟁점으로 다른 항목이다. 이 라벨 정정은 설계자 자체 발견이며
+        seed 에 이 파생 항목 자체가 없다는 점도 함께 인간 검토가 필요하다."
+    handling: "확정 서술 금지."

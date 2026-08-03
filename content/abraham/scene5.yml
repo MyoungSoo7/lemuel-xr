@@ -1,0 +1,382 @@
+# Scene 5 — 이삭 (75초, 오랜 기다림 끝의 출산 · 웃음이 돌아오다)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene5-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-ABRAHAM.md(v5-b) 기반의 ≤70% 초안. 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ 이 Scene 진입 직전 R4 동의 게이트가 있다(seed §3-1 정본 YAML — 발명하지 않고 그대로 옮김).
+#   skip 목적지는 "같은" Scene 5 다 — scene5_alt.yml 같은 별도 파일을 만들지 않는다.
+# ⚠️ Scene 4 의 18:12-15 블록 뒤에는 마무리 문구·적용 문장을 두지 않는 "순서 잠금"이 있다 —
+#   이 Scene 의 서두는 출생 서사(21:1-2, 21:5)로 시작해 21:6(웃음이 되돌아오는 절)으로 이어지며,
+#   그 사이에 편집자적 해설·적용 문장을 끼워 넣지 않는다. 성경 본문만 이어진다.
+# ⚠️ 21:5의 '백 세라'를 격려·비교 수치로 쓰지 않는다("25년이 짧다"는 뜻으로 읽히면 안 됨).
+# ⚠️ br_s5_closing_message 라우팅은 seed §5-1 정본 YAML 그대로 — 발명하지 않았다. wait_label ×
+#   faith_tone 9종 + null 폴백 1종의 마무리 문구 전문은 docs/MVP-ABRAHAM.md 부록에 있다(seed §5-2
+#   정본). 이 파일의 routes 는 balanced 톤 기본값 자리다(seed 원문 그대로의 관례).
+# ⚠️ 이삭을 제물로 드리라는 시험 사건·여종 서사·아내를 누이라 속인 사건 — 전면 배제 원칙은
+#   Scene 1 에서 선언, 이 인물 전 Scene 공통 적용. 이 Scene 은 출생·젖먹임(21:1-2, 21:5-7)만
+#   다루며 그 이후 장으로 넘어가지 않는다.
+# ⚠️ lint_forbidden_tokens 는 safety_gates[].id: R2_R3_lint_forbidden 하위에 중첩한다(seed §7-1(a) 정본).
+
+scene_id: abraham_scene5
+scene_name: isaac
+mission_id: abraham
+version: 1.0.0
+duration_seconds_target: 75
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: mamre_tent_interior_daylight
+  background_model: env_mamre_tent_interior_calm
+  lighting:
+    type: soft_daylight_through_tent_weave
+    color_temperature_kelvin: 3600
+    dust_road_haze_emphasis: false
+  ambient_sound:
+    - id: quiet_tent_interior_ambience
+      gain_db: -24
+      spatial: true
+    - id: infant_soft_sound_distant
+      gain_db: -30
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: abraham_self
+    voice_id: abraham_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 아브라함 — first-person, 음성은 내면 독백만"
+  - id: sarah_speaking
+    voice_id: sarah_v1
+    position: [0.9, 1.6, 0.5]
+    initial_animation: hold_infant
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "사라 — 21:6, 21:7 의 직접 화법을 이 목소리로 낭독. 실사 얼굴 형상 배제."
+  - id: isaac_infant_abstract
+    voice_id: none
+    position: [0.9, 1.2, 0.5]
+    visual_traits: [abstract_low_detail_bundle]
+    note: "이삭(영아) — 구체적 신생아 신체 묘사 없이 포대기 실루엣으로만 암시."
+
+narration_blocks:
+  - id: nb_s5_birth_21_2
+    speaker: narrator_v1
+    text_ko: "여호와께서 말씀하신 대로 사라를 돌보셨고 여호와께서 말씀하신 대로 사라에게 행하셨으므로 (창세기 21:1) 사라가 임신하고 하나님이 말씀하신 시기가 되어 노년의 아브라함에게 아들을 낳으니 (21:2) 아브라함이 그의 아들 이삭이 그에게 태어날 때에 백 세라 (21:5)"
+    citation_id: A_gen21_1_2_5
+    audio_clip_id: aud_s5_birth_21_2_ko
+    start_at_seconds: 5.0
+    duration_seconds: 18.0
+    hidden_until_event: null
+    note: "'백 세라'(21:5)는 정보로만 제시 — 격려·비교 수치로 쓰지 않는다. R4 skip 시 미렌더(affected_blocks)."
+  - id: nb_s5_laughter_21_6
+    speaker: sarah_v1
+    text_ko: "사라가 이르되 하나님이 나를 웃게 하시니 듣는 자가 다 나와 함께 웃으리로다 (창세기 21:6)"
+    citation_id: A_gen21_6
+    audio_clip_id: aud_s5_laughter_21_6_ko
+    start_at_seconds: 25.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    note: "R4 skip 시에도 이 블록만은 자막 한 장으로 노출된다(skip_state_note 참조) — 웃음이 되돌아오는 절이므로 생략하지 않는다."
+  - id: nb_s5_nursing_21_7
+    speaker: sarah_v1
+    text_ko: "또 이르되 사라가 자식들을 젖먹이겠다고 누가 아브라함에게 말하였으리요마는 아브라함의 노경에 내가 아들을 낳았도다 하니라 (창세기 21:7)"
+    citation_id: A_gen21_7
+    audio_clip_id: aud_s5_nursing_21_7_ko
+    start_at_seconds: 36.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "R4 skip 시 미렌더(affected_blocks). 젖먹임 묘사 어휘를 최소화한다."
+  - id: nb_s5_closing_message
+    speaker: system
+    text_ko: "" # br_s5_closing_message 의 매칭 route.static_text_ko 로 런타임 주입
+    citation_id: null
+    audio_clip_id: null
+    start_at_seconds: 52.0
+    duration_seconds: 15.0
+    hidden_until_event: birth_narration_witnessed
+    default_path: static_curation
+    llm_optin_only: true
+    default_text_ko: "아브라함은 오래 기다렸다. 이 이야기는 그 기다림을 지우지 않고 그대로 두었다."
+    note: "wait_label 이 null(미선택·스킵·R1 인터럽트)로 도달한 가장 취약한 경로도 문구 없이 끝나지 않는다(§5-1)."
+
+interactions:
+  - id: ix_s5_witness_only
+    type: auto_proceed
+    target_assets: []
+    presentation:
+      user_interaction: none
+      description: "이 Scene 은 목격 전용 — 사용자 조작 없음."
+    validation_rules:
+      - rule: auto_proceed
+        on_scene_narration_complete: birth_narration_witnessed
+
+branches:
+  - id: br_s5_closing_message
+    triggered_by_event: [scene_enter]
+    decision_key: closing_key
+    backend_endpoint: "POST /api/game/abraham/complete"
+    default_path: static_curation
+    llm_optin_only: true
+    body_template:
+      wait_label: "{{from_scene3_or_null}}"
+      faith_tone: "{{users.faith_tone}}"
+      consent_skipped: "{{true|false}}"
+    routes:
+      - when: { wait_label: voice_the_lack }
+        static_text_ko: "아브람은 자기에게 없는 것을 그대로 말했다. 본문은 그 말을 지우지 않고 남겨 두었다."
+        llm_prompt_key: "abraham_s5_closing_voice_the_lack_balanced"
+      - when: { wait_label: hold_the_promise }
+        static_text_ko: "아브람은 믿었고, 그 뒤로도 오래 기다렸다. 믿음은 기다림을 끝내 주지 않았다."
+        llm_prompt_key: "abraham_s5_closing_hold_the_promise_balanced"
+      - when: { wait_label: sit_with_unknowing }
+        static_text_ko: "사백 년의 이유는 다른 곳에 있었다. 아브라함은 그 이유를 끝내 다 알지 못한 채로 살았다."
+        llm_prompt_key: "abraham_s5_closing_sit_with_unknowing_balanced"
+      - when: { wait_label: null } # ← 폴백. Scene 3 스킵·타임아웃·R1 인터럽트
+        static_text_ko: "아브라함은 오래 기다렸다. 이 이야기는 그 기다림을 지우지 않고 그대로 두었다."
+        note: "라벨 없이 도달한 사용자 — 가장 취약한 경로. 문구 없이 끝나지 않는다."
+    note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9종 사전 큐레이션. 위 3행은 balanced 기본값 자리 — 9종 전문+폴백은 docs/MVP-ABRAHAM.md 부록(seed §5-2 정본)에 있다."
+
+safety_gates:
+  - id: R4_pre_scene5_birth_consent
+    enforced_at: before_scene_enter
+    description: "Scene 5 진입 직전 R4 동의 카드 — 노년 출산 서사 사전 고지"
+    consent_card_id: abraham_scene5_birth_warning
+    consent_card_intensity: low_mid
+    consent_card_ko: |
+      다음 장면에는 오랜 기다림 끝의 출산 이야기가 나옵니다.
+      · 약 1분입니다. 지금 보지 않으셔도 이야기는 온전히 끝맺어집니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 웃음 자막 한 장과 마무리로 이동]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+    skip_alternative_scene_id: 5
+    voice_intensity_options: [subtitle_only, low, default]
+    skip_state_note: "skip 시 nb_s5_birth_21_2 · nb_s5_nursing_21_7 미렌더, nb_s5_laughter_21_6(21:6 인용 자막) 한 장만 노출 후 라우팅 분기로 직행. wait_label 과 마무리 문구는 동일하게 도달한다."
+    on_trigger:
+      affected_blocks: [nb_s5_birth_21_2, nb_s5_nursing_21_7]
+      soften: "임신·출산·젖먹임 묘사 어휘를 최소화하고 낭독 강도를 '약' 프리셋으로 사전 설정."
+      skip: "상태가 특히 무거우면 두 블록 전체 스킵, 21:6 자막과 고요만 노출."
+      note: "임상 판정 아님 — 취약 상태 이력 사용자에 대한 톤 자동 완화. 판정 로직은 백엔드 소관, 본 선언은 콘텐츠 게이트 계약."
+  - id: F66_closing_state_gate
+    enforced_at: nb_s5_closing_message
+    description: "취약 상태 사용자에 대한 마무리 문구 완화 게이트 — elijah/solomon F66 관례를 구조적 일관성을 위해 이식(seed 미명시, 본 파일에서 baseline 패턴을 따라 추가함을 보고서에 명시)."
+    trigger_conditions:
+      [recent_R1_interrupt_in_mission, consent_skipped_low_mid_or_higher]
+    on_trigger:
+      intensity_default_preset: subtitle_only
+      skip_button_visual_emphasis: true
+      crisis_card_position: above_closing_text
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "지연 정당화(R2)·기다림 성과 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패. seed §2-D FORBIDDEN 정본 52종을 표층형 감사로 재작성한 117종(YAML block 리스트, 아래 주석에 변경 사유)."
+    # 🔻 토큰 감사(어간형 분리 · 과대 토큰 축소) — 표층형 기준 재작성, 축은 그대로다.
+    #    한국어 부정은 언제나 어간 *뒤* 에 '-지 않/못'·'-가 아니'로 붙는다. 따라서 어간·술어
+    #    앞에서 끊은 토큰은 그 축의 *정당한 부정형 위로* 를 반드시 삼킨다
+    #    (ForbiddenTokenConfigTest KDoc + 커밋 92d5fe2 의 '쓰임받/도구로 쓰' 선례).
+    #    아래 16종을 그 규칙대로 갈라내거나, 문맥 없이 흔한 파편은 축을 지키는 더 긴 표층형으로
+    #    바꿨다. 2인칭(너/당신)·높임(-셔/-시) 커버리지는 항목마다 유지한다 — 줄이는 게 아니라
+    #    오작동을 없애는 게 목적이다.
+    #    · '기다림에는 뜻이' → '…뜻이 있' 2종 ("기다림에는 뜻이 없어도 괜찮습니다" 통과)
+    #    · '아직 준비가 안'  → 원인 어미 4종 ("아직 준비가 안 되셨다면 건너뛰셔도 됩니다" —
+    #                          R4 동의 카드가 실제로 써야 하는 문장이라 반드시 열어 둔다)
+    #    · '조금만 더'       → '조금만 더 견디/참/버티/기다리/힘내' ("조금만 더 쉬셔도 됩니다" 통과)
+    #    · '보이지 않아도'   → '…반드시/결국/이미/응답' ("아무것도 보이지 않아도 그 마음은
+    #                          사실입니다" 같은 타당화 문장이 살아난다)
+    #    · '에도 이유가 있'  → 기다림/지연/침묵/늦어짐/이 시간 한정 ("당신이 우는 데에도 이유가
+    #                          있습니다" — 감정 타당화가 R2 금칙에 걸리던 과대 토큰이었다)
+    #    · '반드시 이유가'   → 주어 한정 4종 (같은 이유)
+    #    · '결국 받'         → '결국 받게 되/받으실/받을 것/받습니' ("결국 받지 못해도 괜찮습니다" 통과)
+    #    · '준비되었을 때'·'준비되면' → 2인칭 주어·후행 어휘 한정 (동의 게이트 UI 의 "준비되면
+    #                          알려 주세요" 류가 걸리던 파편)
+    #    · '도 은혜'         → 문맥 없는 과대 파편. 기다림/지연/침묵/고통/이것 한정으로 교체
+    #    · '보상받'          → '보상받으/는/을/아/습' ("보상받지 못해도 괜찮습니다" 통과 — 92d5fe2
+    #                          의 '쓰임받' 분리와 동형)
+    #    · '헛되지 않'       → 주어를 기다림/기다린 시간/눈물로 한정. 전역 목록에 합쳐지면 이 리포가
+    #                          이미 사람 검수를 통과시킨 위로문(elijah scene5 "네 열심이 헛되지
+    #                          않았다")을 차단한다 — 실측으로 확인하고 좁혔다.
+    #    · '기다리는 동안'   → '…자라/준비/빚어/에도 이미' ("기다리는 동안 많이 외로우셨겠습니다" 통과).
+    #                          부분문자열 lint 는 주어 삽입에 새므로("기다리는 동안 *당신은* 자라고
+    #                          있었습니다") 2인칭 삽입형을 명시적으로 함께 넣었다. 그 밖의 삽입형은
+    #                          이 게이트로 못 막는다 — 방어선은 LLM 시스템 프롬프트와 사람 검토다.
+    #    · '사라지지 않'     → '헛되이/그냥 사라지지 않'·'사라지지 않고 쌓'·'기다림은 사라지지 않'
+    #                          ("이 슬픔은 사라지지 않아도 괜찮습니다" 통과). scene3 의
+    #                          "…사라지지 않고 그대로 놓였다" 는 지연 정당화가 아니라 *항의를
+    #                          지우지 않는다* 는 이 미션의 핵심 문장이므로, 본문이 아니라 토큰을 갈랐다.
+    #    · '일하고 계'       → '계십니/계세/계신 것/계실 것/계셔/계셨' ("하나님이 일하고 계시지
+    #                          않는 것처럼 느껴질 수 있습니다" — 탄식 타당화 통과)
+    #    · '계산보다'        → 소유격 한정 4종 (전역 목록에 합쳐지면 무관 문맥에서 오작동)
+    #    · '믿음으로 바라보' → 명령·당위형 5종 ("지금은 믿음으로 바라보지 못해도 괜찮습니다" 통과)
+    #    유지한 것: '조금 더 견디/참/버티' — 선행 '조금 더' 가 이미 강요 표층을 고정하고, 이 축의
+    #    자연스러운 위로는 "더 견디지 않으셔도 됩니다" 라 '조금 더' 를 포함하지 않는다.
+    #    '당신의 일도/너의 일도/네 일도' — 2인칭 전이가 곧 이 축이라 줄이면 커버리지가 사라진다.
+    lint_forbidden_tokens:
+      - "기다림에는 뜻이 있"
+      - "기다림에도 뜻이 있"
+      - "때가 되면"
+      - "너를 준비시"
+      - "당신을 준비시"
+      - "시간이 너를 빚"
+      - "시간이 당신을 빚"
+      - "아직 준비가 안 돼서"
+      - "아직 준비가 안 되어서"
+      - "아직 준비가 안 되셔서"
+      - "아직 준비가 안 됐기 때문"
+      - "조금만 더 견디"
+      - "조금만 더 참"
+      - "조금만 더 버티"
+      - "조금만 더 기다리"
+      - "조금만 더 힘내"
+      - "믿음을 가지면"
+      - "기다린 만큼"
+      - "당신에게도 올"
+      - "너에게도 올"
+      - "당신에게도 기한이"
+      - "너에게도 기한이"
+      - "당신의 기한이"
+      - "너의 기한이"
+      - "보이지 않아도 반드시"
+      - "보이지 않아도 결국"
+      - "보이지 않아도 이미"
+      - "보이지 않아도 응답"
+      - "늦지 않으"
+      - "당신의 때"
+      - "너의 때"
+      - "때는 반드시"
+      - "기다림도 응답"
+      - "기다림은 헛되지 않"
+      - "기다림이 헛되지 않"
+      - "기다린 시간은 헛되지 않"
+      - "기다린 시간이 헛되지 않"
+      - "눈물은 헛되지 않"
+      - "눈물이 헛되지 않"
+      - "반드시 이루어"
+      - "기다림에도 이유가 있"
+      - "지연에도 이유가 있"
+      - "침묵에도 이유가 있"
+      - "늦어짐에도 이유가 있"
+      - "이 시간에도 이유가 있"
+      - "하나님께는 반드시 이유가"
+      - "모든 일에는 반드시 이유가"
+      - "이 기다림에는 반드시 이유가"
+      - "그 지연에는 반드시 이유가"
+      - "당신도 곧"
+      - "너도 곧"
+      - "포기하지 않으"
+      - "결국 받게 되"
+      - "결국 받으실"
+      - "결국 받을 것"
+      - "결국 받습니"
+      - "당신이 준비되었을 때"
+      - "네가 준비되었을 때"
+      - "준비되었을 때 비로소"
+      - "준비되었을 때에야"
+      - "당신이 준비되면"
+      - "네가 준비되면"
+      - "준비되면 비로소"
+      - "준비되면 주실"
+      - "준비되면 이루어"
+      - "기다림도 은혜"
+      - "지연도 은혜"
+      - "침묵도 은혜"
+      - "이 고통도 은혜"
+      - "이것도 은혜"
+      - "보상받으"
+      - "보상받는"
+      - "보상받을"
+      - "보상받아"
+      - "보상받습"
+      - "하나님의 시계"
+      - "응답이 올"
+      - "늦으신 적이"
+      - "늦으신 게 아"
+      - "가장 좋은 것으로"
+      - "미루시"
+      - "미루십"
+      - "기다리는 동안 자라"
+      - "기다리는 동안 당신은 자라"
+      - "기다리는 동안 너는 자라"
+      - "기다리는 동안 준비"
+      - "기다리는 동안 당신은 준비"
+      - "기다리는 동안 너는 준비"
+      - "기다리는 동안 빚어"
+      - "기다리는 동안 당신은 빚"
+      - "기다리는 동안 너는 빚"
+      - "기다리는 동안에도 이미"
+      - "헛되이 사라지지 않"
+      - "그냥 사라지지 않"
+      - "사라지지 않고 쌓"
+      - "기다림은 사라지지 않"
+      - "일하고 계십니"
+      - "일하고 계세"
+      - "일하고 계신 것"
+      - "일하고 계실 것"
+      - "일하고 계셔"
+      - "일하고 계셨"
+      - "당신의 계산보다"
+      - "너의 계산보다"
+      - "네 계산보다"
+      - "사람의 계산보다"
+      - "조금 더 견디"
+      - "조금 더 참"
+      - "조금 더 버티"
+      - "믿음으로 바라보세"
+      - "믿음으로 바라보십"
+      - "믿음으로 바라보셔야"
+      - "믿음으로 바라봐"
+      - "믿음으로 바라보면"
+      - "당신의 일도"
+      - "너의 일도"
+      - "네 일도"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    fade_to_black_seconds: 0.8
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    card_text_ko: "지금 힘든 마음이 드셨다면 이야기를 잠시 멈추겠습니다. 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
+    buttons_ko: ["계속하기", "잠시 쉬기", "미션 종료"]
+    note: >-
+      ⑤ 재개는 사용자가 '계속하기'를 누를 때만. 자동 재개 없음.
+      ⑥ 발화는 해시만 저장하고 평문을 남기지 않는다(COMMON §4 R1).
+      ⑦ 감지 경로에서 LLM 을 호출하지 않는다 — 정적 카드만.
+      ⑧ '미션 종료'를 실패로 기록하지 않는다.
+  - id: crisis_reminder
+    enforced_at: always
+    text_ko: "지금 마음이 많이 힘들다면 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "br_s5_closing_message 의 routes 는 wait_label × faith_tone 조합 전부 정적으로 존재한다(9종+폴백) — opt-out 도 서사가 완결된다."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.2
+  fade_in_seconds: 0.0
+
+theology_footer_refs:
+  - citation_id: A_gen21_1_7_candidate
+    source: "창세기 21:1-7 이삭의 출생과 사라의 웃음 — 확정 서지 미확보(드릴다운 필요, seed §10 후보 참조)"
+    note: "21:6 은 17:17·18:12 의 웃음이 되돌아오는 절이다 — 정정·성취의 트로피가 아니라 같은 웃음의 회귀로 읽는다."
+    anchor_block: nb_s5_laughter_21_6
+  - disputed_points:
+      - id: DP6
+        summary: "이 미션의 정점을 '오랜 기다림 끝의 응답'으로만 읽지 않는다 — 아브라함 서사에서 흔히 신학적 정점으로 다뤄지는 시험 사건(창세기 21장 직후에 이어지는 장)은 본 미션에서 전면 배제되어 있으므로, 이삭의 출생을 그 사건의 전조·복선으로 암시하는 연출·문구를 넣지 않는다."
+      - id: DP2
+        summary: "여종 서사(창 16, 창 21:8-21)는 이 인물의 서사에서 자주 함께 다뤄지지만 학대·유기 narrative라 본편에서 완전히 배제한다. 이 지점에만 기록한다."
+    handling: "출생·웃음의 회귀만 다룬다. 이후 장으로 이어지는 복선·암시를 넣지 않는다."
+
+recovery_metric_dimensions:
+  spiritual:
+    ["기다림 속의 임재 인정", "이유가 나에 관한 것이 아님", "대화의 계속"]
+  emotional:
+    ["없음을 말해도 되는 안전함", "붙듦과 인내의 정직한 무게", "모름을 견딤"]
+  rational:
+    [
+      "지연의 이유를 사용자에게 전이하지 않기",
+      "성취를 약속하지 않고 시간을 인정하기",
+      "웃음의 비대칭을 숨기지 않기",
+    ]

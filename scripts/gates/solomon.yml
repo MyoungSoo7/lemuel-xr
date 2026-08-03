@@ -13,7 +13,10 @@ doc_min_lines:
 
 # content/solomon/scene*.yml 의 R2_R3_lint_forbidden / R3_no_reorientation_pressure 실측 7종
 forbidden:
-  - "이제 깨달았으니"
+  # 런타임은 '이제 깨달았으니' 가 아니라 **'깨달았으'** 를 막는다(높임형 '깨달으셨으' 별도).
+  # ForbiddenTokenConfigTest 가 좁은 토큰이 활용만으로 뚫리는 걸 확인하고 바꾼 결과인데
+  # 이 설정만 옛 문자열로 남아 G5b 가 "런타임에 없다" 고 red 였다 — 설정 노후지 안전 공백이 아니다.
+  - "깨달았으"
   - "다시 열심히"
   - "허무를 극복"
   - "믿음이 부족"

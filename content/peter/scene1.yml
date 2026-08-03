@@ -1,0 +1,277 @@
+# Scene 1 — 중보와 확언 (60초, 눅 22:31-34) · 실패 이전에 이미 예고된 회복
+# ⚠️ R2 핵심: 눅 22:31-32(중보 예고)를 눅 22:33(확언)보다 먼저 배치 — "실패 이전에 이미 중보가 있었다".
+#    Scene 1 을 "자만 → 벌"의 인과로 구성하면 즉시 반려(seed §4 R2).
+# note: 사용자가 베드로 — 1인칭.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — 인간 안전검토자 사인오프 전 프로덕션 반영 금지 (R1 직접 취급 + "실패·수치심 이후 정체성 재구성" 신규 카테고리 첫 도입).
+
+scene_id: peter_scene1
+scene_name: intercession_and_declaration
+mission_id: peter
+version: 1.0.0
+duration_seconds_target: 60
+note: "사용자가 베드로 — 1인칭"
+
+environment:
+  space_id: upper_room_before_supper_end
+  background_model: env_upper_room_lamp_lit
+  lighting:
+    type: warm_lamp_interior
+    color_temperature_kelvin: 2800
+  ambient_sound:
+    - id: room_murmur_low
+      gain_db: -24
+      spatial: true
+    - id: table_settle_soft
+      gain_db: -28
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jesus_present
+    voice_id: jesus_v1
+    position: [0.0, 1.65, 1.2]
+    visual_traits: [backlit_silhouette_no_face, hand_closeup_only]
+    note: "얼굴 렌더 없음 — 역광 실루엣 + 손 클로즈업만. 실사 얼굴 아바타 금지, 완전 추상 광휘도 금지(seed §7)."
+  - id: peter_self
+    voice_id: peter_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 베드로 — 1인칭 내면 독백. 감정 과장 억양 금지."
+
+narration_blocks:
+  - id: nb_s1_sift_warning
+    speaker: jesus_present
+    text_ko: "시몬아, 시몬아, 보라 사탄이 너희를 밀 까부르듯 하려고 요구하였으나 (누가복음 22:31)"
+    audio_clip_id: aud_s1_sift_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s1_intercession
+    speaker: jesus_present
+    text_ko: "그러나 내가 너를 위하여 네 믿음이 떨어지지 않기를 기도하였노니 너는 돌이킨 후에 네 형제를 굳게 하라 (누가복음 22:32)"
+    audio_clip_id: aud_s1_intercession_ko
+    start_at_seconds: 12.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "R2 핵심 — 실패(22:34 예고)보다 중보(22:31-32)가 먼저 온다. 이 순서를 뒤집지 않는다."
+  - id: nb_s1_peter_vow
+    speaker: peter_self
+    text_ko: "그가 말하되 주여 내가 주와 함께 옥에도, 죽는 데에도 가기를 각오하였나이다 (누가복음 22:33)"
+    audio_clip_id: aud_s1_vow_ko
+    start_at_seconds: 26.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "v1 오류 정정 확인 — '주와 함께 죽기까지'가 아니라 '옥에도, 죽는 데에도 가기를 각오'가 정문(개역개정)."
+  - id: nb_s1_prediction
+    speaker: jesus_present
+    text_ko: "이르시되 베드로야 내가 네게 말하노니 오늘 닭 울기 전에 네가 세 번 나를 모른다고 부인하리라 하시니라 (누가복음 22:34)"
+    audio_clip_id: aud_s1_prediction_ko
+    start_at_seconds: 38.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s1_listen_only
+    type: auto_proceed
+    presentation:
+      description: "사용자는 4개 자막을 순서대로 듣기만 한다 — 결정 없음."
+    validation_rules:
+      - rule: auto_proceed
+        description: "선택지 없음. nb_s1_prediction 종료 시 자동 전환."
+
+branches: []
+
+# R2 (실패 이전에 이미 중보가 예고됨: 22:31-32 를 22:34 보다 먼저 배치, '자만→벌' 인과 구성 금지)는
+# 위 narration_blocks 순서 자체로 집행된다 — 별도 safety_gates 항목이 아니다(seed §4 R2 참조).
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    # ⚠️ 어간·부사형에서 끊지 않는다. 한국어 부정은 '-지 않/못'·'-가 아니'로 어간 *뒤* 에
+    # 붙으므로, 어간에서 끊은 토큰은 그 축의 부정형 위로를 반드시 삼킨다(92d5fe2 와 같은 규칙,
+    # ForbiddenTokenConfigTest KDoc 참조). 이 목록은 전역 런타임 목록에 합쳐져 *모든 인물*의
+    # LLM 출력에 적용되므로, 초안의 어간형 27종을 당위·명령 종결형(-세/-십/-셔야/-야 합/-야죠/
+    # -해라)과 긍정 계속형(-으/-시려/-는)으로 갈라냈다.
+    #
+    # 🔻 실측으로 삼키고 있던 위로(이제 통과한다) — 전부 "그 토큰이 잡을 뻔한 가장 자연스러운 말":
+    #   다시는 부인 / 부인하지 않겠 → "다시는 부인하지 않겠다고 다짐하지 않으셔도 됩니다"
+    #     ← docs/MVP-PETER.md §10 의 '다짐하는 자가 아니라 호명받는 자'. 이 미션이 하려는
+    #        말 그 자체가 이 미션의 게이트에 막혀 있었다.
+    #   넘어지지 않겠 → "다시는 넘어지지 않겠다고 약속하지 않아도 괜찮습니다"
+    #   부인하지 마 → "예수께서는 다시는 부인하지 말라고 하지 않으셨습니다"
+    #   스스로를 용서 → "아직 스스로를 용서하지 못해도 괜찮습니다" (자책 강화 금지 축의 정면 문장)
+    #   자격을 갖추 → "그 아침에 자격을 갖추고 오라는 말은 없었습니다" (Scene 5 회복 문구 톤 그대로)
+    #   더 사랑해 / 더 사랑하라 → "그 물음은 더 사랑하라는 요구가 아니었습니다"
+    #   내려놓으 → "억지로 내려놓으려 애쓰지 않으셔도 됩니다"
+    #   붙들지 않으 → "그 밤을 계속 붙들지 않으셔도 됩니다"
+    #   이제 죄책 → "이제 죄책감이 밀려와도 괜찮습니다"
+    #   실패했으 / 실패했기 → "세 번 실패했으나 이름은 그대로였습니다" /
+    #     "그 일은 당신이 실패했기 때문이 아닙니다" (엘리야 '당신 때문에'와 같은 조사 '에' 분리)
+    #
+    # 🔻 문맥 없이 흔한 짧은 조각 → 축을 지키는 더 긴 표층형으로 교체(전역 오검출 실측):
+    #   놓아주 → content/joseph/scene3.yml 의 XR 지시문 "자루를 줄에 놓아주세요"를 잡고 있었다.
+    #     대상어(이제/그만/마음을/과거를)를 붙여 '감정 정리 재촉' 축만 남기고,
+    #     "주님은 당신을 놓아주지 않으십니다"는 열어 둔다.
+    #   연단 → 2음절 단독형이라 '연단(演壇)'·롬 5:4 인용 등 무관 용례까지 잡는다.
+    #     daniel scene2~5 가 이미 쓰는 '연단하시'·'연단하십' 으로 정렬한다(전역 목록 중복 제거).
+    #   겸손하게 / 떳떳하게 → 부사형 단독은 아무 동사에나 붙는다("겸손하게 낮은 자리로 오셨습니다").
+    #   있어야 더 / 사라진 뒤에 / 준비가 되면·되었을 → 조각이 짧아 무관 문장을 잡는다
+    #     ("마음의 준비가 되면 이어서 보셔도 됩니다" ← R4 동의 카드 톤 / "안개가 사라진 뒤에").
+    #
+    # 🔻 유지 결정(좁히지 않음): 낮추시려·다듬으시려·빚으시려 는 어간이 아니라 높임+의도형에서
+    #   끊었으므로 '-지 않' 부정형("다듬으시지 않습니다")과 이미 갈라져 있다. "~시려는 것이
+    #   아닙니다"까지 막히는 것은 92d5fe2 의 '도구로 쓰려'와 같은 잔여 과차단이고, 같은 뜻의
+    #   대안 표면("그 밤에 뜻을 붙이지 않겠습니다")이 열려 있으므로 결정으로 남긴다.
+    #
+    # 🔻 커버리지 대가와 이득: 문어체 순수 명령 '더 사랑하라'·'부인하지 말라'는 인용 부정문
+    #   ("더 사랑하라는 요구가 아니었습니다")과 부분문자열로 갈라낼 수 없어 명령 종결형으로
+    #   대체했다(엘리야 "정신 차리라고 말하지 않겠습니다"와 같은 선택). 반대로 초안이 활용형
+    #   변경만으로 놓치던 가해문 4종("겸손해지셔야 합니다" / "더 키우시려고 그러신 겁니다" /
+    #   "이제 그만 다짐하세요" / "지금보다 더 사랑하세요")은 새로 잡힌다.
+    lint_forbidden_tokens:
+      # (a) R2 — 실패·수치에 신적 의도(훈육·연단·성장)를 부여하는 인과형
+      - "겸손하게 하시려"
+      - "겸손하게 만드시려"
+      - "겸손하게 만들려고"
+      - "겸손하게 받아들이세"
+      - "겸손하게 받아들이십"
+      - "겸손하게 받아들여야 합"
+      - "겸손해지세"
+      - "겸손해지십"
+      - "겸손해지셔야"
+      - "겸손해져야 합"
+      - "연단하시"
+      - "연단하십"
+      - "낮추시려"
+      - "다듬으시려"
+      - "빚으시려"
+      - "보셨기 때문에"
+      - "있어야 더 깊어"
+      - "있어야 더 단단"
+      - "있어야 더 강해"
+      - "있어야 더 성숙"
+      - "있어야 더 성장"
+      - "더 키우시려"
+      - "더 키우세"
+      - "더 키우십"
+      - "더 키우셔야"
+      - "더 키워야 합"
+      - "더 키워야죠"
+      - "실패했으니"
+      - "실패했으므로"
+      - "실패했기 때문에"
+      # (b) R3 — 재발 방지 다짐 요구(이 미션의 최우선 금지 축, MVP §10)
+      - "다시는 부인하지 않겠습니다"
+      - "다시는 넘어지지 않겠습니다"
+      - "부인하지 않겠다고 다짐하세"
+      - "부인하지 않겠다고 다짐하십"
+      - "부인하지 않겠다고 다짐해야"
+      - "부인하지 않겠다고 약속하세"
+      - "넘어지지 않겠다고 다짐하세"
+      - "넘어지지 않겠다고 다짐하십"
+      - "넘어지지 않겠다고 다짐해야"
+      - "넘어지지 않겠다고 약속하세"
+      - "부인하지 마세"
+      - "부인하지 마십"
+      - "부인하지 마요"
+      - "부인하지 말아야 합"
+      - "부인하지 말아야죠"
+      - "다짐하세"
+      - "다짐하십"
+      - "다짐하셔야"
+      - "다짐해야 합"
+      - "다짐해야죠"
+      - "다짐해 보세"
+      - "다짐해라"
+      # (c) R3 — 감정 정리·자기용서 재촉
+      - "내려놓으세"
+      - "내려놓으십"
+      - "내려놓으셔야"
+      - "내려놓아야 합"
+      - "내려놓아야죠"
+      - "이제 내려놓을 때"
+      - "이제 놓아주"
+      - "그만 놓아주"
+      - "마음을 놓아주"
+      - "과거를 놓아주"
+      - "놓아주셔야 합"
+      - "놓아줘야 합"
+      - "놓아줘야죠"
+      - "붙들지 않으셔야"
+      - "붙들지 않으시면"
+      - "붙들지 말아야 합"
+      - "그만 붙들고"
+      - "이제 죄책감은 그만"
+      - "이제 죄책감을 버리세"
+      - "이제 죄책감을 버리십"
+      - "이제 죄책감을 버려야"
+      - "이제 죄책감에서 벗어나세"
+      - "이제 죄책감에서 벗어나야 합"
+      - "스스로를 용서하세"
+      - "스스로를 용서하십"
+      - "스스로를 용서하셔야"
+      - "스스로를 용서해야 합"
+      - "스스로를 용서해야죠"
+      - "스스로를 용서하지 못하면"
+      # (d) R3 — 조건부 회복(자격·준비·수치 소멸을 회복의 전제로 두는 프레임)
+      - "자격을 갖추세"
+      - "자격을 갖추십"
+      - "자격을 갖추셔야"
+      - "자격을 갖춰야 합"
+      - "자격을 갖춰야죠"
+      - "자격을 갖추어야 합"
+      - "자격을 갖춘 뒤에야"
+      - "떳떳하게 사세"
+      - "떳떳하게 사십"
+      - "떳떳하게 살아야 합"
+      - "떳떳하게 살아야죠"
+      - "떳떳하게 서세"
+      - "떳떳해지셔야"
+      - "떳떳해져야 합"
+      - "준비가 되면 부르"
+      - "준비가 되면 회복"
+      - "준비가 되면 다시 쓰"
+      - "준비가 되어야 부르"
+      - "준비가 되어야 회복"
+      - "준비가 되었을 때 부르"
+      - "준비가 되었을 때 회복"
+      - "준비가 되었을 때 비로소"
+      - "수치가 사라진 뒤에"
+      - "죄책감이 사라진 뒤에"
+      - "두려움이 사라진 뒤에"
+      - "사라진 뒤에야 회복"
+      - "사라진 뒤에야 부르"
+      # (e) R3 — 요 21:15-17 의 물음을 '사랑의 요구'로 바꾸는 축
+      - "더 사랑하세"
+      - "더 사랑하십"
+      - "더 사랑하셔야"
+      - "더 사랑해야 합"
+      - "더 사랑해야죠"
+      - "더 사랑해 보세"
+      - "더 사랑해라"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: peter_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.0
+
+theology_footer_refs:
+  - citation_id: P_disputed_6_ref
+    source: "docs/MVP-PETER.md disputed_points 6번 참조"
+    note: "눅 22:31 은 사탄의 요구에 대한 진술이며, 베드로의 재발 공포에 대한 직접 진술이 아니다 — 목회적 배치이지 주해 주장이 아니다."
+    anchor_block: nb_s1_sift_warning
+  - scripture_refs:
+      - ref: "누가복음 22:31-34"
+        translation: krv
+        anchor_block: nb_s1_prediction
+  - disputed_points: []
+    handling: "Scene 1 자체에는 별도 해석 분쟁 없음. 라벨-본문 매핑 관련 분쟁(6번)은 docs/MVP-PETER.md 참조."

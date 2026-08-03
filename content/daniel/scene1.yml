@@ -1,0 +1,210 @@
+# Scene 1 — 이름을 잃다 (60초, 개명 연출 · 사용자 선택 0개 · 라우팅 0개)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-DANIEL.md(v4) 기반의 ≤70% 초안. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 + 인간 안전검토자 사인오프 전 프로덕션 반영 금지(신규 구원 카테고리 도입, seed §13).
+# ⚠️ 개명 연출은 '다니엘 → 벨드사살' 고정 텍스트만 사용한다. 사용자 실명·프로필 데이터를
+#   이 연출에 투입하지 않는다(seed §4-1) — 이민자·소수자 대상 앱에서 실명을 지워 보이는
+#   연출은 그 자체가 트리거이고 PII 문제도 생긴다.
+# ⚠️ 단 6:24(참소자와 그 가족 집단 처형) 및 6:25-28(다리오의 조서) 전면 배제 — 이 인물 전 Scene 공통 원칙.
+# ⚠️ lint_forbidden_tokens 위치 정정(초안 → 현재): 최상위(top-level)에 두었던 것을
+#   safety_gates[].id: R2_*/R3_* 아래로 옮겼다. seed §14 판정 스크립트가 `d.get('lint_forbidden_tokens')`
+#   로 문서 루트를 읽은 것은 seed 쪽 오류다 — 최상위에 두면 G5a-i(재귀 수집)만 통과하고
+#   축 게이트는 토큰 0종으로 남아 "선언만 있고 0건을 막는" vacuous green 이 된다.
+#   정본 판정은 scripts/newchar_gates.py g5d(㉗) 과 ContentSafetyGateEnforcementTest 이며
+#   둘 다 축 게이트 아래만 집행 수단으로 인정한다. seed §8-2(a) 산문이 맞았다.
+
+scene_id: daniel_scene1
+id: daniel_scene1 # G7 계열 스크립트가 top-level 'id' 를 읽는다(seed §3-2). scene_id 와 항상 동일 값 유지.
+scene_name: name_taken
+mission_id: daniel
+version: 1.0.0
+duration_seconds_target: 60
+default_path: static_curation # R5 — 이 Scene 에는 LLM 호출 지점이 없다는 것을 명시(seed §4 R5)
+llm_optin_only: true
+
+environment:
+  space_id: babylon_palace_hall_torch
+  background_model: env_babylon_court_hall
+  lighting:
+    type: torch_lit_interior
+    color_temperature_kelvin: 2600
+    dust_haze_emphasis: false
+  ambient_sound:
+    - id: distant_court_murmur
+      gain_db: -24
+      spatial: true
+    - id: low_ember_crackle
+      gain_db: -28
+      spatial: true
+    - id: scroll_unroll_soft
+      gain_db: -20
+      spatial: false
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: daniel_self
+    voice_id: daniel_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 다니엘 — first-person, 음성은 내면 독백만"
+  - id: chief_eunuch
+    voice_id: official_v1
+    position: [1.0, 1.65, 1.8]
+    initial_animation: name_scroll_read
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "환관장 — 실사 인물 형상 배제(엘리야 규칙 승계). 악역 톤 금지, 관료적 조심스러움."
+
+narration_blocks:
+  - id: nb_s1_names_changed
+    speaker: scripture_caption
+    text_ko: "환관장이 그들의 이름을 고쳐 다니엘은 벨드사살이라 하고 하나냐는 사드락이라 하고 미사엘은 메삭이라 하고 아사랴는 아벳느고라 하였더라 (다니엘 1:7)"
+    audio_clip_id: aud_s1_names_changed_ko
+    start_at_seconds: 5.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+  - id: nb_s1_inner_daniel
+    speaker: daniel_inner
+    text_ko: "이름이 바뀌었다. 말투도, 음식도, 자리도 바뀔 것이다. 무엇이 바뀌어도 되고, 무엇은 바뀌면 안 되는가."
+    audio_clip_id: aud_s1_inner_ko
+    start_at_seconds: 28.0
+    duration_seconds: 14.0
+    hidden_until_event: name_change_shown
+    note: "미션의 축(경계 설정) 예고 — seed §0. 대인 공포 프레임(트랙 A Theme 7) 아님. '용기 내어 밝힐 것인가/숨길 것인가'(에스더 축) 아님 — '무엇을 지킬 것인가'의 질문만."
+
+interactions:
+  - id: ix_s1_name_change_visual
+    type: auto_proceed
+    target_assets: [ui_name_label_daniel, ui_name_label_belteshazzar]
+    presentation:
+      fixed_text_from: "다니엘"
+      fixed_text_to: "벨드사살"
+      user_identity_data_used: false
+    validation_rules:
+      - rule: auto_proceed
+        description: "사용자 조작 없음 — 개명은 겪는 것이지 선택이 아니다(seed §3 표). 고정 텍스트 전환만 재생, 사용자 실명 미사용."
+        on_event_emit: name_change_shown
+
+branches: [] # 사용자 선택 0개 + 라우팅 0개 (seed §3 표)
+
+safety_gates:
+  - id: real_name_exclusion
+    enforced_at: always
+    description: "개명 연출은 '다니엘 → 벨드사살' 고정 텍스트만 사용한다. 사용자 실명·프로필 데이터를 이 연출에 투입하지 않는다(seed §4-1)."
+  - id: violence_exclusion_dan_6_24
+    enforced_at: always
+    description: "단 6:24(참소자와 그 가족 집단 처형) 및 6:25-28(다리오의 조서) 완전 배제 — 이 인물 전 Scene 공통 원칙(seed §2-3)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    storage: hash_only
+    on_detect:
+      - scene_timeline: pause
+      - audio: fade_to_silence_1200ms
+      - visual: fade_to_soft_black
+      - haptic: stop_all
+      - show_card: card_crisis_daniel
+    crisis_card:
+      id: card_crisis_daniel
+      text_ko: "지금 많이 힘드신 것 같아요. 이야기는 여기서 잠시 멈출게요. 혼자 견디지 않으셔도 됩니다. 도움을 받을 수 있는 곳: {{crisis_resources.default}}"
+      buttons_ko: ["잠시 쉬기", "미션 종료하기", "이어서 진행하기"]
+      default_focus: "잠시 쉬기"
+    resume_rule: explicit_user_tap_only
+    crisis_resource_ref: crisis_resources.default
+  - id: R2_R3_esther_boundary_lint
+    enforced_at: always
+    description: "고난 인과정당화(R2)·회복·담대 압박(R3)·에스더 배타(seed §0, '드러내다/숨기다' 프레임) 어휘 차단. application.yml 전역 리스트와 append-only 동기화(§8-2(b))."
+    # ── 왜 이 토큰인가 ────────────────────────────────────────────────────────
+    # 이 게이트 하나가 축 셋을 덮는다.
+    #  (a) R2 고난 인과정당화 — 연단·단련·허락·"뜻이 있다"·"단단하게 만든다"
+    #  (b) R3 담대·인내 압박 — 담대해지다·"견디면 높아진다"·버텨·참으
+    #  (c) 에스더(16) 배타 — 드러내다/숨기다/타협/물러서다. 다니엘 미션의 축은
+    #      '용기 내어 밝히기' 가 아니라 '무엇이 바뀌어도 되고 무엇은 지킬 것인가' 다(seed §0).
+    #      에스더의 축 어휘가 이 미션에 새어 들어오면 두 미션이 같은 말을 하게 된다.
+    #
+    # 🔻 어간 절단 수정 3건 — 한국어 부정은 어간 *뒤* 에 '-지 않/못'·'-가 아니' 로 붙으므로
+    #    어간에서 끊은 토큰은 그 축의 부정형 위로를 반드시 삼킨다(ForbiddenTokenConfigTest KDoc,
+    #    커밋 92d5fe2). seed §14 원본 36종 중 셋이 이 병에 걸려 있어 당위·명령 어미와
+    #    긍정 계속형을 한 음절 이상 붙여 갈라냈다. 가해형 커버리지는 그대로다.
+    #    · '담대해지' → 담대해지세/담대해지십/담대해지셔야/담대해지면
+    #        삼키던 위로: "오늘 담대해지지 않아도 괜찮습니다." ← 이 미션의 핵심 문장이다.
+    #    · '단단하게 만들' → 단단하게 만듭/만들어/만드는/만들려
+    #        삼키던 위로: "고난은 사람을 단단하게 만들지 않습니다."
+    #    · '감추고 사시'·'감추고 사십'·'감추고 사는' → 감추고 사시면 안/사시겠/살지 마/사십시
+    #        삼키던 위로: "감추고 사는 것도 하나의 길입니다." / "지금 감추고 계셔도 괜찮습니다."
+    #        (개명·포로기 정체성을 다루는 이 미션에서 '감춰도 된다' 는 반드시 열려 있어야 한다.)
+    #
+    # ⚠️ 의도적 과차단 1건 — '숨기는 건/것은/게 부끄러' 는 "숨기는 것은 부끄러운 일이
+    #    아닙니다" 까지 막는다. 좁히지 않았다: 사용자가 갖고 있지도 않았을 '숨기는 건
+    #    부끄러운 일' 이라는 종교적 수치 프레임을 앱이 먼저 꺼내 부정하는 문장이기 때문이다
+    #    (elijah/scene2·scene3 의 같은 결정과 동일 근거). 대가는 대안 표면으로 지불한다 —
+    #    통과: "지금 말하지 않는 것도 당신의 선택입니다" / "드러내지 않아도 이 이야기는 당신 것입니다".
+    #
+    # ⚠️ 위치 정정: 최상위(top-level)에 있던 목록을 여기로 옮겼다 — 파일 상단 주석 참조.
+    lint_forbidden_tokens:
+      [
+        "연단하시",
+        "연단하십",
+        "단련하시",
+        "단련하십",
+        "허락하신 것",
+        "고난에는 뜻이",
+        "고난에도 뜻이",
+        "담대해져",
+        "담대해지세",
+        "담대해지십",
+        "담대해지셔야",
+        "담대해지면",
+        "처럼 담대",
+        "견디면 높",
+        "조금만 견디",
+        "타협하지 말",
+        "타협하지 마",
+        "타협해서는",
+        "타협하면 안",
+        "세상과 구별되지",
+        "숨기는 건 부끄러",
+        "숨기는 것은 부끄러",
+        "숨기는 게 부끄러",
+        "믿음이 있으면 드러내",
+        "믿음이 있다면 드러내",
+        "드러내야 하는 것",
+        "단단하게 만듭",
+        "단단하게 만들어",
+        "단단하게 만드는",
+        "단단하게 만들려",
+        "반드시 이유가 있",
+        "데는 하나님의 계획",
+        "갚아 주실",
+        "용기를 내 보셔",
+        "물러서시면",
+        "물러서지 마",
+        "물러서지 말",
+        "지금은 참으",
+        "이 정도는 버텨",
+        "버텨 내셔야",
+        "감추고 사시면 안",
+        "감추고 사시겠",
+        "감추고 살지 마",
+        "감추고 사십시",
+      ]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path: static_curation."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: daniel_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D1_candidate
+    source: "다니엘서 디아스포라 정체성 — 확정 서지 미확보(드릴다운 필요, seed §12)"
+    note: "개명은 정체성 침식의 상징 — 이 미션은 '무엇이 바뀌어도 되고 무엇은 지켜야 하는가'의 질문에서 출발한다(seed §0 경계 설정 축)."
+    anchor_block: nb_s1_names_changed
+  - disputed_points: []
+    handling: "Scene 1 은 분쟁 지점 없음 — 인물·상황 도입부."

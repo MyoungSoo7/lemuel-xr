@@ -1,0 +1,433 @@
+# Scene 3 — 별, 그리고 사백 년 (105초, 셀 수 없는 약속 · 이유가 나에 관한 것이 아님)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene3-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-ABRAHAM.md(v5-b) 기반의 ≤70% 초안. 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ 이 Scene 의 R2 근거는 "본문이 이유를 침묵한다"가 아니라 "본문이 준 이유(15:16, 아모리 족속의
+#   죄악)가 아브람 자신에게 전이되지 않는다"이다(seed §1-2, HONEST 등급 — v1 의 "본문도 침묵한다"는
+#   틀린 주장이었고 정정되었다). 이 구분을 지운 채 각색하면 안 된다.
+# ⚠️ 창세기 15:2-3(항의)은 인용 자막으로만 노출 — 사용자 1인칭 절망 서술로 LLM 이 재생성하지 않는다.
+# ⚠️ 15:13(사백 년 압제) 블록은 dwell_limit — 3초 내 15:16 으로 자동 전환. 장기 지연 고착 방지(R1).
+# ⚠️ 이삭을 제물로 드리라는 시험 사건·여종 서사·아내를 누이라 속인 사건 — 전면 배제 원칙은
+#   Scene 1 에서 선언, 이 인물 전 Scene 공통 적용.
+# ⚠️ lint_forbidden_tokens 는 safety_gates[].id: R2_R3_lint_forbidden 하위에 중첩한다(seed §7-1(a) 정본).
+
+scene_id: abraham_scene3
+scene_name: stars_and_four_hundred_years
+mission_id: abraham
+version: 1.0.0
+duration_seconds_target: 105
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: canaan_night_sky_open_field
+  background_model: env_canaan_night_starfield
+  lighting:
+    type: clear_night_starfield_no_moon
+    color_temperature_kelvin: 5600
+    star_density: high
+  ambient_sound:
+    - id: night_insects_field
+      gain_db: -24
+      spatial: true
+    - id: low_wind_open_field
+      gain_db: -26
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.6, 1.0] # 하늘을 향해 약간 위쪽
+  camera_locomotion: disabled
+
+npcs:
+  - id: abraham_self
+    voice_id: abraham_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 아브람 — first-person, 음성은 내면 독백 + 인용 항의 자막"
+
+narration_blocks:
+  - id: nb_s3_lack_1
+    speaker: scripture_caption
+    text_ko: "나는 자식이 없사오니 나의 상속자는 다메섹 사람 엘리에셀이니이다 (창세기 15:2)"
+    citation_id: A_gen15_2
+    audio_clip_id: aud_s3_lack_1_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "인용 자막 전용 — 사용자 1인칭 절망 서술로 LLM 재생성 금지(R1 스코프)."
+  - id: nb_s3_lack_2
+    speaker: scripture_caption
+    text_ko: "주께서 내게 씨를 주지 아니하셨으니 내 집에서 길린 자가 내 상속자가 될 것이니이다 (창세기 15:3)"
+    citation_id: A_gen15_3
+    audio_clip_id: aud_s3_lack_2_ko
+    start_at_seconds: 13.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+    note: "인용 자막 전용 — 사용자 1인칭 절망 서술로 LLM 재생성 금지(R1 스코프)."
+  - id: nb_s3_stars
+    speaker: voice_of_yhwh_v1
+    text_ko: "그를 이끌고 밖으로 나가 이르시되 하늘을 우러러 뭇별을 셀 수 있나 보라 또 그에게 이르시되 네 자손이 이와 같으리라 (창세기 15:5)"
+    citation_id: A_gen15_5
+    audio_clip_id: aud_s3_stars_ko
+    start_at_seconds: 25.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_belief
+    speaker: narrator_v1
+    text_ko: "아브람이 여호와를 믿으니 여호와께서 이를 그의 의로 여기시고 (창세기 15:6)"
+    citation_id: A_gen15_6
+    audio_clip_id: aud_s3_belief_ko
+    start_at_seconds: 56.0
+    duration_seconds: 10.0
+    hidden_until_event: stars_gaze_resolved
+  - id: nb_s3_four_hundred
+    speaker: voice_of_yhwh_v1
+    text_ko: "여호와께서 아브람에게 이르시되 너는 반드시 알라 네 자손이 이방에서 객이 되어 그들을 섬기겠고 그들은 사백 년 동안 네 자손을 괴롭히리니 (창세기 15:13)"
+    citation_id: A_gen15_13
+    audio_clip_id: aud_s3_four_hundred_ko
+    start_at_seconds: 67.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "dwell_limit 적용 블록 — 아래 safety_gates.dwell_limit_on_four_hundred_years 참조. 최대 3초 내 15:16 전환."
+  - id: nb_s3_reason
+    speaker: narrator_v1
+    text_ko: "네 자손은 사대 만에 이 땅으로 돌아오리니 이는 아모리 족속의 죄악이 아직 가득 차지 아니함이니라 하시더니 (창세기 15:16)"
+    citation_id: A_gen15_16
+    audio_clip_id: aud_s3_reason_ko
+    start_at_seconds: 79.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+  - id: nb_s3_reason_clarify
+    speaker: narrator_v1
+    text_ko: "이 이유는 아브람에 관한 것이 아니었다."
+    citation_id: null
+    note: "seed §1-2 필수 삽입 — 본문이 준 이유(아모리 족속의 죄악)가 아브람 자신에게 전이되지 않음을 명시. 본문 인용이 아닌 편집 내레이션이므로 citation_id 없음."
+    audio_clip_id: aud_s3_reason_clarify_ko
+    start_at_seconds: 90.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s3_count_the_stars
+    type: gaze_count_then_overflow
+    target_assets: [starfield_sky]
+    gesture: none # 응시 전용 — 비버튼 인터랙션(seed §6 핵심 인터랙션 #1)
+    presentation:
+      tally_increments_on_gaze: true
+      overflow_state_label_ko: "셀 수 없음"
+      overflow_is_intended_outcome: true
+    validation_rules:
+      - rule: gaze_tally_then_overflow
+        start_at_seconds: 25.0
+        max_duration_seconds: 28.0
+        on_complete: stars_gaze_resolved
+        note: "'셀 수 없음' 은 의도된 결말이다 — 실패로 표시하지 않는다(R3). 점수·성취로 decisions 에 기록하지 않는다."
+      - rule: track_micro_signals
+        records: [gaze_dwell_ms_total]
+        note: "기록만 — 서사 분기·평가에 사용하지 않음."
+  - id: ix_s3_wait_label_select
+    type: select_one_of_n
+    target_assets:
+      [card_voice_the_lack, card_hold_the_promise, card_sit_with_unknowing]
+    gesture: card_select
+    presentation:
+      n: 3
+      layout: arc_in_front
+    validation_rules:
+      - rule: timed_choice
+        start_at_seconds: 96.0
+        timeout_seconds: 20
+        on_timeout: treat_as_complete
+        on_timeout_result: { wait_label: null }
+        voice_prompt_id: aud_s3_prompt_choice
+        voice_prompt_max_repeat: 1
+        note: "미선택 20초 경과 시 wait_label: null 로 진행(§5) — 가장 취약한 경로. Scene 5 폴백 문구로 반드시 도달한다."
+
+branches:
+  - id: br_s3_wait_label
+    triggered_by_event: [wait_label_card_selected]
+    decision_key: wait_label
+    backend_endpoint: "POST /api/game/abraham/scene/3/decide"
+    default_path: static_curation
+    llm_optin_only: true
+    body_template:
+      wait_label: "{{voice_the_lack|hold_the_promise|sit_with_unknowing}}"
+    routes:
+      - when: { wait_label: voice_the_lack }
+        card_text_ko: "나는 자식이 없습니다"
+        gesture: card_to_chest
+        static_text_ko: "없다고 말한 그 말은 사라지지 않고 그대로 놓였다."
+        llm_prompt_key: "abraham_s3_wait_voice_the_lack_1_3"
+      - when: { wait_label: hold_the_promise }
+        card_text_ko: "그래도 그 약속을 붙듭니다"
+        gesture: card_place_down
+        static_text_ko: "믿음이 상황을 바꾸지는 않았다. 그는 그렇게 밤하늘 아래에 서 있었다."
+        llm_prompt_key: "abraham_s3_wait_hold_the_promise_2_3"
+      - when: { wait_label: sit_with_unknowing }
+        card_text_ko: "왜인지 모른 채로 있겠습니다"
+        gesture: card_cupped_two_hands
+        static_text_ko: "이유는 다른 곳에 있었다. 그는 그것을 다 알지 못한 채 살아갔다."
+        llm_prompt_key: "abraham_s3_wait_sit_with_unknowing_3_3"
+    safety_note: "세 카드 모두 정당(R3_all_waits_valid) — 정답 없음. wait_label 은 Scene 5 br_s5_closing_message 로 그대로 이월된다(§5)."
+
+safety_gates:
+  - id: R1_scripture_only_no_user_generated_lament
+    enforced_at: [nb_s3_lack_1, nb_s3_lack_2]
+    description: "'이럴 거면 왜' 류 사용자 1인칭 절망 서술을 LLM 으로 생성하지 않는다 — 15:2-3 의 항의는 인용 자막으로만 노출한다."
+  - id: dwell_limit_on_four_hundred_years
+    enforced_at: nb_s3_four_hundred
+    max_dwell_seconds: 3.0
+    on_dwell_exceeded: auto_advance_to_nb_s3_reason
+    description: "본문 노출 직후 최대 3초 내 15:16 으로 자동 전환. 절망 발화 위험이 높은 지점 — 장기 지연 고착 방지(R1)."
+  - id: R2_reason_not_transferred_to_user
+    enforced_at: nb_s3_reason_clarify
+    description: "15:16 이 준 이유(아모리 족속의 죄악, 3자 사유)를 아브람 자신·사용자에게 전이하지 않는다. '본문이 이유를 침묵한다'는 주장도 하지 않는다(v1 오류, seed §1-2 정정본 그대로 유지)."
+    # 이 축은 *두 갈래* 로 어긋난다 — 어느 쪽도 토큰으로 잡히는 표층형이 있다.
+    # (가) 3자 사유(아모리 족속)를 사용자에게 옮기는 2인칭 전이 — "그 이유는 당신에게 있습니다",
+    #      "이 사백 년은 당신을 위한 시간이었습니다", "당신 때문에 늦어진 겁니다".
+    # (나) v1 의 틀린 주장인 '본문도 침묵한다' 계열 — 본문은 15:16 에서 이유를 *말했고*,
+    #      다만 그 이유가 아브람에 관한 것이 아니었을 뿐이다(seed §1-2 HONEST 등급).
+    #
+    # ⚠️ (가)는 어간이 아니라 술어 앞에서 끊지 않았다 — '있습니/있었' 로 갈라, 이 Scene 이 실제로
+    #    해야 하는 말인 "그 이유는 당신에게 있지 않습니다" 는 통과한다(한국어 부정은 어간 뒤에
+    #    '-지 않' 으로 붙으므로 '…있' 에서 끊으면 정답 문장을 삼킨다).
+    # ⚠️ (나)는 반대로 '-지 않' 형을 *의도적으로* 막는다. 여기서는 부정형 문장 자체가 위반이다
+    #    ("본문은 이유를 말하지 않습니다" = v1 오류의 재발). 위로가 아니라 오주장이므로 대안
+    #    표면을 열어 둘 필요가 없다.
+    # ⚠️ 15:16 verbatim("이는 아모리 족속의 죄악이…")·nb_s3_reason_clarify("이 이유는 아브람에
+    #    관한 것이 아니었다")와 표층이 겹치지 않게 골랐다 — 자기 본문 lint 충돌 0건.
+    lint_forbidden_tokens:
+      - "이유는 당신에게 있습니"
+      - "이유는 당신에게 있었"
+      - "이유는 너에게 있습니"
+      - "이유는 너에게 있었"
+      - "이유는 네게 있습니"
+      - "이유는 네게 있었"
+      - "당신을 위한 사백 년"
+      - "너를 위한 사백 년"
+      - "이 사백 년은 당신"
+      - "이 사백 년은 너"
+      - "당신 때문에 늦어"
+      - "너 때문에 늦어"
+      - "당신을 위해 미뤄"
+      - "너를 위해 미뤄"
+      - "본문은 이유를 말하지 않"
+      - "성경은 이유를 말하지 않"
+      - "본문도 이유를 침묵"
+      - "이유는 끝내 침묵"
+  - id: R3_all_waits_valid
+    enforced_at: br_s3_wait_label
+    description: "voice_the_lack / hold_the_promise / sit_with_unknowing 세 경로 모두 정당하다 — 우열·정답 없음."
+    # 토큰 lint 로 집행할 수 없는 *분기 구조* 요건이다(elijah scene4 R3_all_laments_valid 와 같은
+    # 이유). 금칙어를 채우면 카고컬트가 된다 — 우열은 어휘가 아니라 구조로 생긴다.
+    # 이 인물의 추가 조건: 미선택(타임아웃) 경로도 '못 고른 실패' 가 아니라 정당한 라벨(null)이어야
+    # 하며, 그 경로가 Scene 5 에서 문구 없이 끝나면 안 된다(§5 가장 취약한 경로).
+    enforcement: structural
+    structural_check: "br_s3_wait_label.routes 가 정확히 3개이고 when.wait_label 이 voice_the_lack·hold_the_promise·sit_with_unknowing 로 서로 다를 것. 세 route 모두 card_text_ko·static_text_ko·llm_prompt_key 를 갖고 그 값이 서로 중복되지 않을 것(=AI opt-out 에서도 세 경로가 동등하게 정적으로 완결). 분기 서브트리(br_s3_wait_label 이하)에 score/scoring/correct/rank/ranking/best_choice/정답 키가 0건일 것. 미선택 경로 정당성: ix_s3_wait_label_select.validation_rules[0].on_timeout = treat_as_complete 이고 on_timeout_result.wait_label = null 이며, content/abraham/scene5.yml 의 br_s5_closing_message.routes 에 when.wait_label: null 인 폴백 route 가 비어 있지 않은 static_text_ko 와 함께 존재할 것."
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "지연 정당화(R2)·기다림 성과 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패. seed §2-D FORBIDDEN 정본 52종을 표층형 감사로 재작성한 117종(YAML block 리스트, 아래 주석에 변경 사유)."
+    # 🔻 토큰 감사(어간형 분리 · 과대 토큰 축소) — 표층형 기준 재작성, 축은 그대로다.
+    #    한국어 부정은 언제나 어간 *뒤* 에 '-지 않/못'·'-가 아니'로 붙는다. 따라서 어간·술어
+    #    앞에서 끊은 토큰은 그 축의 *정당한 부정형 위로* 를 반드시 삼킨다
+    #    (ForbiddenTokenConfigTest KDoc + 커밋 92d5fe2 의 '쓰임받/도구로 쓰' 선례).
+    #    아래 16종을 그 규칙대로 갈라내거나, 문맥 없이 흔한 파편은 축을 지키는 더 긴 표층형으로
+    #    바꿨다. 2인칭(너/당신)·높임(-셔/-시) 커버리지는 항목마다 유지한다 — 줄이는 게 아니라
+    #    오작동을 없애는 게 목적이다.
+    #    · '기다림에는 뜻이' → '…뜻이 있' 2종 ("기다림에는 뜻이 없어도 괜찮습니다" 통과)
+    #    · '아직 준비가 안'  → 원인 어미 4종 ("아직 준비가 안 되셨다면 건너뛰셔도 됩니다" —
+    #                          R4 동의 카드가 실제로 써야 하는 문장이라 반드시 열어 둔다)
+    #    · '조금만 더'       → '조금만 더 견디/참/버티/기다리/힘내' ("조금만 더 쉬셔도 됩니다" 통과)
+    #    · '보이지 않아도'   → '…반드시/결국/이미/응답' ("아무것도 보이지 않아도 그 마음은
+    #                          사실입니다" 같은 타당화 문장이 살아난다)
+    #    · '에도 이유가 있'  → 기다림/지연/침묵/늦어짐/이 시간 한정 ("당신이 우는 데에도 이유가
+    #                          있습니다" — 감정 타당화가 R2 금칙에 걸리던 과대 토큰이었다)
+    #    · '반드시 이유가'   → 주어 한정 4종 (같은 이유)
+    #    · '결국 받'         → '결국 받게 되/받으실/받을 것/받습니' ("결국 받지 못해도 괜찮습니다" 통과)
+    #    · '준비되었을 때'·'준비되면' → 2인칭 주어·후행 어휘 한정 (동의 게이트 UI 의 "준비되면
+    #                          알려 주세요" 류가 걸리던 파편)
+    #    · '도 은혜'         → 문맥 없는 과대 파편. 기다림/지연/침묵/고통/이것 한정으로 교체
+    #    · '보상받'          → '보상받으/는/을/아/습' ("보상받지 못해도 괜찮습니다" 통과 — 92d5fe2
+    #                          의 '쓰임받' 분리와 동형)
+    #    · '헛되지 않'       → 주어를 기다림/기다린 시간/눈물로 한정. 전역 목록에 합쳐지면 이 리포가
+    #                          이미 사람 검수를 통과시킨 위로문(elijah scene5 "네 열심이 헛되지
+    #                          않았다")을 차단한다 — 실측으로 확인하고 좁혔다.
+    #    · '기다리는 동안'   → '…자라/준비/빚어/에도 이미' ("기다리는 동안 많이 외로우셨겠습니다" 통과).
+    #                          부분문자열 lint 는 주어 삽입에 새므로("기다리는 동안 *당신은* 자라고
+    #                          있었습니다") 2인칭 삽입형을 명시적으로 함께 넣었다. 그 밖의 삽입형은
+    #                          이 게이트로 못 막는다 — 방어선은 LLM 시스템 프롬프트와 사람 검토다.
+    #    · '사라지지 않'     → '헛되이/그냥 사라지지 않'·'사라지지 않고 쌓'·'기다림은 사라지지 않'
+    #                          ("이 슬픔은 사라지지 않아도 괜찮습니다" 통과). scene3 의
+    #                          "…사라지지 않고 그대로 놓였다" 는 지연 정당화가 아니라 *항의를
+    #                          지우지 않는다* 는 이 미션의 핵심 문장이므로, 본문이 아니라 토큰을 갈랐다.
+    #    · '일하고 계'       → '계십니/계세/계신 것/계실 것/계셔/계셨' ("하나님이 일하고 계시지
+    #                          않는 것처럼 느껴질 수 있습니다" — 탄식 타당화 통과)
+    #    · '계산보다'        → 소유격 한정 4종 (전역 목록에 합쳐지면 무관 문맥에서 오작동)
+    #    · '믿음으로 바라보' → 명령·당위형 5종 ("지금은 믿음으로 바라보지 못해도 괜찮습니다" 통과)
+    #    유지한 것: '조금 더 견디/참/버티' — 선행 '조금 더' 가 이미 강요 표층을 고정하고, 이 축의
+    #    자연스러운 위로는 "더 견디지 않으셔도 됩니다" 라 '조금 더' 를 포함하지 않는다.
+    #    '당신의 일도/너의 일도/네 일도' — 2인칭 전이가 곧 이 축이라 줄이면 커버리지가 사라진다.
+    lint_forbidden_tokens:
+      - "기다림에는 뜻이 있"
+      - "기다림에도 뜻이 있"
+      - "때가 되면"
+      - "너를 준비시"
+      - "당신을 준비시"
+      - "시간이 너를 빚"
+      - "시간이 당신을 빚"
+      - "아직 준비가 안 돼서"
+      - "아직 준비가 안 되어서"
+      - "아직 준비가 안 되셔서"
+      - "아직 준비가 안 됐기 때문"
+      - "조금만 더 견디"
+      - "조금만 더 참"
+      - "조금만 더 버티"
+      - "조금만 더 기다리"
+      - "조금만 더 힘내"
+      - "믿음을 가지면"
+      - "기다린 만큼"
+      - "당신에게도 올"
+      - "너에게도 올"
+      - "당신에게도 기한이"
+      - "너에게도 기한이"
+      - "당신의 기한이"
+      - "너의 기한이"
+      - "보이지 않아도 반드시"
+      - "보이지 않아도 결국"
+      - "보이지 않아도 이미"
+      - "보이지 않아도 응답"
+      - "늦지 않으"
+      - "당신의 때"
+      - "너의 때"
+      - "때는 반드시"
+      - "기다림도 응답"
+      - "기다림은 헛되지 않"
+      - "기다림이 헛되지 않"
+      - "기다린 시간은 헛되지 않"
+      - "기다린 시간이 헛되지 않"
+      - "눈물은 헛되지 않"
+      - "눈물이 헛되지 않"
+      - "반드시 이루어"
+      - "기다림에도 이유가 있"
+      - "지연에도 이유가 있"
+      - "침묵에도 이유가 있"
+      - "늦어짐에도 이유가 있"
+      - "이 시간에도 이유가 있"
+      - "하나님께는 반드시 이유가"
+      - "모든 일에는 반드시 이유가"
+      - "이 기다림에는 반드시 이유가"
+      - "그 지연에는 반드시 이유가"
+      - "당신도 곧"
+      - "너도 곧"
+      - "포기하지 않으"
+      - "결국 받게 되"
+      - "결국 받으실"
+      - "결국 받을 것"
+      - "결국 받습니"
+      - "당신이 준비되었을 때"
+      - "네가 준비되었을 때"
+      - "준비되었을 때 비로소"
+      - "준비되었을 때에야"
+      - "당신이 준비되면"
+      - "네가 준비되면"
+      - "준비되면 비로소"
+      - "준비되면 주실"
+      - "준비되면 이루어"
+      - "기다림도 은혜"
+      - "지연도 은혜"
+      - "침묵도 은혜"
+      - "이 고통도 은혜"
+      - "이것도 은혜"
+      - "보상받으"
+      - "보상받는"
+      - "보상받을"
+      - "보상받아"
+      - "보상받습"
+      - "하나님의 시계"
+      - "응답이 올"
+      - "늦으신 적이"
+      - "늦으신 게 아"
+      - "가장 좋은 것으로"
+      - "미루시"
+      - "미루십"
+      - "기다리는 동안 자라"
+      - "기다리는 동안 당신은 자라"
+      - "기다리는 동안 너는 자라"
+      - "기다리는 동안 준비"
+      - "기다리는 동안 당신은 준비"
+      - "기다리는 동안 너는 준비"
+      - "기다리는 동안 빚어"
+      - "기다리는 동안 당신은 빚"
+      - "기다리는 동안 너는 빚"
+      - "기다리는 동안에도 이미"
+      - "헛되이 사라지지 않"
+      - "그냥 사라지지 않"
+      - "사라지지 않고 쌓"
+      - "기다림은 사라지지 않"
+      - "일하고 계십니"
+      - "일하고 계세"
+      - "일하고 계신 것"
+      - "일하고 계실 것"
+      - "일하고 계셔"
+      - "일하고 계셨"
+      - "당신의 계산보다"
+      - "너의 계산보다"
+      - "네 계산보다"
+      - "사람의 계산보다"
+      - "조금 더 견디"
+      - "조금 더 참"
+      - "조금 더 버티"
+      - "믿음으로 바라보세"
+      - "믿음으로 바라보십"
+      - "믿음으로 바라보셔야"
+      - "믿음으로 바라봐"
+      - "믿음으로 바라보면"
+      - "당신의 일도"
+      - "너의 일도"
+      - "네 일도"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    fade_to_black_seconds: 0.8
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    card_text_ko: "지금 힘든 마음이 드셨다면 이야기를 잠시 멈추겠습니다. 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
+    buttons_ko: ["계속하기", "잠시 쉬기", "미션 종료"]
+    note: >-
+      ⑤ 재개는 사용자가 '계속하기'를 누를 때만. 자동 재개 없음.
+      ⑥ 발화는 해시만 저장하고 평문을 남기지 않는다(COMMON §4 R1).
+      ⑦ 감지 경로에서 LLM 을 호출하지 않는다 — 정적 카드만.
+      ⑧ '미션 종료'를 실패로 기록하지 않는다.
+  - id: crisis_reminder
+    enforced_at: always
+    text_ko: "지금 마음이 많이 힘들다면 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "br_s3_wait_label 의 static_text_ko 는 세 경로 모두 정적으로 존재한다 — opt-out 도 서사가 완결된다."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: abraham_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: A_gen15_2_3_candidate
+    source: "창세기 15:2-3 상속자 항의 — 확정 서지 미확보(드릴다운 필요, seed §10 후보 참조)"
+    note: "항의는 그대로 인용 자막으로 남긴다 — 완곡화·삭제하지 않는다."
+    anchor_block: nb_s3_lack_1
+  - citation_id: A_gen15_5_6_candidate
+    source: "창세기 15:5-6 뭇별 언약과 의로 여기심 — 확정 서지 미확보(드릴다운 필요)"
+    note: "'셀 수 없음' 은 실패가 아니라 이 장면의 의도된 결말이다."
+    anchor_block: nb_s3_stars
+  - citation_id: A_gen15_13_16_candidate
+    source: "창세기 15:13-16 사백 년 예고와 아모리 족속 — 확정 서지 미확보(드릴다운 필요)"
+    note: "지연의 이유(15:16)는 3자(아모리 족속)의 사유이지 아브람의 준비·자격에 관한 것이 아니다(seed §1-2 HONEST 등급 정정본)."
+    anchor_block: nb_s3_reason
+  - disputed_points:
+      - id: DP1
+        summary: "창세기 15:6의 '의로 여기심'을 개신교 전통(전가된 의, 로마서 4:3·갈라디아서 3:6)으로 다루되, 배제된 시험 서사와 연결된 신약 본문을 추가 근거로 끌어오지 않는다."
+      - id: DP5
+        summary: "15:16 '사대'의 길이 — 400년(15:13)과 '4대'(15:16)의 관계가 본문 안에서 자명하지 않다. 미해결로 정직히 기록하며, 자막·내레이션에 연대 계산을 쓰지 않는다."
+    handling: "본문 그대로 인용 + 편집 내레이션으로 이유의 소재만 명확히 한다. 적용·유비 확장이나 연대 계산은 하지 않는다."

@@ -1,0 +1,228 @@
+# Scene 4 — 얍복 (90초, 창 32:24-28 · 32:30-31 — 선택 없음, 핵심 인터랙션: 붙잡고 놓지 않기)
+# ⚠️ 초안 — seed-JACOB 기반 ≤70% draft. 인간 안전검토자 사인오프 필수.
+# ⚠️ branches: [] — 이 Scene 의 유일한 인터랙션은 실패 판정이 없는 지속 그립이다.
+# ⚠️ 동의: Scene 1 의 cc_jacob_family_deception 카드가 이 Scene 도 커버한다(별도 카드 없음).
+# ⚠️ 씨름 상대의 정체를 어느 경로에서도 확정 지칭(하나님/천사)하지 않는다 — 32:24 "어떤 사람"을 그대로 쓴다(disputed #1, 신학검토자 승인 대기).
+# ⚠️ "환도뼈" 사용 금지 — 개역개정 표현 "허벅지 관절"(32:25) / "허벅다리"(32:31) 만 사용(COMMON §2 개역한글 금칙어).
+# ⚠️ 32:27 이름 질문에 사용자의 실제 이름을 묻지 않는다 — 응답은 "야곱" 고정.
+# ⚠️ 32:28 "이겼음이니라"를 사용자 성공 라벨로 재사용하지 않는다 — "기도로 하나님을 이긴다" 류 적용 금지(disputed #4).
+
+scene_id: jacob_scene4
+scene_name: jabbok
+mission_id: jacob
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: jabbok_riverside_night
+  background_model: env_river_ford_night
+  lighting:
+    type: moonlit_low_to_dawn_transition
+    color_temperature_kelvin: 5600
+  ambient_sound:
+    - id: river_flow_low
+      gain_db: -16
+      spatial: true
+    - id: struggle_breath_low
+      gain_db: -20
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jacob_self
+    voice_id: jacob_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 야곱. 홀로 남았다(32:24) — 다른 인물 없이 시작."
+  - id: wrestler_npc
+    voice_id: wrestler_v1
+    position: [0.0, 1.6, 0.6]
+    presentation:
+      no_face_render: true
+      gender_unspecified: true
+      form: abstract_humanoid_silhouette
+    note: "형상·성별 미렌더, 음성만(§8). 정체를 지칭하는 명사를 자막·연출 어디에도 붙이지 않는다."
+
+narration_blocks:
+  - id: nb_s4_wrestle_begin
+    speaker: narrator
+    text_ko: "야곱은 홀로 남았더니 어떤 사람이 날이 새도록 야곱과 씨름하다가 (창세기 32:24)"
+    audio_clip_id: aud_s4_wrestle_begin_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s4_hip_wrench
+    speaker: narrator
+    text_ko: "자기가 야곱을 이기지 못함을 보고 그가 야곱의 허벅지 관절을 치매 야곱의 허벅지 관절이 그 사람과 씨름할 때에 어긋났더라 (창세기 32:25)"
+    audio_clip_id: aud_s4_hip_wrench_ko
+    start_at_seconds: 10.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "'환도뼈' 사용 금지 — 개역개정 표현 '허벅지 관절'만 사용(COMMON §2)."
+  - id: nb_s4_hold_on_wrestler
+    speaker: wrestler_npc
+    text_ko: "그가 이르되 날이 새려하니 나로 가게 하라 (창세기 32:26)"
+    audio_clip_id: aud_s4_hold_on_wrestler_ko
+    start_at_seconds: 22.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+  - id: nb_s4_hold_on_jacob
+    speaker: jacob_inner
+    text_ko: "야곱이 이르되 당신이 내게 축복하지 아니하면 가게 하지 아니하겠나이다 (창세기 32:26)"
+    audio_clip_id: aud_s4_hold_on_jacob_ko
+    start_at_seconds: 29.0
+    duration_seconds: 6.0
+    hidden_until_event: hold_completed # ix_s4_hold_and_wrestle 의 지속 그립 완료 이벤트로만 재생
+  - id: nb_s4_name_q
+    speaker: wrestler_npc
+    text_ko: "그 사람이 그에게 이르되 네 이름이 무엇이냐 (창세기 32:27)"
+    audio_clip_id: aud_s4_name_q_ko
+    start_at_seconds: 36.0
+    duration_seconds: 5.0
+    hidden_until_event: hold_completed
+  - id: nb_s4_name_a
+    speaker: jacob_inner
+    text_ko: "그가 이르되 야곱이니이다 (창세기 32:27)"
+    audio_clip_id: aud_s4_name_a_ko
+    start_at_seconds: 42.0
+    duration_seconds: 4.0
+    hidden_until_event: name_response_given
+  - id: nb_s4_rename
+    speaker: wrestler_npc
+    text_ko: "그가 이르되 네 이름을 다시는 야곱이라 부를 것이 아니요 이스라엘이라 부를 것이니 이는 네가 하나님과 및 사람들과 겨루어 이겼음이니라 (창세기 32:28)"
+    audio_clip_id: aud_s4_rename_ko
+    start_at_seconds: 47.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+    note: "이 개명은 이야기 속 야곱의 것이다 — 사용자 실명 개명 연출에 사용 금지(절대 규칙 6)."
+  - id: nb_s4_peniel
+    speaker: narrator
+    text_ko: "그러므로 야곱이 그 곳 이름을 브니엘이라 하였으니 그가 이르기를 내가 하나님과 대면하여 보았으나 내 생명이 보전되었다 함이더라 (창세기 32:30)"
+    audio_clip_id: aud_s4_peniel_ko
+    start_at_seconds: 60.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "'하나님과 대면하여'는 성경 본문 자체의 인용이다 — 이 인용을 넘어서는 정체 확정 코멘트를 추가하지 않는다(disputed #1)."
+  - id: nb_s4_limp
+    speaker: narrator
+    text_ko: "그가 브니엘을 지날 때에 해가 돋았고 그의 허벅다리로 말미암아 절었더라 (창세기 32:31)"
+    audio_clip_id: aud_s4_limp_ko
+    start_at_seconds: 74.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "'환도뼈' 사용 금지 — 개역개정 표현 '허벅다리'만 사용(COMMON §2). limp_persists_to_scene5 플래그로 Scene 5 이동 애니메이션에 전달."
+
+interactions:
+  - id: ix_s4_hold_and_wrestle
+    type: sustained_grab_hold
+    target_assets: [wrestler_form_abstract]
+    gesture: two_handed_hold
+    presentation:
+      no_face_render: true
+      gender_unspecified: true
+    haptic:
+      resistance_intensity: 0.5
+      pulse_on_struggle: true
+    validation_rules:
+      - rule: no_pressure_persistent_grip
+        description: "손을 놓아도 실패가 아니다 — Scene 이 nb_s4_wrestle_begin 부터 다시 시작된다. 몇 번이든 다시 붙들 수 있다(R3). 실패 판정·재시도 횟수 카운트·decisions 기록 없음."
+        on_release: restart_scene_from_wrestle_begin
+        records: none
+      - rule: event_emit
+        on_sustained_hold_seconds: 15
+        emits_event: hold_completed
+    note: "32:26 '당신이 내게 축복하지 아니하면 가게 하지 아니하겠나이다' — 붙잡고 놓지 않는 것 자체가 이 Scene 의 정점. 성공 조건을 '이김'으로 라벨링하지 않는다(disputed #4)."
+  - id: ix_s4_name_response
+    type: fixed_response_prompt
+    prompt_verse: "32:27"
+    user_name_prompt: disabled
+    fixed_response_ko: "야곱이니이다"
+    emits_event: name_response_given
+    note: "사용자 실명을 묻지 않는다 — 응답은 '야곱' 고정(PII·트리거 보호)."
+
+branches: []
+
+safety_gates:
+  - id: R1_no_theophany_identification
+    enforced_at: always
+    description: "씨름 상대의 정체를 확정 지칭(하나님/천사/영)하지 않는다. 32:24 '어떤 사람'을 유지하고, 32:30 본문 인용(‘하나님과 대면하여’)을 넘어서는 코멘트를 추가하지 않는다(disputed #1, 신학검토자 승인 대기)."
+  - id: R1_no_victory_labeling
+    enforced_at: nb_s4_rename
+    description: "32:28 '겨루어 이겼음이니라'를 사용자 개인 신앙 성취·승리 서사로 일반화하지 않는다(disputed #4)."
+  - id: PII_no_real_name_prompt
+    enforced_at: ix_s4_name_response
+    description: "사용자 실명을 요청하지 않는다. 32:27 응답은 고정 문자열 '야곱이니이다'."
+  - id: limp_persists_to_scene5
+    enforced_at: scene_exit
+    description: "32:31 절뚝임을 Scene 5 진입 시 이동 애니메이션에 반영(연속성 — 판정용 게이트 아님)."
+    carry_flag: limp_persistent
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    on_detect:
+      scene_progress: halted
+      audio: fade_out_all
+      interactions: disabled
+      card_text_ko: "지금 들린 말이 마음에 걸립니다. 여기서 잠시 멈추겠습니다. 혼자 감당하지 않아도 됩니다 — {{crisis_resources.default}}"
+      resume: user_initiated_only
+      exit_always_available: true
+      storage: hash_only
+      no_transcript_echo: true
+      clinical_judgment: false
+  - id: R4_not_my_seat_offramp_ref
+    enforced_at: always
+    description: "cc_jacob_not_my_seat 이탈로 — scene1.yml 전문 정의 참조."
+    offramp_ref: cc_jacob_not_my_seat
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "R2·R3 금지 토큰 25종 — Scene 1 과 동일 세트(seed §7 정본)."
+    # 목록·감사 근거는 scene1.yml 의 같은 게이트 주석이 정본이다(5개 Scene 문자 그대로 동일).
+    lint_forbidden_tokens:
+      [
+        "용서해야",
+        "먼저 연락해",
+        "관계는 회복되어야 합",
+        "관계는 회복되어야죠",
+        "관계는 회복되어야 하지",
+        "관계도 회복될",
+        "너를 다듬으시",
+        "너를 다듬으신",
+        "너를 다듬으려",
+        "너를 다듬는",
+        "당신을 다듬으시",
+        "당신을 다듬으신",
+        "당신을 다듬으려",
+        "당신을 다듬는",
+        "속인 대가",
+        "그래서 겸손해지셨",
+        "그래서 겸손해지신",
+        "그래서 겸손해진",
+        "그래서 겸손해집",
+        "흉터도 축복",
+        "언젠가는 가야 합",
+        "언젠가는 가야죠",
+        "언젠가는 가셔야",
+        "언젠가는 가게 될",
+        "아직은 때가 아닐",
+      ]
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jacob_scene5
+transition:
+  type: fade_to_white_dawn
+  fade_out_seconds: 1.2
+  fade_in_seconds: 1.8
+
+theology_footer_refs:
+  - citation_id: J1_candidate
+    source: "docs/THEOLOGY-REFERENCES.md:34 [J2] 창세기 속임수 내러티브 어떻게 이해할 것인가 — 야곱 이야기 중심"
+    note: "씨름 상대 정체(하나님의 현현 vs 천사) 및 32:28 '이김'의 신학적 의미는 확정하지 않는다."
+    anchor_block: nb_s4_rename
+  - disputed_points:
+      - "씨름 상대의 정체 — 유보(disputed #1, 신학검토자 승인 대기)."
+      - "32:28 '이겼음이니라'의 의미 — 유보(disputed #4, 사용자 적용 서사로 일반화 금지만 확정)."
+    handling: "두 쟁점 모두 확정 서술 없이 본문 인용에서 멈춘다. lemuel-theology-reviewer 승인 전까지 이 상태를 유지한다."

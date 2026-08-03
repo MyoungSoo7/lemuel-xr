@@ -5,6 +5,10 @@ backend/.gradle/
 .idea/
 
 # Python
+# 디렉터리별로 적으면 새 파이썬 디렉터리가 생길 때마다 .pyc 가 커밋된다 —
+# scripts/__pycache__/newchar_gates.cpython-314.pyc 가 실제로 그렇게 들어왔다.
+__pycache__/
+*.pyc
 tts/__pycache__/
 ai/__pycache__/
 ai/.pytest_cache/

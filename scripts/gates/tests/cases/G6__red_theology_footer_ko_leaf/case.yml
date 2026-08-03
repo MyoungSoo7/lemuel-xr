@@ -1,0 +1,5 @@
+gate: G6
+expect: FAIL
+reason_contains: "렌더 leaf 에 금지 문구"
+planted: "같은 theology_footer_refs 서브트리 **아래의 `*_ko` leaf** 에 금지 토큰 '정신 차려' 삽입"
+green_proves: "서브트리 카브아웃이 통째 면제가 아님을 보인다. 이 RED 가 없으면 검토 주석 블록이 렌더 한국어 본문의 은닉처가 된다 — 위 GREEN 만으로는 그걸 구분할 수 없다."

@@ -1,0 +1,275 @@
+# Scene 2 — 뜻을 정하다 (90초, 사용자 선택 3개 · 라우팅 0개)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene2-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-DANIEL.md(v4) 기반의 ≤70% 초안. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 + 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ 협상은 2단 구조다(seed §5) — 1:8 환관장에게 구함 → 1:10 환관장의 거절(왕이 두려워서, 이유는
+#   '얼굴이 초췌해 보일까'라는 외모 지표) → 1:11 환관장이 세운 감독관에게 다니엘이 재접근 →
+#   1:12-13 그 외모 지표를 검증 가능한 형태로 되돌려 주는 제안 → 1:14 감독관이 수락.
+#   환관장과 감독관을 같은 인물로 뭉뚱그리지 않는다.
+# ⚠️ 카드 문구에 "용기 내어"/"밝힌다"/"숨긴다" 어휘를 쓰지 않는다 — 에스더(16) 축 배타(seed §0, §6).
+# ⚠️ 3 카드 전부 정당(R3_all_request_styles_valid). 이 결정은 다른 next_scene 으로 갈라지지
+#   않는다 — 셋 다 이미 일어난 실제 사건의 재현이고, 사용자는 "나라면 이 순간 어느 단계 대응에
+#   가장 공감하는가"를 고르는 것뿐이다. 저장값은 Scene 5 마무리 문구 라우팅(request_style)에만 쓰인다.
+
+scene_id: daniel_scene2
+id: daniel_scene2
+scene_name: resolve_and_negotiate
+mission_id: daniel
+version: 1.0.0
+duration_seconds_target: 90
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: babylon_palace_dining_hall
+  background_model: env_babylon_dining_hall
+  lighting:
+    type: interior_daylight_shafts
+    color_temperature_kelvin: 4200
+    dust_haze_emphasis: false
+  ambient_sound:
+    - id: distant_kitchen_clatter
+      gain_db: -26
+      spatial: true
+    - id: hall_murmur_low
+      gain_db: -28
+      spatial: true
+  user_position: [0.0, 1.65, 0.5]
+  user_facing: [0.0, 0.0, -1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: daniel_self
+    voice_id: daniel_v1
+    position: [0.0, 1.65, 0.5]
+    note: "사용자가 다니엘 — first-person, 음성은 내면 독백 + 대사"
+  - id: chief_eunuch
+    voice_id: official_v1
+    position: [1.2, 1.65, -1.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "환관장 — 1:8 요청을 받고 1:10 에서 거절한다. 왕에 대한 두려움이 동기 — 악역 톤 금지."
+  - id: overseer_official
+    voice_id: official_v1
+    position: [-1.2, 1.65, -1.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "환관장이 세운 감독관 — 1:11 이후 다니엘이 재접근하는 실무 담당자. 환관장과 동일 인물 아님(seed §5)."
+
+narration_blocks:
+  - id: nb_s2_resolve_1_8
+    speaker: scripture_caption
+    text_ko: "다니엘은 뜻을 정하여 왕의 음식과 그가 마시는 포도주로 자기를 더럽히지 아니하리라 하고 자기를 더럽히지 아니하도록 환관장에게 구하니 (다니엘 1:8)"
+    audio_clip_id: aud_s2_1_8_ko
+    start_at_seconds: 0.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s2_favor_1_9
+    speaker: scripture_caption
+    text_ko: "하나님이 다니엘로 하여금 환관장에게 은혜와 긍휼을 얻게 하신지라 (다니엘 1:9)"
+    audio_clip_id: aud_s2_1_9_ko
+    start_at_seconds: 22.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "faith_tone strong 근거절(seed §6). '인간 결단 단독 서사'로 읽히지 않도록 1:8 바로 뒤에 배치(seed §13)."
+  - id: nb_s2_refusal_1_10
+    speaker: chief_eunuch
+    text_ko: "환관장이 다니엘에게 이르되 내가 내 주 왕을 두려워하노라 그가 너희 먹을 것과 너희 마실 것을 지정하셨거늘 너희의 얼굴이 초췌하여 같은 또래의 소년들만 못한 것을 그가 보게 할 것이 무엇이냐 그렇게 되면 너희 때문에 내 머리가 왕 앞에서 위태롭게 되리라 하니라 (다니엘 1:10)"
+    audio_clip_id: aud_s2_1_10_ko
+    start_at_seconds: 32.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    note: "거절 사유 = 외모라는 관찰 가능한 지표(seed §5). 이후 1:12-13 제안이 정확히 이 지표에 답한다 — 요약·윤문 없이 전문 사용(seed §1-1 v2 정정 기록)."
+  - id: nb_s2_seek_overseer_1_11
+    speaker: scripture_caption
+    text_ko: "환관장이 다니엘과 하나냐와 미사엘과 아사랴를 감독하게 한 자에게 다니엘이 말하되 (다니엘 1:11)"
+    audio_clip_id: aud_s2_1_11_ko
+    start_at_seconds: 60.0
+    duration_seconds: 6.0
+    hidden_until_event: request_style_selected
+    note: "seek_ally 근거절. 선택 카드와 무관하게 항상 재생 — 실제로 일어난 사건이기 때문."
+  - id: nb_s2_proposal_1_12_13
+    speaker: daniel_self
+    text_ko: "청하오니 당신의 종들을 열흘 동안 시험하여 채식을 주어 먹게 하고 물을 주어 마시게 한 후에 당신 앞에서 우리의 얼굴과 왕의 음식을 먹는 소년들의 얼굴을 비교하여 보아서 당신이 보는 대로 종들에게 행하소서 하매 (다니엘 1:12-13)"
+    audio_clip_id: aud_s2_1_12_13_ko
+    start_at_seconds: 68.0
+    duration_seconds: 15.0
+    hidden_until_event: null
+    note: "verifiable_proposal 근거절. '얼굴을 비교하여'가 1:10 의 외모 지표에 대한 직접 응답 — 나레이션에서 이 대응 관계를 지우지 말 것."
+  - id: nb_s2_agreement_1_14
+    speaker: scripture_caption
+    text_ko: "그가 그들의 말을 따라 열흘 동안 시험하더니 (다니엘 1:14)"
+    audio_clip_id: aud_s2_1_14_ko
+    start_at_seconds: 85.0
+    duration_seconds: 5.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s2_meal_choice
+    type: grab_and_place
+    target_assets:
+      [model_royal_meal_tray, model_vegetables_water_tray, socket_return_tray]
+    gesture: grab_and_place
+    presentation:
+      description: "왕의 진미 쟁반을 손으로 밀어내고 채식과 물 쟁반을 받는 동작. 1:8 의 '뜻을 정하여'를 몸짓으로 체감시키는 장식적 연출."
+    validation_rules:
+      - rule: optional_no_pressure
+        on_timeout: treat_as_complete
+        timeout_seconds: 15.0
+      - rule: track_micro_signals
+        description: "이 인터랙션은 분기가 아니다(seed §7-2). 음식 선택 자체가 아니라 '어떻게 요청하는가'가 결정 변수(request_style)다."
+  - id: ix_s2_request_style_cards
+    type: select_one_of_n
+    target_assets:
+      [ui_card_direct_refusal, ui_card_verifiable_proposal, ui_card_seek_ally]
+    gesture: point_and_select
+    presentation:
+      trigger_event: refusal_heard
+      cards:
+        - value: direct_refusal
+          card_text_ko: "여기까지라고 말한다"
+          anchor_citation: "단 1:8 (자기를 더럽히지 아니하리라)"
+        - value: verifiable_proposal
+          card_text_ko: "확인해 볼 수 있는 방법을 낸다"
+          anchor_citation: "단 1:12-13 (열흘 시험·얼굴 비교)"
+        - value: seek_ally
+          card_text_ko: "결정할 수 있는 사람을 찾는다"
+          anchor_citation: "단 1:11 (감독하게 한 자에게)"
+    validation_rules:
+      - rule: required_optional
+        description: "선택하지 않아도 진행 가능 — R4 스킵 시 request_style: null 폴백으로 Scene 5 라우팅에 도달한다(seed §3-2, §6-2)."
+      - rule: event_emit
+        on_select: request_style_selected
+
+branches:
+  - id: br_s2_request_style
+    triggered_by_event: [request_style_selected]
+    decision_key: request_style
+    backend_endpoint: "POST /api/game/daniel/decision"
+    body_template:
+      request_style: "{{selected_value}}"
+    default_path: static_curation
+    llm_optin_only: true
+    routes:
+      - value: direct_refusal
+        next_scene_id: daniel_scene3
+      - value: verifiable_proposal
+        next_scene_id: daniel_scene3
+      - value: seek_ally
+        next_scene_id: daniel_scene3
+      - value: null
+        next_scene_id: daniel_scene3
+        note: "미선택 폴백 — request_style: null. Scene 5 마무리 문구는 D(null) 표로 도달한다."
+    note: "3 라벨 + null 전부 next_scene_id 동일(daniel_scene3) — 라우팅 분기 0개, 사용자 선택 분기 3개(seed §3 표). request_style 은 여기서 저장되고 Scene 5 br_s5_closing_message 에서만 소비된다."
+
+safety_gates:
+  - id: violence_exclusion_dan_6_24
+    enforced_at: always
+    description: "단 6:24 및 6:25-28 완전 배제 — 이 인물 전 Scene 공통 원칙(seed §2-3)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    storage: hash_only
+    on_detect:
+      - scene_timeline: pause
+      - audio: fade_to_silence_1200ms
+      - visual: fade_to_soft_black
+      - haptic: stop_all
+      - show_card: card_crisis_daniel
+    crisis_card:
+      id: card_crisis_daniel
+      text_ko: "지금 많이 힘드신 것 같아요. 이야기는 여기서 잠시 멈출게요. 혼자 견디지 않으셔도 됩니다. 도움을 받을 수 있는 곳: {{crisis_resources.default}}"
+      buttons_ko: ["잠시 쉬기", "미션 종료하기", "이어서 진행하기"]
+      default_focus: "잠시 쉬기"
+    resume_rule: explicit_user_tap_only
+    crisis_resource_ref: crisis_resources.default
+  - id: R3_all_request_styles_valid
+    enforced_at: br_s2_request_style
+    description: "direct_refusal · verifiable_proposal · seek_ally 3 라벨 모두 정당하다. 어느 카드에도 우열·서열 표현을 두지 않는다(seed §6-1 자체 점검 ⑤)."
+    # ── 왜 토큰이 아니라 structural 인가 ──────────────────────────────────────
+    # "여러 간구 방식이 모두 정당" 은 *어휘* 가 아니라 *분기 구조* 요건이다. 금칙어를
+    # 채워 넣으면 축과 무관한 토큰을 세는 카고컬트가 된다(elijah/scene4 R3_all_laments_valid
+    # 와 같은 판단). 위험은 문장이 아니라 구조에서 온다 — 한 라벨만 다른 next_scene 을 갖거나
+    # 점수·정답 표시가 붙는 순간 '정면 거절이 정답이고 동맹 찾기는 차선' 이 되고,
+    # 그건 이 미션의 R3(회복·담대 압박 금지) 를 정확히 무너뜨린다.
+    enforcement: structural
+    structural_check: "ix_s2_request_style_cards.presentation.cards 가 direct_refusal·verifiable_proposal·seek_ally 3장 전부를 갖고 각 카드가 비어 있지 않은 card_text_ko 와 anchor_citation 을 가질 것(카드 3 · 서로 다른 value 3). br_s2_request_style.routes 가 그 3 라벨 + null 폴백 = 4개이고, 4개 전부 next_scene_id 가 daniel_scene3 로 동일할 것(어느 한 라벨도 다른 후속·다른 길이의 경로를 갖지 않는다). br_s2_request_style 서브트리에 score·scoring·correct·rank·ranking·best_choice·정답 류 키가 0건일 것."
+  - id: R2_R3_esther_boundary_lint
+    enforced_at: always
+    description: "고난 인과정당화(R2)·회복·담대 압박(R3)·에스더 배타(seed §0) 어휘 차단. application.yml 전역 리스트와 append-only 동기화."
+    # 축 셋(R2 인과정당화 / R3 담대·인내 압박 / 에스더 '드러내다·숨기다·타협' 배타)을
+    # 한 게이트가 덮는다. 저작 근거·어간 절단 수정 3건('담대해지'·'단단하게 만들'·'감추고 사는')과
+    # 의도적 과차단 1건('숨기는 것은 부끄러')의 전문은 scene1.yml 의 같은 게이트 주석에 있다.
+    #
+    # 이 Scene 에서 특히 중요한 것은 (c) 축이다 — 협상 카드 3장이 '용기 내어 밝힌다 vs 숨긴다'
+    # 로 재해석되면 에스더 미션과 같은 말이 된다. 그래서 '드러내야 하는 것'·'숨기는 게 부끄러'·
+    # '타협하지 마' 계열이 이 파일에서 반드시 살아 있어야 한다. 통과해야 하는 위로:
+    # "타협처럼 보이는 선택도 실패가 아닙니다" / "드러내지 않아도 괜찮습니다".
+    lint_forbidden_tokens:
+      [
+        "연단하시",
+        "연단하십",
+        "단련하시",
+        "단련하십",
+        "허락하신 것",
+        "고난에는 뜻이",
+        "고난에도 뜻이",
+        "담대해져",
+        "담대해지세",
+        "담대해지십",
+        "담대해지셔야",
+        "담대해지면",
+        "처럼 담대",
+        "견디면 높",
+        "조금만 견디",
+        "타협하지 말",
+        "타협하지 마",
+        "타협해서는",
+        "타협하면 안",
+        "세상과 구별되지",
+        "숨기는 건 부끄러",
+        "숨기는 것은 부끄러",
+        "숨기는 게 부끄러",
+        "믿음이 있으면 드러내",
+        "믿음이 있다면 드러내",
+        "드러내야 하는 것",
+        "단단하게 만듭",
+        "단단하게 만들어",
+        "단단하게 만드는",
+        "단단하게 만들려",
+        "반드시 이유가 있",
+        "데는 하나님의 계획",
+        "갚아 주실",
+        "용기를 내 보셔",
+        "물러서시면",
+        "물러서지 마",
+        "물러서지 말",
+        "지금은 참으",
+        "이 정도는 버텨",
+        "버텨 내셔야",
+        "감추고 사시면 안",
+        "감추고 사시겠",
+        "감추고 살지 마",
+        "감추고 사십시",
+      ]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "default_path: static_curation. br_s2_request_style 은 정적 라우팅이며 LLM 미호출."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: daniel_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D2_candidate
+    source: "다니엘서 1장 음식 규례 언약적 맥락 — 확정 서지 미확보(seed §12, KCI 검색어 '단 1장 음식 규례 언약')"
+    note: "채식 요청은 우상 제물·왕의 상 나눔이라는 언약적 맥락의 경계 설정이지, 식이법 일반 명령으로 제시하지 않는다(disputed_point 1)."
+    anchor_block: nb_s2_resolve_1_8
+  - disputed_points:
+      - id: D1
+        summary: "단 1장의 채식이 규범인가"
+        handling: "채식주의 근거로 쓰지 않는다. 서지 미확보 — 본 미션의 입장 표명이며 학계 합의 주장 아님."
+    handling: "세부는 docs/MVP-DANIEL.md §12.6 참조."

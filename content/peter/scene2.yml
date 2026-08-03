@@ -1,0 +1,366 @@
+# Scene 2 — 세 번의 부인 (90초, 눅 22:54-60 / 요 18:18) · R1 고감도 Scene · R4 동의 트리거
+# ⚠️ consent_card_id / consent_trigger_ko / consent_covers_scenes / skip_alternative_scene_id /
+#    skip_summary_subtitle / consent_cards[] / skip_summary 는 seed §4 R4 확정 전문을
+#    그대로 옮긴 것이다 — designer 가 재작성하지 않는다(§8 검토 대상 ⑥⑧, 인간 사인오프 전).
+# ⚠️ denial_card_id(deny_knowing/deny_belonging/deny_understanding) 는 decisions 에
+#    절대 기록하지 않고 restore_label 과 상관시키지 않는다(seed §5, §3-1).
+# ⚠️ 카드 텍스트는 본문의 세 부인에 1:1 고정(선택형 발명 아님) — seed §3-1 확정 전문.
+# ⚠️ 초안 — 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+
+scene_id: peter_scene2
+scene_name: three_denials
+mission_id: peter
+version: 1.0.0
+duration_seconds_target: 90
+note: "사용자가 베드로 — 1인칭. C1·C2 는 선택(카드를 눌러 진행), C3 는 선택지 없이 자동 재생 — 세 카드 모두 정당하며 틀린 답이 없다(R3_all_denials_are_the_text)."
+
+# --- R4 동의 게이트 (top-level 키 — G7e 가 문서 루트에서 파싱) ---
+consent_card_id: peter_s2_consent
+consent_trigger_ko: "배신·수치·자기정죄"
+consent_covers_scenes: [2, 3]
+skip_alternative_scene_id: 4
+skip_summary_subtitle: true
+
+consent_cards:
+  - id: peter_s2_consent
+    trigger_ko: "배신·수치·자기정죄"
+    body_ko: "다음 장면에는 예수를 안다고 하지 않은 밤과, 그 뒤에 남은 마음이 나옵니다."
+    choice_continue_ko: "이어서 보기"
+    choice_skip_ko: "건너뛰기"
+    note_ko: "건너뛰어도 이야기는 끝까지 이어집니다."
+
+# '건너뛰기' 선택 시에만 재생 — narrator_v1 해설, 감정 연기 없음(§7-1)
+skip_summary:
+  voice_id: narrator_v1
+  duration_sec: 12
+  lines_ko:
+    - "그 밤, 베드로는 멀찍이 따라갔습니다."
+    - "불 곁에서 세 번, 예수를 안다고 하지 않았습니다."
+    - "닭이 울었고, 예수께서 돌이켜 그를 보셨습니다."
+    - "그리고 그는 밖으로 나갔습니다."
+  next_scene_id: 4
+
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: high_priest_courtyard_night
+  background_model: env_courtyard_charcoal_fire
+  lighting:
+    type: firelight_low_key
+    color_temperature_kelvin: 1900
+  ambient_sound:
+    - id: courtyard_crowd_murmur
+      gain_db: -22
+      spatial: true
+    - id: charcoal_fire_crackle
+      gain_db: -18
+      spatial: true
+      note: "숯불 애셋 근거는 요 18:18(ἀνθρακιά) 을 병기한다. 눅 22:55 는 πῦρ(불)이며 숯불 대칭은 요한복음 내부에서만 성립(seed §1-1). 자산 문서 어디에도 두 절을 결합한 표기를 쓰지 않는다."
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.3, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: servant_girl
+    voice_id: servant_v1
+    position: [1.0, 1.55, 0.8]
+    visual_traits: [firelit_silhouette]
+    note: "눅 22:56 여종. 비난조가 아니라 확인조(seed §7-1) — 적대적 연기 금지."
+  - id: bystander_v1
+    voice_id: servant_v1
+    position: [-0.8, 1.7, 1.0]
+    visual_traits: [firelit_silhouette]
+    note: "눅 22:58 지목자. servant_v1 성우의 피치를 낮춘 변주(seed §7-1) — 별도 로스터 추가 금지."
+  - id: bystander_v2
+    voice_id: servant_v1
+    position: [0.5, 1.7, 1.6]
+    visual_traits: [firelit_silhouette]
+    note: "눅 22:59 지목자. servant_v1 변주."
+  - id: peter_self
+    voice_id: peter_v1
+    position: [0.0, 1.55, 0.0]
+    note: "사용자가 베드로 — 1인칭. 울먹임·자책 억양 금지(seed §7-1)."
+
+narration_blocks:
+  - id: nb_s2_setup_54
+    speaker: narrator
+    text_ko: "예수를 잡아 끌고 대제사장의 집으로 들어갈새 베드로가 멀찍이 따라가니라 (누가복음 22:54)"
+    audio_clip_id: aud_s2_54_ko
+    start_at_seconds: 0.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+  - id: nb_s2_setup_55
+    speaker: narrator
+    text_ko: "사람들이 뜰 가운데 불을 피우고 함께 앉았는지라 베드로도 그 가운데 앉았더니 (누가복음 22:55)"
+    audio_clip_id: aud_s2_55_ko
+    start_at_seconds: 8.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+  - id: nb_s2_setup_jhn18_18
+    speaker: narrator
+    text_ko: "그 때가 추운 고로 종과 아랫사람들이 불을 피우고 서서 쬐니 베드로도 함께 서서 쬐더라 (요한복음 18:18)"
+    audio_clip_id: aud_s2_jhn1818_ko
+    start_at_seconds: 16.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+  - id: nb_s2_c1_accusation
+    speaker: servant_girl
+    text_ko: "한 여종이 베드로의 불빛을 향하여 앉은 것을 보고 주목하여 이르되 이 사람도 그와 함께 있었느니라 하니 (누가복음 22:56)"
+    audio_clip_id: aud_s2_56_ko
+    start_at_seconds: 24.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+  - id: nb_s2_c1_denial
+    speaker: peter_self
+    text_ko: "베드로가 부인하여 이르되 이 여자여 내가 그를 알지 못하노라 하더라 (누가복음 22:57)"
+    audio_clip_id: aud_s2_57_ko
+    start_at_seconds: 32.0
+    duration_seconds: 8.0
+    hidden_until_event: branch_c1_resolved
+
+  - id: nb_s2_c2_accusation_and_denial
+    speaker: bystander_v1
+    text_ko: "조금 후에 다른 사람이 보고 이르되 너도 그 도당이라 하거늘 베드로가 이르되 이 사람아 나는 아니로라 하더라 (누가복음 22:58)"
+    audio_clip_id: aud_s2_58_ko
+    start_at_seconds: 40.0
+    duration_seconds: 10.0
+    hidden_until_event: branch_c2_resolved
+
+  - id: nb_s2_c3_accusation
+    speaker: bystander_v2
+    text_ko: "한 시간쯤 있다가 또 한 사람이 장담하여 이르되 이는 갈릴리 사람이니 참으로 그와 함께 있었느니라 (누가복음 22:59)"
+    audio_clip_id: aud_s2_59_ko
+    start_at_seconds: 50.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+
+  - id: nb_s2_c3_denial_and_rooster
+    speaker: peter_self
+    text_ko: "베드로가 이르되 이 사람아 나는 네가 하는 말을 알지 못하노라고 아직 말하고 있을 때에 닭이 곧 울더라 (누가복음 22:60)"
+    audio_clip_id: aud_s2_60_ko
+    start_at_seconds: 58.0
+    duration_seconds: 14.0
+    hidden_until_event: branch_c3_resolved
+    note: "이 블록에서 닭 울음 SFX 재생. 22:61-62(시선·통곡) 본문은 Scene 3 에서 다룬다 — 여기서는 전조 SFX 만."
+
+interactions:
+  - id: ix_s2_c1_card
+    type: select_one_of_n
+    presentation:
+      description: "C1 카드(고정 1장)를 선택해 진행 — 대안 문구 없음. 누르는 행위 자체가 재연."
+      n: 1
+    validation_rules:
+      - rule: tap_to_proceed
+        description: "카드 1장 확인 시 branch_c1_resolved 발화."
+  - id: ix_s2_c2_card
+    type: select_one_of_n
+    presentation:
+      description: "C2 카드(고정 1장)를 선택해 진행."
+      n: 1
+    validation_rules:
+      - rule: tap_to_proceed
+        description: "카드 1장 확인 시 branch_c2_resolved 발화."
+  - id: ix_s2_c3_auto
+    type: auto_proceed
+    presentation:
+      description: "C3 는 선택지로 제시되지 않는다. 눅 22:59 자막 직후 자동 재생."
+    validation_rules:
+      - rule: auto_proceed
+        description: "selectable: false — 사용자 조작 없이 branch_c3_resolved 자동 발화."
+
+# branches 배열 길이 3 — C1·C2 는 선택(카드 3장이 branches 원소가 아니라 C1·C2·C3 각각이 원소),
+# C3 만 selectable:false + auto_advance:true(seed §3-1/§3 표). denial_card_id 값은 각 카드에 1:1 고정.
+branches:
+  - id: br_s2_c1_deny_knowing
+    selectable: true
+    denial_card_id: deny_knowing
+    scripture_ref: "누가복음 22:57"
+    card_text_ko: "나는 그 사람을 모릅니다."
+    static_text_ko: "나는 그 사람을 모릅니다."
+    next_event: branch_c1_resolved
+    note: "denial_card_id 는 decisions 에 기록하지 않는다. restore_label 산정과 상관시키지 않는다(seed §5, §3-1)."
+
+  - id: br_s2_c2_deny_belonging
+    selectable: true
+    denial_card_id: deny_belonging
+    scripture_ref: "누가복음 22:58"
+    card_text_ko: "나는 그 사람들 중 하나가 아닙니다."
+    static_text_ko: "나는 그 사람들 중 하나가 아닙니다."
+    next_event: branch_c2_resolved
+    note: "denial_card_id 는 decisions 에 기록하지 않는다."
+
+  - id: br_s2_c3_deny_understanding
+    selectable: false
+    auto_advance: true
+    denial_card_id: deny_understanding
+    scripture_ref: "누가복음 22:60"
+    card_text_ko: "나는 무슨 말인지 모르겠습니다."
+    static_text_ko: "나는 무슨 말인지 모르겠습니다."
+    next_event: branch_c3_resolved
+    note: "세 번째 부인은 선택 없이 자동 진행(seed §3 ③). denial_card_id 는 decisions 에 기록하지 않는다."
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    # ⚠️ 어간·부사형에서 끊지 않는다 — 한국어 부정('-지 않/못'·'-가 아니')은 어간 *뒤* 에 붙으므로
+    # 어간형 토큰은 그 축의 부정형 위로를 통째로 삼킨다(92d5fe2 와 같은 규칙). 초안의 27종은
+    # 이 미션이 하려는 말 자체를 막고 있었다 — "다시는 부인하지 않겠다고 다짐하지 않으셔도
+    # 됩니다"(MVP §10), "아직 스스로를 용서하지 못해도 괜찮습니다", "자격을 갖추고 오라는 말은
+    # 없었습니다", "그 물음은 더 사랑하라는 요구가 아니었습니다" 등 실측 21건.
+    # 짧은 조각('놓아주'·'연단'·'겸손하게'·'있어야 더'…)은 전역 목록에서 무관한 문장까지 잡았다
+    # (실측: joseph scene3 "자루를 줄에 놓아주세요"). 축을 지키는 더 긴 표층형으로 교체했다.
+    # 변경 사유 전문·유지 결정(낮추시려/다듬으시려/빚으시려)·커버리지 대가는
+    # content/peter/scene1.yml 의 같은 게이트 주석에 있다 — 5개 Scene 의 목록은 동일하다.
+    lint_forbidden_tokens:
+      # (a) R2 — 실패·수치에 신적 의도(훈육·연단·성장)를 부여하는 인과형
+      - "겸손하게 하시려"
+      - "겸손하게 만드시려"
+      - "겸손하게 만들려고"
+      - "겸손하게 받아들이세"
+      - "겸손하게 받아들이십"
+      - "겸손하게 받아들여야 합"
+      - "겸손해지세"
+      - "겸손해지십"
+      - "겸손해지셔야"
+      - "겸손해져야 합"
+      - "연단하시"
+      - "연단하십"
+      - "낮추시려"
+      - "다듬으시려"
+      - "빚으시려"
+      - "보셨기 때문에"
+      - "있어야 더 깊어"
+      - "있어야 더 단단"
+      - "있어야 더 강해"
+      - "있어야 더 성숙"
+      - "있어야 더 성장"
+      - "더 키우시려"
+      - "더 키우세"
+      - "더 키우십"
+      - "더 키우셔야"
+      - "더 키워야 합"
+      - "더 키워야죠"
+      - "실패했으니"
+      - "실패했으므로"
+      - "실패했기 때문에"
+      # (b) R3 — 재발 방지 다짐 요구(이 미션의 최우선 금지 축, MVP §10)
+      - "다시는 부인하지 않겠습니다"
+      - "다시는 넘어지지 않겠습니다"
+      - "부인하지 않겠다고 다짐하세"
+      - "부인하지 않겠다고 다짐하십"
+      - "부인하지 않겠다고 다짐해야"
+      - "부인하지 않겠다고 약속하세"
+      - "넘어지지 않겠다고 다짐하세"
+      - "넘어지지 않겠다고 다짐하십"
+      - "넘어지지 않겠다고 다짐해야"
+      - "넘어지지 않겠다고 약속하세"
+      - "부인하지 마세"
+      - "부인하지 마십"
+      - "부인하지 마요"
+      - "부인하지 말아야 합"
+      - "부인하지 말아야죠"
+      - "다짐하세"
+      - "다짐하십"
+      - "다짐하셔야"
+      - "다짐해야 합"
+      - "다짐해야죠"
+      - "다짐해 보세"
+      - "다짐해라"
+      # (c) R3 — 감정 정리·자기용서 재촉
+      - "내려놓으세"
+      - "내려놓으십"
+      - "내려놓으셔야"
+      - "내려놓아야 합"
+      - "내려놓아야죠"
+      - "이제 내려놓을 때"
+      - "이제 놓아주"
+      - "그만 놓아주"
+      - "마음을 놓아주"
+      - "과거를 놓아주"
+      - "놓아주셔야 합"
+      - "놓아줘야 합"
+      - "놓아줘야죠"
+      - "붙들지 않으셔야"
+      - "붙들지 않으시면"
+      - "붙들지 말아야 합"
+      - "그만 붙들고"
+      - "이제 죄책감은 그만"
+      - "이제 죄책감을 버리세"
+      - "이제 죄책감을 버리십"
+      - "이제 죄책감을 버려야"
+      - "이제 죄책감에서 벗어나세"
+      - "이제 죄책감에서 벗어나야 합"
+      - "스스로를 용서하세"
+      - "스스로를 용서하십"
+      - "스스로를 용서하셔야"
+      - "스스로를 용서해야 합"
+      - "스스로를 용서해야죠"
+      - "스스로를 용서하지 못하면"
+      # (d) R3 — 조건부 회복(자격·준비·수치 소멸을 회복의 전제로 두는 프레임)
+      - "자격을 갖추세"
+      - "자격을 갖추십"
+      - "자격을 갖추셔야"
+      - "자격을 갖춰야 합"
+      - "자격을 갖춰야죠"
+      - "자격을 갖추어야 합"
+      - "자격을 갖춘 뒤에야"
+      - "떳떳하게 사세"
+      - "떳떳하게 사십"
+      - "떳떳하게 살아야 합"
+      - "떳떳하게 살아야죠"
+      - "떳떳하게 서세"
+      - "떳떳해지셔야"
+      - "떳떳해져야 합"
+      - "준비가 되면 부르"
+      - "준비가 되면 회복"
+      - "준비가 되면 다시 쓰"
+      - "준비가 되어야 부르"
+      - "준비가 되어야 회복"
+      - "준비가 되었을 때 부르"
+      - "준비가 되었을 때 회복"
+      - "준비가 되었을 때 비로소"
+      - "수치가 사라진 뒤에"
+      - "죄책감이 사라진 뒤에"
+      - "두려움이 사라진 뒤에"
+      - "사라진 뒤에야 회복"
+      - "사라진 뒤에야 부르"
+      # (e) R3 — 요 21:15-17 의 물음을 '사랑의 요구'로 바꾸는 축
+      - "더 사랑하세"
+      - "더 사랑하십"
+      - "더 사랑하셔야"
+      - "더 사랑해야 합"
+      - "더 사랑해야죠"
+      - "더 사랑해 보세"
+      - "더 사랑해라"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: peter_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - scripture_refs:
+      - ref: "누가복음 22:54-58"
+        translation: krv
+        anchor_block: nb_s2_c2_accusation_and_denial
+      - ref: "요한복음 18:18"
+        translation: krv
+        anchor_block: nb_s2_setup_jhn18_18
+      - ref: "누가복음 22:59-60"
+        translation: krv
+        anchor_block: nb_s2_c3_denial_and_rooster
+  - disputed_points: []
+    handling: "부인 3회 카드 텍스트는 §3-1 확정 전문 그대로이며 자기정죄·자기멸시 어휘 0회, 명령형·권유형 0회, 결과 약속 0회(seed §3-1 하드 제약)."

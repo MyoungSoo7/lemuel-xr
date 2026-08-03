@@ -1,0 +1,293 @@
+# Scene 2 — 장막 (45초, 연출 전용 · 본문 인용 없는 유일한 Scene)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene2-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-ABRAHAM.md(v5-b) 기반의 ≤70% 초안. 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ 이 Scene 은 §1 대조표에 없는 절을 인용하지 않는다 — narration_blocks 는 정황 요약이며
+#   citation_id 를 붙이지 않는다(COMMON §2). 창세기 12-13장 나그네 생활의 일반적 정황 묘사로,
+#   특정 절의 직접 인용이 아니다.
+# ⚠️ 이삭을 제물로 드리라는 시험 사건(창세기 21장 직후에 이어지는 장, 신약 재인용 포함)·
+#   여종 서사(창 16, 창 21:8-21)·아내를 누이라 속인 사건(창 12:10-20) — 전면 배제 원칙은
+#   Scene 1 에서 선언, 이 인물 전 Scene 공통 적용.
+# ⚠️ lint_forbidden_tokens 는 safety_gates[].id: R2_R3_lint_forbidden 하위에 중첩한다(seed §7-1(a) 정본).
+
+scene_id: abraham_scene2
+scene_name: the_tent
+mission_id: abraham
+version: 1.0.0
+duration_seconds_target: 45
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: canaan_hillside_campsite
+  background_model: env_canaan_tent_grove
+  lighting:
+    type: late_afternoon_amber
+    color_temperature_kelvin: 3000
+    dust_road_haze_emphasis: true
+  ambient_sound:
+    - id: tent_cloth_flap_loop
+      gain_db: -20
+      spatial: true
+    - id: herd_bells_distant
+      gain_db: -26
+      spatial: true
+    - id: low_wind_hillside
+      gain_db: -24
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: abraham_self
+    voice_id: abraham_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 아브람 — first-person, 음성은 내면 독백만"
+  - id: sarah_silent
+    voice_id: silent
+    position: [0.9, 1.6, 0.4]
+    initial_animation: fold_cloth
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "사래 — 함께 장막을 접는 동작. 대사 없음."
+
+narration_blocks:
+  - id: nb_s2_tents_struck
+    speaker: narrator_v1
+    text_ko: "장막을 걷고, 다시 세웠다. 이곳에서 저곳으로 — 여러 번."
+    citation_id: null
+    note: "본문 직접 인용 아님 — 창세기 12-13장 나그네 생활의 정황 요약(COMMON §2 준수, citation_id 미부여)."
+    audio_clip_id: aud_s2_tents_struck_ko
+    start_at_seconds: 3.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+  - id: nb_s2_still_sojourner
+    speaker: narrator_v1
+    text_ko: "가나안 땅에 이르렀지만, 그 땅은 아직 그의 것이 아니었다. 그는 거기서 나그네로 살았다."
+    citation_id: null
+    note: "본문 직접 인용 아님 — 정황 요약. '아직'을 성취 예고나 보상 서사로 확장하지 않는다(R2/R3 선제 적용)."
+    audio_clip_id: aud_s2_still_sojourner_ko
+    start_at_seconds: 20.0
+    duration_seconds: 9.0
+    hidden_until_event: peg_interaction_started
+
+interactions:
+  - id: ix_s2_tent_peg_pull_and_drive
+    type: grab_and_manipulate
+    target_assets: [model_tent_peg, model_mallet, socket_ground_anchor]
+    gesture: grab_pull_then_place
+    presentation:
+      repeat_allowed: true
+      count_target: null
+      success_judgment: none
+    haptic:
+      intensity: 0.3
+      duration_ms: 120
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 30
+        on_timeout: treat_as_complete
+        voice_prompt_id: aud_s2_prompt_peg
+        voice_prompt_max_repeat: 1
+        on_first_interaction: peg_interaction_started
+      - rule: track_micro_signals
+        records: [peg_pull_count]
+        note: "기록만 — 성공 판정·서사 분기에 사용하지 않음(§6.2). 이 인터랙션은 반복 자체가 의미다."
+
+branches: [] # Scene 2 결정 분기 없음 — 연출 전용(seed §3 표).
+
+safety_gates:
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "지연 정당화(R2)·기다림 성과 압박(R3) 금칙어 — 텍스트 풀에 존재 시 빌드 실패. seed §2-D FORBIDDEN 정본 52종을 표층형 감사로 재작성한 117종(YAML block 리스트, 아래 주석에 변경 사유)."
+    # 🔻 토큰 감사(어간형 분리 · 과대 토큰 축소) — 표층형 기준 재작성, 축은 그대로다.
+    #    한국어 부정은 언제나 어간 *뒤* 에 '-지 않/못'·'-가 아니'로 붙는다. 따라서 어간·술어
+    #    앞에서 끊은 토큰은 그 축의 *정당한 부정형 위로* 를 반드시 삼킨다
+    #    (ForbiddenTokenConfigTest KDoc + 커밋 92d5fe2 의 '쓰임받/도구로 쓰' 선례).
+    #    아래 16종을 그 규칙대로 갈라내거나, 문맥 없이 흔한 파편은 축을 지키는 더 긴 표층형으로
+    #    바꿨다. 2인칭(너/당신)·높임(-셔/-시) 커버리지는 항목마다 유지한다 — 줄이는 게 아니라
+    #    오작동을 없애는 게 목적이다.
+    #    · '기다림에는 뜻이' → '…뜻이 있' 2종 ("기다림에는 뜻이 없어도 괜찮습니다" 통과)
+    #    · '아직 준비가 안'  → 원인 어미 4종 ("아직 준비가 안 되셨다면 건너뛰셔도 됩니다" —
+    #                          R4 동의 카드가 실제로 써야 하는 문장이라 반드시 열어 둔다)
+    #    · '조금만 더'       → '조금만 더 견디/참/버티/기다리/힘내' ("조금만 더 쉬셔도 됩니다" 통과)
+    #    · '보이지 않아도'   → '…반드시/결국/이미/응답' ("아무것도 보이지 않아도 그 마음은
+    #                          사실입니다" 같은 타당화 문장이 살아난다)
+    #    · '에도 이유가 있'  → 기다림/지연/침묵/늦어짐/이 시간 한정 ("당신이 우는 데에도 이유가
+    #                          있습니다" — 감정 타당화가 R2 금칙에 걸리던 과대 토큰이었다)
+    #    · '반드시 이유가'   → 주어 한정 4종 (같은 이유)
+    #    · '결국 받'         → '결국 받게 되/받으실/받을 것/받습니' ("결국 받지 못해도 괜찮습니다" 통과)
+    #    · '준비되었을 때'·'준비되면' → 2인칭 주어·후행 어휘 한정 (동의 게이트 UI 의 "준비되면
+    #                          알려 주세요" 류가 걸리던 파편)
+    #    · '도 은혜'         → 문맥 없는 과대 파편. 기다림/지연/침묵/고통/이것 한정으로 교체
+    #    · '보상받'          → '보상받으/는/을/아/습' ("보상받지 못해도 괜찮습니다" 통과 — 92d5fe2
+    #                          의 '쓰임받' 분리와 동형)
+    #    · '헛되지 않'       → 주어를 기다림/기다린 시간/눈물로 한정. 전역 목록에 합쳐지면 이 리포가
+    #                          이미 사람 검수를 통과시킨 위로문(elijah scene5 "네 열심이 헛되지
+    #                          않았다")을 차단한다 — 실측으로 확인하고 좁혔다.
+    #    · '기다리는 동안'   → '…자라/준비/빚어/에도 이미' ("기다리는 동안 많이 외로우셨겠습니다" 통과).
+    #                          부분문자열 lint 는 주어 삽입에 새므로("기다리는 동안 *당신은* 자라고
+    #                          있었습니다") 2인칭 삽입형을 명시적으로 함께 넣었다. 그 밖의 삽입형은
+    #                          이 게이트로 못 막는다 — 방어선은 LLM 시스템 프롬프트와 사람 검토다.
+    #    · '사라지지 않'     → '헛되이/그냥 사라지지 않'·'사라지지 않고 쌓'·'기다림은 사라지지 않'
+    #                          ("이 슬픔은 사라지지 않아도 괜찮습니다" 통과). scene3 의
+    #                          "…사라지지 않고 그대로 놓였다" 는 지연 정당화가 아니라 *항의를
+    #                          지우지 않는다* 는 이 미션의 핵심 문장이므로, 본문이 아니라 토큰을 갈랐다.
+    #    · '일하고 계'       → '계십니/계세/계신 것/계실 것/계셔/계셨' ("하나님이 일하고 계시지
+    #                          않는 것처럼 느껴질 수 있습니다" — 탄식 타당화 통과)
+    #    · '계산보다'        → 소유격 한정 4종 (전역 목록에 합쳐지면 무관 문맥에서 오작동)
+    #    · '믿음으로 바라보' → 명령·당위형 5종 ("지금은 믿음으로 바라보지 못해도 괜찮습니다" 통과)
+    #    유지한 것: '조금 더 견디/참/버티' — 선행 '조금 더' 가 이미 강요 표층을 고정하고, 이 축의
+    #    자연스러운 위로는 "더 견디지 않으셔도 됩니다" 라 '조금 더' 를 포함하지 않는다.
+    #    '당신의 일도/너의 일도/네 일도' — 2인칭 전이가 곧 이 축이라 줄이면 커버리지가 사라진다.
+    lint_forbidden_tokens:
+      - "기다림에는 뜻이 있"
+      - "기다림에도 뜻이 있"
+      - "때가 되면"
+      - "너를 준비시"
+      - "당신을 준비시"
+      - "시간이 너를 빚"
+      - "시간이 당신을 빚"
+      - "아직 준비가 안 돼서"
+      - "아직 준비가 안 되어서"
+      - "아직 준비가 안 되셔서"
+      - "아직 준비가 안 됐기 때문"
+      - "조금만 더 견디"
+      - "조금만 더 참"
+      - "조금만 더 버티"
+      - "조금만 더 기다리"
+      - "조금만 더 힘내"
+      - "믿음을 가지면"
+      - "기다린 만큼"
+      - "당신에게도 올"
+      - "너에게도 올"
+      - "당신에게도 기한이"
+      - "너에게도 기한이"
+      - "당신의 기한이"
+      - "너의 기한이"
+      - "보이지 않아도 반드시"
+      - "보이지 않아도 결국"
+      - "보이지 않아도 이미"
+      - "보이지 않아도 응답"
+      - "늦지 않으"
+      - "당신의 때"
+      - "너의 때"
+      - "때는 반드시"
+      - "기다림도 응답"
+      - "기다림은 헛되지 않"
+      - "기다림이 헛되지 않"
+      - "기다린 시간은 헛되지 않"
+      - "기다린 시간이 헛되지 않"
+      - "눈물은 헛되지 않"
+      - "눈물이 헛되지 않"
+      - "반드시 이루어"
+      - "기다림에도 이유가 있"
+      - "지연에도 이유가 있"
+      - "침묵에도 이유가 있"
+      - "늦어짐에도 이유가 있"
+      - "이 시간에도 이유가 있"
+      - "하나님께는 반드시 이유가"
+      - "모든 일에는 반드시 이유가"
+      - "이 기다림에는 반드시 이유가"
+      - "그 지연에는 반드시 이유가"
+      - "당신도 곧"
+      - "너도 곧"
+      - "포기하지 않으"
+      - "결국 받게 되"
+      - "결국 받으실"
+      - "결국 받을 것"
+      - "결국 받습니"
+      - "당신이 준비되었을 때"
+      - "네가 준비되었을 때"
+      - "준비되었을 때 비로소"
+      - "준비되었을 때에야"
+      - "당신이 준비되면"
+      - "네가 준비되면"
+      - "준비되면 비로소"
+      - "준비되면 주실"
+      - "준비되면 이루어"
+      - "기다림도 은혜"
+      - "지연도 은혜"
+      - "침묵도 은혜"
+      - "이 고통도 은혜"
+      - "이것도 은혜"
+      - "보상받으"
+      - "보상받는"
+      - "보상받을"
+      - "보상받아"
+      - "보상받습"
+      - "하나님의 시계"
+      - "응답이 올"
+      - "늦으신 적이"
+      - "늦으신 게 아"
+      - "가장 좋은 것으로"
+      - "미루시"
+      - "미루십"
+      - "기다리는 동안 자라"
+      - "기다리는 동안 당신은 자라"
+      - "기다리는 동안 너는 자라"
+      - "기다리는 동안 준비"
+      - "기다리는 동안 당신은 준비"
+      - "기다리는 동안 너는 준비"
+      - "기다리는 동안 빚어"
+      - "기다리는 동안 당신은 빚"
+      - "기다리는 동안 너는 빚"
+      - "기다리는 동안에도 이미"
+      - "헛되이 사라지지 않"
+      - "그냥 사라지지 않"
+      - "사라지지 않고 쌓"
+      - "기다림은 사라지지 않"
+      - "일하고 계십니"
+      - "일하고 계세"
+      - "일하고 계신 것"
+      - "일하고 계실 것"
+      - "일하고 계셔"
+      - "일하고 계셨"
+      - "당신의 계산보다"
+      - "너의 계산보다"
+      - "네 계산보다"
+      - "사람의 계산보다"
+      - "조금 더 견디"
+      - "조금 더 참"
+      - "조금 더 버티"
+      - "믿음으로 바라보세"
+      - "믿음으로 바라보십"
+      - "믿음으로 바라보셔야"
+      - "믿음으로 바라봐"
+      - "믿음으로 바라보면"
+      - "당신의 일도"
+      - "너의 일도"
+      - "네 일도"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    fade_to_black_seconds: 0.8
+    crisis_resource_ref: crisis_resources.default
+    severity_high_keywords_semantic: true
+    card_text_ko: "지금 힘든 마음이 드셨다면 이야기를 잠시 멈추겠습니다. 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
+    buttons_ko: ["계속하기", "잠시 쉬기", "미션 종료"]
+    note: >-
+      ⑤ 재개는 사용자가 '계속하기'를 누를 때만. 자동 재개 없음.
+      ⑥ 발화는 해시만 저장하고 평문을 남기지 않는다(COMMON §4 R1).
+      ⑦ 감지 경로에서 LLM 을 호출하지 않는다 — 정적 카드만.
+      ⑧ '미션 종료'를 실패로 기록하지 않는다.
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path: static_curation 은 미션 공통."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: abraham_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: null
+    source: "본문 직접 인용 없음 — 창세기 12-13장 나그네 생활 정황의 연출 요약."
+    note: "이 Scene 은 §1 대조표에 없는 절을 인용하지 않는다는 COMMON §2 원칙을 그대로 지킨다."
+    anchor_block: nb_s2_still_sojourner
+  - disputed_points: []
+    handling: "Scene 2 는 분쟁 지점 없음 — 본문 인용이 없으므로 신학적 주장도 없다."

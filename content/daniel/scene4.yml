@@ -1,0 +1,220 @@
+# Scene 4 — 금령 (60초, 사용자 선택 0개 · 라우팅 0개 · R4 트리거 Scene ①)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene4-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-DANIEL.md(v4) 기반의 ≤70% 초안. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 + 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ R1 민감 Scene ① — 신앙을 이유로 한 처형 위협의 고지(seed §4). crisis_reminder 필수 배치.
+# ⚠️ R4 트리거 축 = "종교적 박해·처형 위협의 고지"(텍스트). Scene 5(위협의 실행)와는 별개로
+#   독립적으로 동의를 묻는다(seed §3-1) — 두 Scene 의 동의는 서로를 대신하지 않는다.
+# ⚠️ 단 6:4 인용은 반드시 전문("아무 근거, 아무 허물도 찾지 못하였으니") — "근거"를 빠뜨리면
+#   R2 차단의 논점(표적 수사에 실체가 없었다)이 사라진다(seed §13).
+# ⚠️ 단 6:24/6:25-28 전면 배제 — 이 Scene 은 6:7 에서 끝난다. 처형 실행 장면 없음.
+# ⚠️ skip_alternative_scene_id 는 이 파일 내부 conditional_blocks[].id 를 가리키며,
+#   scene 자신의 id(daniel_scene4) 를 가리키지 않는다(seed §3-2, G7b).
+
+scene_id: daniel_scene4
+id: daniel_scene4
+scene_name: the_decree
+mission_id: daniel
+version: 1.0.0
+duration_seconds_target: 60
+default_path: static_curation
+llm_optin_only: true
+
+consent_cards:
+  - id: card_consent_daniel_s4
+    text_ko: "다음 장면에는 신앙을 이유로 한 처벌을 정한 왕의 금령이 본문 그대로 나옵니다. 처형 방법을 명시한 문장이 포함됩니다. 읽지 않고 넘어가셔도 이야기는 이어집니다. 힘드시면 {{crisis_resources.default}}"
+    buttons_ko: ["본문 그대로 보기", "요약만 듣고 넘어가기"]
+    default_focus: none # 어느 쪽에도 기본 포커스를 주지 않는다(R3) — seed §3-1 그대로
+consent_card_id: card_consent_daniel_s4
+skip_alternative_scene_id: daniel_scene4_alt_decree_brief
+conditional_blocks:
+  - id: daniel_scene4_alt_decree_brief
+    condition: consent_declined_or_skipped
+    description: "단 6:7 전문 자막 미재생. 처형 조항을 읽지 않고 '왕의 도장이 찍힌 금령이 내려졌다'는 사실만 나레이션으로 전달한 뒤 Scene 5 로 넘긴다."
+    omits_assets:
+      [subtitle_dan_6_7, vo_decree_full, sfx_court_decree, vfx_seal_stamp]
+    duration_seconds: 25
+  - id: daniel_scene4_full
+    condition: consent_granted
+    duration_seconds: 60
+
+crisis_reminder:
+  text_ko: "신앙 때문에 위협을 받는 이야기가 이어집니다. 지금 힘드시면 {{crisis_resources.default}}"
+
+environment:
+  space_id: babylon_throne_hall_formal
+  background_model: env_babylon_throne_hall
+  lighting:
+    type: formal_court_session
+    color_temperature_kelvin: 3200
+    dust_haze_emphasis: false
+  ambient_sound:
+    - id: court_official_gathering
+      gain_db: -22
+      spatial: true
+    - id: scroll_seal_wax_drip
+      gain_db: -26
+      spatial: true
+  user_position: [0.0, 1.65, 2.0]
+  user_facing: [0.0, 0.0, -1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: daniel_self
+    voice_id: daniel_v1
+    position: [0.0, 1.65, 2.0]
+    note: "사용자가 다니엘 — 이 Scene 은 대사 없음, 관찰자 시점으로 금령 선포를 듣는다."
+  - id: court_officials_group
+    voice_id: official_v1
+    position: [1.5, 1.65, -1.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "총리·고관 집단 — 단 6:7 을 왕에게 구하는 발화자. 개인 악역으로 형상화하지 않는다(관료 집단 합의로 포장된 표적 입법, seed §1-1)."
+  - id: darius_king
+    voice_id: darius_v1
+    position: [-1.5, 1.65, -2.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "다리오 왕 — 이 Scene 에서는 금령에 도장을 찍는 배경 동작만. 6:19-20 의 다급함은 Scene 5 로 유보."
+
+narration_blocks:
+  - id: nb_s4_context_bridge
+    speaker: narrator_v1
+    text_ko: "다니엘은 총리 셋 중 하나로 나라를 다스렸다. 그 자리를 넘겨다보는 사람들이 있었다."
+    audio_clip_id: aud_s4_bridge_ko
+    start_at_seconds: 0.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+    note: "비성경 브리지 — 단 6:2-4 요약 연결. '체제 안에서 유능하게 일했다'는 사실을 세상과의 분리가 아니라 경계 설정 축으로 유지(seed §13)."
+  - id: nb_s4_no_grounds_6_4
+    speaker: scripture_caption
+    text_ko: "이에 총리들과 고관들이 국사에 대하여 다니엘을 고발할 근거를 찾고자 하였으나 아무 근거, 아무 허물도 찾지 못하였으니 이는 그가 충성되어 아무 그릇됨도 없고 아무 허물도 없음이었더라 (다니엘 6:4)"
+    audio_clip_id: aud_s4_6_4_ko
+    start_at_seconds: 8.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    note: "R2 차단의 성경적 뿌리(seed §4 R2). '근거'를 빠뜨리지 않고 전문 사용 — 표적 수사에 실체가 없었다는 것이 이 미션이 고난에 원인을 붙이지 않는 이유다."
+  - id: nb_s4_decree_6_7
+    speaker: scripture_caption
+    text_ko: "나라의 모든 총리와 지사와 총독과 법관과 관원이 의논하고 왕에게 한 법률을 세우며 한 금령을 정하실 것을 구하나이다 왕이여 그것은 곧 이제부터 삼십일 동안에 누구든지 왕 외의 어떤 신에게나 사람에게 무엇을 구하면 사자 굴에 던져 넣기로 한 것이니이다 (다니엘 6:7)"
+    audio_clip_id: aud_s4_6_7_ko
+    start_at_seconds: 28.0
+    duration_seconds: 22.0
+    hidden_until_event: null
+    note: "동화 압력의 구조를 보여주는 이 미션의 교육 핵심(seed §3-1) — 관료 집단의 '의논' 으로 포장된 표적 입법. R4 동의 카드 통과 후에만 재생. 스킵 시 daniel_scene4_alt_decree_brief 로 대체."
+
+interactions:
+  - id: ix_s4_seal_stamp_observe
+    type: auto_proceed
+    target_assets: [vfx_seal_stamp, sfx_court_decree]
+    validation_rules:
+      - rule: auto_proceed
+        description: "사용자 조작 없음 — 금령 선포는 관찰 대상이지 개입 대상이 아니다. omits_assets 스킵 시 이 인터랙션 자체가 로드되지 않는다."
+
+branches: [] # 사용자 선택 0개 + 라우팅 0개 (seed §3 표)
+
+safety_gates:
+  - id: R4_consent_before_scene_content
+    enforced_at: before_scene_enter
+    consent_card_ref: card_consent_daniel_s4
+    description: "사전 고지 + 거절 가능 + 거절 시 대체 경로(daniel_scene4_alt_decree_brief) 3요소 충족. 위기 리마인더는 동의를 대신하지 않는다(seed §3-1)."
+  - id: violence_exclusion_dan_6_24
+    enforced_at: always
+    description: "단 6:24 및 6:25-28 완전 배제 — 이 Scene 은 6:7 에서 끝난다(seed §2-3)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    storage: hash_only
+    on_detect:
+      - scene_timeline: pause
+      - audio: fade_to_silence_1200ms
+      - visual: fade_to_soft_black
+      - haptic: stop_all
+      - show_card: card_crisis_daniel
+    crisis_card:
+      id: card_crisis_daniel
+      text_ko: "지금 많이 힘드신 것 같아요. 이야기는 여기서 잠시 멈출게요. 혼자 견디지 않으셔도 됩니다. 도움을 받을 수 있는 곳: {{crisis_resources.default}}"
+      buttons_ko: ["잠시 쉬기", "미션 종료하기", "이어서 진행하기"]
+      default_focus: "잠시 쉬기"
+    resume_rule: explicit_user_tap_only
+    crisis_resource_ref: crisis_resources.default
+  - id: R2_no_suffering_justification
+    enforced_at: always
+    description: "6:4 가 R2 차단의 성경적 뿌리 — 표적 수사에 근거가 없었다는 사실을 '뜻이 있다' 류로 정당화하지 않는다. application.yml 전역 리스트와 append-only 동기화."
+    # ── 왜 이 토큰인가 ────────────────────────────────────────────────────────
+    # 이 Scene 의 본문(6:4)은 "아무 근거, 아무 허물도 찾지 못하였으니" 라고 말한다.
+    # 즉 다니엘이 당한 일에는 *원인이 없었다*. 그런데 종교적 박해를 다루는 묵상은
+    # 거의 자동으로 원인을 만들어 낸다 — "뜻이 있어서", "믿음이 좋아서 시험받는 것",
+    # "감당할 사람에게만 주신다". 종교적 학대·가정폭력 피해 이력이 있는 사용자에게
+    # 이 문장들은 '지금 당하는 일에도 이유가 있으니 남아 있으라' 로 읽힌다(F-6.1 R2).
+    # 그래서 축은 (a) 고난의 목적화, (b) 박해를 자격·증거로 환산하기 둘이다.
+    #
+    # 먼저 쓴 위로 → 그다음 토큰. 아래는 전부 통과해야 하고 통과한다:
+    #   "이 일이 왜 일어났는지에 이유가 없을 수도 있습니다."
+    #   "당신이 무언가 잘못해서 생긴 일이 아닙니다."
+    #   "이 고난이 훈련이라고 말하지 않겠습니다." / "고난은 훈련이 아닙니다."
+    #   "감당할 수 없어도 괜찮습니다."
+    #   "하나님이 당신을 시험하시는 게 아닙니다."  ← '시험하시' 를 어간에서 끊지 않은 이유
+    #   "핍박이 복이라고 말하지 않겠습니다."       ← 토큰은 '핍박은 복'(조사로 갈랐다)
+    #
+    # 🔻 어간 절단 회피: '시험하시'·'훈련시키시' 는 위 부정형을 통째로 삼킨다. 목적·진행
+    #    어미(-려/-는 중)까지 붙이고 주어를 '당신을' 로 한정했다 — 후자는 아브라함(창 22)
+    #    본문 서술("아브라함을 시험하시니라")이 전역 런타임 목록에서 오차단되지 않게 하는 장치다.
+    # 🔻 '뜻이 있' 을 그대로 쓰지 않았다 — "뜻이 있다고 말하지 않겠습니다" 를 삼킨다.
+    #    인과 어미('있어서 그')·당위 연결('있으니 견디')·일반화('있는 법')만 잡는다.
+    # ⚠️ '갚아 주실' 은 이 Scene 에 특히 필요하다 — 단 6:24(참소자와 그 가족 집단 처형)를
+    #    전면 배제한 이유가 보복 서사를 위로로 쓰지 않기 위해서이기 때문이다(seed §2-3).
+    lint_forbidden_tokens:
+      [
+        "연단하시",
+        "연단하십",
+        "단련하시",
+        "단련하십",
+        "허락하신 것",
+        "고난에는 뜻이",
+        "고난에도 뜻이",
+        "단단하게 만듭",
+        "단단하게 만들어",
+        "단단하게 만드는",
+        "단단하게 만들려",
+        "반드시 이유가 있",
+        "데는 하나님의 계획",
+        "갚아 주실",
+        "뜻이 있어서 그",
+        "뜻이 있으니 견디",
+        "다 뜻이 있는 법",
+        "이유 없는 고난은 없",
+        "핍박은 복",
+        "핍박받는 것은 복",
+        "박해는 믿음의 증거",
+        "고난은 믿음의 증거",
+        "고난은 훈련입니",
+        "고난은 시험입니",
+        "감당할 만하니",
+        "감당할 수 있는 사람에게만",
+        "당신을 시험하시는 중",
+        "당신을 시험하시려",
+        "당신을 훈련시키시는 중",
+        "당신을 훈련시키시려",
+      ]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path: static_curation."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: daniel_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D4_candidate
+    source: "다니엘서 저작연대 논쟁 — 확정 서지 미확보(seed §12, KCI 검색어 '다니엘서 저작연대 논쟁')"
+    note: "6세기 전통 입장에 서되 2세기 마카비설의 존재를 명시한다(disputed_point 2). 이 Scene 의 서사 성립에는 저작연대 문제가 걸리지 않는다."
+    anchor_block: nb_s4_decree_6_7
+  - disputed_points:
+      - id: D3
+        summary: "'메대 사람 다리오'의 역사적 신원"
+        handling: "미해결로 정직 기록. 미션 서사는 신원 문제에 의존하지 않는다. '메대 사람 다리오' 어구는 단 5:31 에 있다(단 6:1 아님) — 자막 사용 금지, 각주 전용."
+    handling: "세부는 docs/MVP-DANIEL.md §12.6 참조."

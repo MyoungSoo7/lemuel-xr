@@ -1,0 +1,263 @@
+# Scene 4 — 다시 던진 그물 (75초, 요 21:1-6)
+# ⚠️ 요 21:7-8 은 본 Scene 범위 밖 — 인용·암시하지 않는다.
+# ⚠️ 초안 — 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+
+scene_id: peter_scene4
+scene_name: the_net_cast_again
+mission_id: peter
+version: 1.0.0
+duration_seconds_target: 75
+note: "사용자가 베드로 — 1인칭. 부활 이후, 부인 사건 이후 첫 새벽 — 갈릴리 바다로 돌아온 어부의 밤."
+
+environment:
+  space_id: sea_of_galilee_dawn_boat
+  background_model: env_boat_dawn_mist
+  lighting:
+    type: dawn_gradient_low_key
+    color_temperature_kelvin: 3800
+  ambient_sound:
+    - id: water_lap_boat
+      gain_db: -16
+      spatial: true
+    - id: dawn_birds_distant
+      gain_db: -26
+      spatial: true
+  user_position: [0.0, 1.2, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  note: "사용자는 배 위, 좌측에 앉음. 그물은 항상 오른쪽에서 던진다(throw_side: right_fixed) — seed 확정."
+
+npcs:
+  - id: fellow_disciples
+    voice_id: npc_group_male_v1
+    position: [-0.6, 1.3, 0.3]
+    visual_traits: [silhouette_group_of_6]
+    note: "요한복음 21:2 기준 시몬 베드로 포함 7인 중 나머지 — 사용자가 베드로이므로 6인 그룹으로 표현."
+  - id: jesus_shore_distant
+    voice_id: jesus_v1
+    position: [0.0, 1.65, 40.0]
+    visual_traits: [distant_shore_silhouette_no_face]
+    note: "요 21:4 — 아직 예수이신 줄 알지 못함. 얼굴 렌더 없음, 원경 실루엣만."
+
+narration_blocks:
+  - id: nb_s4_return_to_sea
+    speaker: narrator
+    text_ko: "그 후에 예수께서 디베랴 호수에서 또 제자들에게 자기를 나타내셨으니 나타내신 일은 이러하니라 (요한복음 21:1)"
+    audio_clip_id: aud_s4_return_ko
+    start_at_seconds: 0.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+
+  - id: nb_s4_group_list
+    speaker: narrator
+    text_ko: "시몬 베드로와 디두모라 하는 도마와 갈릴리 가나 사람 나다나엘과 세베대의 아들들과 또 다른 제자 둘이 함께 있더니 (요한복음 21:2)"
+    audio_clip_id: aud_s4_group_ko
+    start_at_seconds: 11.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+
+  - id: nb_s4_go_fishing
+    speaker: peter_self
+    text_ko: "시몬 베드로가 나는 물고기 잡으러 가노라 하니 그들이 우리도 함께 가겠다 하고 나가서 배에 올랐으나 그 날 밤에 아무 것도 잡지 못하였더니 (요한복음 21:3)"
+    audio_clip_id: aud_s4_gofishing_ko
+    start_at_seconds: 22.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    note: "이 대사는 회한의 도피가 아니라 익숙한 노동으로의 복귀로 연출 — R3 회복 압박 방지, 실패 서사로 각색하지 않는다."
+
+  - id: nb_s4_stranger_calls
+    speaker: jesus_shore_distant
+    text_ko: "날이 새어갈 때에 예수께서 바닷가에 서셨으나 제자들이 예수이신 줄 알지 못하는지라 예수께서 이르시되 얘들아 너희에게 고기가 있느냐 대답하되 없나이다 (요한복음 21:4-5)"
+    audio_clip_id: aud_s4_stranger_ko
+    start_at_seconds: 35.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+
+  - id: nb_s4_cast_instruction
+    speaker: jesus_shore_distant
+    text_ko: "이르시되 그물을 배 오른편에 던지라 그리하면 잡으리라 하시니 이에 던졌더니 물고기가 많아 그물을 들 수 없더라 (요한복음 21:6)"
+    audio_clip_id: aud_s4_cast_ko
+    start_at_seconds: 48.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+
+interactions:
+  - id: ix_s4_net_cast
+    type: grab_and_place
+    presentation:
+      description: "사용자는 오른손으로 그물을 잡아 배 오른편(right_fixed)으로 던지고, 이후 무게가 실린 그물을 끌어올린다."
+      objects: [fishing_net]
+    # 4키 확정값 — seed §6-2. throw_gesture_window=4초 / haul_hold_duration=5~7초.
+    # 판정은 4키 존재 여부이지 산문 설명이 아니다(seed §6 "산문 설명은 pass 로 치지 않는다").
+    predicate_keys:
+      throw_gesture_window: { duration_seconds: 4.0 }
+      haul_hold_duration: { min_seconds: 5.0, max_seconds: 7.0 }
+      on_timeout:
+        {
+          action: treat_as_complete,
+          fallback_narration_id: nb_s4_cast_instruction,
+        }
+      throw_side: right_fixed
+    validation_rules:
+      - rule: throw_must_be_right_side
+        description: "throw_side 는 항상 right_fixed — 좌측 던지기 제스처는 인식하지 않고 오른쪽으로 재유도."
+      - rule: haul_completes_on_hold_or_timeout
+        description: "haul_hold_duration 충족 또는 on_timeout 발동 시 그물 인양 애니메이션 자동 완료."
+
+branches: []
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "발화 원문 미저장 — SHA-256 해시만."
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    # ⚠️ 어간·부사형에서 끊지 않는다 — 한국어 부정('-지 않/못'·'-가 아니')은 어간 *뒤* 에 붙으므로
+    # 어간형 토큰은 그 축의 부정형 위로를 통째로 삼킨다(92d5fe2 와 같은 규칙). 초안의 27종은
+    # 이 미션이 하려는 말 자체를 막고 있었다 — "다시는 부인하지 않겠다고 다짐하지 않으셔도
+    # 됩니다"(MVP §10), "아직 스스로를 용서하지 못해도 괜찮습니다", "자격을 갖추고 오라는 말은
+    # 없었습니다", "그 물음은 더 사랑하라는 요구가 아니었습니다" 등 실측 21건.
+    # 짧은 조각('놓아주'·'연단'·'겸손하게'·'있어야 더'…)은 전역 목록에서 무관한 문장까지 잡았다
+    # (실측: joseph scene3 "자루를 줄에 놓아주세요"). 축을 지키는 더 긴 표층형으로 교체했다.
+    # 변경 사유 전문·유지 결정(낮추시려/다듬으시려/빚으시려)·커버리지 대가는
+    # content/peter/scene1.yml 의 같은 게이트 주석에 있다 — 5개 Scene 의 목록은 동일하다.
+    lint_forbidden_tokens:
+      # (a) R2 — 실패·수치에 신적 의도(훈육·연단·성장)를 부여하는 인과형
+      - "겸손하게 하시려"
+      - "겸손하게 만드시려"
+      - "겸손하게 만들려고"
+      - "겸손하게 받아들이세"
+      - "겸손하게 받아들이십"
+      - "겸손하게 받아들여야 합"
+      - "겸손해지세"
+      - "겸손해지십"
+      - "겸손해지셔야"
+      - "겸손해져야 합"
+      - "연단하시"
+      - "연단하십"
+      - "낮추시려"
+      - "다듬으시려"
+      - "빚으시려"
+      - "보셨기 때문에"
+      - "있어야 더 깊어"
+      - "있어야 더 단단"
+      - "있어야 더 강해"
+      - "있어야 더 성숙"
+      - "있어야 더 성장"
+      - "더 키우시려"
+      - "더 키우세"
+      - "더 키우십"
+      - "더 키우셔야"
+      - "더 키워야 합"
+      - "더 키워야죠"
+      - "실패했으니"
+      - "실패했으므로"
+      - "실패했기 때문에"
+      # (b) R3 — 재발 방지 다짐 요구(이 미션의 최우선 금지 축, MVP §10)
+      - "다시는 부인하지 않겠습니다"
+      - "다시는 넘어지지 않겠습니다"
+      - "부인하지 않겠다고 다짐하세"
+      - "부인하지 않겠다고 다짐하십"
+      - "부인하지 않겠다고 다짐해야"
+      - "부인하지 않겠다고 약속하세"
+      - "넘어지지 않겠다고 다짐하세"
+      - "넘어지지 않겠다고 다짐하십"
+      - "넘어지지 않겠다고 다짐해야"
+      - "넘어지지 않겠다고 약속하세"
+      - "부인하지 마세"
+      - "부인하지 마십"
+      - "부인하지 마요"
+      - "부인하지 말아야 합"
+      - "부인하지 말아야죠"
+      - "다짐하세"
+      - "다짐하십"
+      - "다짐하셔야"
+      - "다짐해야 합"
+      - "다짐해야죠"
+      - "다짐해 보세"
+      - "다짐해라"
+      # (c) R3 — 감정 정리·자기용서 재촉
+      - "내려놓으세"
+      - "내려놓으십"
+      - "내려놓으셔야"
+      - "내려놓아야 합"
+      - "내려놓아야죠"
+      - "이제 내려놓을 때"
+      - "이제 놓아주"
+      - "그만 놓아주"
+      - "마음을 놓아주"
+      - "과거를 놓아주"
+      - "놓아주셔야 합"
+      - "놓아줘야 합"
+      - "놓아줘야죠"
+      - "붙들지 않으셔야"
+      - "붙들지 않으시면"
+      - "붙들지 말아야 합"
+      - "그만 붙들고"
+      - "이제 죄책감은 그만"
+      - "이제 죄책감을 버리세"
+      - "이제 죄책감을 버리십"
+      - "이제 죄책감을 버려야"
+      - "이제 죄책감에서 벗어나세"
+      - "이제 죄책감에서 벗어나야 합"
+      - "스스로를 용서하세"
+      - "스스로를 용서하십"
+      - "스스로를 용서하셔야"
+      - "스스로를 용서해야 합"
+      - "스스로를 용서해야죠"
+      - "스스로를 용서하지 못하면"
+      # (d) R3 — 조건부 회복(자격·준비·수치 소멸을 회복의 전제로 두는 프레임)
+      - "자격을 갖추세"
+      - "자격을 갖추십"
+      - "자격을 갖추셔야"
+      - "자격을 갖춰야 합"
+      - "자격을 갖춰야죠"
+      - "자격을 갖추어야 합"
+      - "자격을 갖춘 뒤에야"
+      - "떳떳하게 사세"
+      - "떳떳하게 사십"
+      - "떳떳하게 살아야 합"
+      - "떳떳하게 살아야죠"
+      - "떳떳하게 서세"
+      - "떳떳해지셔야"
+      - "떳떳해져야 합"
+      - "준비가 되면 부르"
+      - "준비가 되면 회복"
+      - "준비가 되면 다시 쓰"
+      - "준비가 되어야 부르"
+      - "준비가 되어야 회복"
+      - "준비가 되었을 때 부르"
+      - "준비가 되었을 때 회복"
+      - "준비가 되었을 때 비로소"
+      - "수치가 사라진 뒤에"
+      - "죄책감이 사라진 뒤에"
+      - "두려움이 사라진 뒤에"
+      - "사라진 뒤에야 회복"
+      - "사라진 뒤에야 부르"
+      # (e) R3 — 요 21:15-17 의 물음을 '사랑의 요구'로 바꾸는 축
+      - "더 사랑하세"
+      - "더 사랑하십"
+      - "더 사랑하셔야"
+      - "더 사랑해야 합"
+      - "더 사랑해야죠"
+      - "더 사랑해 보세"
+      - "더 사랑해라"
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: peter_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - scripture_refs:
+      - ref: "요한복음 21:1-6"
+        translation: krv
+        anchor_block: nb_s4_cast_instruction
+  - disputed_points: []
+    handling: "요한복음 21:7-8(요한이 먼저 알아봄, 베드로가 물에 뛰어듦)은 본 Scene 범위 밖 — 인용·연출·암시하지 않는다. Scene 5 는 21:9 부터 재개."

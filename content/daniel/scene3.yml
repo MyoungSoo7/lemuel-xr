@@ -1,0 +1,228 @@
+# Scene 3 — 열흘 (45초, 사용자 선택 0개 · 라우팅 0개)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene3-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-DANIEL.md(v4) 기반의 ≤70% 초안. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 + 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ 기다림은 성취가 아니다(seed §3 표) — 이 Scene 에 사용자 조작을 두지 않는다. 시간의 흐름을
+#   보여주는 것으로 충분하다. "버텨냈다"류 성취 프레이밍을 자막에 두지 않는다(R3).
+# ⚠️ 1:16 은 협상 상대가 감독관임을 최종 확증하는 절이다(seed §1-1) — 환관장으로 표기하지 않는다.
+
+scene_id: daniel_scene3
+id: daniel_scene3
+scene_name: ten_days
+mission_id: daniel
+version: 1.0.0
+duration_seconds_target: 45
+default_path: static_curation
+llm_optin_only: true
+
+environment:
+  space_id: babylon_dining_hall_timelapse
+  background_model: env_babylon_dining_hall
+  lighting:
+    type: day_cycle_timelapse
+    color_temperature_kelvin: 4200
+    dust_haze_emphasis: false
+  ambient_sound:
+    - id: hall_murmur_low
+      gain_db: -30
+      spatial: true
+    - id: soft_day_cycle_chime
+      gain_db: -22
+      spatial: false
+  user_position: [0.0, 1.65, 0.5]
+  user_facing: [0.0, 0.0, -1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: daniel_self
+    voice_id: daniel_v1
+    position: [0.0, 1.65, 0.5]
+    note: "사용자가 다니엘 — first-person, 이 Scene 은 대사 없이 관찰만"
+  - id: overseer_official
+    voice_id: official_v1
+    position: [-1.2, 1.65, -1.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "감독관 — 1:16 에서 채식 지급을 확정하는 인물. 환관장과 다른 인물(seed §5)."
+
+narration_blocks:
+  - id: nb_s3_intro_days_pass
+    speaker: narrator_v1
+    text_ko: "열흘이 지났다."
+    audio_clip_id: aud_s3_intro_ko
+    start_at_seconds: 2.0
+    duration_seconds: 4.0
+    hidden_until_event: null
+    note: "비성경 나레이터 브리지 문장 — 성경 인용 아님, 시간 경과 고지용."
+  - id: nb_s3_appearance_1_15
+    speaker: scripture_caption
+    text_ko: "열흘 후에 그들의 얼굴이 더욱 아름답고 살이 더욱 윤택하여 왕의 음식을 먹는 다른 소년들보다 더 좋아 보인지라 (다니엘 1:15)"
+    audio_clip_id: aud_s3_1_15_ko
+    start_at_seconds: 10.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+  - id: nb_s3_provision_1_16
+    speaker: scripture_caption
+    text_ko: "그리하여 감독하는 자가 그들에게 지정된 음식과 마실 포도주를 제하고 채식을 주니라 (다니엘 1:16)"
+    audio_clip_id: aud_s3_1_16_ko
+    start_at_seconds: 24.0
+    duration_seconds: 11.0
+    hidden_until_event: null
+    note: "협상 상대가 감독관임을 최종 확증하는 절(seed §1-1). 자막 화자는 overseer_official 이 아니라 scripture_caption 유지 — 이 절은 결과 서술이지 대사가 아니다."
+  - id: nb_s3_wisdom_1_17
+    speaker: scripture_caption
+    text_ko: "하나님이 이 네 소년에게 학문을 주시고 모든 서적을 깨닫게 하시고 지혜를 주셨으니 다니엘은 또 모든 환상과 꿈을 깨달아 알더라 (다니엘 1:17)"
+    audio_clip_id: aud_s3_1_17_ko
+    start_at_seconds: 37.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "'유능하게 기능' 축 근거(seed §1-1) — 인간 결단의 결과가 아니라 하나님이 주신 것으로 서술."
+
+interactions:
+  - id: ix_s3_day_cycle_timelapse
+    type: auto_proceed
+    target_assets: [vfx_light_cycle_ten_days, ui_day_counter]
+    validation_rules:
+      - rule: auto_proceed
+        description: "사용자 조작 없음 — 기다림은 성취가 아니다(seed §3 표). 날짜 카운터는 정보 표시일 뿐 점수·타이머·실패 판정 없음."
+
+branches: [] # 사용자 선택 0개 + 라우팅 0개 (seed §3 표)
+
+safety_gates:
+  - id: violence_exclusion_dan_6_24
+    enforced_at: always
+    description: "단 6:24 및 6:25-28 완전 배제 — 이 인물 전 Scene 공통 원칙(seed §2-3)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    storage: hash_only
+    on_detect:
+      - scene_timeline: pause
+      - audio: fade_to_silence_1200ms
+      - visual: fade_to_soft_black
+      - haptic: stop_all
+      - show_card: card_crisis_daniel
+    crisis_card:
+      id: card_crisis_daniel
+      text_ko: "지금 많이 힘드신 것 같아요. 이야기는 여기서 잠시 멈출게요. 혼자 견디지 않으셔도 됩니다. 도움을 받을 수 있는 곳: {{crisis_resources.default}}"
+      buttons_ko: ["잠시 쉬기", "미션 종료하기", "이어서 진행하기"]
+      default_focus: "잠시 쉬기"
+    resume_rule: explicit_user_tap_only
+    crisis_resource_ref: crisis_resources.default
+  - id: R3_no_achievement_framing
+    enforced_at: always
+    description: "'버텨냈다'·'이겨냈다' 류 성취 프레이밍 금지 — 기다림은 선택이 아니라 겪는 시간(seed §3 표). 자막은 결과 서술(1:15-17)에 머문다."
+    # ── 왜 이 토큰인가 ────────────────────────────────────────────────────────
+    # 이 Scene 은 사용자 조작이 0개다. 그런데도 열흘이 지나간다 — 여기에 '해냈다' 를
+    # 붙이는 순간 아무것도 하지 않은 사용자가 무언가를 성취한 것으로 재서술되고,
+    # 다음에 못 견딘 날은 실패가 된다. 그게 R3 회복 압박의 정확한 작동 방식이다.
+    # 그래서 축은 '완료·성취의 과거형 칭찬' 과 '끝까지 버티라는 명령' 둘이다.
+    #
+    # 먼저 쓴 위로 → 그다음 토큰(순서를 뒤집지 않았다). 아래는 전부 통과해야 하고 통과한다:
+    #   "오늘 아무것도 이겨 내지 못했어도 괜찮습니다."
+    #   "버텨 내지 않아도 이 시간은 지나갑니다."
+    #   "기다림을 훈련이라고 부르지 않겠습니다."
+    #   "열흘을 견뎌 낸 것이 당신의 공로는 아닙니다."   ← '견뎌 낸' 을 토큰에 넣지 않은 이유
+    #
+    # 🔻 어간 절단 회피: '이겨 내'·'버텨 내'·'견뎌 내' 를 그대로 쓰면 위 첫 두 문장을 삼킨다
+    #    (한국어 부정은 어간 뒤에 붙는다 — 커밋 92d5fe2). 완료 과거·높임 완료형(-냈/-내셨/-내신)
+    #    까지 붙여 *칭찬 문장만* 남겼다.
+    # 🔻 '다니엘처럼' 계열도 명령 어미까지 붙였다 — "다니엘처럼 견디지 않아도 괜찮습니다" 는
+    #    이 미션이 반드시 할 수 있어야 하는 말이다.
+    # ⚠️ 형제 게이트(R2_R3_esther_boundary_lint)의 '이 정도는 버텨'·'버텨 내셔야' 와
+    #    표면형이 겹치지 않게 골랐다(솔로몬 scene5 규약).
+    lint_forbidden_tokens:
+      [
+        "버텨 냈",
+        "버텨 내셨",
+        "잘 버티셨",
+        "끝까지 버티세",
+        "끝까지 버티십",
+        "견뎌 냈",
+        "견뎌 내셨",
+        "이겨 냈",
+        "이겨 내셨",
+        "이겨 내신",
+        "잘 참아 내셨",
+        "잘 해 내셨",
+        "기다림은 훈련",
+        "기다림도 훈련",
+        "다니엘처럼 견디세",
+        "다니엘처럼 기다리세",
+      ]
+  - id: R2_R3_esther_boundary_lint
+    enforced_at: always
+    description: "고난 인과정당화(R2)·회복·담대 압박(R3)·에스더 배타(seed §0) 어휘 차단. application.yml 전역 리스트와 append-only 동기화."
+    # 축 셋(R2 인과정당화 / R3 담대·인내 압박 / 에스더 '드러내다·숨기다·타협' 배타)을
+    # 한 게이트가 덮는다. 저작 근거·어간 절단 수정 3건과 의도적 과차단 1건의 전문은
+    # scene1.yml 의 같은 게이트 주석에 있다.
+    #
+    # 이 Scene 에서 특히 중요한 것은 (a)(b) 축이다 — 열흘의 결과(1:15)가 좋았다는 이유로
+    # "견디면 높아진다"·"고난이 단단하게 만든다" 로 미끄러지기 가장 쉬운 자리다.
+    # 형제 게이트 R3_no_achievement_framing 이 '완료형 칭찬' 을, 이 게이트가 '인과 정당화' 를 맡는다.
+    lint_forbidden_tokens:
+      [
+        "연단하시",
+        "연단하십",
+        "단련하시",
+        "단련하십",
+        "허락하신 것",
+        "고난에는 뜻이",
+        "고난에도 뜻이",
+        "담대해져",
+        "담대해지세",
+        "담대해지십",
+        "담대해지셔야",
+        "담대해지면",
+        "처럼 담대",
+        "견디면 높",
+        "조금만 견디",
+        "타협하지 말",
+        "타협하지 마",
+        "타협해서는",
+        "타협하면 안",
+        "세상과 구별되지",
+        "숨기는 건 부끄러",
+        "숨기는 것은 부끄러",
+        "숨기는 게 부끄러",
+        "믿음이 있으면 드러내",
+        "믿음이 있다면 드러내",
+        "드러내야 하는 것",
+        "단단하게 만듭",
+        "단단하게 만들어",
+        "단단하게 만드는",
+        "단단하게 만들려",
+        "반드시 이유가 있",
+        "데는 하나님의 계획",
+        "갚아 주실",
+        "용기를 내 보셔",
+        "물러서시면",
+        "물러서지 마",
+        "물러서지 말",
+        "지금은 참으",
+        "이 정도는 버텨",
+        "버텨 내셔야",
+        "감추고 사시면 안",
+        "감추고 사시겠",
+        "감추고 살지 마",
+        "감추고 사십시",
+      ]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path: static_curation."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: daniel_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: D3_candidate
+    source: "다니엘서 디아스포라 정체성 — 확정 서지 미확보(seed §12)"
+    note: "1:17 은 결과를 다니엘의 의지력이 아니라 하나님이 주신 것으로 서술한다 — '인간 결단 단독 서사로 쓰지 말 것'(seed §13)."
+    anchor_block: nb_s3_wisdom_1_17
+  - disputed_points: []
+    handling: "Scene 3 은 별도 분쟁 지점 없음 — Scene 2 D1(채식 규범 여부)의 결과 서술 연장."

@@ -1,0 +1,24 @@
+# Scene 1 — 도입 (픽스처)
+scene_id: testchar_scene1
+mission_id: testchar
+narration_blocks:
+  - id: nb_s1_open
+    speaker: scripture_caption
+    text_ko: "그가 한 노간주 나무 아래에 앉아서 (테스트 본문 1)"
+# 신학 검토자 주석 — 금지 토큰을 **인용해야** 하는 자리다.
+theology_footer_refs:
+  - citation_id: T1
+    source: "테스트 서지"
+    handling: "'왜 도망' 이라는 추궁 독법을 차단한다. 본문은 책망 없이 먹고 자게 한다."
+    anchor_block: nb_s1_open
+    disputed_points:
+      - id: DP1
+        summary: "'믿음이 부족' 으로 단순화하는 독법 — 채택하지 않는다."
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

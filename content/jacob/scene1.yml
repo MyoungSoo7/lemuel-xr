@@ -1,0 +1,195 @@
+# Scene 1 — 속임 (60초, 창 27:19 · 27:35 — 선택 없음)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-JACOB v5-b(독립 채점 완료본) 기반 ≤70% draft. lemuel-theology-reviewer + lemuel-mental-health-safety
+#    사후 검토 + **인간 안전검토자 사인오프 필수**(신규 구원 카테고리: 내가 가해자인 관계의 회복 + R1 인접 가족 학대·살해 위협).
+# ⚠️ 이 미션 전체는 사용자를 "가해자 자리"에 앉힌다(§0) — 아래 R4 동의 카드가 그 사실을 진입 전 명시 고지한다.
+# ⚠️ branches: [] — 사용자는 이미 저지른 자리에서 시작한다. 이 Scene 에 선택지가 없다.
+# ⚠️ 이 동의 카드는 Scene 1~4 를 함께 커버한다(seed §3-1). Scene 2~4 는 별도 카드 없이 이 결정을 상속한다.
+
+scene_id: jacob_scene1
+scene_name: deception
+mission_id: jacob
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: isaac_tent_interior_dim
+  background_model: env_tent_interior_aged
+  lighting:
+    type: dim_interior_failing_eyes
+    color_temperature_kelvin: 2400
+  ambient_sound:
+    - id: tent_cloth_rustle
+      gain_db: -24
+      spatial: true
+    - id: distant_flock_faint
+      gain_db: -30
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jacob_self
+    voice_id: jacob_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 야곱 — first-person. 교활함 연기 금지, 두려움이 기본 톤(§8 voice 로스터)."
+  - id: isaac_npc
+    voice_id: isaac_v1
+    position: [0.0, 1.45, 1.0]
+    initial_animation: aged_seated_reaching_blind
+    note: "노쇠·시력 상실. 27:35 대사만 담당."
+
+narration_blocks:
+  - id: nb_s1_jacob_lie
+    speaker: jacob_inner
+    text_ko: "나는 아버지의 맏아들 에서로소이다 아버지께서 내게 명하신 대로 내가 하였사오니 원하건대 일어나 앉아서 내가 사냥한 고기를 잡수시고 아버지 마음껏 내게 축복하소서 (창세기 27:19)"
+    audio_clip_id: aud_s1_lie_ko
+    start_at_seconds: 5.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    note: "alt_routes[1_alt] 진입 시 이 블록은 재생되지 않고 summary_text_ko(요약 자막)로 대체된다."
+  - id: nb_s1_isaac_realize
+    speaker: isaac_npc
+    text_ko: "네 아우가 와서 속여 네 복을 빼앗았도다 (창세기 27:35)"
+    audio_clip_id: aud_s1_isaac_realize_ko
+    start_at_seconds: 34.0
+    duration_seconds: 8.0
+    hidden_until_event: null
+    note: "성경이 야곱의 속임을 승인하지 않는다는 것을 이 절 명시 인용으로 확정 처리한다(disputed #2, 확정 항목)."
+
+interactions: []
+# ⚠️ 의도적으로 비어 있음 — 이 Scene 은 사용자가 선택할 자리가 아니라 이미 저지른 자리에서 시작한다(seed §3).
+#    Unity 는 duration_seconds_target 경과 또는 nb_s1_isaac_realize 종료 시 next_scene_id 로 자동 전환한다.
+
+branches: []
+
+alt_routes:
+  - id: 1_alt
+    triggered_by: consent_card_skip # cc_jacob_skip 선택 시
+    presentation_mode: summary_caption_only
+    summary_text_ko: "야곱은 축복을 속임으로 취했다. (창세기 27:19, 27:35 요약)"
+    carries_to_scene2: { presentation_mode: caption_only_no_audio }
+    note: "27:19 재연 없이 요약 자막만 제공 → Scene 2 의 27:34 도 소리 없이 자막으로만 노출된다(seed §3-1)."
+
+safety_gates:
+  - id: R4_pre_scene1_family_deception_consent
+    enforced_at: before_scene_enter
+    description: "미션 전체(Scene 1~4) 진입 전 R4 동의 카드 — 역할 고지 + 소재 고지 + 피해자 이탈로(seed §3-1-a 리터럴, 변경 없이 그대로 반영)."
+    consent_card_id: cc_jacob_family_deception
+    consent_card:
+      id: cc_jacob_family_deception
+      role_disclosure_ko: "이 미션에서 당신은 야곱의 자리에 섭니다. 야곱은 상처를 받은 쪽이 아니라 상처를 준 쪽입니다."
+      trigger_disclosure_ko: "다루는 소재 — 가족 안의 기만과 편애 · 속은 형제의 절규 · 형이 품은 살해 의도."
+      options:
+        - { id: cc_jacob_enter, label_ko: "들어간다", action: enter_scene1 }
+        - {
+            id: cc_jacob_skip,
+            label_ko: "연출 없이 요약으로 본다",
+            action: goto_route,
+            target: 1_alt,
+          }
+        - {
+            id: cc_jacob_not_my_seat,
+            label_ko: "나는 이 자리에 서 있지 않다",
+            action: exit_before_start,
+          }
+    crisis_resource_ref: crisis_resources.default
+  - id: R4_not_my_seat_offramp
+    enforced_at: always
+    description: "가족 안에서 상처를 받은(피해자) 쪽에 서 있는 사용자를 위한 이탈로 — Scene 1~5 전부에서 상시 제공(seed §3-1-a). 스킵(1_alt/5_alt)과 다른 경로다: 스킵은 '소재는 괜찮지만 연출이 부담' / 이 이탈로는 '이 자리 자체가 내 자리가 아니다'."
+    offramp:
+      id: cc_jacob_not_my_seat
+      notice_ko: "가족 안에서 상처를 받은 쪽에 서 있다면, 이 미션은 당신의 자리를 다루지 않습니다. 회복할 것이 없다는 뜻이 아니라, 이 미션이 다른 자리를 다룬다는 뜻입니다. 여기서 마치셔도 됩니다."
+      crisis_resource_ref: crisis_resources.default
+      records_decision: false # decisions 에 아무것도 남기지 않는다
+      closing_phrase: none # 야곱 프레이밍의 마무리 문구(§5-2 10문)를 주지 않는다 — notice_ko 자체가 마무리
+      mission_complete: true # 미완·중도이탈로 표시하지 않는다 (R3)
+      available_at: [scene1, scene2, scene3, scene4, scene5]
+  - id: R1_voice_self_harm_listener
+    enforced_at: always # 5개 Scene 전부
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    on_detect:
+      scene_progress: halted
+      audio: fade_out_all
+      interactions: disabled
+      card_text_ko: "지금 들린 말이 마음에 걸립니다. 여기서 잠시 멈추겠습니다. 혼자 감당하지 않아도 됩니다 — {{crisis_resources.default}}"
+      resume: user_initiated_only
+      exit_always_available: true # '계속하기'와 동등 위계로 '여기서 마치기' 병기(R3) — cc_jacob_not_my_seat 와 동일 문구 지향
+      storage: hash_only
+      no_transcript_echo: true
+      clinical_judgment: false
+  - id: R2_R3_lint_forbidden
+    enforced_at: always
+    description: "R2(라반 20년 인과응보 교훈화)·R3(화해 강요·유예 프레이밍) 금지 토큰 25종 — 텍스트 풀에 존재 시 빌드 실패. 전문은 seed §7 표 / 산출 문서에는 리터럴을 재현하지 않는다(G6 카브아웃 없음, seed §7-2)."
+    # 🔻 토큰 감사(11종 → 25종). 축은 그대로다 — 어간에서 끊겨 *부정형 위로까지 삼키던* 4축을
+    #    어미로 갈라냈을 뿐이다. 한국어 부정은 어간 뒤에 '-지 않'·'-가 아니'로 붙으므로 어간형
+    #    토큰은 그 축에서 앱이 해야 할 말을 반드시 함께 막는다(92d5fe2 의 '도구로 쓰' 처리와 동일).
+    #      · '너를 다듬'/'당신을 다듬' → 다듬으시/다듬으신/다듬으려/다듬는 (4형 × 2인칭 2종)
+    #        막고 있던 말: "하나님은 당신을 다듬지 않으십니다" — 연단 신학 오용을 끊는 이 미션의 문장이다.
+    #      · '그래서 겸손해' → 겸손해지셨/겸손해지신/겸손해진/겸손해집
+    #        막고 있던 말: "그래서 겸손해지지 않아도 됩니다".
+    #      · '언젠가는 가' → 언젠가는 가야 합/가야죠/가셔야/가게 될
+    #        막고 있던 말: "언젠가는 가지 않아도 됩니다" — stay_and_pray 를 종결 상태로 두는
+    #        이 미션 최우선 안전선(§5-2-a)이 정작 자기 토큰에 막혀 있었다.
+    #      · '관계는 회복되어야' → 회복되어야 합/회복되어야죠/회복되어야 하지
+    #        막고 있던 말: "모든 관계는 회복되어야 하는 것이 아닙니다"(MVP §8 회복≠재결합).
+    #    가해형 커버리지는 축별로 재확인했다 — "당신을 다듬으시려고", "그래서 겸손해지신 겁니다",
+    #    "언젠가는 가야죠", "관계는 회복되어야 합니다" 모두 그대로 차단된다.
+    #    남는 과차단 1건을 정직하게 적는다: '-으려' 형은 "하나님은 당신을 다듬으려고 고통을 주지
+    #    않으십니다" 도 함께 막는다(부정이 어간이 아니라 뒤 문장의 서술어에 붙어서 부분문자열로는
+    #    가를 수 없다). '다듬으려고 주셨습니다' 가 이 축에서 가장 흔한 가해 표면이라 유지하되,
+    #    대안 표면이 반드시 열려 있어야 한다는 규율(92d5fe2 '의도적 과차단의 대가')에 따라
+    #    "하나님은 당신을 다듬지 않으십니다" 가 통과하는 것을 확인했다.
+    #    유지한 과차단(결정): '용서해야'·'먼저 연락해'·'아직은 때가 아닐' 은 부정형("용서해야
+    #    한다고 말하지 않겠습니다")도 함께 막는다. 화해 강요는 이 미션의 최우선 안전선이라
+    #    프레임을 앱이 먼저 꺼내는 쪽을 택하지 않는다. 같은 뜻은 마무리 10문의 해제 문장
+    #    ("당신의 실제 관계에 적용하지 않아도 된다")으로 이미 말하고 있다.
+    lint_forbidden_tokens:
+      [
+        "용서해야",
+        "먼저 연락해",
+        "관계는 회복되어야 합",
+        "관계는 회복되어야죠",
+        "관계는 회복되어야 하지",
+        "관계도 회복될",
+        "너를 다듬으시",
+        "너를 다듬으신",
+        "너를 다듬으려",
+        "너를 다듬는",
+        "당신을 다듬으시",
+        "당신을 다듬으신",
+        "당신을 다듬으려",
+        "당신을 다듬는",
+        "속인 대가",
+        "그래서 겸손해지셨",
+        "그래서 겸손해지신",
+        "그래서 겸손해진",
+        "그래서 겸손해집",
+        "흉터도 축복",
+        "언젠가는 가야 합",
+        "언젠가는 가야죠",
+        "언젠가는 가셔야",
+        "언젠가는 가게 될",
+        "아직은 때가 아닐",
+      ]
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jacob_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J1_candidate
+    source: "docs/THEOLOGY-REFERENCES.md:34 [J2] 창세기 속임수 내러티브 어떻게 이해할 것인가 — 야곱 이야기 중심 (기존 교차참조 — 신규 서지 발명 전 우선 인용)"
+    note: "성경은 야곱의 속임을 승인하지 않는다 — 이 항만 확정(disputed #2). 27:35 '속여'를 그대로 명시 인용해 '결과가 좋았으니 방법도 옳았다' 독법을 차단한다."
+    anchor_block: nb_s1_isaac_realize
+  - disputed_points:
+      - "성경이 야곱의 속임을 승인하는가 — 이 미션에서 유일하게 확정하는 항목: 미승인(seed §9 쟁점 2). lemuel-theology-reviewer 명시 승인 대상."
+    handling: "'결과가 좋았으니 방법도 옳았다' 독법을 차단한다. 반대 방향(인과응보 교훈화) 독법은 lint_forbidden_tokens 의 '속인 대가'·'그래서 겸손해'·'너를 다듬'/'당신을 다듬' 축으로 동시 차단(§9 쟁점 5)."

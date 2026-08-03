@@ -1,0 +1,56 @@
+# 야곱 — /새인물 파이프라인 초안(≤70%, 인간 사인오프 대기).
+#
+# ⚠️ 이 설정은 seed 산출물이 아니라 **저작된 content/jacob/scene*.yml 에서 실측해 역산한 것**이다.
+#    seed 층 입력(배제 문자열 표·verses.txt·POLITE_EVASIVE·token_examples)은 존재하지 않는다.
+#    그래서 해당 게이트는 BLOCKED 로 나온다 — 이건 "통과"가 아니라 "판정 불가"다.
+character: jacob
+ruleset: newchar-v5 # 토큰 규약 이후 인물 — 면제 없음
+scene_count: 5
+
+docs:
+  mvp: docs/MVP-JACOB.md
+doc_min_lines:
+  mvp: 450
+# content 문서(docs/MVP-JACOB-CONTENT.md)는 **아직 없다.** 없는 문서를 선언하면
+# 게이트가 없는 것을 검사하는 척하게 된다 — 작성 전까지 선언하지 않는다.
+
+# content/jacob/scene*.yml 의 lint_forbidden_tokens 합집합 **전량** 25종(실측).
+# 부분집합을 적으면 G6/G6d/G9 가 나머지를 안 보면서 초록이 된다(vacuous green).
+forbidden:
+  - "관계는 회복되어야 하지"
+  - "관계는 회복되어야 합"
+  - "관계는 회복되어야죠"
+  - "관계도 회복될"
+  - "그래서 겸손해지셨"
+  - "그래서 겸손해지신"
+  - "그래서 겸손해진"
+  - "그래서 겸손해집"
+  - "너를 다듬는"
+  - "너를 다듬으려"
+  - "너를 다듬으시"
+  - "너를 다듬으신"
+  - "당신을 다듬는"
+  - "당신을 다듬으려"
+  - "당신을 다듬으시"
+  - "당신을 다듬으신"
+  - "먼저 연락해"
+  - "속인 대가"
+  - "아직은 때가 아닐"
+  - "언젠가는 가게 될"
+  - "언젠가는 가셔야"
+  - "언젠가는 가야 합"
+  - "언젠가는 가야죠"
+  - "용서해야"
+  - "흉터도 축복"
+
+# §5(c) — ForbiddenTokenConfigTest.kt 는 인물 식별자를 **한국어**로 남긴다(`// 야곱`).
+test_identifier: "야곱"
+
+# ── 미정의 = BLOCKED (판정 불가). 없는 것을 있는 척하지 않는다 ──────────────
+# verses_file:            (없음) → G0b BLOCKED
+# exclusions:             (없음) → G0b/G0e/G9/G9d BLOCKED
+# token_examples:         (없음) → G0c BLOCKED
+# token_examples_declared:(없음) → G0c BLOCKED
+# polite_evasive:         (없음) → G0d BLOCKED
+# trigger_scenes:         (없음) → G7 BLOCKED
+# crisis_reminder_scenes: (없음) → G3d BLOCKED

@@ -1,0 +1,392 @@
+# Scene 5 — 창문 → 사자굴 → 보전 (105초, 사용자 선택 0개 · 라우팅 1개 · R4 트리거 Scene ② · 최종 Scene)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene5-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+# ⚠️ 초안 — seed-DANIEL.md(v4) 기반의 ≤70% 초안. lemuel-theology-reviewer + lemuel-mental-health-safety
+#   사후 검토 + 인간 안전검토자 사인오프 전 프로덕션 반영 금지.
+# ⚠️ branches: [] 아님 — 사용자 선택 0개 + 라우팅 1개(br_s5_closing_message). seed §3-0 이
+#   v2 의 이 지점 자기모순(선택 0인데 branches: [] 로 적어 9개 마무리 문구를 실을 자리가 없어짐)을
+#   명시적으로 정정한 부분이다.
+# ⚠️ R1 민감 Scene ② — 죽음 위협·폐쇄·박해 실행. crisis_reminder 필수 배치. 최종 Scene 이므로
+#   footer_persistent·crisis_resources.default 도 반드시 이 파일에 존재해야 한다(G3c).
+# ⚠️ dwell_limit — 사자굴 투척 블록(6:16-17)에만 건다. 투척 직후 최대 3초 내 6:22 보전 자막으로
+#   전환하며 굴 안 폐쇄 상태에 체류시키지 않는다(seed §4 R1).
+# ⚠️ 단 6:24/6:25-28 전면 배제 — 이 Scene 은 6:23(미션 종료점)에서 끝난다. 그 뒤 사건은
+#   자막·나레이션·음향·VFX·LLM 프롬프트 어디에도 등장하지 않는다(seed §2-3).
+# ⚠️ 창문 정렬 인터랙션(ix_s5_window_alignment)은 R4 스킵 경로에서도 유지된다 — 트리거는
+#   사자굴이지 창문이 아니다(seed §7).
+# ⚠️ Scene 5 는 최종 Scene 이므로 next_scene_id: null.
+
+scene_id: daniel_scene5
+id: daniel_scene5
+scene_name: window_den_preserved
+mission_id: daniel
+version: 1.0.0
+duration_seconds_target: 105
+default_path: static_curation
+llm_optin_only: true
+
+consent_cards:
+  - id: card_consent_daniel_s5
+    text_ko: "다음 장면에는 좁고 어두운 공간과 맹수 소리가 나옵니다. 폐쇄된 공간이 부담되시면 건너뛰셔도 괜찮습니다. 건너뛰셔도 마무리는 그대로 받으십니다. 힘드시면 {{crisis_resources.default}}"
+    buttons_ko: ["그대로 보기", "조용한 장면으로 넘어가기"]
+    default_focus: none # 어느 쪽에도 기본 포커스를 주지 않는다(R3) — seed §3-1 그대로
+consent_card_id: card_consent_daniel_s5
+skip_alternative_scene_id: daniel_scene5_alt_quiet_window # 자기 id(daniel_scene5) 와 달라야 한다(G7b)
+conditional_blocks:
+  - id: daniel_scene5_alt_quiet_window
+    condition: consent_declined_or_skipped
+    description: "사자굴 시각·음향·햅틱 에셋 전부 미로드. 6:10(창문 정렬) 연출 + 6:22·6:23 인용 자막 + 보전 서술만 재생. 6:16·6:17·6:19·6:20·6:21 나레이션 블록은 이 조건에서 재생하지 않는다(각 블록의 condition_gate: daniel_scene5_full 참조)."
+    omits_assets:
+      [
+        model_lion,
+        sfx_lion_growl,
+        env_den_interior,
+        vfx_stone_seal,
+        haptic_impact,
+      ]
+    duration_seconds: 70 # 105초 대비 단축 — 남는 35초는 창문 정렬 여유로 흡수
+  - id: daniel_scene5_full
+    condition: consent_granted
+    duration_seconds: 105
+
+crisis_reminder:
+  text_ko: "여기까지 오시느라 애쓰셨습니다. 오늘 마음이 무겁게 남으셨다면 {{crisis_resources.default}}"
+
+environment:
+  space_id: babylon_upper_room_and_den
+  background_model: env_babylon_upper_room
+  lighting:
+    type: window_dawn_transition
+    color_temperature_kelvin: 3000
+    dust_haze_emphasis: false
+  ambient_sound:
+    - id: quiet_evening_room
+      gain_db: -28
+      spatial: true
+    - id: distant_city_low
+      gain_db: -30
+      spatial: true
+  user_position: [0.0, 1.65, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: daniel_self
+    voice_id: daniel_v1
+    position: [0.0, 1.65, 0.0]
+    note: "사용자가 다니엘 — first-person. 6:21 대사만 daniel_self 발화, 나머지는 자막."
+  - id: darius_king
+    voice_id: darius_v1
+    position: [-1.0, 1.65, -3.0]
+    visual_traits: [abstract_silhouette_low_detail]
+    note: "다리오 왕 — 6:19-20 의 다급함. condition_gate: daniel_scene5_full (스킵 경로에서 미등장)."
+
+narration_blocks:
+  - id: nb_s5_window_6_10
+    speaker: scripture_caption
+    text_ko: "다니엘이 이 조서에 왕의 도장이 찍힌 것을 알고도 자기 집에 돌아가서는 윗방에 올라가 예루살렘으로 향한 창문을 열고 전에 하던 대로 하루 세 번씩 무릎을 꿇고 기도하며 그의 하나님께 감사하였더라 (다니엘 6:10)"
+    audio_clip_id: aud_s5_6_10_ko
+    start_at_seconds: 0.0
+    duration_seconds: 20.0
+    hidden_until_event: null
+    note: "비버튼 인터랙션(ix_s5_window_alignment)의 성경적 근거. '전에 하던 대로'가 요점 — 과시 연출 금지(seed §7)."
+  - id: nb_s5_report_bridge
+    speaker: narrator_v1
+    text_ko: "그 모습이 그대로 보고되었다."
+    audio_clip_id: aud_s5_bridge_ko
+    start_at_seconds: 22.0
+    duration_seconds: 4.0
+    hidden_until_event: window_aligned_or_timeout
+    note: "비성경 브리지 — 6:11-15(고발 경위)는 §2 범위 밖이라 자막화하지 않는다. 두 경로(전체/스킵) 공통."
+  - id: nb_s5_thrown_6_16
+    speaker: scripture_caption
+    text_ko: "이에 왕이 명령하매 다니엘을 끌어다가 사자 굴에 던져 넣는지라 왕이 다니엘에게 이르되 네가 항상 섬기는 너의 하나님이 너를 구원하시리라 하니라 (다니엘 6:16)"
+    audio_clip_id: aud_s5_6_16_ko
+    start_at_seconds: 27.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    condition_gate: daniel_scene5_full
+    dwell_limit_seconds: 3
+    note: "dwell_limit 대상(seed §4 R1) — 투척 직후 최대 3초 내 6:22 로 전환. 굴 안 폐쇄 상태에 체류시키지 않는다. omits_assets: model_lion, sfx_lion_growl 과 연동."
+  - id: nb_s5_sealed_6_17
+    speaker: scripture_caption
+    text_ko: "이에 돌을 굴려다가 굴 어귀를 막으매 왕이 그의 도장과 귀족들의 도장으로 봉하였으니 이는 다니엘에 대한 조치를 고치지 못하게 하려 함이었더라 (다니엘 6:17)"
+    audio_clip_id: aud_s5_6_17_ko
+    start_at_seconds: 39.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    condition_gate: daniel_scene5_full
+    dwell_limit_seconds: 3
+    note: "dwell_limit 대상. omits_assets: env_den_interior, vfx_stone_seal, haptic_impact 와 연동."
+  - id: nb_s5_dawn_6_19
+    speaker: scripture_caption
+    text_ko: "이튿날에 왕이 새벽에 일어나 급히 사자 굴로 가서 (다니엘 6:19)"
+    audio_clip_id: aud_s5_6_19_ko
+    start_at_seconds: 51.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+    condition_gate: daniel_scene5_full
+  - id: nb_s5_king_cry_6_20
+    speaker: darius_king
+    text_ko: "다니엘이 든 굴에 가까이 이르러서 슬피 소리 질러 다니엘에게 묻되 살아 계시는 하나님의 종 다니엘아 네가 항상 섬기는 네 하나님이 사자들에게서 능히 너를 구원하셨느냐 하니라 (다니엘 6:20)"
+    audio_clip_id: aud_s5_6_20_ko
+    start_at_seconds: 57.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    condition_gate: daniel_scene5_full
+  - id: nb_s5_daniel_reply_6_21
+    speaker: daniel_self
+    text_ko: "다니엘이 왕에게 아뢰되 왕이여 원하건대 왕은 만수무강 하옵소서 (다니엘 6:21)"
+    audio_clip_id: aud_s5_6_21_ko
+    start_at_seconds: 71.0
+    duration_seconds: 6.0
+    hidden_until_event: null
+    condition_gate: daniel_scene5_full
+  - id: nb_s5_preserved_6_22
+    speaker: daniel_self
+    text_ko: "나의 하나님이 이미 그의 천사를 보내어 사자들의 입을 봉하셨으므로 사자들이 나를 상해하지 못하였사오니 이는 나의 무죄함이 그 앞에 명백함이오며 또 왕이여 나는 왕에게도 해를 끼치지 아니하였나이다 하니라 (다니엘 6:22)"
+    audio_clip_id: aud_s5_6_22_ko
+    start_at_seconds: 77.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    note: "보전 anchor. 두 경로(전체/스킵) 공통 — 스킵 경로에서는 nb_s5_report_bridge 직후 여기로 직행한다. '천사'의 신원(피조 천사 vs 신현)은 확정 서술하지 않고 본문 어휘 그대로(disputed_point 4)."
+  - id: nb_s5_mission_end_6_23
+    speaker: scripture_caption
+    text_ko: "왕이 심히 기뻐서 명하여 다니엘을 굴에서 올리라 하매 그들이 다니엘을 굴에서 올린즉 그의 몸이 조금도 상하지 아니하였으니 이는 그가 자기의 하나님을 믿음이었더라 (다니엘 6:23)"
+    audio_clip_id: aud_s5_6_23_ko
+    start_at_seconds: 95.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    note: "미션 종료점(seed §1-1). 이 절 이후(6:24 이하) 어떤 사건도 이어 붙이지 않는다."
+
+interactions:
+  - id: ix_s5_window_alignment
+    type: non_button_gaze_or_pose_align
+    target_assets: [model_window_jerusalem_facing, vfx_soft_light_on_alignment]
+    gesture: gaze_or_body_facing_align
+    presentation:
+      description: "창문을 열고 예루살렘 방향으로 몸(또는 시선)을 정렬. 정렬되면 조용히 빛이 드는 정도의 피드백만 — 과시 연출 금지. '전에 하던 대로'가 요점(seed §7)."
+    validation_rules:
+      - rule: optional_no_pressure
+        on_timeout: treat_as_complete
+        timeout_seconds: 20.0
+        description: "점수·타이머·실패 판정 없음. 정렬하지 않아도 20초 후 자동 완주 처리."
+      - rule: preserved_in_skip_path
+        description: "R4 스킵 경로(daniel_scene5_alt_quiet_window)에서도 이 인터랙션은 유지된다 — 트리거는 사자굴이지 창문이 아니다(seed §7)."
+
+branches:
+  - id: br_s5_closing_message
+    triggered_by_event: [scene_enter] # 사용자 선택이 아니라 진입 시 자동
+    decision_key: request_style # seed §6 의 라벨 키. 정의 없는 변수(closing_tone 등)를 쓰지 않는다
+    backend_endpoint: "POST /api/game/daniel/complete"
+    body_template:
+      request_style: "{{from_scene2_or_null}}" # Scene 2 미수행·스킵이면 null
+      faith_tone: "{{users.faith_tone}}" # strong | balanced | soft
+    default_path: static_curation
+    llm_optin_only: true
+    route_selection:
+      match: all_keys_equal # when 의 모든 키가 AND 로 일치해야 그 라우트
+      keys: [request_style, faith_tone]
+      on_no_match: route_fallback_null_balanced # 12개 중 어디에도 안 걸리면 이 라우트
+    routes:
+      # ── A. direct_refusal × 3 ────────────────────────────────
+      - when: { request_style: direct_refusal, faith_tone: strong }
+        static_text_ko: '다니엘은 뜻을 정했고, 그 결정이 그 혼자 감당할 일로 남지 않았습니다. 본문은 곧바로 이렇게 적습니다 — "하나님이 다니엘로 하여금 환관장에게 은혜와 긍휼을 얻게 하신지라"(단 1:9). 오늘 당신이 그은 선도, 당신 혼자 그은 것이 아닙니다.'
+      - when: { request_style: direct_refusal, faith_tone: balanced }
+        static_text_ko: "다니엘은 왕의 음식 앞에서 물러서지 않았습니다. 그리고 그 거절이 관계를 끝내지도 않았습니다. 선을 긋는 일과 사람을 잃는 일이 언제나 같은 일은 아닙니다."
+      - when: { request_style: direct_refusal, faith_tone: soft }
+        static_text_ko: '"여기까지"라고 말해 본 사람은 그 말이 얼마나 무거운지 압니다. 오늘 그 무게를 한 번 들어 보았다는 것, 그것만 여기 남겨 둡니다.'
+      # ── B. verifiable_proposal × 3 ───────────────────────────
+      - when: { request_style: verifiable_proposal, faith_tone: strong }
+        static_text_ko: '다니엘은 거절당한 자리에서 멈추지 않고, 열흘이라는 확인 가능한 제안을 내놓았습니다(단 1:12-13). 본문은 그 결과를 사람의 전략으로만 적지 않습니다 — "하나님이 이 네 소년에게 학문을 주시고 모든 서적을 깨닫게 하시고 지혜를 주셨으니"(단 1:17). 당신이 준비하고 있는 말도 혼자 놓여 있지 않습니다.'
+      - when: { request_style: verifiable_proposal, faith_tone: balanced }
+        static_text_ko: '다니엘은 "안 됩니다"라는 답을 들은 뒤에, 확인해 볼 수 있는 열흘을 제안했습니다. 거절이 대화의 끝은 아니었습니다. 당신이 찾는 방법도 아직 다 나오지 않았을 뿐입니다.'
+      - when: { request_style: verifiable_proposal, faith_tone: soft }
+        static_text_ko: "열흘이면 알 수 있다 — 다니엘의 제안은 그만큼 작았습니다. 크게 바꾸지 않아도 되는 방법이 남아 있을 때가 있습니다."
+      # ── C. seek_ally × 3 ─────────────────────────────────────
+      - when: { request_style: seek_ally, faith_tone: strong }
+        static_text_ko: '환관장은 왕을 두려워해 거절했지만, 본문은 다니엘이 만난 또 한 사람을 기록합니다 — "감독하게 한 자"(단 1:11). 그 만남 바로 앞에 이 문장이 놓여 있습니다 — "하나님이 다니엘로 하여금 환관장에게 은혜와 긍휼을 얻게 하신지라"(단 1:9). 당신 곁에도 아직 만나지 않은 사람이 있습니다.'
+      - when: { request_style: seek_ally, faith_tone: balanced }
+        static_text_ko: "다니엘이 처음 말을 건넨 사람에게는 결정권이 없었습니다. 그래서 그는 다른 자리로 갔습니다. 같은 말을 다른 사람에게 하는 것은 물러서는 일이 아닙니다."
+      - when: { request_style: seek_ally, faith_tone: soft }
+        static_text_ko: "혼자 밀어붙이지 않고 사람을 찾는 것도 하나의 길입니다. 오늘 그 길을 골랐다는 것만 기록해 둡니다."
+      # ── D. null 폴백 × 3 — G1b 가 찾는 라우트 ─────────────────
+      - when: { request_style: null, faith_tone: strong }
+        static_text_ko: '다니엘의 이야기는 그가 무엇을 골랐는지가 아니라 그가 지켜졌다는 사실로 끝납니다 — "사자들이 나를 상해하지 못하였사오니"(단 6:22). 오늘 아무것도 고르지 않았어도, 그 문장은 그대로 남아 있습니다.'
+      - id: route_fallback_null_balanced
+        when: { request_style: null, faith_tone: balanced }
+        static_text_ko: "오늘은 아무것도 고르지 않아도 되는 날이었습니다. 선택하지 않는 것도 하나의 자리입니다. 여기까지 온 것으로 이 시간은 끝납니다."
+        note: "Scene 2 skip · 라벨 미선택 · R4 스킵(Scene 4/5) 경로 — 동일하게 완결. faith_tone 미설정 사용자도 여기로 온다(on_no_match 목적지)."
+      - when: { request_style: null, faith_tone: soft }
+        static_text_ko: "고르지 않고 지나온 시간도 시간입니다. 오늘은 여기까지입니다."
+    note: "3 라벨 × 3 톤 + null × 3 = 12 라우트. 전문은 seed §6-1 A·B·C·D 표에서 글자 그대로 옮김 — 요약·윤문 없음. 결과 보장 서술 0건(disputed_point 7)."
+
+safety_gates:
+  - id: R4_consent_before_scene_content
+    enforced_at: before_scene_enter
+    consent_card_ref: card_consent_daniel_s5
+    description: "사자굴 에셋 로드 이전에 뜬다(seed §3-1 리터럴 요구). 거절 시 daniel_scene5_alt_quiet_window 로 전환 — model_lion·env_den_interior 실재 배제 확인됨(G7d 대상)."
+  - id: violence_exclusion_dan_6_24
+    enforced_at: always
+    description: "단 6:24 및 6:25-28 완전 배제 — 이 Scene 은 6:23(미션 종료점)에서 끝난다(seed §2-3)."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    storage: hash_only
+    on_detect:
+      - scene_timeline: pause
+      - audio: fade_to_silence_1200ms
+      - visual: fade_to_soft_black # Scene 5 — 사자굴 에셋 즉시 언로드
+      - haptic: stop_all
+      - show_card: card_crisis_daniel
+    crisis_card:
+      id: card_crisis_daniel
+      text_ko: "지금 많이 힘드신 것 같아요. 이야기는 여기서 잠시 멈출게요. 혼자 견디지 않으셔도 됩니다. 도움을 받을 수 있는 곳: {{crisis_resources.default}}"
+      buttons_ko: ["잠시 쉬기", "미션 종료하기", "이어서 진행하기"]
+      default_focus: "잠시 쉬기"
+    resume_rule: explicit_user_tap_only
+    crisis_resource_ref: crisis_resources.default
+  - id: dwell_limit_lion_den_block
+    enforced_at: nb_s5_thrown_6_16, nb_s5_sealed_6_17
+    max_seconds: 3
+    description: "투척·봉인 블록 체류 최대 3초. 최종 Scene 이므로 컷 대상은 Scene 내부 블록이지 다음 Scene 으로의 전환이 아니다(seed §4 R1)."
+  - id: R3_no_outcome_guarantee
+    enforced_at: always
+    description: "마무리 문구 12종 어디에도 결과 보장 서술을 두지 않는다(disputed_point 7). 미션은 다니엘의 선택 구조를 체험시키지 결과를 약속하지 않는다."
+    # ── 왜 이 토큰인가 ────────────────────────────────────────────────────────
+    # disputed_point 7 이 지목한 위험이 여기서 실현된다 — 사용자가 1인칭으로 다니엘의
+    # 자리에 섰다가 '나도 저렇게 지켜져야 한다' 를 안고 나가는 것. 지켜지지 않은 사람에게
+    # 이 미션은 그 순간 "네 믿음이 그만큼이 아니었다" 가 된다. 그래서 막는 것은 '고난'이
+    # 아니라 *결과의 약속* 이다.
+    #
+    # ⚠️ 이 파일의 앞선 초안 주석은 "마무리 문구 12종은 정적 경로라 토큰 스캐너 밖" 이라고
+    #    적었다. 사실이 아니다 — static_text_ko 는 `_ko` 접미라 자기 본문 lint 대상이다
+    #    (ContentSafetyGateEnforcementTest 의 userFacingText). 12종 전부가 실제로 스캔된다.
+    #
+    # 먼저 쓴 위로 → 그다음 토큰. 아래는 전부 통과해야 하고 통과한다:
+    #   "지켜 주신다고 약속할 수 없습니다."
+    #   "다니엘처럼 되지 않아도 괜찮습니다."
+    #   "응답이 없어도 당신의 기도는 기도입니다."
+    #   "좋아지지 않아도 괜찮습니다."
+    #   "하나님이 함께 계십니다."  ← 임재는 결과가 아니다. 이 표면은 반드시 열어 둔다.
+    #
+    # ⚠️ 전역 영향 고지: '지켜 주십니다'·'건져 주십니다' 는 흔한 신앙 관용구라 전역 런타임
+    #    목록에 들어가면 다른 인물 묵상에서도 막힌다. 그게 의도다 — 결과 보장은 인물과
+    #    무관하게 R3 위반이다. 대가는 위의 마지막 줄이 지불한다(임재·동행 표면은 무제한).
+    # ⚠️ 형제 게이트(R2_R3_esther_boundary_lint)의 '갚아 주실' 과 표면형이 겹치지 않게 골랐다.
+    lint_forbidden_tokens:
+      [
+        "반드시 지켜 주",
+        "꼭 지켜 주실",
+        "지켜 주십니다",
+        "반드시 건져 주",
+        "건져 주십니다",
+        "믿으면 건져",
+        "반드시 응답하십",
+        "응답해 주실 겁니다",
+        "기도하면 반드시",
+        "결국 다 잘 될",
+        "반드시 좋아질",
+        "곧 좋아질 겁니다",
+        "조금도 상하지 않을",
+        "사자의 입을 막아 주실",
+      ]
+  - id: R2_R3_esther_boundary_lint
+    enforced_at: always
+    description: "고난 인과정당화(R2)·회복·담대 압박(R3)·에스더 배타(seed §0) 어휘 차단. application.yml 전역 리스트와 append-only 동기화. 마무리 문구 12종(static_text_ko)도 이 목록의 스캔 대상이다."
+    # 축 셋(R2 인과정당화 / R3 담대·인내 압박 / 에스더 '드러내다·숨기다·타협' 배타)을
+    # 한 게이트가 덮는다. 저작 근거·어간 절단 수정 3건과 의도적 과차단 1건의 전문은
+    # scene1.yml 의 같은 게이트 주석에 있다.
+    #
+    # 이 Scene 은 사자굴(박해의 실행)과 마무리 문구 12종이 같은 파일에 있어 R2 미끄러짐이
+    # 가장 위험한 자리다 — "사자굴을 지났으니 당신도 담대해지세요" 한 문장이면 미션 전체가
+    # 뒤집힌다. 형제 게이트 R3_no_outcome_guarantee 가 '결과의 약속' 을, 이 게이트가
+    # '고난의 정당화와 담대 압박' 을 맡는다. 두 목록은 표면형이 겹치지 않는다.
+    #
+    # 자기 본문 확인(초안 문구가 실제로 이 목록을 통과하는지 직접 대조했다):
+    #   "다니엘은 왕의 음식 앞에서 물러서지 않았습니다"  ← '물러서지 마/말' 과 갈라진다
+    #   "같은 말을 다른 사람에게 하는 것은 물러서는 일이 아닙니다"  ← 동일
+    #   "혼자 견디지 않으셔도 됩니다"(위기 카드)  ← '조금만 견디'·'견디면 높' 과 갈라진다
+    lint_forbidden_tokens:
+      [
+        "연단하시",
+        "연단하십",
+        "단련하시",
+        "단련하십",
+        "허락하신 것",
+        "고난에는 뜻이",
+        "고난에도 뜻이",
+        "담대해져",
+        "담대해지세",
+        "담대해지십",
+        "담대해지셔야",
+        "담대해지면",
+        "처럼 담대",
+        "견디면 높",
+        "조금만 견디",
+        "타협하지 말",
+        "타협하지 마",
+        "타협해서는",
+        "타협하면 안",
+        "세상과 구별되지",
+        "숨기는 건 부끄러",
+        "숨기는 것은 부끄러",
+        "숨기는 게 부끄러",
+        "믿음이 있으면 드러내",
+        "믿음이 있다면 드러내",
+        "드러내야 하는 것",
+        "단단하게 만듭",
+        "단단하게 만들어",
+        "단단하게 만드는",
+        "단단하게 만들려",
+        "반드시 이유가 있",
+        "데는 하나님의 계획",
+        "갚아 주실",
+        "용기를 내 보셔",
+        "물러서시면",
+        "물러서지 마",
+        "물러서지 말",
+        "지금은 참으",
+        "이 정도는 버텨",
+        "버텨 내셔야",
+        "감추고 사시면 안",
+        "감추고 사시겠",
+        "감추고 살지 마",
+        "감추고 사십시",
+      ]
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "default_path: static_curation. br_s5_closing_message 는 전부 static_text_ko — 기본 경로에서 LLM 미호출."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null # 최종 Scene
+transition:
+  type: fade_to_soft_light
+  fade_out_seconds: 1.5
+  fade_in_seconds: 0.0
+
+recovery_metric_dimensions:
+  spiritual: ["경계 설정", "함께하심(단 1:9·1:17·6:22)", "보전"]
+  emotional: ["두려움 인정", "무게를 내려놓음", "혼자가 아니라는 감각"]
+  rational: ["체제 안 협력 지점과 거절 지점의 구분", "검증 가능한 제안 설계"]
+
+theology_footer_refs:
+  - citation_id: D5_candidate
+    source: "다니엘서 6장 장르 논쟁(역사 기술 vs 궁정 설화) — 확정 서지 미확보(seed §12)"
+    note: "보수적 정통 입장(역사 기술)에 서되 논쟁의 존재를 명시한다(disputed_point 5)."
+    anchor_block: nb_s5_mission_end_6_23
+  - disputed_points:
+      - id: D4
+        summary: "6:22 '천사'의 신원 — 피조된 천사 vs 신현(theophany)"
+        handling: "확정 서술하지 않는다. 자막은 본문 어휘('그의 천사')를 그대로 쓴다."
+      - id: D5
+        summary: "6장의 장르 — 역사 기술 vs 궁정 설화"
+        handling: "보수적 정통 입장(역사 기술)에 서되 논쟁의 존재를 명시한다."
+      - id: D6
+        summary: "단 6:24 배제 결정 — 아동을 포함한 집단 처형 본문을 MVP 에서 완전 배제한 사유"
+        handling: "정직 기록. 은폐가 아니라 트리거 허용선 밖이라는 scoping. 세부는 docs/MVP-DANIEL.md §12.6 참조."
+      - id: D7
+        summary: "1인칭 배역(사용자 = 다니엘)의 신학적 부담 — '나도 저렇게 지켜져야 한다'는 기대로 읽힐 위험"
+        handling: "마무리 문구 12종 어디에도 결과 보장 서술을 두지 않는다. 미션은 선택 구조를 체험시키지 결과를 약속하지 않는다."
+    handling: "전체 disputed_points 목록(7건)은 docs/MVP-DANIEL.md §12.6 참조."
