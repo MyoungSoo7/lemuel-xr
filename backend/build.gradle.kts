@@ -104,6 +104,14 @@ tasks.withType<Test> {
     useJUnitPlatform()
     systemProperty("file.encoding", "UTF-8")
     finalizedBy(tasks.named("jacocoTestReport"))
+
+    // ContentSafetyGateEnforcementTest 는 리포 루트의 `content/{인물}/scene*.yml` 을 읽는다.
+    // 그 디렉터리는 백엔드 소스도 클래스패스도 아니라서 Gradle 이 입력으로 보지 못하고,
+    // 저작 YAML 만 고치면 :test 가 UP-TO-DATE 로 건너뛴다 — 안전 게이트가 조용히 낡는다.
+    // 입력으로 등록해 콘텐츠가 바뀌면 반드시 다시 돌게 한다.
+    inputs.dir(rootProject.layout.projectDirectory.dir("../content"))
+        .withPropertyName("authoringContent")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jacoco {

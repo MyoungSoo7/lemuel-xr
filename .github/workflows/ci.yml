@@ -25,6 +25,10 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
+              # 저작 콘텐츠도 backend 잡의 입력이다 — ContentSafetyGateEnforcementTest 가
+              # content/{인물}/scene*.yml 의 안전 게이트를 검사한다. 이 줄이 없으면
+              # 콘텐츠만 고친 PR 은 안전 게이트 검사를 한 번도 거치지 않고 머지된다.
+              - 'content/**'
             tts:
               - 'tts/**'
             ai:

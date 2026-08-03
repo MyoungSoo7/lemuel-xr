@@ -162,6 +162,9 @@ safety_gates:
   - id: R3_all_laments_valid
     enforced_at: br_s4_honest_lament
     description: "외로움·소진·두려움 세 토로 모두 정당 — 단일 정답 금지."
+    # 토큰 lint 로 집행할 수 없는 *분기 구조* 요건이다. 금칙어를 채우면 카고컬트가 된다.
+    enforcement: structural
+    structural_check: "br_s4_honest_lament 의 3 routes(loneliness·burnout·fear)가 모두 존재하고, 각각 carry_to_scene5 로 동등한 후속 경로를 가지며, 특정 route 를 우대하는 점수·성취·정답 표시가 없을 것(routes 수 3 · 서로 다른 god_response_tone 3 · score/correct 류 키 0건)."
   - id: R1_no_death_wish_card
     enforced_at: br_s4_honest_lament
     description: "토로 카드에 자살사고 선택지 없음 — 정직한 감정 라벨링만(Affect Labeling)."
