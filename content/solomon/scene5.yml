@@ -14,7 +14,7 @@ duration_seconds_target: 75
 
 environment:
   space_id: gibeon_altar_dawn_return
-  background_model: env_gibeon_altar_dawn      # Scene 1 공간 재사용, 빛만 새벽으로 — 처음 구하던 자리로 돌아옴(수미상관)
+  background_model: env_gibeon_altar_dawn # Scene 1 공간 재사용, 빛만 새벽으로 — 처음 구하던 자리로 돌아옴(수미상관)
   lighting:
     type: pre_dawn_soft_warmth
     color_temperature_kelvin: 3200
@@ -38,12 +38,12 @@ npcs:
     voice_id: solomon_old_v1
     position: [0.0, 1.65, 0.0]
 
-conditional_assets:      # 결정 A — 경로 의존 내려놓기 오브젝트
+conditional_assets: # 결정 A — 경로 의존 내려놓기 오브젝트
   - asset: model_crown
     condition: always
     meaning_ko: "왕관 — Scene 1 의 부담"
   - asset: model_judgment_sword
-    condition: scene3_completed      # '완주'만 칼 — skip·미완주 등 그 외 전부 두루마리 폴백 (S3)
+    condition: scene3_completed # '완주'만 칼 — skip·미완주 등 그 외 전부 두루마리 폴백 (S3)
     meaning_ko: "칼 — Scene 3 판결의 무게"
   - asset: model_judgment_scroll
     condition: scene3_skipped_or_incomplete
@@ -79,14 +79,14 @@ narration_blocks:
     note: "R3 — 내려놓기는 초대이지 요구가 아님. '내려놓지 않아도 괜찮다' 명시."
   - id: nb_s5_reorientation_message
     speaker: system
-    text_ko: ""      # hevel_label × faith_tone 정적 매트릭스 주입 (MVP-SOLOMON-CONTENT §6, 9조합 사전 큐레이션)
+    text_ko: "" # hevel_label × faith_tone 정적 매트릭스 주입 (MVP-SOLOMON-CONTENT §6, 9조합 사전 큐레이션)
     audio_clip_id: null
     start_at_seconds: 52.0
     duration_seconds: 14.0
     hidden_until_event: null
     default_path: static_curation
     default_text_ko: "가장 많이 가진 왕이 마지막에 남긴 말은 하나뿐이었다 — 하나님을 경외하라. (전도서 12:13)"
-    llm_optin_only: true              # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
+    llm_optin_only: true # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
     llm_prompt_key_map:
       emptiness: "solomon_s5_reorientation_emptiness"
       restlessness: "solomon_s5_reorientation_restlessness"
@@ -96,12 +96,19 @@ narration_blocks:
 interactions:
   - id: ix_s5_lay_down_optional
     type: grab_and_place
-    target_assets: [model_crown, model_judgment_sword, model_judgment_scroll, model_treasure_pile, socket_altar_front]
+    target_assets:
+      [
+        model_crown,
+        model_judgment_sword,
+        model_judgment_scroll,
+        model_treasure_pile,
+        socket_altar_front,
+      ]
     gesture: grab_and_place
     presentation:
       optional: true
       objects_resolved_by: conditional_assets
-      per_object_placement: true       # 하나만 내려놓아도, 셋 다 내려놓아도, 하나도 안 내려놓아도 모두 완주
+      per_object_placement: true # 하나만 내려놓아도, 셋 다 내려놓아도, 하나도 안 내려놓아도 모두 완주
     haptic:
       intensity: 0.25
       duration_ms: 250
@@ -137,6 +144,16 @@ branches:
         note: "Scene 4 skip 또는 라벨 미선택 경로 — 기본 정적 문구로 동일하게 완결 (결정 A·R4)."
     note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9 사전 큐레이션 (MVP-SOLOMON-CONTENT §6). 위 문구는 balanced 기본값."
 
+# 이 Scene 은 이탈 지점(미션 종료)이다 — 위기 리마인더는 여기서 예외가 없다.
+# 문구는 **새로 쓴 것이 아니라 이미 배포되어 나가는 값** 이다:
+#   backend/src/main/resources/scenarios/solomon.yml outro 의 `crisis_reminder`.
+# 저작층(content/)에 같은 이름의 키가 없어 G3d 가 판정 불가였다 — 실제로 나가는 문구를
+# 저작 정본에도 기록해 이름을 맞춘 것이지, 없던 안전 문구를 지어낸 것이 아니다.
+crisis_reminder:
+  persistent: true
+  dismissible: true
+  text_ko: "{{crisis_resources.default}}."
+
 safety_gates:
   - id: R3_no_reorientation_pressure
     enforced_at: always
@@ -152,7 +169,19 @@ safety_gates:
     #    솔로몬 scene5 의 R3_no_instrumentalization 에서 '깨달았으면' 을 삭제한 것도
     #    같은 이유다 — '깨달았으' 가 포섭한다. 두 삭제 모두 ForbiddenTokenConfigTest 의
     #    mustBlock 문장으로 커버리지가 유지됨을 검증한다.
-    lint_forbidden_tokens: ["믿음이 부족", "감사가 부족", "욕심이 많아서", "욕심이 많으셔", "욕심이 많으시", "만족을 모르", "깨달았으", "깨달으셨으", "다시 열심히", "허무를 극복"]
+    lint_forbidden_tokens:
+      [
+        "믿음이 부족",
+        "감사가 부족",
+        "욕심이 많아서",
+        "욕심이 많으셔",
+        "욕심이 많으시",
+        "만족을 모르",
+        "깨달았으",
+        "깨달으셨으",
+        "다시 열심히",
+        "허무를 극복",
+      ]
   - id: R3_no_instrumentalization
     enforced_at: always
     description: "'허무를 느꼈으니 이제 바르게 살아라'류 교훈화 차단 — 재정향은 결론 본문(전 12:13)의 안착 톤으로만."
@@ -163,7 +192,21 @@ safety_gates:
     # "이 공허를 교훈으로 삼지 않으셔도 됩니다"를 삼켰다 — 둘 다 이 Scene 의 결론 톤이다.
     # 당위·명령 어미(-야 합/-야죠/-라/-세요)와 긍정 계속형(-으/-는/-아/-을)까지 붙여 갈라냈다.
     # 형제 게이트(R3_no_reorientation_pressure)와 표면형이 겹치지 않게 골랐다.
-    lint_forbidden_tokens: ["바르게 살아야 합", "바르게 살아야죠", "바르게 살아야 하지", "바르게 살아라", "바르게 사세", "바르게 사십", "이제부터라도", "교훈으로 삼으", "교훈으로 삼는", "교훈으로 삼아", "교훈으로 삼을", "허무하지 않으려면"]
+    lint_forbidden_tokens:
+      [
+        "바르게 살아야 합",
+        "바르게 살아야죠",
+        "바르게 살아야 하지",
+        "바르게 살아라",
+        "바르게 사세",
+        "바르게 사십",
+        "이제부터라도",
+        "교훈으로 삼으",
+        "교훈으로 삼는",
+        "교훈으로 삼아",
+        "교훈으로 삼을",
+        "허무하지 않으려면",
+      ]
   - id: F66_reorientation_state_gate
     enforced_at: before_scene_enter
     description: "F-6.6 조건부 완화 — 취약 상태 이력 사용자에게 재정향 문구가 압박으로 읽히지 않도록 자동 소프트닝 또는 스킵."
@@ -192,7 +235,7 @@ safety_gates:
     enforced_at: always
     text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
 
-next_scene_id: null      # 미션 종료 → 메인 복귀 (또는 트랙 A 전도서 Theme 3 bridge 제안)
+next_scene_id: null # 미션 종료 → 메인 복귀 (또는 트랙 A 전도서 Theme 3 bridge 제안)
 transition:
   type: fade_to_black
   fade_out_seconds: 1.2
@@ -201,7 +244,7 @@ transition:
 bridge:
   offer_track_a: true
   prompt_ko: "이 시간을 기록하시겠어요?"
-  yes_route: "GET /api/track-a/ecclesiastes-bridge?theme=3"    # Track A Theme 3 — 전도서와 인생 (허무·공허)
+  yes_route: "GET /api/track-a/ecclesiastes-bridge?theme=3" # Track A Theme 3 — 전도서와 인생 (허무·공허)
   no_route: main_menu
 
 recovery_metric_dimensions:

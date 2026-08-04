@@ -121,6 +121,16 @@ branches:
           정본을 그 실제 동작에 맞춰 명시한 것이다(문구는 R3 축 — 회복에 시간표를 붙이지 않음).
     note: "faith_tone(strong/balanced/soft) × 3 라벨 = 9 사전 캐싱 (MVP-ELIJAH-CONTENT §6)."
 
+# 이 Scene 은 이탈 지점(미션 종료)이다 — 위기 리마인더는 여기서 예외가 없다.
+# 문구는 **새로 쓴 것이 아니라 이미 배포되어 나가는 값** 이다:
+#   backend/src/main/resources/scenarios/elijah.yml outro 의 `crisis_reminder`.
+# 저작층(content/)에 같은 이름의 키가 없어 G3d 가 판정 불가였다 — 실제로 나가는 문구를
+# 저작 정본에도 기록해 이름을 맞춘 것이지, 없던 안전 문구를 지어낸 것이 아니다.
+crisis_reminder:
+  persistent: true
+  dismissible: true
+  text_ko: "{{crisis_resources.default}}."
+
 safety_gates:
   - id: R3_no_recovery_pressure
     enforced_at: always
