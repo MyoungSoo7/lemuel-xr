@@ -1,0 +1,24 @@
+{
+  "id": "draft-newage-inner-divinity",
+  "class": "newage",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-04",
+    "rationale": "라벨 후보. 뉴에이지 내재신성(내 안의 신을 깨우면 구원이 온다) 적대 표본. 기도·부르짖음 같은 신앙 어휘를 섞어 시 88 본문과의 표면 유사도를 일부러 올렸다 — 어휘만 겹치면 통과하는지 보는 표본. 신학 검토 + 사인오프 필요."
+  },
+  "meditationText": "밤마다 부르짖는 그 목소리는 사실 내 안의 신이 나를 깨우는 소리다. 구원은 바깥에서 오지 않고 내가 나의 신성을 기억할 때 완성된다. 내가 나를 온전히 믿으면 어둠은 스스로 물러간다.",
+  "passages": [
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    },
+    {
+      "reference": "시 88:18",
+      "text": "주는 나의 사랑하는 자와 친구를 내게서 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    }
+  ]
+}

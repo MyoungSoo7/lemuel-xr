@@ -112,6 +112,12 @@ tasks.withType<Test> {
     inputs.dir(rootProject.layout.projectDirectory.dir("../content"))
         .withPropertyName("authoringContent")
         .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    // 골든셋(eval/grounding)도 같은 이유로 등록한다. 픽스처만 추가하고 :test 가 UP-TO-DATE 로
+    // 넘어가면, 무결성 검증(GroundingDatasetTest)을 통과한 적 없는 표본이 데이터셋에 남는다.
+    inputs.dir(rootProject.layout.projectDirectory.dir("../eval/grounding"))
+        .withPropertyName("groundingGoldenSet")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jacoco {

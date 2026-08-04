@@ -1,85 +1,76 @@
 package github.lms.lemuel.xr.ai.grounding.validation
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import github.lms.lemuel.xr.ai.grounding.adapter.out.embedding.GeminiEmbeddingAdapter
 import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase
-import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase.Passage
-import github.lms.lemuel.xr.ai.grounding.application.port.out.GroundingMetricsPort
-import github.lms.lemuel.xr.ai.grounding.domain.GroundingPolicy
-import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
+import github.lms.lemuel.xr.ai.grounding.eval.EvalMetrics
+import github.lms.lemuel.xr.ai.grounding.eval.GroundingDataset
+import github.lms.lemuel.xr.ai.grounding.eval.GroundingScorer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
 
 /**
- * 라이브 검증 harness — 진짜 Gemini 임베딩으로 5 픽스처를 돌려 게이트의 의미적 판별력을 입증.
- * GEMINI_API_KEY 없으면 자동 비활성화(@EnabledIfEnvironmentVariable). CI 기본 제외용 @Tag.
+ * 라이브 **회귀** 게이트 — 고정된(pinned) 정책에서 골든셋 `signed_off` 표본이 전부 기대 상태와
+ * 맞는지 확인한다. 진짜 Gemini 임베딩을 쓰므로 `GEMINI_API_KEY` 없으면 자동 비활성화된다.
  *
- * 임계치는 실행 시 튜닝 대상. 아래 정책으로 정통 ACCEPTED / 적대적 REJECTED 분리가 안 되면,
- * 스펙 §7 에 따라 이 테스트를 임계치 스윕 리포트로 바꾸고 precision/recall 을 기록한다.
+ * 역할 분담(스펙 §7):
+ *  - **이 테스트** = 회귀. "지금 쓰는 임계치가 아직 유효한가" 를 예/아니오로 답한다.
+ *  - [github.lms.lemuel.xr.ai.grounding.eval.GroundingThresholdSweepReport] = 탐색.
+ *    임계치 격자를 훑어 precision/recall 곡선과 P3 만족 구간을 리포트로 낸다.
+ *
+ * 픽스처·정책은 더 이상 이 파일에 하드코딩되지 않는다. 리포 루트 `eval/grounding/v1/` 이
+ * 단일 출처이고, 무결성은 `GroundingDatasetTest` 가 네트워크 없이 CI 에서 지킨다.
  */
 @Tag("live-embedding")
 @EnabledIfEnvironmentVariable(named = "GEMINI_API_KEY", matches = ".+")
 class ScriptureGroundingValidationTest {
 
-    private data class Fixture(
-        val purpose: String = "meditation",
-        val expectedStatus: String = "",
-        val meditationText: String = "",
-        val passages: List<Passage> = emptyList(),
-    )
-
-    private val mapper = jacksonObjectMapper()
-    private val noopMetrics = object : GroundingMetricsPort {
-        override fun evaluated(purpose: String) {}
-        override fun rejected(purpose: String) {}
-        override fun unsupportedRate(purpose: String, rate: Double) {}
-        override fun inconclusive(purpose: String) {}
-    }
-
-    // 2026-07-19 라이브 튜닝(gemini-embedding-001, 3072차원) 결과 도출한 임계치.
-    // 관측 per-fixture 미근거율: 정통 욥/시88 = 0.00, 영지주의/뉴에이지 = 1.00,
-    // 고난정당화 = 0.33(스펙 §8 "근거 있는 오독" — 실구절 어휘를 빌려 2/3 문장이 근거로 잡힘).
-    // maxUnsupportedRate 0.5 로는 고난정당화가 통과(MISS) → 0.3 으로 조이면 5/5 분리.
-    // ⚠️ n=5 소표본 튜닝이라 과적합 주의. 고난정당화 유형은 근본적으로 theology-reviewer 가
-    //    잡아야 하는 케이스(§8). 임베딩 모델 변경 시 재튜닝 필요.
-    private val policy = GroundingPolicy(similarityThreshold = 0.62, maxUnsupportedRate = 0.3)
-
-    private val fixtureNames = listOf(
-        "orthodox-job", "psalm88-lament",
-        "gnostic-secret-knowledge", "newage-universal-energy", "suffering-justification",
-    )
-
-    private fun load(name: String): Fixture =
-        javaClass.getResourceAsStream("/grounding/$name.json").use {
-            mapper.readValue(it, Fixture::class.java)
-        }
-
     @Test
     fun `real embeddings separate orthodox from heterodox meditations`() {
+        val dataset = GroundingDataset.load()
+        val policy = dataset.manifest.pinnedPolicy.toPolicy()
         val useCase = EvaluateGroundingUseCase(
             GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = "gemini-embedding-001"),
-            noopMetrics,
+            GroundingScorer.NOOP_METRICS,
         )
-        val report = StringBuilder("\n=== grounding validation ===\n")
-        var failures = 0
-        fixtureNames.forEach { name ->
-            val fx = load(name)
-            val verdict = useCase.evaluate(fx.purpose, fx.meditationText, fx.passages, policy)
-            val expected = GroundingStatus.valueOf(fx.expectedStatus)
-            val ok = verdict.status == expected
-            if (!ok) failures++
-            report.append(
-                "%-28s expected=%-10s got=%-12s rate=%.2f %s\n".format(
-                    name, expected, verdict.status, verdict.unsupportedRate, if (ok) "OK" else "MISS",
+
+        // draft 는 사람 사인오프 전이라 게이트 판단 근거가 될 수 없다 — 회귀는 signed_off 만 본다.
+        val fixtures = dataset.signedOff
+        val outcomes = GroundingScorer.outcomes(useCase, fixtures, policy)
+        val summary = EvalMetrics.summarize(outcomes)
+        val b = summary.binary
+
+        val report = buildString {
+            append("\n=== grounding validation (${dataset.manifest.dataset} ${dataset.manifest.version}, ")
+            append("sim=${policy.similarityThreshold} maxUnsup=${policy.maxUnsupportedRate}) ===\n")
+            outcomes.sortedBy { it.id }.forEach { o ->
+                append(
+                    "%-34s expected=%-12s got=%-12s rate=%.2f %s\n".format(
+                        o.id, o.expected, o.actual, o.unsupportedRate, if (o.correct) "OK" else "MISS",
+                    ),
+                )
+            }
+            append("--\n")
+            append("n=%d  TP=%d FP=%d FN=%d TN=%d  기권=%d\n".format(summary.sampleCount, b.tp, b.fp, b.fn, b.tn, b.abstained))
+            append(
+                "정밀도=%s 재현율=%s F1=%s  P3(오탐률=FP/(TP+FP))=%s\n".format(
+                    b.precision.fmt(), b.recall.fmt(), b.f1.fmt(), b.p3FalseRejectRate.fmt(),
                 ),
             )
         }
         println(report)
-        // 스펙 §7: 문서화된 임계치에서 전부 기대 상태와 일치해야 한다.
-        assertThat(failures)
-            .withFailMessage("일부 픽스처가 기대 상태와 불일치 — 임계치 튜닝 또는 precision/recall 리포트로 전환 필요:%s", report)
+
+        // 기권이 섞이면 위 지표를 믿을 수 없다(임베딩 장애를 정밀도 1.0 으로 오독하게 됨).
+        assertThat(b.abstained)
+            .withFailMessage("기대가 ACCEPTED/REJECTED 인데 판정 불가 — 임베딩 호출 실패 의심:%s", report)
             .isZero()
+        // 고정 임계치에서 signed_off 전부 일치해야 한다. 깨지면 재튜닝 후 스윕 리포트 경로를
+        // 커밋 메시지에 남기는 것이 규약(eval/grounding/README.md §5).
+        assertThat(summary.mismatches)
+            .withFailMessage("고정 임계치에서 불일치 발생 — 스윕 리포트로 재튜닝 필요:%s", report)
+            .isEmpty()
     }
+
+    private fun Double?.fmt(): String = this?.let { "%.3f".format(it) } ?: "n/a"
 }

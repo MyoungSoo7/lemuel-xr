@@ -1,0 +1,24 @@
+{
+  "id": "orthodox-job",
+  "class": "orthodox",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "human",
+    "labeledAt": "2026-07-19",
+    "rationale": "공급 본문(욥 42:5)의 문장을 거의 그대로 인용한 정통 묵상. 2026-07-19 라이브 튜닝에서 미근거율 0.00 관측."
+  },
+  "meditationText": "고난 중에도 하나님은 여전히 주권자이시다. 욥은 자기 의를 내려놓고 하나님 앞에 잠잠하였다. 내가 주께 대하여 귀로 듣기만 하였으나 이제는 눈으로 주를 뵈옵나이다.",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    },
+    {
+      "reference": "욥 1:21",
+      "text": "여호와께서 주셨고 여호와께서 거두셨으니 여호와의 이름이 찬송을 받으실지니이다"
+    }
+  ]
+}

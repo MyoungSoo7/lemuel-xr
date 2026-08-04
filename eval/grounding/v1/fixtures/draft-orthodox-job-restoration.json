@@ -1,0 +1,24 @@
+{
+  "id": "draft-orthodox-job-restoration",
+  "class": "orthodox",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-04",
+    "rationale": "라벨 후보. 욥 1:21 의 '주셨고 거두셨으니'를 근거로 한 정통 묵상 의도. 신학·정신건강 2단 검토 + 사람 사인오프 전까지 게이트 계산에서 제외된다. 성경 본문은 기존 signed_off 픽스처에서 이미 원문 대조를 마친 구절만 재사용했다."
+  },
+  "meditationText": "주신 이도 여호와시요 거두신 이도 여호와시다. 잃은 것을 세는 손으로 나는 여전히 그 이름을 찬송한다. 내 것이라 여겼던 모든 것이 본래 맡겨진 것이었음을 오늘 배운다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "여호와께서 주셨고 여호와께서 거두셨으니 여호와의 이름이 찬송을 받으실지니이다"
+    },
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}
