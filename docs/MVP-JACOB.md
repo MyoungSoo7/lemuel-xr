@@ -165,7 +165,8 @@ Scene 5: 받으니라 (90초, XR 핵심 #2: 예물 내밀기 + 자동 라우팅 
 
 **동의**: Scene 1의 카드가 이 Scene도 커버(별도 카드 없음). `cc_jacob_not_my_seat` 이탈로 상시 접근.
 
-**Scene 2·5 전용 위기 리마인더**(`R1_crisis_reminder`): _"지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"_
+**Scene 2·5 전용 위기 리마인더**(`crisis_reminder` — 2026-08-05 이전 표기는 `R1_crisis_reminder` 였다. 런타임 계약 키·다른 6인물과
+이름을 통일했고 문구는 그대로다): _"지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"_
 
 **LLM 호출**: 0회.
 

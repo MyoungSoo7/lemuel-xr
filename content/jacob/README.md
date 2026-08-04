@@ -34,7 +34,7 @@ content/jacob/
 ## Jacob 의 차별점 — 가해자 자리 고지 + 보상 비대칭 금지
 
 - **scene1.yml (진입 게이트)**: `cc_jacob_family_deception` 동의 카드 — `role_disclosure_ko` 로 사용자가 **가해자 자리**에 선다는 것을 명시 고지(리터럴 키, 산문 서술이 아님). 3택: 들어간다 / 요약으로만 본다(`1_alt`) / **`cc_jacob_not_my_seat` 이탈로**(피해자 쪽 사용자용, 5 Scene 전부 상시 이용 가능).
-- **scene2.yml (목격, R1)**: `interactions: []` — "남의 고통은 선택지가 아니다." 27:34 절규는 `dwell_limit: 3초`로 고착 방지, 27:41(살해 의도)은 인용 자막으로만, 위협 연출 완전 배제. `R1_crisis_reminder` 리터럴 배치.
+- **scene2.yml (목격, R1)**: `interactions: []` — "남의 고통은 선택지가 아니다." 27:34 절규는 `dwell_limit: 3초`로 고착 방지, 27:41(살해 의도)은 인용 자막으로만, 위협 연출 완전 배제. `crisis_reminder` 리터럴 배치(2026-08-05 이전 표기 `R1_crisis_reminder` — 문구 변경 없이 이름만 다른 인물·런타임과 통일).
 - **scene3.yml (유일한 사용자 결정)**: `return_label` 3택(`send_ahead`/`go_afraid`/`stay_and_pray`) — 전부 정당, 서열화 금지. `stay_and_pray` 는 **종결 상태**(유예 아님) — "아직"·"언젠가" 등 어휘 전면 금지. `carry_to_scene5` 로 값이 그대로 전달된다.
 - **scene4.yml (XR 핵심 #1)**: 비버튼 지속 그립(`ix_s4_hold_and_wrestle`) — 놓아도 실패가 아니라 재시작, 횟수 카운트 없음. 정체성 응답은 사용자 실명을 묻지 않고 "야곱" 고정. 씨름 상대는 형상·성별 미렌더(disputed #1 신현 논쟁 회피).
 - **scene5.yml (XR 핵심 #2 + R3 최우선)**: `cc_jacob_confrontation` 동의 카드에 `r3_reunion_safety_notice_ko`(재회 위험 고지, 고정 키) 리터럴. 예물 인터랙션(`ix_jacob_gift`) 두 경로(`rt_offer_again`/`rt_withdraw`) 가 **완전히 동등**(`entry_mode_after: full` 통일, `parity_assert`) — 물러서는 선택이 콘텐츠로 벌받지 않는다. 마무리는 `br_s5_closing_message` 자동 라우팅(`return_label` × `faith_tone` = 9종 + null 폴백 1종, 전부 동일한 해제 문장으로 종료).

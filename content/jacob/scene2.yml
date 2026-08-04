@@ -76,9 +76,21 @@ safety_gates:
   - id: R1_no_threat_dramatization_2741
     enforced_at: nb_s2_esau_hatred_intent
     description: "27:41(살해 의도)은 인용 자막으로만 노출 — 위협 연출(추격·무기·긴박 음향 등) 완전 배제."
-  - id: R1_crisis_reminder
+  # 🔻 2026-08-05 — `R1_crisis_reminder` → `crisis_reminder` **이름만** 바꿨다(사용자 지시).
+  #    문구·`enforced_at`·`crisis_resource_ref`·note 는 한 글자도 건드리지 않았다 —
+  #    seed §4-3 리터럴 그대로다. 안전 문구의 개정이 아니라 키 이름의 통일이다.
+  #    · 왜 `crisis_reminder` 쪽으로 통일했나: 이게 **런타임 계약 키**다.
+  #      backend/src/main/resources/scenarios/*.yml 7종(joseph·moses·david·job·jesus·
+  #      elijah·solomon)이 전부 `crisis_reminder:` 로 내보내고, 백엔드 테스트도
+  #      `extras["crisis_reminder"]` 를 단언한다(GameWebIT.kt:196). 저작층 7인물 중
+  #      6인물도 같은 이름이다. 야곱만 달랐다.
+  #    · `R1_` 접두사를 잃는 게 축 정보의 손실은 아니다 — 아브라함·에스더도
+  #      `R1_voice_self_harm_listener` 와 `crisis_reminder` 를 같은 목록에 나란히 둔다.
+  #      접두사 있는 쪽은 축 라벨이고, 이건 런타임이 이름으로 집어가는 계약 키다.
+  #    · 텍스트 키도 `crisis_reminder_text_ko` → `text_ko` 로 맞췄다(아브라함·에스더 동일).
+  - id: crisis_reminder
     enforced_at: on_scene_enter
-    crisis_reminder_text_ko: "지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"
+    text_ko: "지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"
     crisis_resource_ref: crisis_resources.default
     note: "seed §4-3 리터럴 그대로. CRISIS_REMINDER_SCENES = (2, 5) 중 하나."
   - id: R1_voice_self_harm_listener

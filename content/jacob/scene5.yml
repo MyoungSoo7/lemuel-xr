@@ -186,9 +186,12 @@ safety_gates:
       r3_reunion_safety_notice_ko: "재회가 안전하지 않은 관계가 실재합니다. 학대나 폭력이 있었던 관계에서 다시 만나는 것은 회복이 아니라 위험일 수 있습니다. 이것은 야곱에게 있었던 일이며, 당신의 실제 관계에 적용하지 않아도 됩니다. 넘어가도 되고 여기서 마쳐도 됩니다."
       skip_alternative_scene_id: 5_alt
     crisis_resource_ref: crisis_resources.default
-  - id: R1_crisis_reminder
+  # 🔻 2026-08-05 — `R1_crisis_reminder` → `crisis_reminder` **이름만** 바꿨다(사용자 지시).
+  #    근거 전문은 scene2.yml 의 같은 항목 주석 참조. 문구는 그 파일과 문자 그대로
+  #    동일하며(seed §4-3 리터럴), 이번 변경으로 바뀐 것은 키 이름 둘뿐이다.
+  - id: crisis_reminder
     enforced_at: on_scene_enter
-    crisis_reminder_text_ko: "지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"
+    text_ko: "지금 이 장면이 버겁다면 멈추어도 됩니다. 도움을 받을 수 있는 곳이 있습니다 — {{crisis_resources.default}}"
     crisis_resource_ref: crisis_resources.default
     note: "seed §4-3 리터럴 그대로. CRISIS_REMINDER_SCENES = (2, 5) 중 하나."
   - id: R3_no_reconciliation_pressure

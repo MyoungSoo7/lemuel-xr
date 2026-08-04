@@ -238,23 +238,28 @@ polite_evasive:
 trigger_scenes: [1, 5]
 
 # ── G3d — 위기 리마인더 리터럴 키 ──────────────────────────────────────────
-# 야곱은 **이름이 다르다**. 다른 인물은 `crisis_reminder` 인데 이 인물의 저작층은
-# `- id: R1_crisis_reminder` 로 적혀 있다 (scene2.yml:79 · scene5.yml:189, 문구는
-# `crisis_reminder_text_ko` 에 :81 / :191).
+# ✅ 2026-08-05 — 오래 적어 두었던 이름 부채가 닫혔다. 야곱만 `- id: R1_crisis_reminder`
+#    였고, 그래서 여기에 `crisis_reminder_key: R1_crisis_reminder` 노브를 걸어 두고
+#    "통일할 방향은 `crisis_reminder` 쪽이지만 저작 정본을 고치는 일이라 임의로 하지
+#    않는다"고 적어 두었었다. 사용자 지시로 **저작층 쪽을 고쳐서** 닫았다 —
+#    content/jacob/scene2.yml · scene5.yml 의 id 가 이제 `crisis_reminder` 이고
+#    문구 키도 `crisis_reminder_text_ko` → `text_ko` 로 맞췄다. 따라서 노브는 필요 없다
+#    (기본값 `crisis_reminder` 로 판정한다).
 #
-# 문구를 지어내지도, content/ 의 이름을 조용히 바꾸지도 않는다 — G3d 가 제공하는
-# `crisis_reminder_key` 노브로 **저작층이 실제로 쓰는 이름**을 게이트에 알려준다.
-# 검사 강도는 그대로다: 선언한 Scene 에 그 리터럴 키가 실재하는지 여전히 판정한다.
+#    ⚠️ 바뀐 것은 **이름 둘뿐**이다. 문구·`enforced_at`·`crisis_resource_ref`·note 는
+#       그대로다. 안전 문구를 새로 쓰거나 고친 변경이 아니다.
 #
-# Scene 목록의 출처도 콘텐츠 역산이 아니다 — 두 파일의 note 가 seed 사양을 그대로
+#    왜 `crisis_reminder` 쪽이 정본인가 — 이게 런타임 계약 키다:
+#      · backend/src/main/resources/scenarios/*.yml 7종이 전부 `crisis_reminder:` 로 내보낸다
+#      · 백엔드 테스트가 `extras["crisis_reminder"]` 를 단언한다(GameWebIT.kt:196,
+#        CrisisTokenResolverTest.kt, ScenePayloadForbiddenTokenGateTest.kt:145)
+#      · 저작층 7인물 중 6인물이 이미 같은 이름이었다
+#    즉 노브 없이 도는 다른 도구(런타임·에디터·리뷰 스크립트)가 야곱만 놓치던 문제가
+#    실제로 사라진 것이지, 게이트 설정만 초록으로 바꾼 게 아니다.
+#
+# Scene 목록의 출처는 콘텐츠 역산이 아니다 — 두 파일의 note 가 seed 사양을 그대로
 # 인용한다: "seed §4-3 리터럴 그대로. CRISIS_REMINDER_SCENES = (2, 5) 중 하나."
 # 즉 (2,5)는 설계가 정한 값이고 콘텐츠는 그걸 이행한 쪽이다.
-#
-# ⚠️ 남는 부채(사람 판단): 이름 불일치 자체는 결함이다. 인물마다 키 이름이 다르면
-#    이런 노브 없이 도는 다른 도구(런타임·에디터·리뷰 스크립트)는 야곱만 놓친다.
-#    통일할 방향은 `crisis_reminder` 쪽이지만 그건 저작 정본을 고치는 일이라 여기서
-#    임의로 하지 않는다.
-crisis_reminder_key: R1_crisis_reminder
 crisis_reminder_scenes: [2, 5]
 
 # ── 미정의 = BLOCKED (판정 불가). 없는 것을 있는 척하지 않는다 ──────────────
