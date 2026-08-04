@@ -101,12 +101,14 @@ safety_gates:
     offramp_ref: cc_jacob_not_my_seat
   - id: R2_R3_lint_forbidden
     enforced_at: always
-    description: "R2·R3 금지 토큰 25종 — Scene 1 과 동일 세트(seed §7 정본)."
+    description: "R2·R3 금지 토큰 29종 — Scene 1 과 동일 세트(seed §7 정본)."
     # 목록·감사 근거는 scene1.yml 의 같은 게이트 주석이 정본이다(5개 Scene 문자 그대로 동일).
     lint_forbidden_tokens:
       [
         "용서해야",
         "먼저 연락해",
+        "먼저 손을 내미",
+        "먼저 손을 내밀",
         "관계는 회복되어야 합",
         "관계는 회복되어야죠",
         "관계는 회복되어야 하지",
@@ -125,11 +127,13 @@ safety_gates:
         "그래서 겸손해진",
         "그래서 겸손해집",
         "흉터도 축복",
+        "훈장",
         "언젠가는 가야 합",
         "언젠가는 가야죠",
         "언젠가는 가셔야",
         "언젠가는 가게 될",
         "아직은 때가 아닐",
+        "지나고 보면",
       ]
   - id: footer_persistent
     enforced_at: always
