@@ -1115,7 +1115,9 @@ def g5c(c: Ctx) -> Result:
     )
 
 
-def _scan_scene_values(c: Ctx, needles: list[str]) -> list[str]:
+def _scan_scene_values(
+    c: Ctx, needles: list[str], line_marker: str | None = None
+) -> list[str]:
     """content/{인물}/scene*.yml 의 **렌더되는 스칼라 leaf** 에서만 needles 를 찾는다.
 
     줄 단위 문자열 검색은 쓰지 않는다. 실측(라이브 5인, 토큰 후보 목록):
@@ -1138,16 +1140,42 @@ def _scan_scene_values(c: Ctx, needles: list[str]) -> list[str]:
     nneedles = [(n, norm_ws(n)) for n in needles]
     hits = []
     for f in c.require_scenes():
+        raw = read_lines(f) if line_marker else []
         for line, key, val, anc in scalar_nodes(f):
             if key in nonuser:
                 continue
             if _in_nonuser_subtree(key, anc, subtrees):
+                continue
+            if line_marker and _line_declared(raw, line, val, line_marker):
                 continue
             nval = norm_ws(val)
             for orig, nn in nneedles:
                 if violation_index(nval, nn) >= 0:
                     hits.append(f"{c.rel(f)}:{line}: [{orig}] ({key}) {nval[:90]}")
     return hits
+
+
+def _line_declared(raw: list[str], line: int, val: str, marker: str) -> bool:
+    """이 leaf 의 원본 줄이 **선언 마커 주석**을 달고 있는가(G9 전용).
+
+    문서에는 `EXCLUSION-DECL` 마커로 "이건 배제를 *인용* 하는 줄이지 위반이 아니다"를
+    말하는 길이 있다(G9d/_scan_docs). 콘텐츠 leaf 에는 그 길이 없었다. 그래서
+    `excluded_passages_note: "요 21:18-19(순교 예고)는 … 배제되었다"` 처럼 **배제를
+    설명하느라 배제 문자열을 담은 leaf** 가 G9 를 빨갛게 만들고, 게이트가 시키는 자명한
+    수리가 "배제를 기록한 문장을 지우는 것"이 된다. 그건 안전 저하에 보상을 주는 짓이다.
+    (실측: content/peter/scene5.yml 의 그 leaf 는 이미 `# <!-- EXCLUSION-DECL -->` 를
+    달고 있었다 — 저자는 규약대로 적었는데 집행기에 그 개념이 없었다.)
+
+    ⚠️ 두 가지를 의도적으로 좁혔다.
+      · **G9 에서만** 쓴다. `_scan_scene_values` 의 기본값은 여전히 마커 없음이라
+        G6(금지 토큰)에는 이 면제가 존재하지 않는다 — 안전 토큰을 주석 한 줄로
+        면제하는 길은 열지 않는다.
+      · 마커가 **값 안에** 있으면 면제하지 않는다. 그러면 렌더되는 문장에 마커 문자열을
+        박아 넣어 자기 자신을 면제하는 길이 생긴다. 주석에만 있어야 한다.
+    """
+    if not (0 < line <= len(raw)):
+        return False
+    return marker in raw[line - 1] and marker not in val
 
 
 def _scan_docs(c: Ctx, needles: list[str], doc_marker: str) -> list[str]:
@@ -1309,9 +1337,13 @@ def g9(c: Ctx) -> Result:
     scope 와 무관하게 **선언된 값 전부** 를 산출물에 대고 잰다. verse_ref 든
     verse_text 든 배제한 재료가 렌더되면 안 된다는 요구는 같기 때문이다.
     (scope 는 G0b 의 '어느 열에 실재해야 하는가' 를 정하지, 여기의 대상을 정하지 않는다.)
+
+    배제를 *기록하는* leaf 는 `EXCLUSION-DECL` 주석으로 면제된다 — 문서 쪽 G9d 와 같은
+    규약이고, 근거·범위 제한은 `_line_declared` 참조. G6 에는 이 면제가 없다.
     """
     needles = [e["value"] for e in _exclusion_entries(c)]
-    hits = _scan_scene_values(c, needles)
+    marker = str(c.cfg.get("exclusion_decl_marker", "EXCLUSION-DECL"))
+    hits = _scan_scene_values(c, needles, line_marker=marker)
     if hits:
         return fail("G9", f"렌더 leaf 에 배제 문자열 {len(hits)}건", hits[:40])
     return ok("G9", f"{len(needles)}종 × 렌더 leaf 0건")

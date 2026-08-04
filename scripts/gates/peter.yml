@@ -571,15 +571,69 @@ trigger_scenes: [2]
 # 실측: scene3.yml·scene5.yml 둘 다 리터럴 키 보유. 설계가 지정한 2개와 정확히 일치한다.
 crisis_reminder_scenes: [3, 5]
 
-# ── 미정의 = BLOCKED (판정 불가). 없는 것을 있는 척하지 않는다 ──────────────
-# verses_file:            (없음) → G0b BLOCKED
-# exclusions:             (없음) → G0b/G0e/G9/G9d BLOCKED
-#     ㉝ 이후 형식: 원소마다 `value` + `scope`(verse_ref|verse_text|content_leaf) + `expect`.
-#     scope 는 필수이고 기본값이 없다 — 어느 텍스트에 대고 재는지가 선언의 일부다.
-#     ⚠️ 베드로는 다른 인물과 사정이 조금 다르다: 배제 문자열 **표 자체는 실재한다**
-#        (docs/MVP-PETER.md:473-499 §12.8, [A]군 8종 + [B]군 12종). 그런데 [A]군의
-#        정의가 "원문 대조표의 EXCLUDED 구간에 **실재해야** 한다"(:475)이고 그 대조표
-#        (verses.txt 류)는 레포에 없다 — G0b 는 대조할 열이 없다. 표만 옮겨 적으면
-#        G9/G9d 는 돌지만 G0b 가 요구하는 양방향(실재+부재) 검증은 영원히 성립하지 않는다.
-#        어느 텍스트를 상대로 재는지가 정의의 일부라는 ㉝의 결론에 따라, 대조 원본이
-#        생기기 전까지는 선언하지 않고 BLOCKED 로 남긴다. (별도 작업으로 보고함)
+# ── 배제 선언 (2026-08-05 — 오래 BLOCKED 였던 4건 중 4건 모두 판정 가능해졌다) ──
+#
+# 여기 있던 옛 주석은 "대조표(verses.txt)가 레포에 없으니 선언하지 않고 BLOCKED 로
+# 남긴다"였다. 사용자 지시로 대조표를 만들어 닫는다 — `docs/verses-peter.txt`.
+# 그 파일의 머리말이 출처를 적고 있다(USED 는 콘텐츠 기계 추출, EXCLUDED 두 줄만
+# 대한성서공회 개역개정에서 옮김 + 사람 검토 권고).
+#
+# ⚠️ **20종 전부를 선언하지 않았다. 15종만이다.** 나머지 5종은 아래 "선언하지 못한
+#    5종"에 이유를 적었다 — 초록을 위해 빼놓은 게 아니라, 이 게이트로는 잴 수 없다는
+#    측정 결과다. docs/MVP-PETER.md §12.8 의 표 20행은 그대로 둔다(설계상 배제는
+#    여전히 20종이다). 기계 판정 대상이 15종인 것이다.
+verses_file: docs/verses-peter.txt
+
+exclusions:
+  # ── [A]군 8종 — 배제한 절(요 21:18-19)의 자구. `verse_text` = 본문 열에 대고 잰다.
+  #    expect: excluded_only → EXCLUDED 구간에 **실재**해야 하고(없으면 영구 0건인
+  #    가짜 게이트다) USED 구간에는 **부재**해야 한다(있으면 자기 콘텐츠 과차단).
+  #    실측(2026-08-05): 8/8 배제장 실재 · 8/8 사용장 부재.
+  - { value: "이 말씀을 하심은", scope: verse_text, expect: excluded_only }
+  - { value: "어떠한 죽음으로", scope: verse_text, expect: excluded_only }
+  - {
+      value: "하나님께 영광을 돌릴 것을 가리키심이러라",
+      scope: verse_text,
+      expect: excluded_only,
+    }
+  - { value: "나를 따르라", scope: verse_text, expect: excluded_only }
+  - { value: "늙어서는", scope: verse_text, expect: excluded_only }
+  - { value: "네 팔을 벌리리니", scope: verse_text, expect: excluded_only }
+  - { value: "띠 띠고", scope: verse_text, expect: excluded_only }
+  - { value: "띠 띠우고", scope: verse_text, expect: excluded_only }
+  # ── [B]군 참조 2종 — `verse_ref` = 참조(라벨) 열에 대고 잰다. 본문 열에 대고 찾으면
+  #    라벨이 거기 없으므로 원리상 영원히 0건이다(㉝ 이 잡은 그 결함).
+  #    그래서 verses 파일의 참조 열도 같은 약칭(`요 21:x`)으로 맞춰 두었다 — 표기가
+  #    어긋나면 이 판정도 영구 초록이 된다. docs 표기는 "부재해야 함"이므로 expect: absent.
+  - { value: "요 21:18", scope: verse_ref, expect: absent }
+  - { value: "요 21:19", scope: verse_ref, expect: absent }
+  # ── [B]군 개념·오기·축배타 5종 — verses 파일로는 잴 수 없다(성경 본문이 아니다).
+  #    `content_leaf` = 산출물 YAML 의 렌더 leaf 에 대고 G9 가 잰다. expect 는 absent 만
+  #    가능하다(leaf 에는 USED/EXCLUDED 구분이 없다).
+  - { value: "십자가에 거꾸로", scope: content_leaf, expect: absent }
+  - { value: "22:55 의 숯불", scope: content_leaf, expect: absent }
+  - { value: "22:55의 숯불", scope: content_leaf, expect: absent }
+  - { value: "밝힐 용기", scope: content_leaf, expect: absent }
+  - { value: "타협의 선", scope: content_leaf, expect: absent }
+
+# ── 선언하지 못한 5종 (부채 — 사람 판단 필요) ────────────────────────────────
+#   "순교" · "드러낼 것인가" · "숨길 것인가" · "어디까지 협력" · "어디서 멈출"
+#
+#   전부 G0e(과차단 사전 스캔)가 막는다. 그리고 **G0e 가 옳다**:
+#     · "순교" 는 2글자로 길이 하한 3 미달이다. 그리고 실제로 content/esther/scene4.yml
+#       의 disputed_point("'죽으면 죽으리이다'를 순교적 결단으로 읽을 것인가")를 친다.
+#     · 나머지 4종은 에스더·다니엘의 **축 문구 그 자체**다 — content/esther/README.md,
+#       content/daniel/README.md, docs/MVP-DANIEL.md 에 실재한다. 베드로가 이 문자열을
+#       배제하는 이유가 바로 "저건 저 인물 것이다" 이므로, 다른 인물 콘텐츠에 실재하는
+#       것은 결함이 아니라 설계다.
+#
+#   여기서 두 갈래였고, 두 번째를 택했다:
+#     (가) `expected_elsewhere: true` 같은 예외 노브를 만들어 G0e 를 침묵시킨다.
+#     (나) 선언하지 않고 이유를 적는다.
+#   (가)를 택하지 않은 이유: G0e 가 내는 신호는 false positive 가 아니라 **genericity
+#   경고**다. "드러낼 것인가" 는 평범한 한국어 구문이라, 베드로 콘텐츠가 언젠가 에스더
+#   프레이밍과 무관하게 같은 말을 쓰면 G9 가 멀쩡한 문장을 잡는다. 노브는 그 참인 신호를
+#   끄는 장치가 된다. 축 배타는 리터럴 문자열 게이트가 아니라 설계 검토
+#   (docs/MVP-PETER.md §12.6 인간 검토 항목)가 집행할 일이다.
+#
+#   ⚠️ 그러므로 이 5종에 대해 "게이트가 통과했다"고 말하면 안 된다. 재지 않았다.

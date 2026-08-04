@@ -1,0 +1,4 @@
+gate: G9
+expect: FAIL
+reason_contains: "렌더 leaf 에 배제 문자열"
+planted: "마커 문자열을 **주석이 아니라 렌더되는 값 안에** 박아 넣어 자기 자신을 면제하려 함 — 마커 면제가 열어 줄 수 있는 유일한 우회로다"
