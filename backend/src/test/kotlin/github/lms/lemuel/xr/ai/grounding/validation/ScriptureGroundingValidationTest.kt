@@ -63,11 +63,28 @@ class ScriptureGroundingValidationTest {
         assertThat(b.abstained)
             .withFailMessage("기대가 ACCEPTED/REJECTED 인데 판정 불가 — 임베딩 호출 실패 의심:%s", report)
             .isZero()
-        // 고정 임계치에서 signed_off 전부 일치해야 한다. 깨지면 재튜닝 후 스윕 리포트 경로를
-        // 커밋 메시지에 남기는 것이 규약(eval/grounding/README.md §5).
+        // 고정 임계치에서 불일치 집합이 **정확히** 알려진 2건이어야 한다(README §6.1).
+        //
+        // `isEmpty()` 가 아닌 이유: 2026-08-04 성경 본문 교정 이후 이 둘은 실제로 어긋나 있고,
+        // 표본이 목표치에 못 미쳐 임계치를 재고정하지 않기로 했다. 빨간불로 방치하면 아무도 안 보게 된다.
+        // `containsExactly` 인 이유: 목록이 늘어나면(새 회귀) 물론이고 **줄어들어도**(누가 고쳤는데
+        // 기록을 안 남김) 실패한다. 허용 목록이 조용히 자라는 것을 막는 유일한 방법이다.
         assertThat(summary.mismatches)
-            .withFailMessage("고정 임계치에서 불일치 발생 — 스윕 리포트로 재튜닝 필요:%s", report)
-            .isEmpty()
+            .withFailMessage(
+                "고정 임계치의 불일치 집합이 알려진 상태와 다르다. 늘었으면 회귀, 줄었으면 " +
+                    "README §6.1 과 이 목록을 함께 갱신할 것:%s",
+                report,
+            )
+            .containsExactlyInAnyOrderElementsOf(KNOWN_MISMATCHES)
+    }
+
+    private companion object {
+        /**
+         * 고정 임계치 0.62/0.3 에서 어긋나는 것이 **알려진** 표본. 성격이 서로 다르다:
+         *  - `orthodox-job` — 유사도 0.6141 로 임계치에 0.006 못 미치는 오탐. 표본이 늘면 재판단한다.
+         *  - `gnostic-inner-divinity` — 이단인데 통과한다. 임계치가 아니라 유사도 기반 근거성의 구조적 한계다.
+         */
+        val KNOWN_MISMATCHES = listOf("orthodox-job", "gnostic-inner-divinity")
     }
 
     private fun Double?.fmt(): String = this?.let { "%.3f".format(it) } ?: "n/a"
