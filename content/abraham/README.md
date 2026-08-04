@@ -15,7 +15,7 @@
 | `scene1.yml` | 떠남 — 부르심과 순종                                 | 창 12:1-2, 12:4                 | 낮음                                                                          |
 | `scene2.yml` | 장막 — 반복되는 이동 (본문 인용 없는 유일한 Scene)   | 없음(정황 요약)                 | 낮음                                                                          |
 | `scene3.yml` | 별, 그리고 사백 년 ★ 핵심 인터랙션 #1(뭇별 헤아리기) | 창 15:2-3, 15:5-6, 15:13, 15:16 | **mid** — 상속자 없음 고백 + 사백 년 압제 예고, dwell_limit + crisis_reminder |
-| `scene4.yml` | 웃음 — 두 웃음의 비대칭, 18:14 특수 처리             | 창 17:1, 17:5, 17:17, 18:12-15  | **mid~high** — 이 미션 단일 최대 R2 위험 지점(18:14)                          |
+| `scene4.yml` | 웃음 — 두 웃음의 비대칭, 18:14 특수 처리             | 창 17:1, 17:5, 17:17, 18:12-15  | **mid~high** — 이 미션 단일 최대 R2 위험 지점(18:14), crisis_reminder         |
 | `scene5.yml` | 이삭 — 오랜 기다림 끝의 출생                         | 창 21:1-2, 21:5-7               | **mid** — R4 진입 전 동의 게이트(노년 출산 서사), skip 경로 있음              |
 
 ## 스키마 정본
@@ -46,9 +46,11 @@ pause_fade_black_show_crisis_card`, `fade_to_black_seconds: 0.8`). Scene 3 은 1
   skip 시 21:6 인용 자막 한 장만 노출 후 라우팅 직행 — skip 목적지는 **같은** Scene 5(별도 파일 없음).
 - **R5** — `default_path: static_curation` + `llm_optin_only: true` 5/5 Scene 최상위. 분기 텍스트(Scene 3 카드 응답,
   Scene 5 마무리 문구 9종+폴백) 전부 정적으로 존재 — opt-out 도 서사가 완결된다.
-- **crisis 자원** — 하드코딩 금지, `{{crisis_resources.default}}` 토큰만. 본 디렉터리 yml 내 실측 **13곳**: Scene 1
-  Pre-Scene 0 게이트 1 + `footer_persistent` 5(Scene 마다 1) + `R1_voice_self_harm_listener.card_text_ko` 5(Scene 마다 1)
-  - `crisis_reminder`(Scene 3, 5) 2.
+- **crisis 자원** — 하드코딩 금지, `{{crisis_resources.default}}` 토큰만. 본 디렉터리 yml 내 실측 **20곳**
+  (`grep -o` 기준). 내역: `footer_persistent` 5(Scene 마다 1), `R1_voice_self_harm_listener.card_text_ko` 5(Scene 마다 1),
+  `R1_voice_self_harm_listener.crisis_resource_ref` 5(Scene 마다 1), `crisis_reminder` 3(Scene 3·4·5), Scene 1
+  Pre-Scene 0 게이트 1, Scene 5 R4 동의 카드 1. ※ 이전 표기 "13곳"은 `crisis_resource_ref` 5건과 동의 카드
+  1건을 빠뜨린 수치였다(2026-08-05 정정). Scene 4 의 `crisis_reminder` 는 같은 날 추가됐다.
 
 ## 콘텐츠 배제 경계 (제품 안전선 — 신학 판단 아님)
 

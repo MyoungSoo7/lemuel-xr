@@ -362,6 +362,20 @@ safety_gates:
       ⑥ 발화는 해시만 저장하고 평문을 남기지 않는다(COMMON §4 R1).
       ⑦ 감지 경로에서 LLM 을 호출하지 않는다 — 정적 카드만.
       ⑧ '미션 종료'를 실패로 기록하지 않는다.
+  # 🔻 2026-08-05 추가 — 이 Scene 에만 상시 리마인더가 없던 비대칭을 없앤다.
+  #    이 미션의 **단일 최대 R2 위험 지점**(MVP-ABRAHAM.md:12, :194 — 창 18:14)인데
+  #    Scene 3·5 가 가진 `crisis_reminder` 를 이 Scene 만 갖고 있지 않았다.
+  #    · 문구는 **새로 쓰지 않았다** — scene3.yml·scene5.yml 의 같은 항목과 문자 그대로
+  #      동일한 문자열이다(이미 검토를 통과한 문구를 옮겨 적은 것이지 새 안전 문구가 아니다).
+  #    · `footer_persistent` 가 이미 위기 자원을 노출하고는 있었지만 그건 **다른 트랙**이다
+  #      (content/peter/README.md:28 이 두 트랙의 분리를 명시한다). 푸터는 AI 고지 줄이고,
+  #      이건 "혼자 감당하지 않아도 된다"는 상시 문장이다.
+  #    ⚠️ §1-4 '순서 잠금'(18:12-15 블록 뒤에 마무리·적용 문장을 붙이지 않는다)과 충돌하지
+  #      않는다 — 이것은 블록 뒤에 붙는 문장이 아니라 `enforced_at: always` 인 상시 UI 요소로,
+  #      Scene 진입 시점부터 이미 떠 있다. 낭독 순서에 아무 것도 추가하지 않는다.
+  - id: crisis_reminder
+    enforced_at: always
+    text_ko: "지금 마음이 많이 힘들다면 혼자 감당하지 않으셔도 됩니다. {{crisis_resources.default}}"
   - id: R5_ai_optout_respected
     enforced_at: always
     description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. default_path: static_curation 은 미션 공통."
