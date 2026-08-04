@@ -157,7 +157,7 @@ class EvalMetricsTest {
         id = id,
         className = className,
         difficulty = "medium",
-        reviewStatus = GroundingDataset.ReviewStatus.SIGNED_OFF,
+        reviewStatus = GoldenSet.ReviewStatus.SIGNED_OFF,
         expected = expected,
         actual = actual,
         unsupportedRate = 0.0,

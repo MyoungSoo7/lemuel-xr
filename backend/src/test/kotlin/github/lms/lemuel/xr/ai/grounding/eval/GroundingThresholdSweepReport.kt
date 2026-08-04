@@ -2,9 +2,13 @@ package github.lms.lemuel.xr.ai.grounding.eval
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import github.lms.lemuel.xr.ai.grounding.adapter.out.embedding.GeminiEmbeddingAdapter
+import github.lms.lemuel.xr.ai.grounding.adapter.out.goldenset.ClasspathGoldenSetAdapter
 import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase
+import github.lms.lemuel.xr.ai.grounding.application.MemoizingEmbeddingPort
 import github.lms.lemuel.xr.ai.grounding.application.SentenceSplitter
+import github.lms.lemuel.xr.ai.grounding.application.port.out.GroundingMetricsPort
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingPolicy
+import github.lms.lemuel.xr.ai.grounding.domain.GroundingVerdict
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -27,7 +31,7 @@ import kotlin.math.roundToInt
  * 표본을 목표치까지 채운 뒤 Phase 4 에서 붙인다. 지금 assert 하는 건 *리포트 자체가 망가지지 않았는지*뿐이다.
  *
  * ## 비용
- * [CachingEmbeddingPort] 덕분에 임베딩은 **고유 텍스트당 1회**다. 격자를 아무리 키워도 API 호출은 늘지 않는다.
+ * [MemoizingEmbeddingPort] 덕분에 임베딩은 **고유 텍스트당 1회**다. 격자를 아무리 키워도 API 호출은 늘지 않는다.
  *
  * 산출물: `build/reports/grounding-eval/latest.json` (+ 타임스탬프 사본) · 콘솔 요약표.
  * Phase 3 에서 이 JSON 을 CronJob 이 읽어 Prometheus gauge 로 내보낸다.
@@ -40,14 +44,14 @@ class GroundingThresholdSweepReport {
 
     @Test
     fun `sweep similarity and unsupported-rate thresholds over the golden set`() {
-        val dataset = GroundingDataset.load()
+        val dataset = ClasspathGoldenSetAdapter(mapper).load(GoldenSet.DEFAULT_VERSION)
         val model = System.getenv("GROUNDING_EMBEDDING_MODEL")
             ?: dataset.manifest.tunedAgainst.embeddingModel.ifBlank { "gemini-embedding-001" }
 
-        val embeddings = CachingEmbeddingPort(
+        val embeddings = MemoizingEmbeddingPort(
             GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = model),
         )
-        val useCase = EvaluateGroundingUseCase(embeddings, GroundingScorer.NOOP_METRICS)
+        val useCase = EvaluateGroundingUseCase(embeddings, NOOP_METRICS)
 
         // 워밍업 — 격자를 돌기 전에 고유 텍스트를 한 번에 임베딩한다. 여기서 실패하면
         // 스윕 도중이 아니라 즉시 죽어서 원인이 분명해진다.
@@ -60,13 +64,13 @@ class GroundingThresholdSweepReport {
         val cells = grid().map { policy ->
             Cell(
                 policy = policy,
-                signedOff = EvalMetrics.summarize(GroundingScorer.outcomes(useCase, signedOff, policy)),
-                draft = EvalMetrics.summarize(GroundingScorer.outcomes(useCase, drafts, policy)),
+                signedOff = EvalMetrics.summarize(score(useCase, signedOff, policy).map { it.toOutcome() }),
+                draft = EvalMetrics.summarize(score(useCase, drafts, policy).map { it.toOutcome() }),
             )
         }
 
         val pinnedPolicy = dataset.manifest.pinnedPolicy.toPolicy()
-        val pinnedScored = GroundingScorer.score(useCase, dataset.fixtures, pinnedPolicy)
+        val pinnedScored = score(useCase, dataset.fixtures, pinnedPolicy)
         val pinnedSignedOff = EvalMetrics.summarize(
             pinnedScored.filter { it.fixture.signedOff }.map { it.toOutcome() },
         )
@@ -107,7 +111,7 @@ class GroundingThresholdSweepReport {
                 "model" to model,
                 "dimensions" to dimensions,
                 "uniqueTextsEmbedded" to embeddings.embeddedTexts,
-                "note" to "임계치 격자 크기와 무관하게 고유 텍스트당 1회만 호출한다(CachingEmbeddingPort).",
+                "note" to "임계치 격자 크기와 무관하게 고유 텍스트당 1회만 호출한다(MemoizingEmbeddingPort).",
             ),
             "warnings" to warnings,
             "pinnedPolicy" to policyMap(pinnedPolicy),
@@ -183,11 +187,11 @@ class GroundingThresholdSweepReport {
 
     private fun Double.round3() = (this * 1000).roundToInt() / 1000.0
 
-    private fun reportDir(): Path =
-        GroundingDataset.repoRoot().resolve("backend/build/reports/grounding-eval")
+    /** Gradle Test 태스크의 작업 디렉터리는 백엔드 모듈 루트다. */
+    private fun reportDir(): Path = Path.of("build", "reports", "grounding-eval")
 
     private fun console(
-        dataset: GroundingDataset.Loaded,
+        dataset: GoldenSet.Loaded,
         model: String,
         warnings: List<String>,
         pinned: GroundingPolicy,
@@ -233,8 +237,37 @@ class GroundingThresholdSweepReport {
 
     private fun pct(v: Double?): String = v?.let { "%.1f%%".format(it * 100) } ?: "n/a"
 
+    /** 픽스처를 게이트에 통과시켜 채점 결과로 바꾼다. */
+    private fun score(
+        useCase: EvaluateGroundingUseCase,
+        fixtures: List<GoldenSet.Fixture>,
+        policy: GroundingPolicy,
+    ): List<Scored> = fixtures.map { fx ->
+        Scored(fx, useCase.evaluate(fx.purpose, fx.meditationText, fx.passages, policy))
+    }
+
+    private data class Scored(val fixture: GoldenSet.Fixture, val verdict: GroundingVerdict) {
+        fun toOutcome() = EvalMetrics.Outcome(
+            id = fixture.id,
+            className = fixture.`class`,
+            difficulty = fixture.difficulty,
+            reviewStatus = fixture.reviewStatus,
+            expected = fixture.expected,
+            actual = verdict.status,
+            unsupportedRate = verdict.unsupportedRate,
+        )
+    }
+
     private companion object {
         /** 승격계약 §2 P3 의 오탐률 상한. */
         const val P3_MAX_FALSE_REJECT = 0.05
+
+        /** 평가 harness 는 게이트의 운영 메트릭을 오염시키면 안 된다 — 전부 버리는 포트. */
+        val NOOP_METRICS = object : GroundingMetricsPort {
+            override fun evaluated(purpose: String) = Unit
+            override fun rejected(purpose: String) = Unit
+            override fun unsupportedRate(purpose: String, rate: Double) = Unit
+            override fun inconclusive(purpose: String) = Unit
+        }
     }
 }

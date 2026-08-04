@@ -1,27 +1,22 @@
 package github.lms.lemuel.xr.ai.grounding.eval
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import github.lms.lemuel.xr.LemuelXrApplication
 import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase.Passage
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingPolicy
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
-import java.nio.file.Files
-import java.nio.file.Path
 
 /**
- * 리포 루트 `eval/grounding/<version>/` 골든셋 로더.
+ * 근거성 골든셋의 **형태** — 데이터 모델만 담는다. 어디서 어떻게 읽어 오는지는
+ * `GoldenSetPort` 구현(어댑터)의 몫이다.
  *
- * 골든셋을 백엔드 테스트 리소스가 아니라 리포 루트에 둔 이유는 `eval/grounding/README.md` §1 참조.
- * 경로 탐색은 `ContentSafetyGateEnforcementTest` 와 같은 방식(코드소스에서 위로 올라가 모듈 루트를 찾고
- * 그 부모를 리포 루트로 본다) — 이 리포에 이미 있는 규약을 따른다.
+ * 데이터의 원본은 리포 루트 `eval/grounding/<version>/` 이다(그 위치를 고른 이유는 그곳 README §1).
+ * 빌드가 그 디렉터리를 `grounding-golden-set/` 아래로 복사해 jar 에 넣으므로
+ * (backend/build.gradle.kts 의 processResources), 런타임은 클래스패스만 보면 된다.
  */
-object GroundingDataset {
+object GoldenSet {
 
     const val DEFAULT_VERSION = "v1"
-
-    private val mapper = jacksonObjectMapper()
+    const val CLASSPATH_ROOT = "grounding-golden-set"
 
     /** 라벨 검토 상태. [SIGNED_OFF] 만 게이트 판정·승격조건 지표에 들어간다. */
     enum class ReviewStatus { SIGNED_OFF, DRAFT }
@@ -44,6 +39,8 @@ object GroundingDataset {
         val review: Review = Review(),
         val meditationText: String = "",
         val passages: List<Passage> = emptyList(),
+        /** 로드한 파일명(JSON 밖의 정보). 무결성 검증이 id 와 대조한다. */
+        val sourceName: String = "",
     ) {
         val expected: GroundingStatus get() = GroundingStatus.valueOf(expectedStatus)
 
@@ -51,12 +48,12 @@ object GroundingDataset {
             get() = when (review.status) {
                 "signed_off" -> ReviewStatus.SIGNED_OFF
                 "draft" -> ReviewStatus.DRAFT
-                else -> error("픽스처 ${id}: 알 수 없는 review.status='${review.status}'")
+                else -> error("픽스처 $id: 알 수 없는 review.status='${review.status}'")
             }
 
         val signedOff: Boolean get() = reviewStatus == ReviewStatus.SIGNED_OFF
 
-        /** 임베딩 캐시 워밍용 — 이 픽스처가 필요로 하는 전체 텍스트. */
+        /** 임베딩 캐시 워밍용 — 이 픽스처가 필요로 하는 근거 본문 전체. */
         fun texts(): List<String> = passages.map { it.text }
     }
 
@@ -88,36 +85,8 @@ object GroundingDataset {
         val signedOff: List<Fixture> get() = fixtures.filter { it.signedOff }
         val drafts: List<Fixture> get() = fixtures.filterNot { it.signedOff }
 
-        /** manifest 의 클래스 정의 — id → 기대 상태. */
+        /** manifest 의 클래스 정의 — id → 기대 상태 문자열. 미정의 클래스면 null. */
         fun expectedStatusOf(className: String): String? =
             manifest.classes.firstOrNull { it.id == className }?.expectedStatus
-    }
-
-    fun load(version: String = DEFAULT_VERSION): Loaded {
-        val dir = datasetDir(version)
-        val manifest: Manifest = mapper.readValue(dir.resolve("manifest.json").toFile())
-        val fixtureDir = dir.resolve("fixtures")
-        check(Files.isDirectory(fixtureDir)) { "픽스처 디렉터리 없음: $fixtureDir" }
-        val files = Files.list(fixtureDir).use { stream ->
-            stream.filter { it.fileName.toString().endsWith(".json") }.sorted().toList()
-        }
-        check(files.isNotEmpty()) { "픽스처가 한 건도 없다: $fixtureDir — 경로 탐색이 깨졌을 수 있다" }
-        return Loaded(manifest, files.map { mapper.readValue<Fixture>(it.toFile()) })
-    }
-
-    fun datasetDir(version: String = DEFAULT_VERSION): Path {
-        val dir = repoRoot().resolve("eval/grounding").resolve(version)
-        check(Files.isDirectory(dir)) { "골든셋 디렉터리 없음: $dir" }
-        return dir
-    }
-
-    fun repoRoot(): Path = checkNotNull(moduleRoot().parent) { "리포 루트 탐색 실패" }
-
-    /** LemuelXrApplication 코드소스에서 위로 올라가 src/main/kotlin 을 가진 모듈 루트. */
-    private fun moduleRoot(): Path {
-        var p: Path? = Path.of(LemuelXrApplication::class.java.protectionDomain.codeSource.location.toURI())
-        if (p != null && !Files.isDirectory(p)) p = p.parent
-        while (p != null && !Files.isDirectory(p.resolve("src/main/kotlin"))) p = p.parent
-        return checkNotNull(p) { "모듈 루트(src/main/kotlin 보유) 탐색 실패" }
     }
 }

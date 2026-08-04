@@ -90,23 +90,57 @@ n=1 로 정한 임계치라는 뜻이고, 이 층의 표본을 늘리는 게 데
 
 ```bash
 # 1단 — 데이터셋 무결성 + 지표 계산 로직 (네트워크 불필요, CI 에서 항상 실행)
-cd backend && ./gradlew test --tests '*GroundingDatasetTest' --tests '*EvalMetricsTest'
+cd backend && gradle test --tests '*GoldenSetIntegrityTest' --tests '*EvalMetricsTest'
 
 # 2단 — 실제 임베딩으로 임계치 스윕 리포트 (GEMINI_API_KEY 필요)
-GEMINI_API_KEY=... ./gradlew test --tests '*GroundingThresholdSweepReport'
+GEMINI_API_KEY=... gradle test --tests '*GroundingThresholdSweepReport'
 #   → build/reports/grounding-eval/latest.json  (+ 콘솔 요약표)
 
 # 고정 임계치 회귀 확인 (GEMINI_API_KEY 필요)
-GEMINI_API_KEY=... ./gradlew test --tests '*ScriptureGroundingValidationTest'
+GEMINI_API_KEY=... gradle test --tests '*ScriptureGroundingValidationTest'
 ```
 
 `GEMINI_API_KEY` 가 없으면 라이브 테스트 2종은 `@EnabledIfEnvironmentVariable` 로 자동 skip 된다.
-**즉 지금 CI 는 정확도를 측정하지 않는다** — 이걸 야간 CronJob 으로 옮기는 게 Phase 3 이다.
+**즉 CI 는 정확도를 측정하지 못한다** — 키가 없는 곳에 측정 체계를 두는 건 측정하는 시늉이다.
+그래서 Phase 3 은 측정 주체를 CI 가 아니라 **배포된 애플리케이션**으로 옮긴다(§8).
 
-## 8. 다음 단계 (Phase 3~4, 미구현)
+## 8. Phase 3 — 애플리케이션이 스스로 채점한다 (구현 완료, 기본 비활성)
 
-- **Phase 3**: 야간 CronJob 으로 스윕을 돌리고 `grounding_eval_precision{class,dataset_version,threshold}` 등
-  gauge 를 Prometheus 로 노출. 클러스터에 Pushgateway 가 없으므로, 이미 스크레이프 중인
-  `ServiceMonitor lemuel-xr-prod/lemuel-xr-backend` 에 얹는 쪽이 신규 부품 0 이다.
-  per-fixture 원시 결과는 stdout JSON → fluent-bit → ELK (회귀 시 "어느 문장이 뒤집혔나" 추적용).
-- **Phase 4**: 직전 런 대비 recall·오탐률 악화 시 CI 실패. `p3FalseRejectRate > 0.05` 2회 연속 시 Alertmanager.
+골든셋은 빌드 시 `eval/grounding/v*/` → jar 안 `grounding-golden-set/` 으로 복사된다
+(`backend/build.gradle.kts` 의 `processResources`). 배포된 파드가 클래스패스에서 읽어
+하루 1회 채점하고, 결과를 `grounding.goldenset.*` gauge 로 낸다. 수집은 **이미 있는**
+`ServiceMonitor lemuel-xr-prod/lemuel-xr-backend` 가 그대로 한다 — 신규 부품 0, Pushgateway 불필요.
+
+| 설정 | 기본값 | 뜻 |
+|---|---|---|
+| `GROUNDING_EVAL_ENABLED` | `false` | 켜야 돈다. 켜면 유료 임베딩 API 를 주기 호출한다 |
+| `GROUNDING_EVAL_CRON` | `0 30 3 * * *` | 매일 03:30 KST (ShedLock `xr-grounding-goldenset-eval` 로 파드 1개만) |
+| `GROUNDING_EVAL_VERSION` | `v1` | 채점할 골든셋 버전 |
+| `GEMINI_API_KEY` | (없음) | **켜려면 필수.** 없이 켜면 부팅에서 즉시 실패한다 |
+
+주요 지표(`grounding.goldenset.` 접두사): `precision` · `recall` · `f1` ·
+`false_reject_rate`(P3 정의 = FP/(TP+FP)) · `false_positive_rate`(통계적 FPR) ·
+`exact_accuracy` · `abstain_rate` · `samples` · `mismatches` · `excluded_drafts` ·
+`embedded_texts` · `class_accuracy{class}` · `policy.similarity_threshold` ·
+`policy.max_unsupported_rate` · `last_success_epoch_seconds` · `runs` · `failures`.
+
+두 가지 설계 원칙이 지표를 정직하게 만든다:
+
+1. **값이 없으면 0 이 아니라 `NaN`.** 표본·분모가 없을 때 0 을 내면 "오탐률 0%" 로 읽혀
+   P3(<5%) 을 표본 없이 통과한 것처럼 보인다. 빈 값이 조용히 틀린 값보다 낫다.
+2. **실패해도 지난 값을 덮지 않는다.** 임베딩 장애 시 `failures` 만 오르고
+   `last_success_epoch_seconds` 가 늙어 장애가 드러난다. 지표를 0 으로 밀면 가짜 회귀 알람이 된다.
+
+채점은 `signed_off` 표본만 대상으로 하고 합성 트래픽이므로 게이트 운영 메트릭(`grounding.*`)에
+섞이지 않는다(무동작 `GroundingMetricsPort` 주입).
+
+> **아직 안 켰다.** 켜려면 `charts/lemuel-xr/templates/app.yaml` 의 백엔드 Deployment 에
+> 기존 시크릿 `lemuel-xr-gemini-secret` 참조와 `GROUNDING_EVAL_ENABLED=true` 를 넣어야 한다
+> (지금 그 Deployment 에는 `GEMINI_API_KEY` 가 없다 — 키는 AI 사이드카에만 있다).
+> 그건 프로덕션 변경이라 별도 승인 후 진행한다.
+
+## 9. 다음 단계 (Phase 4, 미구현)
+
+- 직전 런 대비 recall·오탐률 악화 시 알람. `p3FalseRejectRate > 0.05` 2회 연속 시 Alertmanager.
+- per-fixture 원시 결과를 stdout JSON → fluent-bit → ELK (회귀 시 "어느 문장이 뒤집혔나" 추적용).
+- 표본을 목표치(§6)까지 채우기 전에는 어떤 수치 하한도 과적합 고정에 불과하다 — 그게 선행 조건이다.

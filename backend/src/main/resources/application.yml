@@ -270,6 +270,17 @@ chatops:
     chat-id: ${CHATOPS_TELEGRAM_CHAT_ID:}
     base-url: https://api.telegram.org
 
+# === 근거성 골든셋 정기 채점 (승격계약 §2 의 지속 측정) ===
+# 기본 꺼짐. 켜면 매 주기 유료 임베딩 API 를 호출하므로 배포자가 명시적으로 켠다.
+# 결과는 `grounding.goldenset.*` 게이지로 /actuator/prometheus 에 실려 기존 ServiceMonitor 가 수집.
+grounding:
+  eval:
+    enabled: ${GROUNDING_EVAL_ENABLED:false}
+    cron: ${GROUNDING_EVAL_CRON:0 30 3 * * *} # 매일 03:30 KST
+    version: ${GROUNDING_EVAL_VERSION:v1}
+    embedding-model: ${GROUNDING_EVAL_EMBEDDING_MODEL:gemini-embedding-001}
+    api-key: ${GEMINI_API_KEY:}
+
 # === XR 자산 ===
 asset:
   manifest:

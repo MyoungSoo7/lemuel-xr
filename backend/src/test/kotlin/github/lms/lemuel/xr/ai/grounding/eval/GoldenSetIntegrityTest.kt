@@ -1,10 +1,12 @@
 package github.lms.lemuel.xr.ai.grounding.eval
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import github.lms.lemuel.xr.ai.grounding.adapter.out.goldenset.ClasspathGoldenSetAdapter
 import github.lms.lemuel.xr.ai.grounding.application.SentenceSplitter
 import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
-import java.nio.file.Files
 
 /**
  * 골든셋 **1단 기계 검증** — 스키마·정합성·본문 출처를 네트워크 없이 확인한다.
@@ -12,18 +14,19 @@ import java.nio.file.Files
  * `GEMINI_API_KEY` 와 무관하게 **CI 에서 항상 돈다** — 라이브 측정이 skip 되는 동안
  * 데이터셋이 조용히 썩는 것을 막는 유일한 방어선이다.
  */
-class GroundingDatasetTest {
+class GoldenSetIntegrityTest {
 
-    private val dataset = GroundingDataset.load()
+    private val loader = ClasspathGoldenSetAdapter(jacksonObjectMapper())
+    private val dataset = loader.load(GoldenSet.DEFAULT_VERSION)
 
     @Test
     fun `파일명과 id 가 일치하고 id 는 유일하다`() {
-        val files = Files.list(GroundingDataset.datasetDir().resolve("fixtures")).use { s ->
-            s.map { it.fileName.toString() }.filter { it.endsWith(".json") }.sorted().toList()
+        dataset.fixtures.forEach { fx ->
+            // id 는 리포트·로그의 조인 키다. 파일명과 어긋나면 회귀를 파일로 되짚을 수 없다.
+            assertThat(fx.sourceName)
+                .describedAs("픽스처 id '${fx.id}' 와 파일명이 다르다")
+                .isEqualTo("${fx.id}.json")
         }
-        val expectedNames = dataset.fixtures.map { "${it.id}.json" }.sorted()
-        // id 는 리포트·ELK 로그의 조인 키다. 파일명과 어긋나면 회귀를 파일로 되짚을 수 없다.
-        assertThat(expectedNames).isEqualTo(files)
         assertThat(dataset.fixtures.map { it.id }).doesNotHaveDuplicates()
     }
 
@@ -94,6 +97,15 @@ class GroundingDatasetTest {
                 .describedAs("${it.id}: 문장이 분리되면 INCONCLUSIVE 분기에 안 걸린다")
                 .isEmpty()
         }
+    }
+
+    @Test
+    fun `없는 버전을 읽으면 빈 결과가 아니라 실패한다`() {
+        // 조용히 빈 데이터셋을 돌려주면 모든 지표가 null 이 되어, 배선이 깨진 것을
+        // "표본이 없다" 로 오독하게 된다.
+        assertThatThrownBy { loader.load("v-does-not-exist") }
+            .isInstanceOf(IllegalStateException::class.java)
+            .hasMessageContaining("manifest")
     }
 
     @Test

@@ -4,7 +4,7 @@ import github.lms.lemuel.xr.ai.grounding.domain.GroundingStatus
 
 /**
  * 골든셋 판정 결과 → 정확도·재현율 집계. **순수 함수**(네트워크·임베딩 무접촉)라
- * CI 에서 항상 검증된다([EvalMetricsTest]).
+ * CI 에서 항상 검증된다(`EvalMetricsTest`).
  *
  * ## 양성 클래스는 REJECTED 다
  * 게이트의 존재 이유가 "걸러야 할 것을 거른다"이므로 REJECTED 를 양성으로 둔다.
@@ -30,7 +30,7 @@ object EvalMetrics {
         val id: String,
         val className: String,
         val difficulty: String,
-        val reviewStatus: GroundingDataset.ReviewStatus,
+        val reviewStatus: GoldenSet.ReviewStatus,
         val expected: GroundingStatus,
         val actual: GroundingStatus,
         val unsupportedRate: Double,

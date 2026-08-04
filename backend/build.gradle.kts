@@ -113,11 +113,18 @@ tasks.withType<Test> {
         .withPropertyName("authoringContent")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
-    // 골든셋(eval/grounding)도 같은 이유로 등록한다. 픽스처만 추가하고 :test 가 UP-TO-DATE 로
-    // 넘어가면, 무결성 검증(GroundingDatasetTest)을 통과한 적 없는 표본이 데이터셋에 남는다.
-    inputs.dir(rootProject.layout.projectDirectory.dir("../eval/grounding"))
-        .withPropertyName("groundingGoldenSet")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
+}
+
+// === 근거성 골든셋을 jar 에 넣는다 ======================================
+// 원본은 리포 루트 `eval/grounding/` 이다(백엔드 리소스가 아닌 이유는 그곳 README §1).
+// 배포된 파드가 스스로 골든셋을 채점하려면 데이터가 아티팩트 안에 있어야 하므로 복사한다.
+// `from(...)` 이 이 디렉터리를 태스크 입력으로 선언하므로, 픽스처만 고쳐도
+// processResources → test 가 다시 돈다(무결성 검증을 건너뛴 표본이 남지 않는다).
+tasks.named<ProcessResources>("processResources") {
+    from(rootProject.layout.projectDirectory.dir("../eval/grounding")) {
+        into("grounding-golden-set")
+        include("v*/**")   // README 등 사람이 읽는 문서는 아티팩트에 넣지 않는다
+    }
 }
 
 jacoco {

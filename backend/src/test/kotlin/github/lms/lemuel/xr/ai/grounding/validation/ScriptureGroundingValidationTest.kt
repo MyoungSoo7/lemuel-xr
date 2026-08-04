@@ -1,10 +1,9 @@
 package github.lms.lemuel.xr.ai.grounding.validation
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import github.lms.lemuel.xr.ai.grounding.adapter.out.embedding.GeminiEmbeddingAdapter
-import github.lms.lemuel.xr.ai.grounding.application.EvaluateGroundingUseCase
-import github.lms.lemuel.xr.ai.grounding.eval.EvalMetrics
-import github.lms.lemuel.xr.ai.grounding.eval.GroundingDataset
-import github.lms.lemuel.xr.ai.grounding.eval.GroundingScorer
+import github.lms.lemuel.xr.ai.grounding.adapter.out.goldenset.ClasspathGoldenSetAdapter
+import github.lms.lemuel.xr.ai.grounding.application.EvaluateGoldenSetUseCase
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
@@ -20,7 +19,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable
  *    임계치 격자를 훑어 precision/recall 곡선과 P3 만족 구간을 리포트로 낸다.
  *
  * 픽스처·정책은 더 이상 이 파일에 하드코딩되지 않는다. 리포 루트 `eval/grounding/v1/` 이
- * 단일 출처이고, 무결성은 `GroundingDatasetTest` 가 네트워크 없이 CI 에서 지킨다.
+ * 단일 출처이고, 무결성은 `GoldenSetIntegrityTest` 가 네트워크 없이 CI 에서 지킨다.
  */
 @Tag("live-embedding")
 @EnabledIfEnvironmentVariable(named = "GEMINI_API_KEY", matches = ".+")
@@ -28,21 +27,19 @@ class ScriptureGroundingValidationTest {
 
     @Test
     fun `real embeddings separate orthodox from heterodox meditations`() {
-        val dataset = GroundingDataset.load()
-        val policy = dataset.manifest.pinnedPolicy.toPolicy()
-        val useCase = EvaluateGroundingUseCase(
+        // 프로덕션이 매일 돌리는 바로 그 use-case 를 그대로 쓴다 — 배선까지 함께 회귀 검증된다.
+        // (draft 제외·고정 정책 선택·합성 트래픽 메트릭 격리가 전부 use-case 안에 있다.)
+        val result = EvaluateGoldenSetUseCase(
             GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = "gemini-embedding-001"),
-            GroundingScorer.NOOP_METRICS,
-        )
-
-        // draft 는 사람 사인오프 전이라 게이트 판단 근거가 될 수 없다 — 회귀는 signed_off 만 본다.
-        val fixtures = dataset.signedOff
-        val outcomes = GroundingScorer.outcomes(useCase, fixtures, policy)
-        val summary = EvalMetrics.summarize(outcomes)
+            ClasspathGoldenSetAdapter(jacksonObjectMapper()),
+        ).run()
+        val policy = result.policy
+        val outcomes = result.outcomes
+        val summary = result.summary
         val b = summary.binary
 
         val report = buildString {
-            append("\n=== grounding validation (${dataset.manifest.dataset} ${dataset.manifest.version}, ")
+            append("\n=== grounding validation (golden set ${result.version}, ")
             append("sim=${policy.similarityThreshold} maxUnsup=${policy.maxUnsupportedRate}) ===\n")
             outcomes.sortedBy { it.id }.forEach { o ->
                 append(
@@ -52,6 +49,7 @@ class ScriptureGroundingValidationTest {
                 )
             }
             append("--\n")
+            append("draft 제외=%d\n".format(result.excludedDrafts))
             append("n=%d  TP=%d FP=%d FN=%d TN=%d  기권=%d\n".format(summary.sampleCount, b.tp, b.fp, b.fn, b.tn, b.abstained))
             append(
                 "정밀도=%s 재현율=%s F1=%s  P3(오탐률=FP/(TP+FP))=%s\n".format(
