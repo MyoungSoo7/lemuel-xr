@@ -64,6 +64,20 @@ const DIRECT_MISSIONS: Array<{
     tagline: "해 아래, 빈 손 — 공허는 채움이 아니라 방향을 묻는 신호다",
     active: true,
   },
+  {
+    href: "/job",
+    name: "Job",
+    korean: "욥",
+    tagline: "너의 비탄은 부끄러운 것이 아니다 — 답이 아닌 만남",
+    active: true,
+  },
+  {
+    href: "/elijah",
+    name: "Elijah",
+    korean: "엘리야",
+    tagline: "로뎀나무 아래 — 먼저 먹고 자도 됩니다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -232,6 +246,8 @@ export default function HomePage() {
                       "david",
                       "jesus",
                       "solomon",
+                      "job",
+                      "elijah",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
