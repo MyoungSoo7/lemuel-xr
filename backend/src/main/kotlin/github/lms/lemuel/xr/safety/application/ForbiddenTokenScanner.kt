@@ -6,7 +6,8 @@ import org.springframework.stereotype.Component
 /**
  * 가스라이팅 금지 토큰 스캐너.
  *
- * 토큰 목록의 출처는 저작 YAML(`content/{인물}/scene*.yml`)의 `lint_forbidden_tokens` 다.
+ * 토큰 목록의 출처는 저작 YAML 의 `safety_gates[].lint_forbidden_tokens` 다 — 트랙 B
+ * `content/{인물}/scene*.yml` 과 Stage 1 `resources/scenarios/{인물}.yml` 두 곳.
  * 그 목록은 오랫동안 *어떤 코드도 읽지 않아* 게이트가 아니라 주석에 머물렀다.
  * 이 스캐너가 그것을 런타임 판정으로 승격시킨다.
  *
