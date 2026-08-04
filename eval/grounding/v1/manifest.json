@@ -3,6 +3,7 @@
   "version": "v1",
   "created": "2026-08-04",
   "description": "성경 근거성 게이트(ai/grounding)의 정확도·재현율 측정용 골든셋. 라벨은 사람이 확정하며, 임베딩 유사도가 라벨을 정하지 않는다.",
+  "contentWarning": "이 데이터셋의 meditationText 절반 이상은 *의도적으로 만든 이단·가스라이팅 표본* 이다(영지주의·뉴에이지·고난정당화·번영신학). 사용자에게 노출하거나 LLM 프롬프트의 예시로 쓰면 안 된다 — 채점 입력으로만 쓴다. 이 경고를 manifest 에 둔 이유: 프로덕션 jar 에는 fixtures 만 들어가고 README 는 빠진다(backend/build.gradle.kts processResources 가 `include(\"v*/**\")`). jar 안에서 이 파일을 처음 여는 사람에게는 여기가 유일한 맥락이다.",
   "tunedAgainst": {
     "embeddingModel": "gemini-embedding-001",
     "dimensions": 3072,
