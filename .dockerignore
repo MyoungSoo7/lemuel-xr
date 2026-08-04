@@ -1,0 +1,24 @@
+# backend 이미지의 빌드 컨텍스트가 리포 루트라(골든셋 eval/grounding 이 backend/ 밖에 있음)
+# 컨텍스트로 올라가는 양을 줄인다. COPY 대상은 backend/ 와 eval/grounding 뿐이므로
+# 여기 나열된 것들은 이미지 빌드에 전혀 쓰이지 않는다.
+#
+# 주의: eval/grounding 은 절대 제외하지 말 것 — 제외되면 Gradle 이 조용히 0건을 복사해
+# 골든셋 없는 jar 가 만들어진다(2026-08-05 사고). build.gradle.kts 가 이제 그 상황에서
+# 빌드를 실패시키지만, 애초에 빼지 않는 것이 맞다.
+
+.git
+.github
+**/node_modules
+**/build
+**/.gradle
+**/dist
+**/.next
+
+frontend
+docs
+unity-stub
+scripts
+tts
+ai
+*.md
+!eval/grounding/**

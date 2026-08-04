@@ -1,3 +1,7 @@
+// `java` 는 plugins 블록의 Gradle 확장에 가려져 패키지로 해석되지 않는다.
+// 아래 bootJar 검증에서 쓰므로 최상단에서 명시적으로 import 한다.
+import java.util.zip.ZipFile
+
 plugins {
     java
     jacoco
@@ -120,10 +124,47 @@ tasks.withType<Test> {
 // 배포된 파드가 스스로 골든셋을 채점하려면 데이터가 아티팩트 안에 있어야 하므로 복사한다.
 // `from(...)` 이 이 디렉터리를 태스크 입력으로 선언하므로, 픽스처만 고쳐도
 // processResources → test 가 다시 돈다(무결성 검증을 건너뛴 표본이 남지 않는다).
+//
+// ⚠️ 원본 디렉터리가 없으면 Gradle 의 `from(...)` 은 **조용히 0건을 복사하고 성공한다**.
+//    2026-08-05 운영에서 정확히 그렇게 터졌다: Docker 빌드 컨텍스트가 `backend` 라
+//    리포 루트의 `eval/grounding` 이 이미지 안에 아예 없었고, 빌드는 초록불로 통과했으며,
+//    골든셋 없는 jar 가 배포돼 첫 채점이 "manifest 없음" 으로 실패했다.
+//    그래서 아래에서 존재를 강제하고, bootJar 결과물까지 열어 확인한다.
+val goldenSetSrc = rootProject.layout.projectDirectory.dir("../eval/grounding")
+
 tasks.named<ProcessResources>("processResources") {
-    from(rootProject.layout.projectDirectory.dir("../eval/grounding")) {
+    val srcDir = goldenSetSrc.asFile
+    doFirst {
+        check(srcDir.isDirectory) {
+            "골든셋 원본이 없다: ${srcDir.absolutePath} — Docker 빌드라면 컨텍스트가 리포 루트인지, " +
+                "Dockerfile 이 eval/grounding 을 COPY 하는지 확인할 것. " +
+                "여기서 멈추지 않으면 골든셋 없는 jar 가 조용히 만들어진다."
+        }
+    }
+    from(goldenSetSrc) {
         into("grounding-golden-set")
         include("v*/**")   // README 등 사람이 읽는 문서는 아티팩트에 넣지 않는다
+    }
+}
+
+// 산출물 검증 — "복사 태스크가 돌았다" 와 "jar 안에 있다" 는 다른 명제다.
+// 실제로 배포되는 아티팩트를 열어서 확인한다. 파드가 읽는 그 경로 그대로.
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    doLast {
+        val jar = archiveFile.get().asFile
+        val entries = ZipFile(jar).use { zip ->
+            zip.entries().asSequence()
+                .map { it.name }
+                .filter { it.startsWith("BOOT-INF/classes/grounding-golden-set/") }
+                .toList()
+        }
+        check(entries.any { it.endsWith("/manifest.json") }) {
+            "bootJar 에 골든셋 manifest 가 없다: ${jar.name} — 배포하면 채점이 " +
+                "'골든셋 manifest 없음' 으로 실패한다(2026-08-05 재발 방지)."
+        }
+        val fixtures = entries.count { it.contains("/fixtures/") && it.endsWith(".json") }
+        check(fixtures > 0) { "bootJar 에 골든셋 픽스처가 0건이다: ${jar.name}" }
+        logger.lifecycle("골든셋 jar 포함 확인: manifest 1, 픽스처 ${fixtures}건")
     }
 }
 
