@@ -201,6 +201,34 @@ class GameWebIT : IntegrationTestBase() {
     }
 
     @Test
+    @Suppress("UNCHECKED_CAST")
+    fun `converges_to 재고 선택은 HTTP 레벨에서도 씬을 넘기지 않는다`() {
+        // 저작 의도는 "재고 후 수렴" 이다. 이 계약이 엔진이 아니라 프론트에만 있으면
+        // VR·API 직접 호출 클라이언트는 수렴 구간을 통째로 건너뛴다 —
+        // 그래서 web 계층까지 내려와 확인한다(solomon scene3, 왕상 3:24~28).
+        val started = start("solomon", "spiritual")
+        val sid = UUID.fromString(started["sessionId"] as String)
+
+        val reconsider = authed().post().uri("/api/game/solomon/{sid}/decide", sid)
+            .body(mapOf("sceneId" to 3, "decision" to mapOf("value" to "first_woman")))
+            .retrieve().body(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})!!
+        assertThat(reconsider)
+            .containsEntry("previousScene", 3)
+            .containsEntry("currentScene", 3)
+        assertThat(reconsider["responseText"] as String).contains("판결을 멈추고")
+        // 같은 씬을 돌려주므로 payload 도 scene 3 이어야 한다.
+        assertThat(reconsider["scenePayload"] as Map<String, Any?>).containsEntry("sceneId", 3)
+
+        // 성경 경로(sword_test)는 converges_to 가 없다 → 평소대로 Scene 4 로 진행.
+        val advance = authed().post().uri("/api/game/solomon/{sid}/decide", sid)
+            .body(mapOf("sceneId" to 3, "decision" to mapOf("value" to "sword_test")))
+            .retrieve().body(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})!!
+        assertThat(advance)
+            .containsEntry("previousScene", 3)
+            .containsEntry("currentScene", 4)
+    }
+
+    @Test
     fun `미인증 start 거부`() {
         try {
             client().post().uri("/api/game/joseph/start").body(mapOf("mode" to "emotional"))

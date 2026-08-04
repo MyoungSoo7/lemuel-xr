@@ -57,7 +57,8 @@ test.describe("Solomon 5-Scene mission", () => {
     ).toBeVisible();
     await consent(page);
 
-    // converges_to 로컬 집행 — 첫째/둘째 여인 선택은 씬을 넘기지 않고 재고 텍스트를 띄운다
+    // converges_to 는 이제 엔진이 집행한다(SceneConvergenceResolver) — 첫째/둘째 여인
+    // 선택은 서버가 같은 씬을 돌려주고, 프론트는 재고 텍스트만 띄운다.
     await page.getByRole("button", { name: /첫째 여인에게 주라/ }).click();
     await expect(page.getByText(/판결을 멈추고/)).toBeVisible({
       timeout: 10_000,

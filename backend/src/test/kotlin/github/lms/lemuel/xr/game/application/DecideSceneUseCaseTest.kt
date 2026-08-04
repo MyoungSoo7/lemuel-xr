@@ -35,6 +35,7 @@ class DecideSceneUseCaseTest {
         ResponseResolver(llm, DecisionKeyExtractor(), mock(), SafetyGateFixtures.sanitizer()),
         // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환·금지 토큰 게이트까지 통과하는지 함께 본다.
         ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }, SafetyGateFixtures.sanitizer()),
+        SceneConvergenceResolver(DecisionKeyExtractor()),
     )
 
     private fun scene(id: Int, next: Int?, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =
@@ -234,5 +235,111 @@ class DecideSceneUseCaseTest {
         }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_MODE_MISMATCH)
+    }
+
+    // ── converges_to — 재고 선택은 씬을 넘기지 않는다 ──────────────────────────
+    //
+    // 이 네 개가 없으면 "수렴" 은 저작 문서에만 있는 말이 된다. 종전 엔진은 어떤 값을
+    // 받아도 next 로 넘겼고, 그래서 solomon scene3 의 재고 구간이 통째로 건너뛰어졌다.
+
+    /** solomon scene3 과 같은 중첩 `extras:` 블록 배치. */
+    private fun judgmentScene(id: Int, next: Int?): Scenario.Scene = scene(
+        id, next, false,
+        mapOf(
+            "extras" to mapOf(
+                "options" to listOf(
+                    mapOf("id" to "first_woman", "label" to "첫째 여인에게", "converges_to" to "sword_test"),
+                    mapOf("id" to "second_woman", "label" to "둘째 여인에게", "converges_to" to "sword_test"),
+                    mapOf("id" to "sword_test", "label" to "칼을 가져오라"),
+                ),
+                "reconsider_texts" to mapOf(
+                    "first_woman" to "왕은 판결을 멈추고 다른 길을 생각했다.",
+                    "second_woman" to "증거는 없고 두 주장만 남았다.",
+                ),
+                "default_choice" to "sword_test",
+            ),
+        ),
+    )
+
+    @Test
+    fun `execute converges_to 선택은 같은 scene 에 머물고 재고 텍스트를 돌려준다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario("solomon", "해 아래", listOf(judgmentScene(3, 4), scene(4, 5, false, emptyMap())))
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "solomon", null)))
+        whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
+
+        val r = uc.execute(
+            sid, Character.SOLOMON,
+            DecideSceneUseCase.Input(3, mapOf("value" to "first_woman"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(3)
+        assertThat(r.scenePayload["sceneId"]).isEqualTo(3)
+        assertThat(r.responseText).isEqualTo("왕은 판결을 멈추고 다른 길을 생각했다.")
+    }
+
+    @Test
+    fun `execute 수렴 대상 선택은 평소대로 다음 scene 으로 넘어간다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario("solomon", "해 아래", listOf(judgmentScene(3, 4), scene(4, 5, false, emptyMap())))
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "solomon", null)))
+        whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
+
+        val r = uc.execute(
+            sid, Character.SOLOMON,
+            DecideSceneUseCase.Input(3, mapOf("value" to "sword_test"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(4)
+        assertThat(r.scenePayload["sceneId"]).isEqualTo(4)
+    }
+
+    @Test
+    fun `execute converges_to 없는 인물은 종전대로 무조건 진행한다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "joseph", "곡식 7년",
+            listOf(
+                scene(2, 3, false, mapOf("options" to listOf(mapOf("id" to "save_33")))),
+                scene(3, null, false, emptyMap()),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(2, mapOf("value" to "save_33"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(3)
+    }
+
+    /** 재고 텍스트가 없어도 수렴은 성립한다 — 씬을 넘기지 않는 것이 본질이다. */
+    @Test
+    fun `execute 재고 텍스트가 없어도 씬은 넘어가지 않는다`() {
+        val sid = UUID.randomUUID()
+        val bare = scene(
+            3, 4, false,
+            mapOf(
+                "extras" to mapOf(
+                    "options" to listOf(
+                        mapOf("id" to "a", "converges_to" to "b"),
+                        mapOf("id" to "b"),
+                    ),
+                ),
+            ),
+        )
+        val scenario = Scenario("solomon", "해 아래", listOf(bare, scene(4, null, false, emptyMap())))
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "solomon", null)))
+        whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
+
+        val r = uc.execute(
+            sid, Character.SOLOMON,
+            DecideSceneUseCase.Input(3, mapOf("value" to "a"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(3)
+        assertThat(r.responseText).isNull()
     }
 }

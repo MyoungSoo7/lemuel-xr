@@ -199,6 +199,50 @@ class ScenarioYamlLoaderTest {
     }
 
     /**
+     * `converges_to` 무결성 — 전 인물. 수렴 대상은 **같은 Scene 의 형제 선택지 id** 여야 한다.
+     *
+     * 엔진이 이제 이 값을 집행하기 때문에(SceneConvergenceResolver) 오타 하나가 곧
+     * "그 선택지를 고르면 아무 일도 안 일어난다" 가 된다. 자기 자신을 가리키면 사용자가
+     * 같은 씬에 갇히므로 그것도 막는다. 재고 텍스트는 있으면 비어 있지 않아야 한다.
+     */
+    @Test
+    fun `모든 시나리오의 converges_to 가 형제 선택지를 가리킨다`() {
+        var checked = 0
+        for (c in Character.entries) {
+            for (scene in loader.forCharacter(c).scenes) {
+                for (block in listOf(scene.extras, inner(scene))) {
+                    val options = block?.get("options") as? List<*> ?: continue
+                    val maps = options.filterIsInstance<Map<*, *>>()
+                    val ids = maps.mapNotNull { it["id"]?.toString() }
+                    val reconsider = block["reconsider_texts"] as? Map<*, *>
+
+                    for (o in maps) {
+                        val target = o["converges_to"]?.toString() ?: continue
+                        val self = o["id"]?.toString()
+                        checked++
+
+                        assertThat(ids)
+                            .describedAs("%s scene %d — converges_to '%s' 가 형제 선택지에 없다", c, scene.id, target)
+                            .contains(target)
+                        assertThat(target)
+                            .describedAs("%s scene %d — 선택지 '%s' 가 자기 자신으로 수렴한다", c, scene.id, self)
+                            .isNotEqualTo(self)
+
+                        val text = reconsider?.get(self)
+                        if (text != null) {
+                            assertThat(text.toString().isNotBlank())
+                                .describedAs("%s scene %d — '%s' 의 재고 텍스트가 비었다", c, scene.id, self)
+                                .isTrue()
+                        }
+                    }
+                }
+            }
+        }
+        // 0건이면 이 테스트는 아무것도 증명하지 못한다 — 빈 순회를 통과로 읽지 않는다.
+        assertThat(checked).describedAs("converges_to 선언이 하나도 없다 — 순회 0회는 통과가 아니다").isPositive()
+    }
+
+    /**
      * yml 의 `extras:` 블록은 로더가 표준필드를 걷어낸 뒤 `extras["extras"]` 로 한 겹 더 들어간다.
      * (표준필드 목록에 "extras" 가 없기 때문 — 기존 로더 동작 그대로.)
      */

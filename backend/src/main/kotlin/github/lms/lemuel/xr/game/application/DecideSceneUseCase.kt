@@ -20,6 +20,8 @@ class DecideSceneUseCase(
     /** Phase 2-B — Scene.realtimeLlm=true 일 때 realtime LLM, 없으면 정적 fallback 을 골라주는 전략. */
     private val responseResolver: ResponseResolver,
     private val payloads: ScenePayloadAssembler,
+    /** pick_one 의 `converges_to` 집행 — 재고 선택은 씬을 넘기지 않는다. */
+    private val convergences: SceneConvergenceResolver,
 ) {
 
     @Transactional
@@ -32,6 +34,18 @@ class DecideSceneUseCase(
         persistDecision(sessionId, currentScene, input)
         recordProgress(session, input)
         sessions.save(session)
+
+        // `converges_to` 선택은 *재고* 다 — 씬을 넘기지 않고 같은 씬에 머문다.
+        // 이게 없으면 수렴 구간이 통째로 건너뛰어진다(SceneConvergenceResolver 참조).
+        val convergence = convergences.resolve(currentScene, input.decision)
+        if (convergence != null) {
+            return Result(
+                sessionId, input.sceneId,
+                input.sceneId, payloads.build(scenario, input.sceneId),
+                convergence.reconsiderText
+                    ?: responseResolver.resolve(character, currentScene, input.decision, session),
+            )
+        }
 
         val next = currentScene.next
         val nextPayload: Map<String, Any?> = if (next == null) {

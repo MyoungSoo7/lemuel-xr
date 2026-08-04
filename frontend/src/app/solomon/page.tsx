@@ -31,15 +31,16 @@ import {
  *    보낸다 — 프론트에 번호를 적으면 정책 개정 때 낡은 번호가 남는다(ScenarioHotlineRatchetTest
  *    가 yml 쪽을 막는 것과 같은 이유).
  *
- * 3) Scene 3 의 `converges_to` 를 프론트가 집행한다. 런타임 엔진은 pick_one 의 어떤 값을
- *    받아도 `next` 로 넘긴다 — 즉 first_woman/second_woman 을 고르면 저작 정본이 의도한
- *    "재고(reconsider) 후 칼 시험으로 수렴" 이 통째로 건너뛰어진다. 그래서 이 두 선택은
- *    decide 를 호출하지 않고 reconsider_texts 를 보여준 뒤 같은 씬에 머문다. 씬을 실제로
- *    넘기는 것은 sword_test 뿐이다(= yml 의 converges_to·default_choice 와 일치).
+ * 3) Scene 3 의 `converges_to` 는 **엔진이** 집행한다(SceneConvergenceResolver).
+ *    first_woman/second_woman 은 오답이 아니라 *재고* 이고, 엔진이 같은 씬을 그대로
+ *    돌려주면서 재고 텍스트를 responseText 로 준다. 프론트는 응답을 따르기만 한다.
+ *    (예전에는 이 페이지가 decide 호출 자체를 건너뛰어 국소 집행했다 — 그러면 이
+ *    웹페이지 밖의 클라이언트에는 수렴 보호가 없었다.)
  *
- * responseText 는 solomon 에서 항상 null 이다 (solomon.yml 에 monologues/outcomes/reactions
- * map 이 없음 — david 와 같은 상황). echo 는 payload 안의 정본 문자열만 쓰고, 프론트가
- * 새 문장을 지어내지 않는다.
+ * responseText 는 solomon 의 정적 lookup 에서는 항상 null 이다 (solomon.yml 에
+ * monologues/outcomes/reactions map 이 없음 — david 와 같은 상황). 유일한 예외가 위
+ * 3) 의 재고 텍스트다. echo 는 payload 안의 정본 문자열만 쓰고, 프론트가 새 문장을
+ * 지어내지 않는다.
  */
 type Scene = JosephStartResponse;
 
@@ -110,10 +111,17 @@ export default function SolomonPage() {
       sceneId: number;
       decision: unknown;
     }) => decideMission("solomon", scene!.sessionId, sceneId, decision),
-    onSuccess: (d) => {
+    onSuccess: (d, vars) => {
+      // 엔진이 같은 씬을 돌려주면 = `converges_to` 재고다. 씬이 안 바뀌었으므로
+      // 동의 상태를 초기화하면 안 된다 — 초기화하면 R4 동의 카드가 씬 도중에 다시 뜬다.
+      const stayed = d.currentScene === vars.sceneId;
+      setScene(d);
+      if (stayed) {
+        setReconsider(d.responseText ?? null);
+        return;
+      }
       setConsented(false);
       setReconsider(null);
-      setScene(d);
       setHistory((h) => [
         ...h,
         String((d.scenePayload as Record<string, unknown>).title ?? ""),
@@ -180,18 +188,14 @@ export default function SolomonPage() {
   };
 
   /**
-   * pick_one 선택 처리.
+   * pick_one 선택 처리 — 모든 선택을 그대로 엔진에 보낸다.
    *
-   * Scene 3 은 yml 의 `converges_to` 를 프론트가 집행한다 — first_woman/second_woman 은
-   * 오답이 아니라 *재고* 이며, 씬을 넘기지 않고 reconsider_texts 를 띄운 뒤 같은 자리에
-   * 머문다. 실제 advance 는 sword_test(= default_choice) 에서만 일어난다.
+   * Scene 3 의 `converges_to`(first_woman/second_woman) 는 이제 **엔진이** 집행한다
+   * (SceneConvergenceResolver). 재고 선택이면 엔진이 같은 씬 + 재고 텍스트를 돌려주므로
+   * 프론트는 응답을 따르기만 하면 된다. 예전에는 여기서 decide 호출 자체를 건너뛰었는데,
+   * 그러면 이 웹페이지 밖(VR·API 직접 호출)에는 수렴 보호가 전혀 없었다.
    */
   const onPick = (optionId: string) => {
-    const reconsiderTexts = field<Record<string, string>>("reconsider_texts");
-    if (reconsiderTexts && reconsiderTexts[optionId]) {
-      setReconsider(reconsiderTexts[optionId]);
-      return;
-    }
     if (field<string>("decision_key") === "hevel_label") {
       setHevelLabel(optionId as HevelLabel);
       setScene4Visited(true);
