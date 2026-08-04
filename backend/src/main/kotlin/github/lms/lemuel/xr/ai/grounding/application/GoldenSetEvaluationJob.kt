@@ -17,15 +17,26 @@ import org.springframework.scheduling.annotation.Scheduled
  *
  * [SchedulerLock] — 롤링 업데이트로 옛/새 파드가 잠깐 공존할 때 양쪽이 동시에 임베딩 API 를
  * 태우는 것을 막는다.
+ *
+ * **`open` 인 이유** — ShedLock 의 기본 interceptMode(PROXY_METHOD)는 `@SchedulerLock` 이
+ * 붙은 빈을 CGLIB 로 *상속* 해 프록시를 만든다. Kotlin 클래스는 기본이 final 이고,
+ * `kotlin("plugin.spring")` 이 자동으로 열어 주는 건 `@Component` 계열뿐이다. 이 잡은
+ * [github.lms.lemuel.xr.config.GroundingEvalConfig] 의 `@Bean` 으로 등록되므로 그 자동화의
+ * 사각지대에 있다 — 열어 두지 않으면 컨텍스트가 뜨지 않는다.
+ *
+ * 2026-08-05 운영에서 실제로 터졌다: `Cannot subclass final class GoldenSetEvaluationJob`
+ * → CrashLoopBackOff. 기본값이 `enabled=false` 라 이 빈이 *어디서도 만들어진 적이 없어서*
+ * 그때까지 아무 테스트도 이 경로를 밟지 않았다. 형제 잡들(OutboxRelayJob·ComputeDailyMetricsJob)
+ * 은 `@Component` 라 우연히 무사했을 뿐이다.
  */
-class GoldenSetEvaluationJob(
+open class GoldenSetEvaluationJob(
     private val evaluate: EvaluateGoldenSetUseCase,
     private val metrics: GoldenSetEvalMetricsPort,
 ) {
 
     @Scheduled(cron = "\${grounding.eval.cron}", zone = "Asia/Seoul")
     @SchedulerLock(name = "xr-grounding-goldenset-eval", lockAtMostFor = "PT15M")
-    fun run() {
+    open fun run() {
         try {
             val result = evaluate.run()
             metrics.publish(result)
