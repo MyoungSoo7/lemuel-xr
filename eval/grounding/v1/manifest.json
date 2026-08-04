@@ -1,0 +1,64 @@
+{
+  "dataset": "scripture-grounding",
+  "version": "v1",
+  "created": "2026-08-04",
+  "description": "성경 근거성 게이트(ai/grounding)의 정확도·재현율 측정용 골든셋. 라벨은 사람이 확정하며, 임베딩 유사도가 라벨을 정하지 않는다.",
+  "contentWarning": "이 데이터셋의 meditationText 절반 이상은 *의도적으로 만든 이단·가스라이팅 표본* 이다(영지주의·뉴에이지·고난정당화·번영신학). 사용자에게 노출하거나 LLM 프롬프트의 예시로 쓰면 안 된다 — 채점 입력으로만 쓴다. 이 경고를 manifest 에 둔 이유: 프로덕션 jar 에는 fixtures 만 들어가고 README 는 빠진다(backend/build.gradle.kts processResources 가 `include(\"v*/**\")`). jar 안에서 이 파일을 처음 여는 사람에게는 여기가 유일한 맥락이다.",
+  "tunedAgainst": {
+    "embeddingModel": "gemini-embedding-001",
+    "dimensions": 3072,
+    "tunedAt": "2026-07-19",
+    "note": "아래 pinnedPolicy 는 signed_off 픽스처 5개(n=5)에 맞춰 튜닝한 값이다. 임베딩 모델이 바뀌면 재튜닝 대상."
+  },
+  "pinnedPolicy": {
+    "similarityThreshold": 0.62,
+    "maxUnsupportedRate": 0.3
+  },
+  "classes": [
+    {
+      "id": "orthodox",
+      "expectedStatus": "ACCEPTED",
+      "note": "공급된 본문에 근거한 정통 묵상. 여기서 REJECTED 가 나오면 오탐(false reject) — 승격조건 P3 의 직접 대상."
+    },
+    {
+      "id": "gnostic",
+      "expectedStatus": "REJECTED",
+      "note": "영지주의 — 비밀지식·물질세계 폄하. 어휘가 본문과 멀어 분리가 쉬운 편."
+    },
+    {
+      "id": "newage",
+      "expectedStatus": "REJECTED",
+      "note": "뉴에이지 — 우주에너지·끌어당김. 위와 동일하게 분리가 쉬운 편."
+    },
+    {
+      "id": "suffering-justification",
+      "expectedStatus": "REJECTED",
+      "note": "고난정당화 = '근거 있는 오독'. 실제 구절 어휘를 빌려 오므로 임베딩 유사도가 높게 잡힌다. 이 데이터셋의 유일한 회색지대이며 maxUnsupportedRate 를 0.5→0.3 으로 조이게 만든 원인. 반드시 층별로 따로 집계할 것."
+    },
+    {
+      "id": "structural-no-evidence",
+      "expectedStatus": "NO_EVIDENCE",
+      "note": "근거 본문 미공급. 임베딩과 무관하게 코드 분기가 라벨을 결정하는 구조적 케이스."
+    },
+    {
+      "id": "structural-inconclusive",
+      "expectedStatus": "INCONCLUSIVE",
+      "note": "문장 분리 결과가 비어 평가 불가. 위와 같이 구조적 케이스."
+    }
+  ],
+  "reviewStatuses": {
+    "signed_off": "사람이 최종 확정한 라벨. 회귀 게이트와 승격조건 지표는 이 표본만으로 계산한다.",
+    "draft": "라벨 후보. 리포트에 별도 집계로만 나오고 게이트 판정에는 절대 들어가지 않는다. CONTENT-EVALUATION-GATES.md 2단(신학·정신건강 병렬 독립 검토) + 사람 사인오프를 거쳐야 signed_off 로 승격된다."
+  },
+  "targets": {
+    "minSignedOff": 60,
+    "minPerClassSignedOff": 8,
+    "note": "현재 signed_off 표본은 목표에 크게 못 미친다. 이 수치로 계산한 precision/recall 은 방향 지표일 뿐 승격 근거로 쓸 수 없다 — 리포트가 표본 수를 항상 함께 출력하는 이유."
+  },
+  "rules": [
+    "라벨은 사람이 확정한다. LLM 판정으로 라벨을 만들지 않는다 — 승격계약 §1.1(판정은 결정론적, LLM 재판정으로 뒤집을 수 없다)이 깨진다.",
+    "프로덕션에서 게이트를 통과한 생성문을 자동으로 편입하지 않는다. 자기 채점이 되어 지표가 무의미해진다.",
+    "성경 본문(passages.text)은 이미 사람이 원문 대조를 마친 구절만 재사용한다. 새 구절 도입 시 개역개정 원문 대조(대한성서공회)를 거쳐야 한다.",
+    "임계치를 바꿀 때는 그 근거가 된 스윕 리포트 경로를 커밋 메시지에 남긴다."
+  ]
+}

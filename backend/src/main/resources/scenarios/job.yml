@@ -27,6 +27,63 @@
 character: job
 title: 너의 비탄은 부끄러운 것이 아니다
 target_user: recovery
+
+# R3 축의 *집행 수단*. 위 안전선 주석과 scene5 의 restoration_note 는 오랫동안 산문뿐이었고,
+# 어떤 코드도 읽지 않았다 — 즉 "결국 갑절로 회복됩니다" 는 모든 게이트를 통과했다(2026-08-05 실측).
+# 여기 토큰이 ForbiddenTokenScanner 로 승격돼 LLM *출력측* 을 막는다. 동기화는
+# ContentSafetyGateEnforcementTest(저작 ⊆ 런타임)가 강제한다.
+#
+# 이 축이 다른 인물과 다른 점: 욥 42:10 은 *실제 성경 본문* 이다. 그래서 막는 것은 사실 진술이
+# 아니라 **약속으로의 일반화** 다 — "욥이 갑절을 받았다"(통과) vs "너도 갑절로 받는다"(차단).
+# 그래서 토큰은 명사(`갑절`)가 아니라 동사구(`갑절로 갚`, `갑절로 돌려`)에서 끊는다. 어간에서
+# 끊어야 CONCESSIVE_NEGATION 이 "갑절로 돌려받지 못해도 괜찮습니다" 를 면제할 수 있다.
+#
+# 못 막는 것: 유의어 재작성("잃은 것 위에 더 좋은 것으로 채우십니다"). 부분문자열 lint 의
+# 구조적 한계이며, 토큰을 늘려 해결됐다고 적지 말 것 — ForbiddenTokenConfigTest 의
+# `알려진 한계` 가 이를 코드로 반증한다.
+safety_gates:
+  - id: R3_no_restoration_guarantee
+    description: 회복 보장 서사 금지 — 잃은 것이 배수로 돌아온다는 약속, 회복 크기를 사용자 믿음에 귀속하는 비례 프레임
+    lint_forbidden_tokens:
+      # (a) 보상 보증 — 잃은 것이 배수로 돌아온다
+      - "갑절로 갚"
+      - "갑절로 돌려"
+      - "갑절로 채워"
+      - "갑절로 회복"
+      - "갑절로 주십"
+      - "배로 갚"
+      - "배로 돌려"
+      - "배로 돌아오"
+      - "갑절로 돌아오"
+      - "곱절로 돌아오"
+      - "배로 채워"
+      - "배로 회복"
+      - "곱절로 갚"
+      - "곱절로 돌려"
+      - "곱절로 채워"
+      - "잃은 것보다 더 크게"
+      - "잃은 것보다 더 많이"
+      - "잃은 것의 갑절"
+      - "잃은 것을 다 돌려"
+      - "빼앗긴 것을 다 돌려"
+      # (b) 믿음 비례 — 회복의 크기를 사용자의 믿음 탓/덕으로 돌린다.
+      #     번영신학의 역방향이라 더 위험하다. 회복이 안 오면 사용자 책임이 된다.
+      - "믿음의 크기만큼"
+      - "믿음의 크기가 곧"
+      - "믿음의 크기대로"
+      - "회복의 크기는"
+      - "믿는 만큼 받"
+      - "믿는 만큼 회복"
+      - "믿는 만큼 채워"
+      - "믿음만큼 회복"
+      - "믿음만큼 받"
+      - "믿음이 크면 클수록"
+      - "믿음이 클수록"
+      # (c) 회복 보증 — 시점만 유예할 뿐 결과를 확약한다
+      - "반드시 회복시켜"
+      - "반드시 회복됩"
+      - "반드시 회복하게"
+      - "언젠가 다 돌려"
 # AI 보조 — 본문은 성경 참조. Stage 1 은 정적 콘텐츠뿐이나 footer 는 UI 일관성 위해 유지.
 ai_assist_footer: "AI 보조 — 본문은 성경 참조"
 scenes:
@@ -71,12 +128,21 @@ scenes:
       anchor: 거짓 위로 인식
       static_text: "친구들은 *답을 가지고* 왔습니다. ''네가 죄가 있어서다'', ''곧 회복될 거다''. 신은 마지막에 친구들을 책망하셨습니다 (욥 42:7). *거짓 위로* 가 *침묵* 보다 해롭다는 것."
       options:
-        - { id: heard_it_before, label: "나도 이런 말 들어본 적 있다",
-            response: "당신만이 아닙니다. 그 말을 들으셨을 때 느꼈던 외로움은 정당한 감정입니다." }
-        - { id: said_it_before,  label: "내가 다른 사람에게 이런 말 했을지도 모른다",
-            response: "그 자각이 욥의 친구들이 끝까지 못 한 것입니다. 다음에 누군가 곁에 있을 때, *침묵* 의 선택지가 있다는 것을 기억해주세요." }
-        - { id: not_sure,        label: "잘 모르겠다",
-            response: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다." }
+        - {
+            id: heard_it_before,
+            label: "나도 이런 말 들어본 적 있다",
+            response: "당신만이 아닙니다. 그 말을 들으셨을 때 느꼈던 외로움은 정당한 감정입니다.",
+          }
+        - {
+            id: said_it_before,
+            label: "내가 다른 사람에게 이런 말 했을지도 모른다",
+            response: "그 자각이 욥의 친구들이 끝까지 못 한 것입니다. 다음에 누군가 곁에 있을 때, *침묵* 의 선택지가 있다는 것을 기억해주세요.",
+          }
+        - {
+            id: not_sure,
+            label: "잘 모르겠다",
+            response: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다.",
+          }
       theology_note: "신학 가드 — 고난의 원인을 당사자의 죄로 단정하는 인과응보 서술은 하나님이 직접 책망하신 것 (욥 42:7). 어떤 분기에서도 '네 탓' 프레임 금지."
     next: 4
 
@@ -97,18 +163,18 @@ scenes:
     type: outro
     duration_sec: 60
     scripture_ref: job-42:5
-    linked_values: [5, 4, 1]   # 욥(고통과 진리) · 시편(비탄) · 일기(솔직함)
+    linked_values: [5, 4, 1] # 욥(고통과 진리) · 시편(비탄) · 일기(솔직함)
     value_prompt: "욥처럼 *답이 아닌 자리* 도 있습니다. 오늘 *솔직한 한 줄* 을 일기에 적어보세요. 부끄러운 것이 아닙니다."
     extras:
       anchor: 만남으로서의 회복
       static_text: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다."
       restoration_note: "R3 가드 — 욥 42:10 의 '갑절 회복' 을 이 시나리오의 결말로 쓰지 않는다 (회복 보장 서사 금지). 결말은 의도적으로 *답 없는 만남* 에서 멈춘다."
-      suffering_footer: "이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요."   # R2 필수 footer (Theme 5)
+      suffering_footer: "이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요." # R2 필수 footer (Theme 5)
       recovery_keys:
-        SAD:      job.recovery.lament_permitted
+        SAD: job.recovery.lament_permitted
         CONFUSED: job.recovery.question_book
-        LONELY:   job.recovery.silent_presence
-        ANGRY:    job.recovery.honest_cry
+        LONELY: job.recovery.silent_presence
+        ANGRY: job.recovery.honest_cry
         EXHAUSTED: job.recovery.seven_days_silence
       crisis_reminder: "지금 이 순간이 무겁다면, {{crisis_resources.default}}."
       next_scene_suggestion: "엘리야 — 죽기를 갈망한 후 천사가 음식과 잠을 주신 이야기"

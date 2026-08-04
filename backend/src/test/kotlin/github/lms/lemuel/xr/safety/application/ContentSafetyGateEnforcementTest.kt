@@ -10,7 +10,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 /**
- * 저작 YAML(`content/{인물}/scene*.yml`)의 안전 게이트가 *집행 수단* 을 갖는지 검증한다.
+ * 저작 YAML — 트랙 B `content/{인물}/scene*.yml` 과 Stage 1
+ * `backend/src/main/resources/scenarios/{인물}.yml` — 의 안전 게이트가 *집행 수단* 을 갖는지 검증한다.
  *
  * 이 테스트가 존재하는 이유 — "축을 선언해 놓고 0건을 막는 게이트"(vacuous green):
  * `safety_gates[]` 에 R2(고난 가스라이팅 금지)·R3(회복 압박 금지) 축을 `id` 로 선언해 두고
@@ -235,13 +236,25 @@ class ContentSafetyGateEnforcementTest {
 
     private fun normalize(s: String): String = s.trim().replace(WHITESPACE, " ")
 
+    /**
+     * 저작 YAML 전부 — 트랙 B `content/{인물}/scene*.yml` **과** Stage 1
+     * `backend/src/main/resources/scenarios/{인물}.yml`.
+     *
+     * 후자는 2026-08-05 에 들어왔다. 그 전까지 이 검사는 content/ 만 걸었고, scenarios/ 의
+     * 안전선은 헤더 주석으로만 존재해 *아무것도 집행하지 않았다* — job.yml 은 R3(갑절 회복
+     * 금지)을 두 군데 적어 두고 토큰이 0종이라 "결국 갑절로 회복됩니다" 가 통과했다.
+     * 검사 범위 밖에 있는 저작 파일은 검사 대상이 아닌 게 아니라 *무방비* 다.
+     */
     private fun sceneFiles(): List<File> {
-        val dir = repoRoot().resolve("content").toFile()
-        check(dir.isDirectory) { "저작 콘텐츠 디렉터리 없음: $dir" }
-        return dir.walkTopDown()
+        val trackB = repoRoot().resolve("content").toFile()
+        check(trackB.isDirectory) { "저작 콘텐츠 디렉터리 없음: $trackB" }
+        val stage1 = moduleRoot().resolve("src/main/resources/scenarios").toFile()
+        check(stage1.isDirectory) { "Stage 1 시나리오 디렉터리 없음: $stage1" }
+
+        val b = trackB.walkTopDown()
             .filter { it.isFile && it.name.startsWith("scene") && it.name.endsWith(".yml") }
-            .sortedBy { it.path }
-            .toList()
+        val a = stage1.walkTopDown().filter { it.isFile && it.name.endsWith(".yml") }
+        return (b + a).sortedBy { it.path }.toList()
     }
 
     private fun baselinePath(): Path =

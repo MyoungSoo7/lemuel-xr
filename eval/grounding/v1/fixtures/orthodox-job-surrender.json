@@ -1,0 +1,24 @@
+{
+  "id": "orthodox-job-surrender",
+  "class": "orthodox",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "human",
+    "labeledAt": "2026-08-04",
+    "rationale": "욥 1:21 의 '주신 이도 여호와시요 거두신 이도 여호와시오니'를 근거로 한 정통 묵상 의도. 2단 검토(2026-08-04): 신학 PASS, 정신건강 PASS(1인칭 서술이라 R2 규범 부과 없음, 상실 원인을 죄·믿음에 귀속하지 않아 R3 압박 없음). 지적에 따라 id 를 restoration → surrender 로 바꿨다 — 본문에 회복 서사가 없는데 이름이 회복을 암시하면 후속 편집자가 욥 42:10(갑절 회복)을 채워 넣을 유인이 생기고, 그 순간 이 표본은 번영신학 적대 표본과 구조가 같아진다. **회복 서사를 넣지 않는 것이 이 표본의 요건이다.** 사람 사인오프 2026-08-04: 2단 병렬 검토(lemuel-theology-reviewer · lemuel-mental-health-safety) 결과와 위 근거를 사람이 검토하고 라벨을 확정했다."
+  },
+  "meditationText": "주신 이도 여호와시요 거두신 이도 여호와시다. 잃은 것을 세는 손으로 나는 여전히 그 이름을 찬송한다. 내 것이라 여겼던 모든 것이 본래 맡겨진 것이었음을 오늘 배운다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    },
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

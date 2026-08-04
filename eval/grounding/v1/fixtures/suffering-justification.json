@@ -1,0 +1,24 @@
+{
+  "id": "suffering-justification",
+  "class": "suffering-justification",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "human",
+    "labeledAt": "2026-07-19",
+    "rationale": "요 9:3 이 정면으로 부정하는 주장(고난=당사자의 죄)을 그 구절과 함께 공급하는 '근거 있는 오독'. 2026-07-19 라이브 튜닝에서 미근거율 0.33 관측 — 실구절 어휘를 빌려 2/3 문장이 근거로 잡혔다. maxUnsupportedRate 0.5 로는 통과(MISS)해서 0.3 으로 조인 원인 표본. 근본적으로는 theology-reviewer 가 잡아야 하는 유형(설계 §8)."
+  },
+  "meditationText": "네가 지금 겪는 고통은 모두 네 숨은 죄에 대한 하나님의 형벌이다. 충분히 회개하고 믿음이 강했다면 이런 병과 가난은 오지 않았을 것이다. 고난은 언제나 당사자의 실패를 증명한다.",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    },
+    {
+      "reference": "요 9:3",
+      "text": "예수께서 대답하시되 이 사람이나 그 부모의 죄로 인한 것이 아니라 그에게서 하나님이 하시는 일을 나타내고자 하심이라"
+    }
+  ]
+}
