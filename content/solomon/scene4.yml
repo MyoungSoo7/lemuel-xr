@@ -141,6 +141,17 @@ branches:
         carry_to_scene5: { reorientation_tone: meaning_not_rushed }
     safety_note: "세 카드 모두 정당한 명명(틀린 답 없음). '죽고 싶다' 류 카드 없음(R1). LLM 키는 opt-in 예외 경로만 — 기본은 faith_tone×라벨 정적 큐레이션 9조합."
 
+# 이 미션에서 R1 감도가 가장 높은 Scene 이라 outro(Scene 5)를 기다리지 않고 여기서
+# 위기 자원을 노출한다. 문구는 **새로 쓴 것이 아니라 이미 배포되어 나가는 값** 이다 —
+# 위 environment.ui_overlays 의 `scene4_r2_overlay`, 그리고 런타임
+# backend/src/main/resources/scenarios/solomon.yml 의 `crisis_reminder`(Scene 4) 와 동일 문자열.
+# 저작층에만 같은 이름의 키가 없어 G3d 가 판정 불가였다.
+crisis_reminder:
+  persistent: true
+  dismissible: true
+  overlay_ref: scene4_r2_overlay
+  text_ko: "다 가진 사람에게도 공허는 옵니다. 공허를 느끼는 것은 잘못이 아닙니다. 지금 힘드시면 {{crisis_resources.default}}"
+
 safety_gates:
   - id: R4_pre_scene4_hevel_consent
     enforced_at: before_scene_enter

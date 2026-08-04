@@ -190,10 +190,12 @@ trigger_scenes: [2, 4]
 # backend/src/main/resources/scenarios/elijah.yml outro 에서 **이미 배포되어 나가는 값**이고,
 # 저작층에만 같은 이름의 키가 없어 판정 불가였다.
 #
-# ⚠️ Scene 2(자살사고 본문)에는 이 키가 없다. 위기 자원 자체는 footer_persistent 와
-#    R1_voice_self_harm_listener 로 상시 노출되지만, 리터럴 키는 없다 —
-#    Scene 2 에도 둘지는 **사람 판단**이 필요해 여기서 임의로 선언하지 않는다.
-crisis_reminder_scenes: [5]
+# Scene 2(자살사고 본문, 왕상 19:4)는 이 미션의 R1 최고감도 지점이다. 여기에도 같은 키를
+# 추가했다 — 문구는 그 파일 안에 이미 있던 `scene2_r2_footer` 상시 오버레이 문장 그대로다.
+# 위기 자원 노출은 원래 되고 있었고 게이트가 찾는 **키 이름**만 없었다.
+# Scene 2 의 리마인더는 `dismissible: false` 다(Scene 5 와 다른 점) — 이탈 지점이 아니라
+# 본문 노출 중이라 닫을 수 있으면 안 된다.
+crisis_reminder_scenes: [2, 5]
 
 # ── 미정의 = BLOCKED (판정 불가). 없는 것을 있는 척하지 않는다 ──────────────
 # verses_file:            (없음) → G0b BLOCKED

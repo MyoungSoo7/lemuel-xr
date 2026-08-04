@@ -29,7 +29,7 @@ environment:
       spatial: true
   user_position: [0.0, 1.65, 0.0]
   user_facing: [0.0, 0.0, 1.0]
-  camera_locomotion: short_scripted_walk   # 하룻길 — 낮은 속도 + fade, 모션시크 회피
+  camera_locomotion: short_scripted_walk # 하룻길 — 낮은 속도 + fade, 모션시크 회피
   ui_overlays:
     - id: scene2_r2_footer
       position: top_right
@@ -67,7 +67,7 @@ narration_blocks:
     text_ko: "여호와여 넉넉하오니 지금 내 생명을 거두시옵소서 나는 내 조상들보다 낫지 못하니이다 (열왕기상 19:4)"
     audio_clip_id: aud_s2_rotem_lament_ko
     audio_clip_id_low: aud_s2_rotem_lament_ko_low
-    audio_clip_id_off: null                   # 자막만 옵션
+    audio_clip_id_off: null # 자막만 옵션
     start_at_seconds: 50.0
     duration_seconds: 12.0
     hidden_until_event: sat_under_rotem
@@ -91,6 +91,17 @@ interactions:
   # 의도적으로 branches 없음 — 무너짐은 사용자 선택지가 아니다 (R1).
 
 branches: []
+
+# 이 Scene 은 자살사고 본문(왕상 19:4)을 다루는 이 미션의 R1 최고감도 지점이다.
+# 문구는 **새로 쓴 것이 아니라 이미 이 파일 안에 있는 값** 이다 — 위 environment.ui_overlays
+# 의 `scene2_r2_footer` 가 상시(small_persistent) 노출하는 그 문장 그대로다.
+# 위기 자원 노출 자체는 이미 되고 있었고, G3d 가 찾는 **리터럴 키 이름**만 없어서
+# 판정 불가였다. 없던 안전 문구를 지어낸 게 아니라 이미 나가는 문구에 이름을 맞춘 것이다.
+crisis_reminder:
+  persistent: true
+  dismissible: false # R1 최고감도 Scene — 여기서는 닫을 수 없다(scene5 와 다른 점)
+  overlay_ref: scene2_r2_footer
+  text_ko: "불로 응답받은 선지자도 다음 날 무너질 수 있습니다. 무너짐은 실패가 아닙니다. 지금 힘드시면 {{crisis_resources.default}} (자살예방상담·24시간)"
 
 safety_gates:
   - id: R4_pre_scene2_rotem_consent
@@ -131,7 +142,8 @@ safety_gates:
     # '네 믿음이 약하다'는 종교적 수치 프레임을 앱이 먼저 꺼내 부정하는 문장은, 우울 상태의
     # 독자에게 그 프레임을 심는다. 같은 뜻을 통과하는 표면으로 말할 수 있다 —
     # "믿음이 약해도 괜찮습니다" / "무너짐은 믿음의 실패가 아닙니다".
-    lint_forbidden_tokens: ["믿음이 약해서", "기도가 부족해서", "의지가 약해서", "약해서 무너"]
+    lint_forbidden_tokens:
+      ["믿음이 약해서", "기도가 부족해서", "의지가 약해서", "약해서 무너"]
   - id: dwell_limit_on_despair
     enforced_at: nb_s2_rotem_lament
     description: "본문 노출 직후 최대 3초 정적 → Scene 3 자동 전환. 절망 상태 고착 방지."
@@ -141,7 +153,7 @@ safety_gates:
 
 next_scene_id: elijah_scene3
 transition:
-  type: fade_to_gentle_light      # 어둠이 아닌 부드러운 빛으로 — 돌봄(Scene 3) 예고
+  type: fade_to_gentle_light # 어둠이 아닌 부드러운 빛으로 — 돌봄(Scene 3) 예고
   fade_out_seconds: 1.0
   fade_in_seconds: 1.5
 
