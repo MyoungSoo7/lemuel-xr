@@ -25,8 +25,8 @@ class DecideSceneUseCase(
 ) {
 
     @Transactional
-    fun execute(sessionId: UUID, character: Character, input: Input): Result {
-        val session = loadLiveSession(sessionId, character, input)
+    fun execute(userId: UUID, sessionId: UUID, character: Character, input: Input): Result {
+        val session = loadLiveSession(userId, sessionId, character, input)
 
         val scenario = loader.forCharacter(character)
         val currentScene = scenario.scene(input.sceneId)
@@ -63,10 +63,11 @@ class DecideSceneUseCase(
         )
     }
 
-    /** 세션 로드 + 상태/캐릭터/모드 검증. */
-    private fun loadLiveSession(sessionId: UUID, character: Character, input: Input): GameSession {
+    /** 세션 로드 + 소유권/상태/캐릭터/모드 검증. */
+    private fun loadLiveSession(userId: UUID, sessionId: UUID, character: Character, input: Input): GameSession {
         val session = sessions.findById(sessionId)
             .orElseThrow { AppException(ErrorCode.E_SESSION_NOT_FOUND) }
+        requireOwner(session, userId)
         if (session.isTerminated()) {
             throw AppException(ErrorCode.E_SESSION_INVALID)
         }

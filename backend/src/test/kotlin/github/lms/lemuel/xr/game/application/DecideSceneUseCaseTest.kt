@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -23,6 +24,7 @@ import java.util.UUID
 
 class DecideSceneUseCaseTest {
 
+    private val owner: UUID = UUID.randomUUID()
     private val sessions: GameSessionPort = mock()
     private val decisions: GameDecisionPort = mock()
     private val loader: ScenarioYamlLoader = mock()
@@ -46,21 +48,21 @@ class DecideSceneUseCaseTest {
 
     private fun liveSession(id: UUID, character: String?, dimension: String?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, dimension,
+            id, owner, null, character, dimension,
             LocalDateTime.now(), null, null, null, HashMap(), null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun completedSession(id: UUID, character: String?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, null,
+            id, owner, null, character, null,
             LocalDateTime.now(), LocalDateTime.now(), null, null, HashMap(), null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun abandonedSession(id: UUID, character: String?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, null,
+            id, owner, null, character, null,
             LocalDateTime.now(), null, LocalDateTime.now(), null, HashMap(), null, null,
             0.toShort(), null, null, null, null,
         )
@@ -81,7 +83,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.JOSEPH,
+            owner, sid, Character.JOSEPH,
             DecideSceneUseCase.Input(2, mapOf("value" to "save_33"), mapOf("ms" to 1200), "emotional"),
         )
 
@@ -108,7 +110,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.MOSES)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.MOSES,
+            owner, sid, Character.MOSES,
             DecideSceneUseCase.Input(5, mapOf("value" to "go"), null, null),
         )
 
@@ -133,7 +135,7 @@ class DecideSceneUseCaseTest {
             .thenReturn(GenerateLlmResponseUseCase.Result("LLM 실시간 응답", "openai", "gpt", false))
 
         val r = uc.execute(
-            sid, Character.JOSEPH,
+            owner, sid, Character.JOSEPH,
             DecideSceneUseCase.Input(4, mapOf("priority" to "reveal"), null, null),
         )
 
@@ -159,11 +161,57 @@ class DecideSceneUseCaseTest {
             .thenThrow(RuntimeException("sidecar down"))
 
         val r = uc.execute(
-            sid, Character.JOSEPH,
+            owner, sid, Character.JOSEPH,
             DecideSceneUseCase.Input(4, mapOf("value" to "reveal"), null, null),
         )
 
         assertThat(r.responseText).isEqualTo("정적 fallback 텍스트")
+    }
+
+    // ── IDOR 회귀 ──
+
+    @Test
+    fun `남의 세션은 진행할 수 없다 - 존재를 숨기려 404`() {
+        val sid = UUID.randomUUID()
+        val victim = liveSession(sid, "joseph", "emotional")
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(victim))
+
+        assertThatThrownBy {
+            uc.execute(
+                UUID.randomUUID(), sid, Character.JOSEPH,
+                DecideSceneUseCase.Input(2, mapOf("value" to "save_33"), null, "emotional"),
+            )
+        }
+            .isInstanceOf(AppException::class.java)
+            // 403 이 아니라 404 — 세션이 존재한다는 사실 자체를 알려주지 않는다.
+            .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
+
+        // 거부 여부만 보면 부족하다. 소유권 검사는 *쓰기 이전* 이어야 하므로
+        // 결정 영속·세션 저장이 아예 일어나지 않았음을 확인한다.
+        verify(decisions, never()).save(any())
+        verify(sessions, never()).save(any())
+        assertThat(victim.decisions).isEmpty()
+        assertThat(victim.sceneCountCompleted).isEqualTo(0.toShort())
+    }
+
+    @Test
+    fun `userId 없는 레거시 세션은 아무도 진행할 수 없다`() {
+        val sid = UUID.randomUUID()
+        val legacy = GameSession.reconstitute(
+            sid, null, null, "joseph", "emotional",
+            LocalDateTime.now(), null, null, null, HashMap(), null, null,
+            0.toShort(), null, null, null, null,
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(legacy))
+
+        assertThatThrownBy {
+            uc.execute(
+                owner, sid, Character.JOSEPH,
+                DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, null),
+            )
+        }
+            .isInstanceOf(AppException::class.java)
+            .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
     }
 
     // ── 에러 분기 ──
@@ -173,7 +221,7 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.empty())
         assertThatThrownBy {
             uc.execute(
-                sid, Character.JOSEPH,
+                owner, sid, Character.JOSEPH,
                 DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, null),
             )
         }
@@ -187,7 +235,7 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.of(completedSession(sid, "joseph")))
         assertThatThrownBy {
             uc.execute(
-                sid, Character.JOSEPH,
+                owner, sid, Character.JOSEPH,
                 DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, null),
             )
         }
@@ -201,7 +249,7 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.of(abandonedSession(sid, "joseph")))
         assertThatThrownBy {
             uc.execute(
-                sid, Character.JOSEPH,
+                owner, sid, Character.JOSEPH,
                 DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, null),
             )
         }
@@ -215,7 +263,7 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "moses", null)))
         assertThatThrownBy {
             uc.execute(
-                sid, Character.JOSEPH,
+                owner, sid, Character.JOSEPH,
                 DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, null),
             )
         }
@@ -229,7 +277,7 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", "rational")))
         assertThatThrownBy {
             uc.execute(
-                sid, Character.JOSEPH,
+                owner, sid, Character.JOSEPH,
                 DecideSceneUseCase.Input(2, mapOf("value" to "x"), null, "emotional"),
             )
         }
@@ -269,7 +317,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.SOLOMON,
+            owner, sid, Character.SOLOMON,
             DecideSceneUseCase.Input(3, mapOf("value" to "first_woman"), null, null),
         )
 
@@ -286,7 +334,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.SOLOMON,
+            owner, sid, Character.SOLOMON,
             DecideSceneUseCase.Input(3, mapOf("value" to "sword_test"), null, null),
         )
 
@@ -308,7 +356,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.JOSEPH,
+            owner, sid, Character.JOSEPH,
             DecideSceneUseCase.Input(2, mapOf("value" to "save_33"), null, null),
         )
 
@@ -335,7 +383,7 @@ class DecideSceneUseCaseTest {
         whenever(loader.forCharacter(Character.SOLOMON)).thenReturn(scenario)
 
         val r = uc.execute(
-            sid, Character.SOLOMON,
+            owner, sid, Character.SOLOMON,
             DecideSceneUseCase.Input(3, mapOf("value" to "a"), null, null),
         )
 

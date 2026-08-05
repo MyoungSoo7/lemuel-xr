@@ -29,9 +29,10 @@ class CompleteGameSessionUseCase(
 ) {
 
     @Transactional
-    fun execute(sessionId: UUID, finalOutcome: String?, closingMessage: String?): Result {
+    fun execute(userId: UUID, sessionId: UUID, finalOutcome: String?, closingMessage: String?): Result {
         val session = sessions.findById(sessionId)
             .orElseThrow { AppException(ErrorCode.E_SESSION_NOT_FOUND) }
+        requireOwner(session, userId)
         if (session.isTerminated()) {
             throw AppException(ErrorCode.E_SESSION_INVALID)
         }

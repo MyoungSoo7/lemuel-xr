@@ -37,6 +37,7 @@ class CompleteGameSessionCrisisScanTest {
     private val scanner = CrisisKeywordScanner(
         "(?<suicideIntent>자살|죽고\\s?싶|죽어\\s?버|뛰어내리)|(?<selfHarm>자해)",
     )
+    private val owner: UUID = UUID.randomUUID()
     private val sessions: GameSessionPort = mock()
     private val scenarios: ScenarioYamlLoader = mock()
     private val safetyAlerts: RecordSafetyAlertUseCase = mock()
@@ -47,7 +48,7 @@ class CompleteGameSessionCrisisScanTest {
     private fun session(): GameSession {
         val id = UUID.randomUUID()
         val s = GameSession.reconstitute(
-            id, null, null, "joseph", null,
+            id, owner, null, "joseph", null,
             LocalDateTime.now(), null, null, null, null, null, null,
             0.toShort(), null, null, null, null,
         )
@@ -60,7 +61,7 @@ class CompleteGameSessionCrisisScanTest {
     fun `평범한 종료 메시지는 알럿을 만들지 않는다`() {
         val s = session()
 
-        useCase.execute(s.id!!, "completed", "요셉처럼 저도 기다려보려 합니다.")
+        useCase.execute(owner, s.id!!, "completed", "요셉처럼 저도 기다려보려 합니다.")
 
         verify(safetyAlerts, never()).execute(anyOrNull(), anyOrNull(), any(), any())
     }
@@ -69,7 +70,7 @@ class CompleteGameSessionCrisisScanTest {
     fun `위기 신호가 담긴 종료 메시지는 알럿을 남긴다`() {
         val s = session()
 
-        useCase.execute(s.id!!, "completed", "다 끝내고 죽고 싶어요")
+        useCase.execute(owner, s.id!!, "completed", "다 끝내고 죽고 싶어요")
 
         verify(safetyAlerts).execute(
             anyOrNull(), anyOrNull(), eq("game_closing_message"),
@@ -81,7 +82,7 @@ class CompleteGameSessionCrisisScanTest {
     fun `위기 신호가 있어도 세션 완료 자체는 막지 않는다`() {
         val s = session()
 
-        val r = useCase.execute(s.id!!, "completed", "자해를 했어요")
+        val r = useCase.execute(owner, s.id!!, "completed", "자해를 했어요")
 
         // 사용자가 쓴 기록을 삼키지 않는다. 완료는 정상 처리하되 알럿만 추가한다.
         assertThat(r.sessionId).isEqualTo(s.id)
@@ -93,7 +94,7 @@ class CompleteGameSessionCrisisScanTest {
     fun `종료 메시지가 없으면 스캔하지 않는다`() {
         val s = session()
 
-        useCase.execute(s.id!!, "completed", null)
+        useCase.execute(owner, s.id!!, "completed", null)
 
         verify(safetyAlerts, never()).execute(anyOrNull(), anyOrNull(), any(), any())
     }
