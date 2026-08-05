@@ -8,7 +8,6 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
-import kotlin.math.min
 
 /**
  * Theme 6/7 실천·성찰 — 작성/조회 유스케이스.
@@ -55,7 +54,8 @@ class PracticeReflectionUseCase(
 
     fun list(userId: UUID, topicId: Short, limit: Int): List<PracticeReflection> =
         reflections.findByUserIdAndTopicIdOrderByCreatedAtDesc(
-            userId, topicId, PageRequest.of(0, min(limit, 100)),
+            // min 만으론 0·음수를 못 막는다 — PageRequest.of 가 예외를 던져 500 이 된다.
+            userId, topicId, PageRequest.of(0, limit.coerceIn(1, 100)),
         )
 
     fun actionCount(userId: UUID, topicId: Short): Long =
