@@ -10,6 +10,7 @@ import {
   completeMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+import { SceneBootState } from "@/components/SceneBootState";
 
 /**
  * Solomon 미션 — 해 아래, 빈 손. 백엔드 runtime 계약(backend/src/main/resources/scenarios/solomon.yml)
@@ -156,9 +157,11 @@ export default function SolomonPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 

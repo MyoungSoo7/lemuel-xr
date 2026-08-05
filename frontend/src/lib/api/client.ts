@@ -29,6 +29,16 @@ function clearToken() {
   localStorage.removeItem(DISCLAIMER_KEY);
 }
 
+/**
+ * 저장된 게스트 세션을 버린다 — 다음 요청에서 새로 발급된다.
+ *
+ * 사용자 계정 기능이 따로 없어 이 토큰이 유일한 신원이다. 만료된 토큰이 localStorage 에
+ * 박혀 있으면 앱 전체가 잠기므로, 화면에서도 직접 버릴 수 있어야 한다.
+ */
+export function resetGuestSession() {
+  clearToken();
+}
+
 let pendingIssue: Promise<string> | null = null;
 
 const DISCLAIMER_KEY = "lemuel_xr_disclaimer_accepted";
@@ -45,7 +55,12 @@ async function ensureDisclaimerAccepted(token: string): Promise<void> {
     await axios.post(
       "/api/auth/accept-disclaimer",
       {},
-      { headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` } },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      },
     );
     localStorage.setItem(DISCLAIMER_KEY, "true");
   } catch (e) {
@@ -85,7 +100,8 @@ api.interceptors.request.use(async (config) => {
   try {
     const token = await ensureGuestToken();
     config.headers = config.headers ?? {};
-    (config.headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
+    (config.headers as Record<string, string>)["Authorization"] =
+      `Bearer ${token}`;
   } catch (e) {
     // 토큰 발급 실패 시 그냥 통과 (backend 가 401 반환)
     console.warn("guest token issuance failed:", e);
@@ -93,12 +109,17 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-// 401 → 토큰 만료 추정, 1회 재발급 시도
+// 401 → 토큰 만료 추정, 1회 재발급 시도.
+// 403 도 같이 본다: 백엔드에 AuthenticationEntryPoint 가 없던 시절(~2026-08-06) 미인증
+// 요청이 전부 403 으로 나갔고, 여기서 401 만 보다가 죽은 토큰이 localStorage 에 영구히
+// 박혀 앱 전체가 잠겼다. 백엔드는 고쳤지만, 롤아웃이 끝나기 전 브라우저나 되돌아간
+// 배포에서도 스스로 빠져나올 수 있게 두 상태를 함께 처리한다. 진짜 권한 문제라면
+// 재발급 후 한 번 더 403 이 나고 그대로 표면화된다(재시도는 1회뿐).
 api.interceptors.response.use(
   (r) => r,
   async (error) => {
     if (
-      error.response?.status === 401 &&
+      (error.response?.status === 401 || error.response?.status === 403) &&
       error.config &&
       !error.config.__retry
     ) {

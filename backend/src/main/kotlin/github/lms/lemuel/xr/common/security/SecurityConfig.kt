@@ -21,6 +21,8 @@ class SecurityConfig {
         internalFilter: InternalTokenFilter,
         disclaimerGateFilter: DisclaimerGateFilter,
         disclaimerHeaderFilter: DisclaimerHeaderFilter,
+        authEntryPoint: RestAuthenticationEntryPoint,
+        accessDeniedHandler: RestAccessDeniedHandler,
     ): SecurityFilterChain {
         http
             .csrf { it.disable() }
@@ -55,6 +57,11 @@ class SecurityConfig {
                     .requestMatchers("/api/internal/**").hasRole("INTERNAL")
                     // 그 외 모두 인증 필요
                     .anyRequest().authenticated()
+            }
+            // 미인증은 401, 권한부족은 403. 안 달면 Spring Security 가 둘 다 403 으로 뭉갠다.
+            // 프론트엔드는 401 에만 게스트 토큰을 재발급하므로 이게 없으면 만료 시 영구 고장.
+            .exceptionHandling {
+                it.authenticationEntryPoint(authEntryPoint).accessDeniedHandler(accessDeniedHandler)
             }
             .addFilterBefore(internalFilter, UsernamePasswordAuthenticationFilter::class.java)
             .addFilterAfter(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
