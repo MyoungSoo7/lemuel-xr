@@ -18,9 +18,10 @@ class ExitSessionUseCase(
 ) {
 
     @Transactional
-    fun execute(sessionId: UUID, reason: String?, atScene: Int?): Result {
+    fun execute(userId: UUID, sessionId: UUID, reason: String?, atScene: Int?): Result {
         val session = sessions.findById(sessionId)
             .orElseThrow { AppException(ErrorCode.E_SESSION_NOT_FOUND) }
+        requireOwner(session, userId)
         if (session.isTerminated()) {
             throw AppException(ErrorCode.E_SESSION_INVALID)
         }

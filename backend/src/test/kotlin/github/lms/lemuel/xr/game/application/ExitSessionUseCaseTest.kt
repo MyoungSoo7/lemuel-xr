@@ -16,25 +16,26 @@ import java.util.UUID
 class ExitSessionUseCaseTest {
 
     private val sessions: GameSessionPort = mock()
+    private val owner: UUID = UUID.randomUUID()
     private val uc = ExitSessionUseCase(sessions)
 
     private fun live(id: UUID): GameSession =
         GameSession.reconstitute(
-            id, null, null, null, null,
+            id, owner, null, null, null,
             LocalDateTime.now(), null, null, null, null, null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun completed(id: UUID): GameSession =
         GameSession.reconstitute(
-            id, null, null, null, null,
+            id, owner, null, null, null,
             LocalDateTime.now(), LocalDateTime.now(), null, null, null, null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun abandoned(id: UUID): GameSession =
         GameSession.reconstitute(
-            id, null, null, null, null,
+            id, owner, null, null, null,
             LocalDateTime.now(), null, LocalDateTime.now(), null, null, null, null,
             0.toShort(), null, null, null, null,
         )
@@ -45,7 +46,7 @@ class ExitSessionUseCaseTest {
         val e = live(sid)
         whenever(sessions.findById(sid)).thenReturn(Optional.of(e))
 
-        val r = uc.execute(sid, "panic", 3)
+        val r = uc.execute(owner, sid, "panic", 3)
 
         assertThat(r.exitedAt).isNotNull()
         assertThat(e.abandonedAt).isNotNull()
@@ -59,7 +60,7 @@ class ExitSessionUseCaseTest {
         val e = live(sid)
         whenever(sessions.findById(sid)).thenReturn(Optional.of(e))
 
-        uc.execute(sid, null, null)
+        uc.execute(owner, sid, null, null)
 
         assertThat(e.finalOutcome).isEqualTo("safe_exit:user_choice")
     }
@@ -68,7 +69,7 @@ class ExitSessionUseCaseTest {
     fun `execute 세션없음 E_SESSION_NOT_FOUND`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.empty())
-        assertThatThrownBy { uc.execute(sid, "x", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "x", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
     }
@@ -77,7 +78,7 @@ class ExitSessionUseCaseTest {
     fun `execute 이미완료 E_SESSION_INVALID`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.of(completed(sid)))
-        assertThatThrownBy { uc.execute(sid, "x", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "x", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_INVALID)
     }
@@ -86,8 +87,40 @@ class ExitSessionUseCaseTest {
     fun `execute 이미abandoned E_SESSION_INVALID`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.of(abandoned(sid)))
-        assertThatThrownBy { uc.execute(sid, "x", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "x", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_INVALID)
+    }
+
+    // --- IDOR 회귀 ---
+
+    @Test
+    fun `남의 세션은 종료할 수 없다 - 존재를 숨기려 404`() {
+        val sid = UUID.randomUUID()
+        val e = live(sid)
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(e))
+
+        assertThatThrownBy { uc.execute(UUID.randomUUID(), sid, "panic", 3) }
+            .isInstanceOf(AppException::class.java)
+            .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
+
+        // 거부만으로는 부족하다 — 상태가 변하지 않았음을 확인한다.
+        assertThat(e.abandonedAt).isNull()
+        assertThat(e.finalOutcome).isNull()
+    }
+
+    @Test
+    fun `userId 없는 레거시 세션은 아무도 종료할 수 없다`() {
+        val sid = UUID.randomUUID()
+        val legacy = GameSession.reconstitute(
+            sid, null, null, null, null,
+            LocalDateTime.now(), null, null, null, null, null, null,
+            0.toShort(), null, null, null, null,
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(legacy))
+
+        assertThatThrownBy { uc.execute(owner, sid, "x", null) }
+            .isInstanceOf(AppException::class.java)
+            .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
     }
 }

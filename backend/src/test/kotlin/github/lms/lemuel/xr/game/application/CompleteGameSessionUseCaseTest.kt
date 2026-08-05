@@ -18,6 +18,7 @@ import java.util.UUID
 
 class CompleteGameSessionUseCaseTest {
 
+    private val owner: UUID = UUID.randomUUID()
     private val sessions: GameSessionPort = mock()
     private val scenarios: ScenarioYamlLoader = mock()
     // 이 스위트는 완료·valuePrompt 동작만 검증한다. 종료 메시지 위기 스캔은
@@ -32,21 +33,21 @@ class CompleteGameSessionUseCaseTest {
 
     private fun live(id: UUID, character: String?, started: LocalDateTime?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, null,
+            id, owner, null, character, null,
             started, null, null, null, null, null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun completed(id: UUID, character: String?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, null,
+            id, owner, null, character, null,
             LocalDateTime.now(), LocalDateTime.now(), null, null, null, null, null,
             0.toShort(), null, null, null, null,
         )
 
     private fun abandoned(id: UUID, character: String?): GameSession =
         GameSession.reconstitute(
-            id, null, null, character, null,
+            id, owner, null, character, null,
             LocalDateTime.now(), null, LocalDateTime.now(), null, null, null, null,
             0.toShort(), null, null, null, null,
         )
@@ -73,7 +74,7 @@ class CompleteGameSessionUseCaseTest {
         )
         whenever(scenarios.forCharacter(Character.JOSEPH)).thenReturn(scenario)
 
-        val r = uc.execute(sid, "farmer_first", "수고했어요")
+        val r = uc.execute(owner, sid, "farmer_first", "수고했어요")
 
         assertThat(r.completedAt).isNotNull()
         assertThat(r.durationSeconds).isGreaterThanOrEqualTo(119)
@@ -105,7 +106,7 @@ class CompleteGameSessionUseCaseTest {
             ),
         )
 
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
 
         assertThat(r.valuePrompt!!.message).isEqualTo(SafetyGateFixtures.FALLBACK_TEXT)
         // 게이트는 문장만 바꾼다 — 구조는 그대로다.
@@ -125,7 +126,7 @@ class CompleteGameSessionUseCaseTest {
         )
         whenever(scenarios.forCharacter(Character.MOSES)).thenReturn(Scenario("moses", "t", listOf(s1, s2)))
 
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
         assertThat(r.valuePrompt).isNotNull()
         assertThat(r.valuePrompt!!.message).isEqualTo("광야의 실천")
         assertThat(r.valuePrompt!!.suggestedValueIds).isEmpty()
@@ -139,7 +140,7 @@ class CompleteGameSessionUseCaseTest {
             Scenario("david", "t", listOf(outro(null, mapOf("other" to "x")))),
         )
 
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
         assertThat(r.valuePrompt).isNull()
     }
 
@@ -151,7 +152,7 @@ class CompleteGameSessionUseCaseTest {
             Scenario("david", "t", listOf(outro(null, null))),
         )
 
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
         assertThat(r.valuePrompt).isNull()
     }
 
@@ -161,7 +162,7 @@ class CompleteGameSessionUseCaseTest {
         val e = live(sid, "unknown_char", LocalDateTime.now())
         whenever(sessions.findById(sid)).thenReturn(Optional.of(e))
         // Character.from 이 예외 → catch → null
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
         assertThat(r.valuePrompt).isNull()
     }
 
@@ -173,7 +174,7 @@ class CompleteGameSessionUseCaseTest {
         whenever(scenarios.forCharacter(Character.DAVID)).thenReturn(
             Scenario("david", "t", listOf(outro(null, emptyMap()))),
         )
-        val r = uc.execute(sid, "out", null)
+        val r = uc.execute(owner, sid, "out", null)
         assertThat(r.durationSeconds).isNull()
     }
 
@@ -181,7 +182,7 @@ class CompleteGameSessionUseCaseTest {
     fun `execute 세션없음 E_SESSION_NOT_FOUND`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.empty())
-        assertThatThrownBy { uc.execute(sid, "out", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "out", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_NOT_FOUND)
     }
@@ -190,7 +191,7 @@ class CompleteGameSessionUseCaseTest {
     fun `execute 이미완료 E_SESSION_INVALID`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.of(completed(sid, "joseph")))
-        assertThatThrownBy { uc.execute(sid, "out", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "out", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_INVALID)
     }
@@ -199,7 +200,7 @@ class CompleteGameSessionUseCaseTest {
     fun `execute abandoned E_SESSION_INVALID`() {
         val sid = UUID.randomUUID()
         whenever(sessions.findById(sid)).thenReturn(Optional.of(abandoned(sid, "joseph")))
-        assertThatThrownBy { uc.execute(sid, "out", null) }
+        assertThatThrownBy { uc.execute(owner, sid, "out", null) }
             .isInstanceOf(AppException::class.java)
             .hasFieldOrPropertyWithValue("code", ErrorCode.E_SESSION_INVALID)
     }

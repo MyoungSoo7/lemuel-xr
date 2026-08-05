@@ -68,7 +68,7 @@ class GameController(
     ): ResponseEntity<DecideResponse> {
         val c = Character.from(character)
         val r = decideUc.execute(
-            sid, c,
+            RequestContext.currentUserId(), sid, c,
             DecideSceneUseCase.Input(
                 req.sceneId, req.decision, req.interactionMeta, req.mode,
             ),
@@ -88,7 +88,9 @@ class GameController(
         @RequestBody req: CompleteRequest,
     ): ResponseEntity<CompleteResponse> {
         val c = Character.from(character) // 검증
-        val r = completeUc.execute(sid, req.finalOutcome, req.closingMessage)
+        val r = completeUc.execute(
+            RequestContext.currentUserId(), sid, req.finalOutcome, req.closingMessage,
+        )
         metrics.sessionCompleted(c.dbValue)
         return ResponseEntity.ok(
             CompleteResponse(

@@ -1,5 +1,6 @@
 package github.lms.lemuel.xr.safety.adapter.`in`.web
 
+import github.lms.lemuel.xr.common.web.RequestContext
 import github.lms.lemuel.xr.game.application.ExitSessionUseCase
 import github.lms.lemuel.xr.safety.application.GetCrisisResourcesUseCase
 import github.lms.lemuel.xr.safety.application.port.out.SafetyMetricsPort
@@ -43,7 +44,9 @@ class SafetyController(
         @PathVariable("sid") sid: UUID,
         @RequestBody req: ExitRequest,
     ): ResponseEntity<ExitResponse> {
-        val r = exitUc.execute(sid, req.reason, req.atSceneId)
+        // /exit 은 `/api/safety/crisis-resources` 와 달리 permitAll 이 아니다(SecurityConfig).
+        // 즉 여기 도달한 요청은 이미 JWT 를 통과했고 userId 가 반드시 있다.
+        val r = exitUc.execute(RequestContext.currentUserId(), sid, req.reason, req.atSceneId)
         // emergency exit 사유별 메트릭 — Grafana 안전 row 에서 추세 추적.
         metrics.recordSessionExit(req.reason)
         return ResponseEntity.ok(
