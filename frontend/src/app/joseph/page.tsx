@@ -19,6 +19,7 @@ import {
   type Scene4Choice,
 } from "@/lib/content/joseph-monologues";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
+import { SceneBootState } from "@/components/SceneBootState";
 
 type Scene = JosephStartResponse;
 
@@ -73,9 +74,11 @@ export default function JosephPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 

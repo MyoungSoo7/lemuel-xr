@@ -22,6 +22,7 @@ import {
   scene7CrisisReminder,
   iamOf,
 } from "@/lib/content/jesus-monologues";
+import { SceneBootState } from "@/components/SceneBootState";
 
 /**
  * Jesus 미션 — 트랙 B 정점(capstone). Phase 2 완전 활성 (요셉·모세·다윗 동급).
@@ -95,9 +96,11 @@ export default function JesusPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 

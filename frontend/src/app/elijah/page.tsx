@@ -10,6 +10,7 @@ import {
   completeMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+import { SceneBootState } from "@/components/SceneBootState";
 
 /**
  * Elijah 미션 — 로뎀나무 아래, 먼저 먹고 자도 됩니다.
@@ -105,9 +106,11 @@ export default function ElijahPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 

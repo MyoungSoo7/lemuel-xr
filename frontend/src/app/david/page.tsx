@@ -20,6 +20,7 @@ import {
   type Scene2Choice,
   type Scene4LastStone,
 } from "@/lib/content/david-monologues";
+import { SceneBootState } from "@/components/SceneBootState";
 
 /**
  * David 미션 — Phase 2 완전 활성 (요셉·모세 동급).
@@ -92,9 +93,11 @@ export default function DavidPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 

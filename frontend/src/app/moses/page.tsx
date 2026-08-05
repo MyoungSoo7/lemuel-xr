@@ -22,6 +22,7 @@ import {
   type Scene3Pattern,
   type Scene4Choice,
 } from "@/lib/content/moses-monologues";
+import { SceneBootState } from "@/components/SceneBootState";
 
 /**
  * Moses 미션 — Phase 2 완전 활성 (요셉과 동급).
@@ -85,9 +86,11 @@ export default function MosesPage() {
 
   if (!scene) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <p className="text-[var(--color-warm)]/60">세션 시작 중...</p>
-      </main>
+      <SceneBootState
+        isError={start.isError}
+        error={start.error}
+        onRetry={() => start.mutate()}
+      />
     );
   }
 
