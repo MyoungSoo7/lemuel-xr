@@ -37,6 +37,8 @@ class CreateJournalEntryUseCase(
         return diaryEntries.save(entry)
     }
 
+    // limit 은 클라이언트가 주므로 그대로 PageRequest 에 넣으면 안 된다.
+    // 0·음수는 PageRequest.of 가 예외를 던져 500 이 되고, 큰 값은 무제한 조회가 된다.
     fun list(userId: UUID, limit: Int): List<DiaryEntry> =
-        diaryEntries.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, limit))
+        diaryEntries.findByUserIdOrderByCreatedAtDesc(userId, PageRequest.of(0, limit.coerceIn(1, 100)))
 }

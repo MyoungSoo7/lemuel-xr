@@ -13,13 +13,30 @@ export const runtime = "nodejs";
 const BACKEND = () =>
   process.env.BACKEND_INTERNAL_URL ?? "http://lemuel-xr-backend:8080";
 
-async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
+/**
+ * 브라우저가 절대 부를 일 없는, 서비스 간 전용 경로.
+ * backend 는 /api/internal/** 를 ROLE_INTERNAL 로 막지만 *rate limit 은 면제* 한다
+ * (RateLimitFilter.limitFor → 0). 이 프록시가 다 넘겨주면 인터넷에서 무제한으로
+ * 토큰을 때려볼 수 있게 되므로, 여기서 먼저 끊는다. 404 로 존재 자체를 숨긴다.
+ */
+const BLOCKED_PREFIXES = ["internal", "actuator"];
+
+async function proxy(
+  req: NextRequest,
+  ctx: { params: Promise<{ path: string[] }> },
+) {
   const { path } = await ctx.params;
+  if (BLOCKED_PREFIXES.includes((path[0] ?? "").toLowerCase())) {
+    return new Response(null, { status: 404 });
+  }
   const target = `${BACKEND()}/api/${path.join("/")}${req.nextUrl.search}`;
+  const headers = Object.fromEntries(req.headers);
+  // 클라이언트가 내부 인증 헤더를 흉내내지 못하게 한다 (헤더 이름은 소문자로 정규화돼 옴).
+  delete headers["x-internal-token"];
   const init: RequestInit = {
     method: req.method,
     headers: {
-      ...Object.fromEntries(req.headers),
+      ...headers,
       // host 헤더 그대로 보내면 backend 가 헷갈림
       host: new URL(BACKEND()).host,
     },
@@ -34,7 +51,8 @@ async function proxy(req: NextRequest, ctx: { params: Promise<{ path: string[] }
     status: upstream.status,
     statusText: upstream.statusText,
     headers: {
-      "content-type": upstream.headers.get("content-type") ?? "application/json",
+      "content-type":
+        upstream.headers.get("content-type") ?? "application/json",
     },
   });
 }
