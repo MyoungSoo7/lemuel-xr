@@ -19,7 +19,8 @@ class CrisisKeywordScannerTest {
     fun `자살 키워드 매칭`() {
         val r = scanner.scan("자살하고 싶어요")
         assertThat(r.matched).isTrue()
-        assertThat(r.severity).isEqualTo("high")
+        // 이 fixture 는 이름 없는 regex 라 crisis_unclassified → critical(가장 보수적).
+        assertThat(r.severity).isEqualTo("critical")
     }
 
     @Test

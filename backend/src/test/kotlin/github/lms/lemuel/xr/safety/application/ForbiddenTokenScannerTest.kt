@@ -134,4 +134,64 @@ class ForbiddenTokenScannerTest {
         // 이 줄은 결함 기록이다 — 잡히지 않게 되면 여기서 빼고 위 mustPass 로 옮길 것.
         assertThat(scanner.scan("빨리 회복해야 한다고 느끼지 않아도 됩니다.").matched).isTrue()
     }
+
+    // ---------------------------------------------------------------------
+    // 선행 문맥 면제 — `덕분에` 는 *누구에게 공을 돌리는가* 로 갈린다.
+    // 사람에게 돌리면 사별한 사용자의 간병을 채점하는 말이 되고(SR-2),
+    // 신에게 돌리면 은혜 시리즈의 축 그 자체다(2026-08-05 사용자 결정).
+    // ---------------------------------------------------------------------
+
+    private val creditScanner = ForbiddenTokenScanner(listOf("덕분에", "빨리 회복"))
+
+    @Test
+    fun `신에게 공을 돌리는 덕분에는 위반이 아니다`() {
+        val mustPass = listOf(
+            "하나님 덕분에 오늘을 견뎠습니다.",
+            "하나님의 은혜 덕분에 여기까지 왔습니다.",
+            "여호와 덕분에 나오미가 돌아올 수 있었습니다.",
+            "주님 덕분에 버틴 하루였습니다.",
+            "하나님  덕분에 견뎠습니다.", // 공백 정규화 뒤에도 면제가 살아 있는가
+        )
+
+        assertThat(mustPass.filter { creditScanner.scan(it).matched })
+            .describedAs("은혜의 주체는 신이다 — 신에게 돌리는 덕분에까지 막으면 축을 막는 것이다")
+            .isEmpty()
+    }
+
+    @Test
+    fun `사람에게 공을 돌리는 덕분에는 계속 막는다`() {
+        val mustBlock = listOf(
+            "당신 덕분에 그 사람이 편히 갈 수 있었던 거예요.", // 간병 채점 — 뒤집으면 책임 전가
+            "네 덕분에 어머니가 편안하셨어.",
+            "덕분에 편히 가셨어요.", // 주어 생략 — 한국어에서 생략된 주어는 청자다
+        )
+
+        assertThat(mustBlock.filter { !creditScanner.scan(it).matched })
+            .describedAs("사람에게 공을 돌리는 덕분에가 새어 나갔다")
+            .isEmpty()
+    }
+
+    @Test
+    fun `선행 문맥 면제는 그 토큰에만 적용된다 — 문장 전체의 통행증이 아니다`() {
+        // 면제를 목록 전 종에 걸면 신 호칭 하나로 문장 전체가 열린다.
+        val r = creditScanner.scan("하나님 덕분에 빨리 회복하실 겁니다.")
+
+        assertThat(r.matched).isTrue()
+        assertThat(r.matchedToken).isEqualTo("빨리 회복")
+    }
+
+    @Test
+    fun `면제 규칙이 없는 토큰은 앞 문맥과 무관하게 잡힌다`() {
+        // PRECEDING_EXEMPTIONS 에 없는 토큰까지 조용히 면제되면 규칙이 새는 것이다.
+        assertThat(creditScanner.scan("하나님 빨리 회복시켜 주실 거예요.").matched).isTrue()
+    }
+
+    @Test
+    fun `알려진 한계 — 덕분에 이외의 활용형은 토큰에 없어 잡히지 않는다`() {
+        // "당신 덕분이에요" · "당신 덕분입니다" 는 같은 축인데 토큰이 `덕분에` 라 안 걸린다.
+        // 토큰을 `덕분` 으로 넓히면 잡히고 이 면제도 그대로 얹히지만, 그러면 선언 목록
+        // 3곳(application.yml · scripts/gates/ruth.yml · content/ruth/scene5.yml)과
+        // g0c 예문 1:1 불변식이 함께 움직인다. 별건으로 둔다 — 이 줄은 결함 기록이다.
+        assertThat(creditScanner.scan("당신 덕분이에요.").matched).isFalse()
+    }
 }

@@ -48,6 +48,7 @@ class EmotionController(
                         true, r.crisisSeverity, r.crisisResources,
                         "지금 이 순간 당신과 함께 있는 사람이 있습니다. 109 (자살예방 상담전화) 또는 위 자원으로 연결됩니다.",
                     ),
+                    null,
                 ),
             )
         }
@@ -57,7 +58,30 @@ class EmotionController(
                 EmotionDto(r.primary!!.name, r.confidence),
                 RecommendationsDto(r.trackA, r.trackB),
                 null,
+                crisisSupport(r),
             ),
+        )
+    }
+
+    /**
+     * lockout 이 아닌 위기 신호(high/medium)를 분류·추천과 *함께* 실어 보낸다.
+     *
+     * `crisisLockout` 을 재사용하지 않은 이유: 그 필드는 "클라이언트가 화면을 강제한다" 는
+     * 계약이다. required=false 를 얹으면 기존 클라이언트가 위기 화면을 띄울지 말지를
+     * 필드 존재 여부가 아니라 내부 불리언으로 판단하게 되고, 한 번 놓치면 그대로 오작동한다.
+     * 새 필드는 모르는 클라이언트가 무시해도 기존 동작이 그대로다.
+     */
+    private fun crisisSupport(r: ClassifyAndRecommendUseCase.Result): CrisisSupportDto? {
+        val placement = r.crisisResourcePlacement ?: return null
+        return CrisisSupportDto(
+            severity = r.crisisSeverity!!,
+            placement = placement,
+            resources = r.crisisResources,
+            gentleMessage = if (placement == ClassifyAndRecommendUseCase.Result.BANNER) {
+                "지금 많이 버거우실 수 있습니다. 아래 연결처는 언제든 열려 있습니다."
+            } else {
+                "혹시 필요하시면, 아래 연결처가 언제든 열려 있습니다."
+            },
         )
     }
 
@@ -74,6 +98,11 @@ class EmotionController(
         val recommendations: RecommendationsDto?,
         /** R1 safety lockout — null 이면 정상 응답. non-null 이면 클라이언트는 위기 화면 강제. */
         val crisisLockout: CrisisLockoutDto?,
+        /**
+         * lockout 은 아니지만 위기 신호가 잡힌 경우(high/medium)의 동반 노출. null 이면 신호 없음.
+         * 분류·추천은 정상적으로 함께 온다 — 이 필드는 흐름을 끊지 않고 자원을 *덧붙인다*.
+         */
+        val crisisSupport: CrisisSupportDto?,
     )
 
     data class EmotionDto(val emotion: String, val confidence: Double)
@@ -86,6 +115,14 @@ class EmotionController(
     data class CrisisLockoutDto(
         val required: Boolean,
         val severity: String?,
+        val resources: List<Map<String, Any?>>,
+        val gentleMessage: String,
+    )
+
+    data class CrisisSupportDto(
+        val severity: String,
+        /** `banner` = 상단 배너(high) · `card` = 하단 조용한 카드(medium). */
+        val placement: String,
         val resources: List<Map<String, Any?>>,
         val gentleMessage: String,
     )

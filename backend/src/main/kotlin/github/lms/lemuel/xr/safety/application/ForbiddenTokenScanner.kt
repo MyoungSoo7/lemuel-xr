@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component
  *   등장 위치 기준이어야 로그·감사에서 "어디서 걸렸는지"가 사람 직관과 맞는다.
  * - **양보 부정(`-지 않아도` / `-지 못해도`)이 토큰 바로 뒤에 붙으면 위반이 아니다.**
  *   [CONCESSIVE_NEGATION] 참고.
+ * - **토큰 바로 *앞* 의 문맥이 그 토큰의 정당한 용법을 가리키면 위반이 아니다.**
+ *   [PRECEDING_EXEMPTIONS] 참고 — 뒤가 아니라 앞을 보는 면제라서 별도로 둔다.
  */
 @Component
 class ForbiddenTokenScanner(
@@ -53,7 +55,7 @@ class ForbiddenTokenScanner(
     }
 
     /**
-     * `token` 의 출현 중 양보 부정으로 면제되지 *않는* 가장 이른 위치. 없으면 -1.
+     * `token` 의 출현 중 어떤 면제에도 걸리지 *않는* 가장 이른 위치. 없으면 -1.
      *
      * 같은 토큰이 한 문장에 두 번 나오면 앞의 것만 면제되고 뒤의 것은 위반일 수 있다
      * ("빨리 회복하지 않아도 됩니다. 그래도 빨리 회복하세요." ← 뒤가 압박) — 그래서
@@ -64,10 +66,18 @@ class ForbiddenTokenScanner(
         while (from <= haystack.length - token.length) {
             val at = haystack.indexOf(token, from)
             if (at < 0) return -1
-            if (!isConcessiveNegation(haystack, at + token.length)) return at
+            val exempt = isConcessiveNegation(haystack, at + token.length) ||
+                isPrecedingExempt(token, haystack, at)
+            if (!exempt) return at
             from = at + 1
         }
         return -1
+    }
+
+    /** 이 출현 바로 *앞* 이 [PRECEDING_EXEMPTIONS] 의 정당 문맥인가. 규칙 없는 토큰은 항상 false. */
+    private fun isPrecedingExempt(token: String, haystack: String, at: Int): Boolean {
+        val rule = PRECEDING_EXEMPTIONS[token] ?: return false
+        return rule.containsMatchIn(haystack.substring(maxOf(0, at - LOOKBEHIND), at))
     }
 
     /** `from` 위치에서 곧바로 양보 부정 어미가 시작하는가. */
@@ -110,5 +120,33 @@ class ForbiddenTokenScanner(
          */
         val CONCESSIVE_NEGATION = Regex("^[가-힣]{0,3}지\\s?(?:않|못)[가-힣]{0,3}도")
         const val LOOKAHEAD = 12
+
+        /**
+         * **토큰별 선행 문맥 면제** — 토큰 바로 *앞* 이 정규식과 맞으면 그 출현은 위반이 아니다.
+         *
+         * [CONCESSIVE_NEGATION] 과 달리 (a) 뒤가 아니라 앞을 보고, (b) 목록 전 종이 아니라
+         * **명시된 토큰에만** 적용된다. 전 종에 걸면 "하나님 덕분에 빨리 회복하세요" 같은 문장이
+         * `빨리 회복` 까지 면제받는다 — 면제는 토큰 하나의 의미론이지 문장의 통행증이 아니다.
+         *
+         * `덕분에` (SR-2 마감 줄 평가 어휘): 금지 대상은 **사람에게 공을 돌리는 용법**이다.
+         * "당신 덕분에 그 사람이 편히 갈 수 있었던 거예요" 는 사별한 사용자의 간병을 채점하고,
+         * 뒤집으면 "덜 했으면 편히 못 갔다"가 된다. 그래서 사람 주어는 계속 막는다.
+         * 주어가 생략된 형태("덕분에 편히 가셨어요")도 막는다 — 한국어에서 생략된 주어는
+         * 청자, 즉 사용자다.
+         *
+         * 반면 **은혜의 주체는 신이다**(2026-08-05 사용자 결정: "덕분에는 신 덕분에고
+         * 인간 덕분에는 굳이 필요 없다"). 이 시리즈의 주연이 삼위일체 신인 이상 신에게 공을
+         * 돌리는 `덕분에` 는 축 그 자체이고, 금지 토큰 런타임은 **전역·무범위**라 이 면제가
+         * 없으면 전 미션에서 그 문장을 못 쓴다.
+         *
+         * `그분` 은 넣지 않는다 — 사별 미션에서 "그분 덕분에" 는 고인을 가리킬 확률이 높다.
+         * 신을 가리킨다는 것이 문자열만으로 확실한 호칭만 면제한다.
+         */
+        val PRECEDING_EXEMPTIONS: Map<String, Regex> = mapOf(
+            "덕분에" to Regex("(?:하나님|하느님|여호와|주님|성령|예수님|그리스도)(?:의)?\\s?(?:은혜\\s?)?$"),
+        )
+
+        /** 선행 문맥을 몇 자까지 거슬러 보는가. "하나님의 은혜 덕분에"(8자) 가 들어가는 최소치. */
+        const val LOOKBEHIND = 14
     }
 }
