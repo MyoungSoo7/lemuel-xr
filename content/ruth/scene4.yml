@@ -1,0 +1,136 @@
+# content/ruth/scene4.yml — Theme 19 룻 · Scene 4 「타작 마당의 밤」
+#
+# 등급 C — 성경 본문 자막만 띄운다. 각색·부연 없음. `branches: []` 는 의도이며 해제되지 않는다.
+# 본문은 어떤 성적인 일도 서술하지 않는다. 이 Scene 은 그런 일을 재연하지 않는다.
+# 헌장 §2.1-b 다섯 항이 전부 적용되며 동의 카드로 해제되지 않는다.
+# 동의 카드 3(ruth_scene4_night_warning) 전문은 seed §4-4-a LOCKED 정본이다.
+
+character: ruth
+theme_id: 19
+scene_id: 4
+scene_name_ko: "타작 마당의 밤"
+duration_seconds_target: 60
+
+exposure_grade: C
+trigger_categories:
+  - sexual_vulnerability_context
+staging_constraints:
+  - "1항 시점 — 카메라를 곡식 단 더미 쪽 인물의 신체 위치나 얼굴 방향에 두지 않는다. 관찰 지점은 마당 바깥의 정적인 한 자리다."
+  - "2항 눕힘 금지 — 사용자 시점을 눕히거나 올려다보는 각도로 두지 않는다. 이 Scene 에서 특히 엄격하다."
+  - "3항 근접 공간 오디오 금지 — 2m 이내 정위 음원 금지. 숨소리·옷깃 등 신체 근접을 암시하는 음향을 두지 않는다."
+  - "4항 신체 프레이밍 금지 — 두 인물은 전신·원경으로만 등장하고 프레임 중심에 신체를 두지 않는다."
+  - "5항 어둠은 조명 지시로만 — 밤은 조명 파라미터로만 표현한다. 시야 차단·촉각 피드백·생체 연동으로 '무슨 일이 일어나는 중'이라는 감각을 만들지 않는다."
+
+# ── R4 동의 카드 3 (이 Scene 직전 재확인) ───────────────────────────────────
+consent_card_id: ruth_scene4_night_warning
+consent_card_intensity: low_mid
+consent_covers_scenes: [4]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: 5
+consent_cards:
+  - consent_card_id: ruth_scene4_night_warning
+    consent_card_intensity: low_mid
+    consent_covers_scenes: [4]
+    consent_declined_route: 5
+    voice_intensity_options: [subtitle_only, low, default]
+    default_focus: none # 어느 쪽에도 기본 포커스를 주지 않는다(다니엘 scene4.yml:28 선례)
+    consent_card_ko: |
+      다음 장면은 밤의 타작 마당입니다.
+      본문은 어떤 성적인 일도 서술하지 않으며, 이 장면은 그런 일을 재연하지 않습니다.
+      지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+      한 여인이 자기보다 힘 있는 사람 곁에서 밤을 보내고, 아침 전에 떠납니다.
+      · 약 1분입니다. 건너뛰셔도 이야기는 이어집니다.
+      계속하시겠어요?
+      [계속한다]  [건너뛰기 — 성문 장면으로 이동]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R3_power_asymmetry_merit_lint
+    enforced_at: always
+    axis: "R3 — 권력 비대칭 상황의 요청을 사용자의 용기·헌신으로 되읽는 문장 차단(헌장 §5-c)"
+    lint_forbidden_tokens:
+      - "용기를 냈기 때문에"
+      - "믿음이 좋아서"
+      - "그만큼 헌신했으니"
+
+environment:
+  location_ko: "타작 마당. 곡식 단이 쌓여 있다."
+  time_of_day: 밤
+  lighting: "달빛 한 겹. 조명 파라미터로만 어둡게 한다."
+  ambient_audio: ["아주 낮은 바람", "먼 곳의 정적"]
+  spatial_audio_min_distance_m: 2
+  assets_shared: [grain_bundle_stack]
+  assets_dedicated: [threshing_floor_night_dedicated]
+  camera_rig: fixed_static_outside_floor
+  ui_overlays:
+    - id: ruth_s4_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: ruth_s4_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: ruth
+    display_ko: "룻"
+    framing: full_body_far
+  - id: boaz
+    display_ko: "보아스"
+    framing: full_body_far
+
+captions:
+  - id: ruth_s4_3_9
+    verse_ref: "룻 3:9 중"
+    speaker: scripture_caption
+    attribution_display_ko: "룻"
+    text_ko: "나는 당신의 여종 룻이오니 당신의 옷자락을 펴 당신의 여종을 덮으소서 이는 당신이 기업을 무를 자가 됨이니이다"
+  - id: ruth_s4_3_11
+    verse_ref: "룻 3:11 중"
+    speaker: scripture_caption
+    attribution_display_ko: "보아스"
+    text_ko: "내 딸아 두려워하지 말라 내가 네 말대로 네게 다 행하리라 네가 현숙한 여자인 줄을 나의 성읍 백성이 다 아느니라"
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: true
+
+interactions: []
+interaction_note: "서사 인터랙션 0개 (의도)."
+
+branches: []
+branches_note: "성적 취약 정황이 있는 자리에 사용자 선택지를 두지 않는다(SERIES-GRACE §2.0 · §2.2 셋째 항). 베드로 Scene 3(눅 22:62) 선례."
+
+next_scene_id: 5
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["옷자락", "무를 자"]
+  emotional: ["두려움 속의 요청"]
+  rational: ["요청과 강요의 구별"]
