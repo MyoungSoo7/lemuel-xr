@@ -27,7 +27,9 @@ doc_min_lines:
 # ── G7 · G3d — R4 트리거 Scene / 위기 리마인더. 룻 선례대로 5개 Scene 전건.
 #    헌장 §2.1-a 양방향 불변식: `trigger_categories` 를 가진 Scene 집합과 정확히 같아야 한다.
 #    ⚠️ 그 불변식을 재는 게이트는 없다 — `trigger_categories` 는 newchar_gates.py 에 0회다.
-#    검사는 `scripts/check_rahab_staging.py`(미착수) 몫이고, 그때까지 **미검사**다.
+#    검사는 `scripts/check_rahab_staging.py` 몫이고 그 파일은 **rev.10 에서 착수·실행됐다**
+#    (b-doc·b-vocab·b-spell 초록). 다만 **문서 층위 대조일 뿐이다** — Scene yml 실값을 재는
+#    b-yml 은 `content/rahab/` 부재로 BLOCKED 이므로, 런타임 값은 여전히 **미검사**다.
 trigger_scenes: [1, 2, 3, 4, 5]
 crisis_reminder_scenes: [1, 2, 3, 4, 5]
 
@@ -309,14 +311,18 @@ release_blockers:
   - id: rahab_designer_start_blockers
     note: >-
       designer 착수 차단 조건(seed §9). `docs/MVP-RAHAB.md` ·
-      `docs/RAHAB-LOCKED-STRINGS.md` · `scripts/check_rahab_staging.py` 셋이 미착수다.
+      `docs/RAHAB-LOCKED-STRINGS.md` 둘이 미착수다.
+      (`scripts/check_rahab_staging.py` 는 rev.10 에서 착수·실행됐다 — 이 줄이 rev.10
+      직후까지 셋으로 세고 있었다. 차단 사유를 실제보다 하나 많게 셌다는 뜻이고,
+      **차단 목록이 사실이 아니면 해제 판단도 사실이 아니다.**)
       이 파일이 존재한다는 사실을 "라합이 검사되고 있다"로 읽지 마라 —
       Scene 산출물 대상 게이트는 전부 BLOCKED 다.
     resolved: false
   - id: rahab_r1_latch_contract_outside_gate
     note: >-
-      R1 래치 값 계약 7키가 newchar_gates.py 에 각 0회다(seed §10 C7). g2 는
-      safety_gates[].id 존재만 본다 — 래치가 통째로 빠지거나 post_crisis_latch_scope 가
+      R1 래치 값 계약은 8키이고(seed §5 R1 표) 그중 7키가 newchar_gates.py 에
+      yaml 키로 0회다(seed §10 C7). 나머지 하나인 id 만 :850 이 값을 대조하고,
+      g2 는 그 id 존재만 본다 — 래치가 통째로 빠지거나 post_crisis_latch_scope 가
       mission 대신 session 으로 실려도 G2 는 초록이다. 이 미션은 수 2:15(높이·매달림)
       때문에 R1 위험이 가장 높은데, 그 축의 계약이 기계 검사 밖에 있다.
     resolved: false

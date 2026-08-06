@@ -305,6 +305,41 @@ def check(seed_path: str, content_dir: str) -> list[Result]:
              f"(SEED-RAHAB.md:{t_scene.line})"],
         ))
 
+    # ── (e-cross) §2 서사 아크 표의 「등급」 열 ↔ §5-3-a 의 exposure_grade ──
+    #
+    # 이 검사는 rev.10 채점이 낸 결함에서 나왔다. §5-3-a 는 5 Scene 전부 `C` 로
+    # 확정했는데 §2 표의 등급 열은 C·C·B·B·B 로 남아 있었다 — rev.2 의 값이다.
+    # 위의 (e) 는 §5-3-a **한 표만** 읽으므로 그 상태에서도 초록을 냈다.
+    # **한 표만 읽는 검사는 두 표가 갈라진 것을 원리적으로 못 본다.**
+    # 등급은 이 문서에서 두 곳이 말하므로, 두 곳을 다 읽어 대조한다.
+    try:
+        s2, e2 = section_bounds(lines, "2. 서사 아크")
+        t_arc = pick_table(parse_tables(lines, s2, e2), "#", "제목", "등급")
+    except LookupError as ex:
+        res.append(blocked("e-cross", f"§2 서사 아크 표를 찾지 못했다 — {ex}"))
+    else:
+        arc: dict[int, str] = {}
+        for r in t_arc.rows:
+            num = strip_markup(r["#"]).strip()
+            if num.isdigit():
+                arc[int(num)] = strip_markup(r["등급"]).strip()
+        clash = [f"Scene {n}: §2 표 {arc[n]!r} ≠ §5-3-a {grade[n]!r}"
+                 for n in sorted(set(arc) & set(grade)) if arc[n] != grade[n]]
+        only = sorted(set(grade) - set(arc)) + sorted(set(arc) - set(grade))
+        if clash:
+            res.append(bad(
+                "e-cross", f"등급을 말하는 두 표가 {len(clash)}개 Scene 에서 갈린다", clash + [
+                    f"§2 표 SEED-RAHAB.md:{t_arc.line} · §5-3-a 표 SEED-RAHAB.md:{t_scene.line}",
+                    "어느 쪽이 정본인지는 이 검사기가 정하지 않는다. 두 표를 같게 만들어라",
+                ]))
+        elif only:
+            res.append(bad("e-cross", f"한쪽 표에만 있는 Scene {only}",
+                           [f"§2:{t_arc.line} · §5-3-a:{t_scene.line}"]))
+        else:
+            res.append(ok("e-cross",
+                          f"§2 표와 §5-3-a 표의 등급이 {len(arc)}개 Scene 전건 일치 — {sorted(set(arc.values()))}",
+                          [f"§2:{t_arc.line} · §5-3-a:{t_scene.line}"]))
+
     # ── (b) 양방향 — trigger_scenes ↔ trigger_categories ─────────────────
     s53, e53 = section_bounds(lines, "5-3. 양방향 불변식")
     body = "\n".join(lines[s53:e53])
