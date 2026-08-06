@@ -1,0 +1,209 @@
+# content/ruth/scene5.yml — Theme 19 룻 · Scene 5 「성문에서」
+#
+# 이 파일은 두 블록을 담는다.
+#   ① Scene 5 본체 (성문 장면)
+#   ② `closing_screen:` — 종결 화면. **별도 파일을 만들지 않는다.**
+#      근거: scripts/newchar_gates.py:398-401 의 scene_files() 는 glob("scene*.yml") 이라
+#      content/ruth/closing.yml 을 아예 보지 않는다. content/*/ 에 비-Scene yml 은 0건이고
+#      content/esther/scene1.yml:130 이 "6번째 파일 금지(COMMON v3 §8-2)"를 못박고 있다.
+#      그래서 종결 화면을 Scene 파일 안의 최상위 블록으로 싣는다.
+#   실집행 키는 jacob 선례를 따른다 — content/jacob/scene5.yml:169 entry_mode: closing_only /
+#   :172 environment_disabled: true / :173 npc_disabled: true / :175 closing_route_ref.
+#   ⚠️ jacob 이 함께 쓰는 `enforcement: structural` 은 채택하지 않는다. 룻은 토큰으로 집행한다.
+#
+# 오벳의 출생은 사실로 존재하되 렌더하지 않는다 — 자막 0 · 에셋 0 · 나레이션 0.
+
+character: ruth
+theme_id: 19
+scene_id: 5
+scene_name_ko: "성문에서"
+duration_seconds_target: 90
+
+exposure_grade: B
+trigger_categories:
+  - pregnancy_childbirth
+staging_constraints:
+  - "1항 시점 — 카메라를 특정 인물의 신체 위치나 얼굴 방향에 두지 않는다. 관찰 지점은 성문 광장 바깥이다."
+  - "2항 눕힘 금지 — 사용자 시점을 눕히거나 올려다보는 각도로 두지 않는다."
+  - "3항 근접 공간 오디오 금지 — 장로들의 낭독과 백성의 웅성임은 원거리 정위만. 2m 이내 정위 금지."
+  - "4항 신체 프레이밍 금지 — 인물은 전신·원경으로만 등장한다."
+  - "5항 어둠은 조명 지시로만 — 이 Scene 은 낮이며, 시야 차단·촉각 피드백·생체 연동을 쓰지 않는다."
+
+# ── R4 — 카드 2(ruth_midpoint_consent)가 이 Scene 을 이미 덮는다. 재확인 카드 없음.
+consent_card_id: ruth_midpoint_consent
+consent_card_defined_in: scene3.yml
+consent_covers_scenes: [3, 5]
+skip_alternative_scene_id: ruth_scene5_alt_short
+conditional_blocks:
+  - id: ruth_scene5_alt_short
+    condition: consent_declined_or_skipped
+    description: "4:11·4:12 자막 미재생. 마감 한 줄과 SR-1 종결 자막에는 반드시 도달한다."
+    omits_assets: [subtitle_ruth_4_11, subtitle_ruth_4_12]
+  - id: ruth_scene5_full
+    condition: consent_granted
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+    priority_order:
+      - "1. R1 위기 카드"
+      - "2. 종결 자막 도달 보장"
+      - "3. 서사 진행"
+    latch_note: "latch 이후에는 묵상 제안(opt-in)도 제시하지 않는다."
+
+  - id: R2_R3_reward_and_evaluation_lint
+    enforced_at: always
+    axis: "R2·R3 — 보상 프레이밍과 마감 줄 평가 어휘 차단(헌장 §3-a·§3-c · seed SR-2)"
+    lint_forbidden_tokens:
+      - "결국 보상받았"
+      - "참으니 복이"
+      - "일곱 아들보다 귀한"
+      - "곁을 지켰"
+      - "물러섰지만"
+      - "그래도 잘"
+      - "덕분에"
+
+environment:
+  location_ko: "베들레헴 성문. 장로 열 명이 앉아 있다."
+  time_of_day: 낮
+  lighting: "늦은 오후. 성문 기둥의 그늘이 길다."
+  ambient_audio: ["낮은 웅성임(원거리)", "발소리"]
+  assets_shared: [town_gate_generic, elder_figure_x10, crowd_silhouette_far]
+  assets_dedicated: []
+  camera_rig: fixed_wide_plaza_edge
+  ui_overlays:
+    - id: ruth_s5_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: ruth_s5_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: elders
+    display_ko: "성읍 장로 열 명"
+    framing: full_body_far
+  - id: naomi
+    display_ko: "나오미"
+    has_dialogue: false
+    framing: full_body_far
+    staging_note: "룻의 곁에 둔다. 낭독 중 반응 컷을 잡지 않는다(SR-4 2항). 아기 에셋을 배치하지 않는다(SR-4 4항)."
+  - id: ruth
+    display_ko: "룻"
+    framing: full_body_far
+
+captions:
+  - id: subtitle_ruth_4_11
+    verse_ref: "룻 4:11 중"
+    speaker: scripture_caption
+    attribution_display_ko: "성문의 백성과 장로들"
+    text_ko: "우리가 증인이 되나니"
+  - id: subtitle_ruth_4_12
+    verse_ref: "룻 4:12 중"
+    speaker: scripture_caption
+    attribution_display_ko: "성문의 백성과 장로들"
+    text_ko: "네 집이 다말이 유다에게 낳아준 베레스의 집과 같게 하시기를 원하노라"
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: true
+
+interactions: []
+interaction_note: "서사 인터랙션 0개 (의도). 마감 줄은 Scene 2 에서 이미 정해진 값을 읽을 뿐이다."
+
+# ── 마감 세 줄 — 집합 크기 정확히 3. faith_tone 을 적용하지 않는다(SR-9). ──────
+branches:
+  - id: ruth_s5_closing_line_select
+    decision_key: belonging_label
+    source_scene_id: 2
+    faith_tone_applied: false
+    routes:
+      - when: { belonging_label: stay_beside }
+        closing_line_ko: "곁에 남은 자리에도 그늘이 닿았다."
+        closing_route_ref: ruth_scene5_closing
+      - when: { belonging_label: step_back }
+        closing_line_ko: "한 걸음 물러선 자리에도 그늘이 닿았다."
+        closing_route_ref: ruth_scene5_closing
+      - when: { belonging_label: null }
+        closing_line_ko: "이 자리에도 그늘이 닿았다."
+        closing_route_ref: ruth_scene5_closing
+
+closing_line_note: "주어는 신 또는 장소다. 세 줄은 같은 술어·같은 목적어를 쓴다. 이 세 줄 다음에 SR-1 종결 자막이 온다 — 순서는 바뀌지 않는다."
+
+# ── ② 종결 화면 — 별도 파일 없이 이 블록이 담는다 ─────────────────────────────
+closing_screen:
+  id: ruth_scene5_closing
+  entry_mode: closing_only
+  presentation_mode: caption_only_no_enactment
+  environment_disabled: true # ← 주석이 아니라 키다. 이 진입에서 environment 를 렌더하지 않는다.
+  npc_disabled: true # ← 주석이 아니라 키다. 이 진입에서 npcs 를 렌더하지 않는다.
+  interactions_disabled: true
+  also_reached_by_full_path: true
+  reached_by:
+    - id: consent_declined_sentinel
+      from: ruth_midpoint_consent
+      sentinel_value: closing
+      note: "카드 2 를 거절한 사용자의 착지점. 카드 1·2 를 연속 거절한 코호트에게는 이것이 마지막 화면이다."
+    - id: voluntary_exit_any_scene
+      from: "Scene 1~5 상시 노출된 나가기 버튼"
+      note: "§4-5 — 어느 지점에서 나가도 같은 화면에 도달한다. 거절 경로와 동일한 산출물이다."
+    - id: full_path_completion
+      from: ruth_s5_closing_line_select
+      note: "마감 한 줄 다음."
+  closing_caption:
+    id: ruth_closing_sr1
+    verse_ref: "룻 2:12 중"
+    speaker: scripture_caption
+    text_ko: "그의 날개 아래에 보호를 받으러 온 네게"
+    canonical: true
+    note: "SR-1 — 이 미션의 유일한 종결 자막 정본. Scene 3 의 2:12 자막과 같지 않고 메아리 관계다."
+  ui_overlays:
+    - id: ruth_closing_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+  crisis_reminder:
+    id: crisis_reminder
+    always_visible: true
+    text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+  baby_asset_present: false
+  birth_scene_rendered: false
+
+meditation_offer:
+  mode: llm_optin
+  default: off
+  suppressed_after_r1_latch: true
+  faith_tone_applies_here_only: true
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["그늘", "계보에 들어감"]
+  emotional: ["안착", "증인 앞에 섬"]
+  rational: ["배제 규정과 계보의 긴장"]

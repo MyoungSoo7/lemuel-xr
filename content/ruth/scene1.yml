@@ -1,0 +1,170 @@
+# content/ruth/scene1.yml — Theme 19 룻 · Scene 1 「갈림길」
+#
+# 동의 카드 전문·면책 4줄·스킵 브리지 나레이션은 seed §4-4-a / §4-7 / §4-2 의
+# LOCKED 정본을 그대로 옮긴 것이다 — designer 가 재작성하지 않는다.
+# 자막은 seed §3-1 LOCKED 정본이며 전부 `중`(부분 인용) 표기다.
+
+character: ruth
+theme_id: 19
+scene_id: 1
+scene_name_ko: "갈림길"
+mission_minutes: "5~7 (전 5 Scene 합계)"
+duration_seconds_target: 80
+
+# ── 헌장 3키 (docs/SERIES-GRACE.md §2.1 · §2.1-a · §2.1-b) ────────────────────
+exposure_grade: B
+trigger_categories:
+  - bereavement_spouse
+  - bereavement_child
+staging_constraints:
+  - "1항 시점 — 카메라를 가해·강압 주체의 신체 위치나 얼굴 방향에 두지 않는다. 관찰 지점은 사건 바깥의 길가에 고정한다."
+  - "2항 눕힘 금지 — 사용자 시점을 눕히거나 올려다보는 각도로 두지 않는다."
+  - "3항 근접 공간 오디오 금지 — 2m 이내 정위 음원과 신체 근접을 암시하는 음향을 두지 않는다."
+  - "4항 신체 프레이밍 금지 — 세 인물은 전신·원경으로만 등장한다. 얼굴 클로즈업 없음."
+  - "5항 어둠은 조명 지시로만 — 시야 차단·촉각 피드백·생체 연동을 쓰지 않는다."
+
+# ── R4 동의 카드 1 (전 미션 진입 게이트) ─────────────────────────────────────
+consent_card_id: ruth_entry_consent
+consent_card_intensity: mid
+consent_covers_scenes: [1, 2]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: 3
+skip_bridge_narration_ko: "두 며느리 중 하나는 돌아가고, 하나는 남았다. 남은 사람의 이름은 룻이었다."
+consent_cards:
+  - consent_card_id: ruth_entry_consent
+    consent_card_intensity: mid
+    consent_covers_scenes: [1, 2]
+    consent_declined_route: 3
+    voice_intensity_options: [subtitle_only, low, default]
+    consent_card_ko: |
+      이 이야기에는 사별한 사람들이 나옵니다.
+      남편을 잃은 두 여인과, 남편과 두 아들을 모두 잃은 한 여인입니다.
+      굶주림과, 낯선 땅에서 이방인으로 불리는 일이 나옵니다.
+      마지막은 성문에서 사람들이 축복하는 장면입니다. 한 아이가 태어나지만 그 장면은 화면에 나오지 않습니다.
+      · 중간에 한 여인이 밤에 홀로 한 남자 곁으로 가는 장면이 있습니다. 본문은 어떤 성적인 일도 서술하지 않으며, 이 장면은 그런 일을 재연하지 않습니다. 그 장면 직전에 다시 여쭙습니다.
+      · 전체 5-7분입니다. 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      · 지금 보지 않으셔도 이야기는 온전히 끝맺어집니다.
+      계속하시겠어요?
+      [계속한다]  [사별 장면은 건너뛴다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+
+# ── 위기 리마인더 (리터럴 키 · 최상위) ────────────────────────────────────────
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+# ── SR-3 R1 latch 3키 (값까지 5 Scene 동일) ──────────────────────────────────
+post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+# ── R5 기본 경로 ─────────────────────────────────────────────────────────────
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener # ← 이 문자열 그대로. 게이트 기본값이다.
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false # 발화 원문 미저장
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    axis: "R2 고난 귀속 금지 · R3 회복 압박 금지"
+    lint_forbidden_tokens:
+      - "나도 죽어"
+      - "따라 죽"
+      - "같이 묻히"
+      - "믿음이 좋아서"
+
+  - id: F66_entry_state_gate
+    enforced_at: mission_entry
+    scope: "취약 상태 이력 사용자에 대한 톤 자동 완화"
+    trigger_conditions: # OR 조건 (하나라도 참이면 발동)
+      - source: safety_alerts
+        rule: "severity='high' 이력 존재 (user_id 기준, category 무관)"
+      - source: emotion_logs
+        rule: "최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)"
+    on_trigger:
+      closing_line_force: null_variant # 마감 줄을 `null` 문자열("이 자리에도 그늘이 닿았다.")로 강제
+      voice_intensity_preset: subtitle_only # 낭독 강도 사전 설정
+      scene4_skip_preoffered: true # Scene 4 스킵을 선제안(카드 기본 포커스는 여전히 none)
+      skip_button_visual_emphasis: true
+    note: "임상 판정 아님 — 취약 상태 이력 사용자에 대한 톤 자동 완화. 판정 로직은 백엔드 소관, 본 선언은 콘텐츠 게이트 계약."
+
+environment:
+  location_ko: "모압에서 유다로 가는 길. 경계석 하나가 서 있다."
+  time_of_day: 낮
+  lighting: "흐린 낮. 그림자 약함."
+  ambient_audio: ["바람", "마른 풀", "멀어지는 발소리"]
+  assets_shared: [road_path_generic, boundary_stone, figure_silhouette_x3]
+  assets_dedicated: []
+  camera_rig: fixed_wide_at_roadside
+  ui_overlays:
+    - id: ruth_s1_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: ruth_s1_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+      note: "§4-5 — 메뉴에 숨기지 않는다. 5개 Scene 상시 노출."
+
+npcs:
+  - id: naomi
+    display_ko: "나오미"
+    framing: full_body_far
+    staging_note: "룻의 곁. 군중 속 구경꾼으로 배치하지 않는다(SR-4 1항)."
+  - id: orpah
+    display_ko: "오르바"
+    framing: full_body_far
+    staging_note: "돌아서는 동작만. 배신 연출·비난 음악·어두운 색 보정을 쓰지 않는다."
+  - id: ruth
+    display_ko: "룻"
+    framing: full_body_far
+
+captions:
+  - id: ruth_s1_1_8
+    verse_ref: "룻 1:8 중"
+    speaker: scripture_caption
+    attribution_display_ko: "나오미"
+    text_ko: "너희는 각기 너희 어머니의 집으로 돌아가라 너희가 죽은 자들과 나를 선대한 것 같이 여호와께서 너희를 선대하시기를 원하며"
+  - id: ruth_s1_1_9
+    verse_ref: "룻 1:9 중"
+    speaker: scripture_caption
+    attribution_display_ko: "나오미"
+    text_ko: "여호와께서 너희에게 허락하사 각기 남편의 집에서 위로를 받게 하시기를 원하노라"
+  - id: ruth_s1_1_16
+    verse_ref: "룻 1:16 중"
+    speaker: scripture_caption
+    attribution_display_ko: "룻"
+    text_ko: "어머니께서 가시는 곳에 나도 가고 어머니께서 머무시는 곳에서 나도 머물겠나이다 어머니의 백성이 나의 백성이 되고 어머니의 하나님이 나의 하나님이 되시리니"
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: true
+  note: "§4-5 — 자막 자동 진행 금지. 사용자 페이스로만 넘어간다."
+
+interactions: []
+interaction_note: "서사 인터랙션 0개 (의도). 이 Scene 은 보는 자리다."
+
+branches: []
+branches_note: "죄·상실이 서술되는 자리에 사용자 선택지를 두지 않는다(SERIES-GRACE §2.0)."
+
+next_scene_id: 2
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["떠남", "따라감"]
+  emotional: ["이별", "상실 인정"]
+  rational: ["돌아갈 곳과 갈 곳의 구별"]

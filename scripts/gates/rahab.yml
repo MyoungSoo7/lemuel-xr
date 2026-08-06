@@ -1,0 +1,335 @@
+# 라합(Theme 20) — 동결 seed `docs/SEED-RAHAB.md` rev.10 §7 의 입력을 옮긴 것.
+#
+# ⚠️ **이 파일이 있다고 라합이 검사된 것이 아니다.** `content/rahab/` 은 아직 없다.
+#    Scene 산출물을 대상으로 하는 게이트는 전부 **BLOCKED(rc=2)** 로 떨어지며, 그것이
+#    맞는 결과다. 지금 이 파일이 실제로 재는 것은 **설정 층위 네 게이트**뿐이다:
+#      · G0b  — 배제 선언 29항이 `docs/verses-rahab.txt` 배제장에 실재하고 사용장에 부재한가
+#      · G0e  — 배제 40항이 다른 인물 콘텐츠를 과차단하지 않는가
+#      · G0c  — 토큰 31종 ↔ 예문 31개가 1:1 인가
+#      · G0d  — 제품 말투 3문장이 토큰에 걸리는가(커버리지)
+#    **BLOCKED 를 PASS 로 읽지 마라.** seed §9 의 designer 착수 차단 조건은 그대로다.
+#
+# 최상위 키는 `scripts/gates/ruth.yml` 과 같은 14개 + `release_blockers`.
+character: rahab # REQUIRED_CFG (newchar_gates.py:463). 없으면 G0cfg FAIL → G0b·G0e·G9·G9d BLOCKED
+ruleset: newchar-v5 # 토큰 규약 이후 인물 — legacy-baseline 면제 없음
+scene_count: 5
+test_identifier: "라합" # §5(c) — ForbiddenTokenConfigTest.kt 는 인물 식별자를 한국어로 남긴다
+
+docs:
+  mvp: docs/MVP-RAHAB.md
+doc_min_lines:
+  mvp: 420 # 룻 하한과 동일
+# ⚠️ `docs/MVP-RAHAB.md` 는 **아직 없다** — designer 산출물이다. 그래서 g10 은 BLOCKED 다.
+#    없는 문서를 선언하는 것이 함정임은 `scripts/gates/peter.yml:14-15` 가 경고한 그대로이나,
+#    여기서는 **일부러 선언한다**: 이 항목이 비어 있으면 "MVP 문서가 필요 없다"로 읽히고,
+#    BLOCKED 로 서 있으면 "필요한데 없다"로 읽힌다. 후자가 사실이다.
+
+# ── G7 · G3d — R4 트리거 Scene / 위기 리마인더. 룻 선례대로 5개 Scene 전건.
+#    헌장 §2.1-a 양방향 불변식: `trigger_categories` 를 가진 Scene 집합과 정확히 같아야 한다.
+#    ⚠️ 그 불변식을 재는 게이트는 없다 — `trigger_categories` 는 newchar_gates.py 에 0회다.
+#    검사는 `scripts/check_rahab_staging.py`(미착수) 몫이고, 그때까지 **미검사**다.
+trigger_scenes: [1, 2, 3, 4, 5]
+crisis_reminder_scenes: [1, 2, 3, 4, 5]
+
+# ── G2 — R1 자해 리스너 id. 값 계약(래치 7키)은 이 파일이 못 잡는다(seed §10 C7).
+r1_listener_id: "R1_voice_self_harm_listener"
+
+# ── G0b — 배제 자구 양방향 대조표. USED 24행 / EXCLUDED 31행.
+verses_file: docs/verses-rahab.txt
+
+# ── G5a-i·G5b·G5e·G6·G6d — 금지 토큰 **31종 = 룻 22 상속 + 라합 고유 9**.
+#    룻 고유 자구에 묶인 것(사별 동반사망 3종 등)도 뺄 이유가 없어 그대로 둔다 —
+#    라합 콘텐츠에 안 나오면 0건일 뿐이고, 0건은 과차단이 아니다(seed §7-1).
+forbidden:
+  # ── 룻 상속 22종 (scripts/gates/ruth.yml:25-53 과 자구 동일) ──
+  # 계열 1 — 공로화 (헌장 §3-a)
+  - "믿음이 좋아서"
+  - "용기를 냈기 때문에"
+  - "그만큼 헌신했으니"
+  - "착해서"
+  - "충성했으니"
+  # 계열 2 — 섭리 설명 (헌장 §3-b · R2)
+  - "하시려고 그 일을 허락"
+  - "다 뜻이 있어"
+  - "연단하시려고"
+  # 계열 3 — 회복 압박 (R3)
+  - "이제 그만 일어나"
+  - "감사하면 회복"
+  - "믿음으로 이겨내"
+  - "빨리 잊고"
+  # 계열 4 — 보상 프레이밍 (헌장 §3-c)
+  - "결국 보상받았"
+  - "참으니 복이"
+  - "일곱 아들보다 귀한"
+  # 계열 5 — 동반사망 (E1)
+  - "나도 죽어"
+  - "따라 죽"
+  - "같이 묻히"
+  # 계열 6 — 마감 줄 평가 어휘 (SR-2)
+  - "곁을 지켰"
+  - "물러섰지만"
+  - "그래도 잘"
+  - "덕분에"
+  # ── 라합 고유 9종 (seed §7-1 표) ──
+  # 계열 7 — 낙인 소거. 본문은 낙인을 씻지 않는다(약 2:25 가 정면으로 반박한다)
+  - "과거를 씻고"
+  - "새사람이 되어"
+  - "더 이상 기생이"
+  # 계열 8 — 본문 밖 서사
+  - "직업을 버리고"
+  # 계열 9 — 공로화 인과. 본문이 대는 이유는 숨김과 맹세다(seed §3-1)
+  - "회개했기 때문에"
+  - "믿었기 때문에"
+  - "믿음 덕분에"
+  # 계열 10 — R2 가스라이팅. §2-1 축이 미끄러지면 정확히 이 문장이 된다
+  - "그래서 쓰임받았"
+  - "쓰시려고 그 자리에"
+
+# ⚠️ **토큰은 하한이지 방어선이 아니다.** 적대 감사가 31종을 전부 통과하면서 R2 를 위반하는
+#    문장 7개를 만들었다(예: "그가 들은 것이 그를 그 자리에 서게 했습니다"). 바꿔쓰기는
+#    무한하므로 그 7문장을 `exclusions` 로 등재하지 **않는다** — F-6.5 footer(§5-4)와
+#    문장 단위 신학·정신건강 리뷰가 맡는 몫이다. **토큰 초록을 "R2 통과"로 읽지 마라.**
+# ⚠️ 축 배타(에스더 계열 "드러낼 것인가"·"숨길 것인가" 등)는 여기 없다. `forbidden` 에
+#    넣으면 아무것도 집행되지 않고(g0e 는 `_exclusion_entries` 만 훑는다), `exclusions` 에
+#    넣으면 G0e 과차단에 걸린다 — 충돌처가 에스더·다니엘의 **축 문장 그 자체**라서 그게 옳다.
+#    집행 수단은 인간 검토뿐이다(seed §7-4).
+
+# ── G0c — 토큰이 자기 예문을 잡는가. 31종과 1:1.
+token_examples_declared: 31
+token_examples:
+  # ── 룻 상속 22 (scripts/gates/ruth.yml:71-147 에서 예문까지 함께 가져온다.
+  #    토큰만 상속하고 예문을 비우면 g0c 가 선언 31 ≠ 실제 9 로 FAIL 한다) ──
+  - {
+      token: "믿음이 좋아서",
+      example: "그분은 믿음이 좋아서 그 밤을 견디신 거예요.",
+    }
+  - {
+      token: "용기를 냈기 때문에",
+      example: "그때 용기를 냈기 때문에 지금의 자리가 생긴 겁니다.",
+    }
+  - {
+      token: "그만큼 헌신했으니",
+      example: "그만큼 헌신했으니 하나님이 갚아 주실 거예요.",
+    }
+  - { token: "착해서", example: "마음이 착해서 그런 은혜를 입으신 겁니다." }
+  - {
+      token: "충성했으니",
+      example: "끝까지 충성했으니 이제 받으실 차례입니다.",
+    }
+  - {
+      token: "하시려고 그 일을 허락",
+      example: "하나님이 더 좋은 것을 주시려 하시려고 그 일을 허락하신 거예요.",
+    }
+  - {
+      token: "다 뜻이 있어",
+      example: "지나고 보면 다 뜻이 있어서 그렇게 되는 겁니다.",
+    }
+  - {
+      token: "연단하시려고",
+      example: "주님이 당신을 연단하시려고 그 상실을 두신 겁니다.",
+    }
+  - {
+      token: "이제 그만 일어나",
+      example: "이만큼 우셨으면 이제 그만 일어나실 때입니다.",
+    }
+  - {
+      token: "감사하면 회복",
+      example: "지금이라도 감사하면 회복이 시작될 거예요.",
+    }
+  - {
+      token: "믿음으로 이겨내",
+      example: "이 시간을 믿음으로 이겨내시면 됩니다.",
+    }
+  - { token: "빨리 잊고", example: "그 일은 빨리 잊고 새 마음으로 시작하세요." }
+  - {
+      token: "결국 보상받았",
+      example: "룻도 결국 보상받았으니 당신도 그러실 거예요.",
+    }
+  - {
+      token: "참으니 복이",
+      example: "묵묵히 참으니 복이 따라온 것 아니겠어요.",
+    }
+  - {
+      token: "일곱 아들보다 귀한",
+      example: "그 한 사람이 일곱 아들보다 귀한 존재가 된 거예요.",
+    }
+  - {
+      token: "나도 죽어",
+      example: "저도 그 사람 곁에서 나도 죽어 함께 있고 싶어요.",
+    }
+  - { token: "따라 죽", example: "먼저 간 사람을 따라 죽고 싶은 마음뿐이에요." }
+  - {
+      token: "같이 묻히",
+      example: "그 사람과 같이 묻히는 것이 제 유일한 소원입니다.",
+    }
+  - {
+      token: "곁을 지켰",
+      example: "끝까지 곁을 지켰으니 후회는 없으실 거예요.",
+    }
+  - {
+      token: "물러섰지만",
+      example: "그때 물러섰지만 그래도 사랑은 하셨던 거잖아요.",
+    }
+  - { token: "그래도 잘", example: "힘드셨어도 그래도 잘 견디신 편이에요." }
+  - {
+      token: "덕분에",
+      example: "당신 덕분에 그 사람이 편히 갈 수 있었던 거예요.",
+    }
+  # ── 라합 고유 9 (seed §7-1 표의 "위험 예문" 열 그대로) ──
+  - { token: "과거를 씻고", example: "라합은 과거를 씻고 새 삶을 시작했습니다" }
+  - {
+      token: "새사람이 되어",
+      example: "그는 새사람이 되어 이스라엘에 받아들여졌습니다",
+    }
+  - {
+      token: "더 이상 기생이",
+      example: "이제 그는 더 이상 기생이 아니었습니다",
+    }
+  - { token: "직업을 버리고", example: "직업을 버리고 하나님을 따랐습니다" }
+  - { token: "회개했기 때문에", example: "회개했기 때문에 구원받았습니다" }
+  - {
+      token: "믿었기 때문에",
+      example: "라합이 믿었기 때문에 계보에 들어갔습니다",
+    }
+  - { token: "믿음 덕분에", example: "믿음 덕분에 가족까지 살았습니다" }
+  - {
+      token: "그래서 쓰임받았",
+      example: "낙인이 있었기에 그래서 쓰임받았습니다",
+    }
+  - {
+      token: "쓰시려고 그 자리에",
+      example: "하나님이 쓰시려고 그 자리에 두셨습니다",
+    }
+
+# ── G0d — 제품 말투(존댓말·완곡) 위험 문장이 토큰에 걸리는가 ──────────────────
+# ⚠️ **커버리지 게이트다. 회피 탐지 게이트가 아니다.** 판정식은
+#    `misses = [s for s in sents if not any(t in s for t in toks)]` — 예문이 토큰에
+#    **걸려야** PASS 다. seed rev.3 이 이것을 읽지 않고 토큰 없는 문장으로 갈아 끼워
+#    영구 FAIL 2/2 를 만들어 놓고 개선이라고 적은 이력이 있다. **문장을 고쳐 초록을
+#    맞추지 마라** — 그러면 게이트가 자기 자신을 검사하게 된다.
+polite_evasive_min: 3
+polite_evasive:
+  - "말씀드리기 조심스럽습니다만, 그분이 믿었기 때문에 그런 결과가 따라온 것으로 정리해 드릴 수 있겠습니다."
+  - "지난 이야기는 접어 두고, 과거를 씻고 새 자리에 서게 된 과정을 중심으로 안내해 드리겠습니다."
+  - "하나님이 쓰시려고 그 자리에 두신 것이라고 이해하시면 마음이 조금 편해지실 수 있습니다."
+# 3번은 R2 계열로 **일부러** 넣었다. 가장 위험한 축(§2-1 미끄러짐)이 존댓말 상담 말투로
+# 나왔을 때 토큰이 잡는지를 재는 자리다.
+
+# ── 배제 선언 40항 (seed §7-3) ───────────────────────────────────────────────
+#
+# scope 배정: 절 참조로 잠글 수 있으면 `verse_ref`, 참조로 잠그면 과차단이 나는 것만
+# `verse_text`, 성경 자구가 아닌 주장·표현은 `content_leaf`/`absent`.
+# `content_leaf` 에 `excluded_only` 를 붙이는 조합은 명시적 설정 오류다(`:627-631`).
+exclusions:
+  # ── verse_ref 29항 · excluded_only ──────────────────────────────────────
+  # 헤렘 전개 14 — `수 6:1-16` 범위 표기는 절별 표에 없어 g0b FAIL 이므로 절별로 펼친다.
+  # 6:1·6:2 만은 펼치면 `수 6:17b`·`수 6:22` 등의 부분문자열이라 과차단 FAIL → 자구로 잠근다.
+  - { value: "수 6:3", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:4", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:5", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:6", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:7", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:8", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:9", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:10", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:11", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:12", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:13", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:14", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:15", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:16", scope: verse_ref, expect: excluded_only }
+  # 헤렘 봉헌 명령 — rev.4 신설. §1 이 사유를 적고 verses-rahab.txt 에도 있었는데
+  # **배제 선언에만 빠져 있었다**(rev.3 의 자기모순).
+  - { value: "수 6:17a", scope: verse_ref, expect: excluded_only }
+  # 헤렘 집행 4
+  - { value: "수 6:18", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:19", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:20", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:21", scope: verse_ref, expect: excluded_only }
+  # 성 소각 / 자녀 사망 저주 / 전멸 소문 / 절단 불가
+  - { value: "수 6:24", scope: verse_ref, expect: excluded_only }
+  - { value: "수 6:26", scope: verse_ref, expect: excluded_only }
+  - { value: "수 2:10", scope: verse_ref, expect: excluded_only }
+  - { value: "히 11:31", scope: verse_ref, expect: excluded_only }
+  # ── rev.10 신설 6항 (seed §1 갈래 5) ────────────────────────────────────
+  # rev.9 까지 이 여섯 절은 verses-rahab.txt EXCLUDED 에 있으면서 배제 선언에도
+  # seed 본문에도 없었다. g0b 는 **선언된 항목만** 순회하므로(newchar_gates.py:665)
+  # 배제장에서 선언 쪽으로 되짚는 방향이 없어 아무 게이트도 울지 않았다(seed §10 C8).
+  - { value: "수 2:17", scope: verse_ref, expect: excluded_only } # 맹세 면책 조건절
+  - { value: "수 2:20", scope: verse_ref, expect: excluded_only } # 맹세 면책 조건절
+  - { value: "수 2:16", scope: verse_ref, expect: excluded_only } # 정탐꾼 동선
+  - { value: "수 2:22", scope: verse_ref, expect: excluded_only } # 정탐꾼 동선
+  - { value: "수 2:23", scope: verse_ref, expect: excluded_only } # 정탐꾼 동선
+  - { value: "수 2:24", scope: verse_ref, expect: excluded_only } # 정복 보고
+
+  # ── verse_text 6항 · excluded_only — 자구 그대로 ─────────────────────────
+  - {
+      value: "곧 그들을 전멸시킨 일을 우리가 들었음이니라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 수 2:10 후반절
+  - {
+      value: "무리가 그 성과 그 가운데에 있는 모든 것을 불로 사르고",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 수 6:24
+  - {
+      value: "그의 맏아들을 잃을 것이요",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 수 6:26
+  - {
+      value: "순종하지 아니한 자와 함께 멸망하지 아니하였도다",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 히 11:31 후반절
+  - {
+      value: "여리고는 굳게 닫혔고 출입하는 자가 없더라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 수 6:1
+  - {
+      value: "내가 여리고와 그 왕과 용사들을 네 손에 넘겨 주었으니",
+      scope: verse_text,
+      expect: excluded_only,
+    } # 수 6:2
+
+  # ── content_leaf 5항 · absent — 저작물에 **없어야** 하는 주장·표현 ────────
+  - { value: "용기 있게 거짓말", scope: content_leaf, expect: absent } # 헌장 §5-e 위반 — 거짓말을 긍정 평가
+  - { value: "선의의 거짓말", scope: content_leaf, expect: absent }
+  - { value: "그리스도의 피의 예표", scope: content_leaf, expect: absent } # 미션은 이 예표론을 주장하지 않는다(DP-R1)
+  - { value: "교회 밖에는 구원이", scope: content_leaf, expect: absent } # extra ecclesiam nulla salus — 채택하지 않는다
+  - { value: "내가 저지른 일이니", scope: content_leaf, expect: absent } # 자기귀책 유도. ruth.yml:271 선례
+
+# ── 릴리스 선결 조건 ─────────────────────────────────────────────────────────
+# ⚠️ `newchar_gates.py` 는 이 키를 읽지 않는다 — 게이트를 통과시키지도 막지도 않는다.
+#    그 사실이 요점이다. 산문 한 줄로만 있으면 초록 앞에서 지워지므로, 릴리스 판단자가
+#    한 파일에서 보게 만든다. AC 에는 넣지 않는다(남의 파일에 완료 판정을 묶지 않는다).
+release_blockers:
+  - id: rahab_designer_start_blockers
+    note: >-
+      designer 착수 차단 조건(seed §9). `docs/MVP-RAHAB.md` ·
+      `docs/RAHAB-LOCKED-STRINGS.md` · `scripts/check_rahab_staging.py` 셋이 미착수다.
+      이 파일이 존재한다는 사실을 "라합이 검사되고 있다"로 읽지 마라 —
+      Scene 산출물 대상 게이트는 전부 BLOCKED 다.
+    resolved: false
+  - id: rahab_r1_latch_contract_outside_gate
+    note: >-
+      R1 래치 값 계약 7키가 newchar_gates.py 에 각 0회다(seed §10 C7). g2 는
+      safety_gates[].id 존재만 본다 — 래치가 통째로 빠지거나 post_crisis_latch_scope 가
+      mission 대신 session 으로 실려도 G2 는 초록이다. 이 미션은 수 2:15(높이·매달림)
+      때문에 R1 위험이 가장 높은데, 그 축의 계약이 기계 검사 밖에 있다.
+    resolved: false
+  - id: rahab_exclusion_reverse_check_missing
+    note: >-
+      g0b 는 선언된 항목만 순회한다(newchar_gates.py:665). 배제장(verses-rahab.txt
+      EXCLUDED)에 있는데 선언에 없는 절을 잡는 역방향 검사가 없다 — 그래서 여섯 절이
+      rev.9 까지 사유 없이 떠 있었다(seed §10 C8). rev.10 이 선언에 채웠지만 그것은
+      문서 통제일 뿐, 다음 판이 하나 더 빠뜨려도 잡을 수단은 여전히 없다.
+    resolved: false
+  - id: rahab_consent_delta_no_runtime
+    note: >-
+      동의 카드 6장의 거절 델타를 실행할 문법이 런타임에 없다(seed §10). kotlin 전문에서
+      consent 는 0회다. 저작 트리는 동의를 선언하고 런타임은 읽지 않는다 —
+      사용자 노출 층위의 R4 보호는 현재 0이다.
+    resolved: false

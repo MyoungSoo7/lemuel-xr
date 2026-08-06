@@ -1,0 +1,158 @@
+# content/ruth/scene3.yml — Theme 19 룻 · Scene 3 「이방 여인」
+#
+# 이 Scene 은 축의 중심이다 — 룻 2:10 "나는 이방 여인이거늘".
+# 룻 2:11 자막은 **무조건 축약형**이다. 조건 분기도, 전문 에셋도 두지 않는다.
+# 동의 카드 2(ruth_midpoint_consent) 전문은 seed §4-4-a LOCKED 정본이다.
+
+character: ruth
+theme_id: 19
+scene_id: 3
+scene_name_ko: "이방 여인"
+duration_seconds_target: 110
+
+exposure_grade: B
+trigger_categories:
+  - bereavement_spouse
+  - ethnic_labeling
+  - poverty_food_insecurity
+staging_constraints:
+  - "1항 시점 — 카메라를 감독하는 자·고용주의 신체 위치나 얼굴 방향에 두지 않는다. 관찰 지점은 밭 가장자리다."
+  - "2항 눕힘 금지 — 사용자 시점을 눕히거나 올려다보는 각도로 두지 않는다. 이삭 줍기 동작에서도 시점은 서 있는 높이를 유지한다."
+  - "3항 근접 공간 오디오 금지 — 수확자들의 소리는 원거리 정위만. 2m 이내 정위 금지."
+  - "4항 신체 프레이밍 금지 — 절하는 동작을 신체 부위로 프레이밍하지 않는다. 전신·원경만."
+  - "5항 어둠은 조명 지시로만 — 이 Scene 은 낮이며, 시야 차단·촉각 피드백·생체 연동을 쓰지 않는다."
+
+# ── R4 동의 카드 2 (중간 게이트 · Scene 3 과 5 를 덮는다) ────────────────────
+consent_card_id: ruth_midpoint_consent
+consent_card_intensity: low_mid
+consent_covers_scenes: [3, 5]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: 4
+consent_cards:
+  - consent_card_id: ruth_midpoint_consent
+    consent_card_intensity: low_mid
+    consent_covers_scenes: [3, 5]
+    consent_declined_route: closing
+    voice_intensity_options: [subtitle_only, low, default]
+    consent_card_ko: |
+      여기서부터는 낯선 땅에서의 일입니다.
+      한 여인이 남의 밭에서 이삭을 줍고, 사람들은 그를 "모압 여인"이라고 부릅니다.
+      그 여인은 남편을 잃은 사람이고, 사람들이 그 일을 입에 올립니다.
+      이야기 끝에 한 아이가 태어나지만, 출산 장면도 아기도 화면에 나오지 않습니다.
+      · 약 3분입니다. 여기서 마치셔도 이야기는 온전히 끝맺어집니다.
+      계속하시겠어요?
+      [계속한다]  [여기서 마친다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      지금 힘드시면: {{crisis_resources.default}}
+consent_declined_route_note: "이 카드의 거절 목적지 센티널은 content/ruth/scene5.yml 최상위 closing_screen 블록으로 해석된다. 센티널은 전 산출물에서 이 카드 하나뿐이다."
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_merit_framing_lint
+    enforced_at: always
+    axis: "R2·R3 — 은혜를 공로의 대가로 되읽는 문장 차단"
+    lint_forbidden_tokens:
+      - "그만큼 헌신했으니"
+      - "착해서"
+      - "충성했으니"
+
+environment:
+  location_ko: "보아스의 보리밭. 추수 중."
+  time_of_day: 낮
+  lighting: "정오 지난 해. 바람에 이삭이 눕는다."
+  ambient_audio: ["바람", "낫질 소리(원거리)", "마른 이삭"]
+  assets_shared: [field_ground_generic, worker_silhouette_far]
+  assets_dedicated: [barley_field_dedicated, gleaning_stalk_grabbable]
+  camera_rig: standing_height_field_edge
+  ui_overlays:
+    - id: ruth_s3_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: ruth_s3_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: ruth
+    display_ko: "룻"
+    framing: full_body_far
+  - id: boaz
+    display_ko: "보아스"
+    framing: full_body_far
+    staging_note: "밭 주인. 위압적 앙각(仰角)으로 잡지 않는다."
+  - id: reapers
+    display_ko: "베는 자들"
+    framing: silhouette_far_only
+
+captions:
+  - id: ruth_s3_2_2
+    verse_ref: "룻 2:2 중"
+    speaker: scripture_caption
+    attribution_display_ko: "룻"
+    text_ko: "내가 밭으로 가서 내가 누구에게 은혜를 입으면 그를 따라서 이삭을 줍겠나이다"
+  - id: ruth_s3_2_10
+    verse_ref: "룻 2:10 중"
+    speaker: scripture_caption
+    attribution_display_ko: "룻"
+    text_ko: "나는 이방 여인이거늘 당신이 어찌하여 내게 은혜를 베푸시며 나를 돌보시나이까"
+  - id: ruth_s3_2_11
+    verse_ref: "룻 2:11 중"
+    speaker: scripture_caption
+    attribution_display_ko: "보아스"
+    unconditional: true
+    text_ko: "네가 시어머니에게 행한 모든 것과 네 부모와 고국을 떠나 전에 알지 못하던 백성에게로 온 일이 내게 분명히 알려졌느니라"
+  - id: ruth_s3_2_12
+    verse_ref: "룻 2:12 중"
+    speaker: scripture_caption
+    attribution_display_ko: "보아스"
+    text_ko: "이스라엘의 하나님 여호와께서 그의 날개 아래에 보호를 받으러 온 네게"
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: true
+
+# ── 핵심 인터랙션 ② — 이삭 줍기 ──────────────────────────────────────────────
+interactions:
+  - id: ruth_s3_gleaning
+    type: grab_and_place
+    objects: [gleaning_stalk_grabbable, cloth_bundle]
+    repeat_allowed: true
+    scoring: none
+    biometrics_used: false
+    note: "점수·판정·분기 없음. 생체 신호를 쓰지 않는다(docs/safety-guidelines.md:52). 몇 개를 줍든 다음 자막으로 넘어간다."
+
+branches: []
+branches_note: "무자격이 서술되는 자리에 사용자 선택지를 두지 않는다(SERIES-GRACE §2.0)."
+
+next_scene_id: 4
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["날개 아래", "받아들여짐"]
+  emotional: ["무자격 자각", "낯섦"]
+  rational: ["이방인 규정과 실제 대우의 간극"]

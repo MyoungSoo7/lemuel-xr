@@ -1,0 +1,308 @@
+# 룻(Theme 19) — /새인물 파이프라인 초안(≤70%, 인간 사인오프 대기).
+#
+# 이 설정은 콘텐츠에서 역산한 것이 아니라 **동결 seed(rev.6.4) §7 의 입력을 옮긴 것**이다.
+# 최상위 키는 베드로와 동일한 14개(`scripts/gates/peter.yml` 실측) + `release_blockers`.
+#
+# ⚠️ 이 파일 하나로 "안전하다"가 증명되지 않는다. §8-1 AC 7·10·11·12·14·23·24·26·27·
+#    28·29·30·31·32(14건)의 실행기(`scripts/check_ruth_captions.py`·
+#    `scripts/check_ruth_biometrics.py`)는 **아직 없다.** 그 14건은 구조상 만족하도록
+#    저작했을 뿐 **기계로 재지 않았다** — 초록을 그 14건의 통과로 읽지 마라.
+character: ruth
+ruleset: newchar-v5 # 토큰 규약 이후 인물 — 면제 없음
+scene_count: 5
+
+docs:
+  mvp: docs/MVP-RUTH.md
+doc_min_lines:
+  mvp: 420
+# CONTENT 문서(docs/MVP-RUTH-CONTENT.md)는 **만들지 않았다**(seed §6 폐기 항목).
+# 없는 문서를 선언하면 g10 이 GateBlocked 다 — peter.yml:14-15 가 같은 함정을 경고한다.
+
+# ── G5a-i·G5b·G5e·G6·G6d — content/ruth/scene*.yml 의 lint_forbidden_tokens
+#    **합집합 전량 22종**. 개수는 하한이 아니라 합집합 동일성이다(seed §7-1).
+#    부분집합을 적으면 G6/G6d/G9 가 나머지를 안 보면서 초록이 된다(vacuous green).
+#    분포: scene1 4 · scene2 7 · scene3 3 · scene4 3(2종 중복) · scene5 7.
+forbidden:
+  # 계열 1 — 공로화 (헌장 §3-a)
+  - "믿음이 좋아서"
+  - "용기를 냈기 때문에"
+  - "그만큼 헌신했으니"
+  - "착해서"
+  - "충성했으니"
+  # 계열 2 — 섭리 설명 (헌장 §3-b · R2)
+  - "하시려고 그 일을 허락"
+  - "다 뜻이 있어"
+  - "연단하시려고"
+  # 계열 3 — 회복 압박 (R3)
+  - "이제 그만 일어나"
+  - "감사하면 회복"
+  - "믿음으로 이겨내"
+  - "빨리 잊고"
+  # 계열 4 — 보상 프레이밍 (헌장 §3-c)
+  - "결국 보상받았"
+  - "참으니 복이"
+  - "일곱 아들보다 귀한"
+  # 계열 5 — 동반사망 (E1)
+  - "나도 죽어"
+  - "따라 죽"
+  - "같이 묻히"
+  # 계열 6 — 마감 줄 평가 어휘 (SR-2)
+  - "곁을 지켰"
+  - "물러섰지만"
+  - "그래도 잘"
+  - "덕분에"
+  #   ↳ 막는 것은 **사람에게 공을 돌리는** 용법이다(예문 참조). 신에게 돌리는 `덕분에` 는
+  #     이 시리즈의 축이라 런타임에서 면제된다 — `ForbiddenTokenScanner.PRECEDING_EXEMPTIONS`,
+  #     신 호칭(하나님·여호와·주님…)이 바로 앞에 올 때만. `그분` 은 고인을 가리킬 수 있어 제외.
+  #     (2026-08-05 사용자 결정: "덕분에는 신 덕분에고 인간 덕분에는 굳이 필요 없다")
+  #     알려진 구멍: `덕분이에요`·`덕분입니다` 는 토큰이 `덕분에` 라 안 걸린다. 별건.
+
+# ⚠️ 계열 7(축 배타)은 여기 없다. `forbidden` 이 아니라 `exclusions` 로 집행한다 —
+#    g0e 는 `_exclusion_entries(c)` 만 훑고 `forbidden` 은 보지 않는다(seed §7-1 재채점 T11).
+# ⚠️ 1-2자 어간(`잘`·`옳`·`용기`)을 올리지 않았다. §4-8 의 어간 목록은 설계 규칙이고,
+#    `forbidden` 에는 3자 이상 표층형만 올린다. `옳` 은 헌장 §5-g 의 다말 절을 친다.
+
+# §5(c) — ForbiddenTokenConfigTest.kt 는 인물 식별자를 **한국어**로 남긴다.
+test_identifier: "룻"
+
+# ── G0c — 토큰이 자기 예문을 잡는가 ────────────────────────────────────────
+# 예문은 제품 말투로 쓴 **위험 문장**이고 토큰 22종과 1:1 이다.
+token_examples_declared: 22
+token_examples:
+  - {
+      token: "믿음이 좋아서",
+      example: "그분은 믿음이 좋아서 그 밤을 견디신 거예요.",
+    }
+  - {
+      token: "용기를 냈기 때문에",
+      example: "그때 용기를 냈기 때문에 지금의 자리가 생긴 겁니다.",
+    }
+  - {
+      token: "그만큼 헌신했으니",
+      example: "그만큼 헌신했으니 하나님이 갚아 주실 거예요.",
+    }
+  - { token: "착해서", example: "마음이 착해서 그런 은혜를 입으신 겁니다." }
+  - {
+      token: "충성했으니",
+      example: "끝까지 충성했으니 이제 받으실 차례입니다.",
+    }
+  - {
+      token: "하시려고 그 일을 허락",
+      example: "하나님이 더 좋은 것을 주시려 하시려고 그 일을 허락하신 거예요.",
+    }
+  - {
+      token: "다 뜻이 있어",
+      example: "지나고 보면 다 뜻이 있어서 그렇게 되는 겁니다.",
+    }
+  - {
+      token: "연단하시려고",
+      example: "주님이 당신을 연단하시려고 그 상실을 두신 겁니다.",
+    }
+  - {
+      token: "이제 그만 일어나",
+      example: "이만큼 우셨으면 이제 그만 일어나실 때입니다.",
+    }
+  - {
+      token: "감사하면 회복",
+      example: "지금이라도 감사하면 회복이 시작될 거예요.",
+    }
+  - {
+      token: "믿음으로 이겨내",
+      example: "이 시간을 믿음으로 이겨내시면 됩니다.",
+    }
+  - { token: "빨리 잊고", example: "그 일은 빨리 잊고 새 마음으로 시작하세요." }
+  - {
+      token: "결국 보상받았",
+      example: "룻도 결국 보상받았으니 당신도 그러실 거예요.",
+    }
+  - {
+      token: "참으니 복이",
+      example: "묵묵히 참으니 복이 따라온 것 아니겠어요.",
+    }
+  - {
+      token: "일곱 아들보다 귀한",
+      example: "그 한 사람이 일곱 아들보다 귀한 존재가 된 거예요.",
+    }
+  - {
+      token: "나도 죽어",
+      example: "저도 그 사람 곁에서 나도 죽어 함께 있고 싶어요.",
+    }
+  - { token: "따라 죽", example: "먼저 간 사람을 따라 죽고 싶은 마음뿐이에요." }
+  - {
+      token: "같이 묻히",
+      example: "그 사람과 같이 묻히는 것이 제 유일한 소원입니다.",
+    }
+  - {
+      token: "곁을 지켰",
+      example: "끝까지 곁을 지켰으니 후회는 없으실 거예요.",
+    }
+  - {
+      token: "물러섰지만",
+      example: "그때 물러섰지만 그래도 사랑은 하셨던 거잖아요.",
+    }
+  - { token: "그래도 잘", example: "힘드셨어도 그래도 잘 견디신 편이에요." }
+  - {
+      token: "덕분에",
+      example: "당신 덕분에 그 사람이 편히 갈 수 있었던 거예요.",
+    }
+
+# ── G0d — 제품 말투(존댓말·완곡) 위험 문장이 토큰에 걸리는가 ────────────────
+# 순회 축은 토큰이 아니라 **문장**이다. g0d(`newchar_gates.py:810-822`)는 순수
+# 부분문자열 비교이므로 어간·활용을 보지 않는다 — 문장이 토큰을 **문자 그대로**
+# 포함해야 한다. seed §7-2 는 rev.4 에서 이 대응이 깨져 있었고(확정 g0d FAIL)
+# rev.6.4 에서 다시 쓴 판본이다. **문장을 고쳐 초록을 맞추지 마라** — 그러면
+# 게이트가 자기 자신을 검사하게 된다.
+polite_evasive:
+  - "그만큼 헌신했으니 하나님이 자리를 주실 거예요."
+  - "곁을 지켰으니 그래도 잘 하신 거예요."
+
+# ── G7 — R4 동의 카드 + 스킵 목적지가 실제로 있는 Scene ─────────────────────
+# 헌장 §2.1-a 양방향 불변식: `trigger_categories` 를 가진 Scene 집합과 정확히 같다.
+# 룻은 5개 Scene 전건이 트리거를 진다(사별 2 · 빈곤 1 · 민족 라벨링 1 ·
+# 성적 취약 정황 1 · 임신출산 1 = 6종). 커버 관계는 카드 3장이 진다 —
+# 카드1 [1,2] · 카드2 [3,5] · 카드3 [4]. Scene 2·5 는 카드 정의를 갖지 않고
+# 참조만 하지만 `consent_card_id` + `skip_alternative_scene_id` 두 키는 보유한다(G7).
+trigger_scenes: [1, 2, 3, 4, 5]
+
+# ── G3d — 위기 리마인더 리터럴 키 ──────────────────────────────────────────
+# 전건이다. 마지막 Scene(베드로 판례) + 탄식층 Scene 2 + C 등급 Scene 4 만으로
+# 좁히지 않았다 — 이 미션은 5개 Scene 전부가 트리거 Scene 이다.
+crisis_reminder_scenes: [1, 2, 3, 4, 5]
+
+# ── G0b — 배제 자구 양방향 대조표 ──────────────────────────────────────────
+verses_file: docs/verses-ruth.txt
+
+# ── 배제 선언 20항목 (seed §7-3 · AC 31 기대값 20) ─────────────────────────
+#
+# ⚠️ **seed §7-3 의 "선언 줄 수" 열과 AC 31 의 기대값이 서로 어긋난다 — 후자를 따랐다.**
+#    표의 열대로 룻기 본문 자구 16종을 `verse_text` + `content_leaf` 두 줄씩 선언하면
+#    항목 수는 16×2 + E1' 1 + E10 1 + 축배타 2 = **36** 이 된다. AC 31 은 `exclusions`
+#    항목 수가 **정확히 20** 이어야 한다고 못박고, 그 20의 내역을 "단일 문자열 18 +
+#    축 배타 2" 로 **값 단위**로 열거한다. 두 지시를 동시에 만족할 수 없다.
+#    값 단위 20 을 택한 근거는 구현이다 — g9/g9d/g0e 는 `scope` 와 무관하게 **선언된
+#    모든 값**을 훑으므로(`newchar_gates.py:1334-1365`·`:696-728`), 룻기 본문 자구에
+#    `content_leaf` 짝을 더 달아도 새로 재는 것이 하나도 없다. 반면
+#    `verse_text`/`excluded_only` 는 g0b 의 양방향 검사(배제장 실재 + 사용장 부재)를
+#    추가로 요구하므로 **엄격하게 더 강하다.** 즉 20항목 선언은 36항목 선언과
+#    검사 범위가 같고 항목 수만 AC 31 과 맞는다. 이 판단은 보고서에 이탈로 적었다.
+#
+# scope 배정 규칙(seed §7-3 조건부 표):
+#   룻기 본문 자구        → verse_text / excluded_only  (16종)
+#   룻기 밖 성경 자구     → content_leaf / absent       (E10 신 23:3)
+#   비-성경 문자열·조각   → content_leaf / absent       (E1' · 축 배타 2종)
+# `content_leaf` 에 `excluded_only` 를 붙이는 조합은 명시적 설정 오류다(`:627-631`).
+exclusions:
+  # ── 룻기 본문 자구 16종 — docs/verses-ruth.txt EXCLUDED 본문 열에 실재하고
+  #    USED 본문 열에는 부재해야 한다. 자구는 docs/VERSES-RUTH-GAE.md 에서 복사했다.
+  - {
+      value: "나도 죽어 거기 묻힐 것이라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E1 룻 1:17
+  - {
+      value: "나는 너희로 말미암아 더욱 마음이 아프도다",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E2 룻 1:13
+  - {
+      value: "여호와께서 나를 징벌하셨고",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E3 룻 1:21b
+  - {
+      value: "너를 건드리지 말라 하였느니라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E4 룻 2:9
+  - {
+      value: "다른 밭에서 사람을 만나지 아니하는 것이 좋으니라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E5 룻 2:22
+  - {
+      value: "새벽까지 그의 발치에 누웠다가",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E6 룻 3:14
+  - {
+      value: "여호와께서 그에게 임신하게 하시므로",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E7 룻 4:13
+  - {
+      value: "오늘 네게 기업 무를 자가 없게 하지 아니하셨도다",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E8 룻 4:14
+  - {
+      value: "이는 네 생명의 회복자이며",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E9-a 룻 4:15
+  - { value: "네 노년의 봉양자", scope: verse_text, expect: excluded_only } # E9-b 룻 4:15
+  - { value: "일곱 아들보다 귀한", scope: verse_text, expect: excluded_only } # E9-c 룻 4:15
+  - { value: "네게 상속자를 주사", scope: verse_text, expect: excluded_only } # E11 룻 4:12a
+  - {
+      value: "네가 행한 일에 보답하시기를 원하며",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E12 룻 2:12a
+  - {
+      value: "온전한 상 주시기를 원하노라",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E13 룻 2:12c
+  - {
+      value: "이스라엘의 집을 세운 라헬과 레아",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E14 룻 4:11b
+  - { value: "네 남편이 죽은 후로", scope: verse_text, expect: excluded_only } # E15 룻 2:11a
+  # ── 조각 1종 — 표층형. 계열 5 토큰과 같은 문자열이며 Scene 파일에서는
+  #    `lint_forbidden_tokens`(NONUSER_KEYS 면제) 아래에만 산다.
+  - { value: "나도 죽어", scope: content_leaf, expect: absent } # E1'
+  # ── 룻기 밖 성경 자구 1종 — verses-ruth.txt 는 룻기 전수표라 EXCLUDED 열에 없다.
+  - {
+      value: "영원히 여호와의 총회에 들어오지 못하리라",
+      scope: content_leaf,
+      expect: absent,
+    } # E10 신 23:3 · SR-10
+  # ── 축 배타 2종 — 8종 중 2종만 선언한다(seed §7-3 재채점 U4 실측).
+  - { value: "내가 저지른 일이니", scope: content_leaf, expect: absent }
+  - { value: "다 가져도 허무하다", scope: content_leaf, expect: absent }
+
+# ── 선언하지 못한 축 배타 6종 (부채 — 사람 판단 필요) ────────────────────────
+#   `드러낼 것인가`(4파일) · `숨길 것인가`(3) · `어디까지 협력`(3) ·
+#   `어디서 멈출`(2) · `밝힐 용기`(1) · `타협의 선`(1)
+#
+#   전부 G0e 과차단 사전 스캔에 걸린다. 그리고 **G0e 가 옳다** — 충돌처가 전부
+#   에스더·다니엘·베드로의 **축 문장 그 자체**다. 룻이 이 문자열을 배제하는 이유가
+#   "저건 저 인물 것이다" 이므로, 다른 인물 콘텐츠에 실재하는 것은 결함이 아니라 설계다.
+#   예외 노브를 만들어 G0e 를 침묵시키지 않았다(peter.yml 선례).
+#   ⚠️ 그러므로 이 6종에 대해 "게이트가 통과했다"고 말하면 안 된다. 재지 않았다.
+#   집행 수단은 §8-2 AC 20 인간 검토뿐이다.
+
+# ── 릴리스 선결 조건 (seed §6 Q12) ─────────────────────────────────────────
+# ⚠️ 이 키는 `newchar_gates.py` 가 읽지 않는다 — 게이트를 통과시키지도 막지도 않는다.
+#    그 사실이 요점이다. §10-1 의 "출시 전에는 보강돼야 하나"가 산문 한 줄로만 있으면
+#    27/27 초록 앞에서 지워진다. 릴리스 판단자가 한 파일에서 보게 만드는 것이 목적이며,
+#    AC 에는 넣지 않는다(남의 파일에 완료 판정을 묶지 않는다).
+release_blockers:
+  - id: emotion_classifier_bereavement_lexicon
+    note: "사별 특이형 동반사망 표현 4종이 EMOTION-CLASSIFIER 사전에 없다(§10-1). 게이트 27/27 초록과 무관하게 출시를 막는다."
+    resolved: true
+    resolved_at: "2026-08-06"
+    resolved_by: >-
+      4종이 docs/EMOTION-CLASSIFIER.md §3 사전과 application.yml 런타임 regex 양쪽에 들어갔고,
+      두 사전이 어긋나면 CrisisKeywordDocContractTest 가 양방향으로 깨진다.
+      등급은 2026-08-06 사용자 결정 그대로 — 따라 죽=critical(lockout) ·
+      같이/함께 묻히=high(상단 배너) · 곁으로 가고 싶 / 고인 지시어+곁에 있고 싶=medium(하단 카드).
+    caveat: >-
+      medium 등급의 일상어 오탐(`마지막`·`혼자 살아`·`아무도 모를` 단독 토큰)은 2026-08-06
+      사용자 결정으로 좁혀서 해소했다(EMOTION-CLASSIFIER.md §3 'medium 오탐 좁힘' 절).
+      남은 것은 하나 — `마지막으로 정리` 는 "마지막으로 정리하겠습니다"가 너무 흔해서
+      **의도적으로 재현율을 포기했다.** 즉 이 표현만 쓰는 사용자는 medium 에 안 걸린다.
+      좁히기의 실패 방향이 오탐에서 미탐으로 바뀌었으므로 CrisisKeywordDocContractTest 는
+      양방향으로 못박는다 — 일상어가 안 걸리는 것과 위험 형태가 여전히 걸리는 것 둘 다.
+      medium 의 영향 범위는 그대로 safety_alerts 잡음 + 하단 카드로 한정된다
+      (lockout 도 chatops 알림도 medium 에는 걸리지 않는다).

@@ -1,0 +1,167 @@
+# content/ruth/scene2.yml — Theme 19 룻 · Scene 2 「빈 손의 귀향」
+#
+# 이 Scene 은 나오미의 탄식층이다. 서사 내(diegetic) 반박·교정·위로 대사를 두지 않는다.
+# 비서사 안전층(면책 오버레이·위기 리마인더)은 예외이며 필수다.
+# 자막은 seed §3-1 LOCKED 정본, 귀속 표기 형식은 SR-8.
+
+character: ruth
+theme_id: 19
+scene_id: 2
+scene_name_ko: "빈 손의 귀향"
+duration_seconds_target: 90
+
+exposure_grade: B
+trigger_categories:
+  - bereavement_spouse
+  - bereavement_child
+  - poverty_food_insecurity
+staging_constraints:
+  - "1항 시점 — 카메라를 가해·강압 주체의 신체 위치나 얼굴 방향에 두지 않는다. 관찰 지점은 성읍 어귀 바깥이다."
+  - "2항 눕힘 금지 — 사용자 시점을 눕히거나 올려다보는 각도로 두지 않는다."
+  - "3항 근접 공간 오디오 금지 — 군중의 웅성임은 원거리 정위만. 2m 이내 정위 금지."
+  - "4항 신체 프레이밍 금지 — 인물은 전신·원경으로만 등장한다."
+  - "5항 어둠은 조명 지시로만 — 시야 차단·촉각 피드백·생체 연동을 쓰지 않는다."
+
+# ── R4 — 카드 1(ruth_entry_consent)이 이 Scene 을 이미 덮는다. 재확인 카드 없음.
+consent_card_id: ruth_entry_consent
+consent_card_defined_in: scene1.yml
+consent_covers_scenes: [1, 2]
+skip_alternative_scene_id: 3
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_narration_divine_affliction_attribution
+    enforced_at: always
+    axis: "R2 — 미션 화자·해설·저널·묵상이 고난을 신의 징벌·연단으로 귀속하는 횟수 0"
+    narration_divine_affliction_attribution: 0
+    scripture_caption_layer_conditions:
+      - "집중 — 탄식은 이 Scene 한 곳에 모은다"
+      - "귀속 명시 — 자막 위에 화자 이름을 상시 표기한다(SR-8)"
+      - "비승격·비반박 — 미션 화자가 나오미의 말을 교리로 승격하지도, 교정하지도 않는다"
+    lint_forbidden_tokens:
+      - "하시려고 그 일을 허락"
+      - "다 뜻이 있어"
+      - "연단하시려고"
+      - "이제 그만 일어나"
+      - "감사하면 회복"
+      - "믿음으로 이겨내"
+      - "빨리 잊고"
+
+environment:
+  location_ko: "베들레헴 성읍 어귀. 보리 추수가 막 시작된 때."
+  time_of_day: 낮
+  lighting: "높은 해. 그림자 짧음."
+  ambient_audio: ["원거리 군중 웅성임", "낫질 소리 아주 멀리"]
+  assets_shared: [town_gate_generic, crowd_silhouette_far, barley_bundle_prop]
+  assets_dedicated: []
+  camera_rig: fixed_wide_outside_gate
+  ui_overlays:
+    - id: ruth_s2_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 이야기는 고통에 이유를 붙이지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: ruth_s2_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: naomi
+    display_ko: "나오미"
+    framing: full_body_far
+    staging_note: "룻의 곁(SR-4 1항). 군중 속 구경거리로 세우지 않는다."
+  - id: ruth
+    display_ko: "룻"
+    framing: full_body_far
+  - id: town_crowd
+    display_ko: "성읍 사람들"
+    framing: silhouette_far_only
+
+captions:
+  - id: ruth_s2_1_19
+    verse_ref: "룻 1:19 중"
+    speaker: scripture_caption
+    attribution_display_ko: "성읍 사람들"
+    text_ko: "이이가 나오미냐"
+  - id: ruth_s2_1_20
+    verse_ref: "룻 1:20 중"
+    speaker: scripture_caption # ← 헌장 §2.1 C 등급의 값. 바꾸지 않는다.
+    attribution_display_ko: "나오미" # 자막 위/옆에 상시 표기. 페이드 없음.
+    text_ko: "나를 나오미라 부르지 말고 나를 마라라 부르라 이는 전능자가 나를 심히 괴롭게 하셨음이니라"
+  - id: ruth_s2_1_21a
+    verse_ref: "룻 1:21 중"
+    speaker: scripture_caption
+    attribution_display_ko: "나오미"
+    text_ko: "내가 풍족하게 나갔더니 여호와께서 내게 비어 돌아오게 하셨느니라"
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: true
+
+# ── 핵심 인터랙션 ① — 애도의 거리. 둘 다 정답이고 서사는 갈라지지 않는다. ──────
+interactions:
+  - id: ruth_s2_belonging_distance
+    type: select_one_of_n
+    decision_key: belonging_label
+    prompt_ko: "지금 어디에 서 계시겠어요?"
+    options:
+      - value: stay_beside
+        label_ko: "곁에 남는다"
+      - value: step_back
+        label_ko: "한 걸음 물러선다"
+    no_timer: true
+    no_default_selection: true
+    note: "죄의 선택이 아니라 애도의 거리다. 점수·판정 없음. 미선택으로 넘어가면 값은 null 이다."
+
+branches:
+  - id: belonging_label_capture
+    decision_key: belonging_label
+    affects: "Scene 5 마감 한 줄 하나뿐. 서사·자막·에셋은 갈라지지 않는다."
+    routes:
+      - when: { belonging_label: stay_beside }
+        next_scene_id: 3
+      - when: { belonging_label: step_back }
+        next_scene_id: 3
+      - when: { belonging_label: null }
+        next_scene_id: 3
+
+journal:
+  mode: static_curation
+  llm_input: false
+  note: "사전 작성 문자열 ID 만 쓴다. F-4.1 자동 묵상 입력으로 흘러가지 않는다."
+  entries:
+    - id: ruth_s2_journal_a
+      text_ko: "오늘 나는 반박하지 않고 들었다."
+    - id: ruth_s2_journal_b
+      text_ko: "누군가 자기 이름을 바꿔 부르는 것을 들었다."
+
+next_scene_id: 3
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["빈 손", "탄식의 허용"]
+  emotional: ["비탄", "듣기"]
+  rational: ["이름과 처지의 구별"]
