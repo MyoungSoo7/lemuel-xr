@@ -53,6 +53,11 @@ APP_YML = ROOT / "backend" / "src" / "main" / "resources" / "application.yml"
 FILE_REF = re.compile(
     r"`?((?:backend|content|frontend|scripts|docs|unity|unity-stub)/[\w./-]+?\.(?:yml|yaml|kt|ts|tsx|py|md)):(\d+)(?:[-–](\d+))?`?"
 )
+# 리포 경로처럼 생긴 앵커 — 식별자 앵커에서 제외한다(대상 파일 안에 있을 리 없다).
+PATHLIKE = re.compile(
+    r"^(?:backend|content|frontend|scripts|docs|unity|unity-stub)/"
+    r"|\.(?:yml|yaml|kt|ts|tsx|py|md)$"
+)
 # 이 문서 자신의 절 정의: `### 5-4. …` / `## 10. …`
 SECTION_DEF = re.compile(r"^#{2,4}\s+(\d+(?:-\d+)?)\.")
 SECTION_REF = re.compile(r"§(\d+-\d+)")
@@ -185,11 +190,40 @@ def check(target: Path) -> int:
         # **못 보는 자리로 남긴다.** 억지로 짝지어 붙이면 조용히 틀린 판정이 된다.
         # (존재·범위 검사는 그대로 하고, **앵커 대조만** 건너뛴다.)
         anchors: list[str] = []
+        key_anchors: list[str] = []
         if len(refs) == 1:
             # 앵커는 참조 표기 자체를 뺀 나머지 백틱·인용 조각이다.
-            rest = FILE_REF.sub(" ", raw)
-            anchors = [strip_md(a or b) for a, b in ANCHOR.findall(rest)]
-            anchors = [a for a in anchors if a and not re.fullmatch(r"[\w./-]+", a)]
+            # **표 행이면 참조가 있는 칸만 본다.** 마크다운 표는 한 줄에 여러 주장을
+            # 담으므로, 옆 칸의 식별자를 이 참조의 앵커로 삼으면 조용히 틀린 판정이
+            # 된다(실측 오탐: 개정 사유 표 7번 행 — 참조는 「사유」 칸, 앵커
+            # `consent_covers_scenes` 는 「조치」 칸 소유였다).
+            rest = raw
+            if raw.lstrip().startswith("|"):
+                for cell in raw.split("|"):
+                    if FILE_REF.search(cell):
+                        rest = cell
+                        break
+            rest = FILE_REF.sub(" ", rest)
+            raw_anchors = [strip_md(a or b) for a, b in ANCHOR.findall(rest)]
+            anchors = [a for a in raw_anchors if a and not re.fullmatch(r"[\w./-]+", a)]
+            # **식별자 앵커** — `staging_constraints` 처럼 한 낱말짜리 키는 위 필터가
+            # 통째로 버린다. 그런데 코드·저작물을 가리키는 인용에서 앵커는 대개
+            # 식별자 하나뿐이라, 버리면 그 줄은 존재·범위만 검사받고 **내용 대조를
+            # 못 받는다**. rev.11 의 `newchar_gates.py:1354`(빈 줄) 세 자리가 정확히
+            # 이 구멍으로 rc=0 을 통과했다.
+            #
+            # ⚠️ 데이터 파일(`.yml`)에만 적용한다. `.py`/`.kt` 는 "그 키를 판정하는
+            # 코드가 있는 줄"을 가리키는 인용이 정상이라 — `newchar_gates.py:914` 가
+            # `crisis_resources.default` 를 상수로 참조하듯 — 리터럴 부재가 결함이
+            # 아니다(실측 오탐 2건). 소스 파일의 좌표 드리프트는 이 축이 아니라
+            # 사람·채점이 잡는다. **못 잡는 자리로 남긴다.**
+            key_anchors = [
+                a for a in raw_anchors
+                if a and a not in anchors
+                and not PATHLIKE.search(a)
+                and re.fullmatch(r"[\w.]+", a)
+                and ("_" in a or "." in a)
+            ]
         for rel, start, end in refs:
             p = ROOT / rel
             if not p.exists():
@@ -202,12 +236,27 @@ def check(target: Path) -> int:
                 bad += 1
                 print(f"  ✗ {name}:{lineno}  {rel}:{last} — 그 파일은 {len(body)}줄뿐")
                 continue
+            # **가리킨 범위가 통째로 빈 줄이면 그 좌표는 언제나 틀렸다.**
+            # 빈 줄을 일부러 인용하는 경우는 없다. 이 규칙은 앵커가 하나도 없는
+            # 인용 — 곧 이 축이 존재·길이만 보고 통과시키던 자리 — 까지 덮는다.
+            # rev.11 채점이 이 형태로 살아 있는 좌표 드리프트 2건을 잡았고
+            # (`SERIES-GRACE.md:113`(실제 `:112`) · `gates/rahab.yml:35`(실제 `:37`)),
+            # 여섯 도구가 전부 rc=0 인 상태였다. **오탐이 원리적으로 없는 규칙**이라
+            # 강등하지 않는다.
+            # ⚠️ 이 규칙도 `path:NNN` 형태만 본다 — 앞 문장의 파일을 이어받는
+            # **맨 `:NNN`** 은 여전히 이 축의 사각이다(§10 C9).
+            if all(not x.strip() for x in body[int(start) - 1:last]):
+                flag(lineno, f"{rel}:{start}" + (f"-{end}" if end else "")
+                             + " — 그 범위는 통째로 빈 줄이다 (좌표가 밀렸다)",
+                     demotable=False)
+                continue
             # **줄이 있다는 것과 거기 그것이 있다는 것은 다르다.** 앵커가
             # 범위 안에 없고 **그 파일의 다른 줄에는 있으면** 좌표가 밀린 것이다.
             # 어디에도 없으면 앵커가 그 파일의 자구가 아니라는 뜻이라 판정하지 않는다.
             scope = strip_md(" ".join(body[int(start) - 1:last]))
             whole = [strip_md(x) for x in body]
-            for a in anchors:
+            probe = anchors + (key_anchors if rel.endswith((".yml", ".yaml")) else [])
+            for a in probe:
                 if a in scope:
                     break
                 hits = [i for i, x in enumerate(whole, 1) if a in x]
@@ -235,6 +284,12 @@ def check(target: Path) -> int:
             # `when: {<label>: null}` · `consent_declined_route: <id>` 처럼
             # 자리표시자를 쓴 것은 값 주장이 아니라 **표기**다. 대조 대상이 아니다.
             if PLACEHOLDER.search(val):
+                continue
+            # URL 은 `키: 값` 이 아니다. `https://…` 의 스킴이 키로 잡히고 나머지가
+            # 값이 된다 — `SERIES-GRACE.md:277`(대한성서공회 링크)이 이 오탐으로
+            # 여러 판 동안 rc=1 을 냈고, 그때마다 "헌장의 알려진 오탐"으로 손으로
+            # 넘겨 왔다. 사람이 매번 넘겨야 하는 빨강은 다음 빨강을 못 보게 한다.
+            if key in ("http", "https", "ftp") or val.lstrip().startswith("//"):
                 continue
             shapes, prose = value_shapes(files, key)
             if not shapes and not prose:
