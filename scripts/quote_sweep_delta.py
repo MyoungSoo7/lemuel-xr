@@ -78,7 +78,9 @@ def main() -> int:
         return 1
     print(f"  ✓ 늘지 않았다 — AC-2 PASS ({'같다' if curr == prev else f'{prev - curr}건 줄었다'})")
     print("  ⚠️ 이 초록이 말하는 것은 **개수의 방향**뿐이다 — 28건 각각이 자구인지 아닌지는")
-    print("     `docs/RAHAB-REVIEW-LOG.md` 가 판정할 몫이고, rev.7 이후 아무도 다시 보지 않았다.")
+    print("     `docs/RAHAB-REVIEW-LOG.md` 몫이고, `scripts/review_log_check.py` 가 그것을 잰다.")
+    print("     ⚠️ 그 판정은 rev.7 이후 아홉 판 동안 없었고, 처음 열었을 때 **자구 훼손 2건**이")
+    print("     나왔다 — 개수가 안 늘었다는 이 초록이 그동안 가리고 있던 것이다.")
     return 0
 
 

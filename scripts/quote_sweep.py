@@ -145,7 +145,14 @@ def line_starts(text: str) -> list[int]:
     return starts
 
 
-def sweep(target: Path) -> int:
+def collect(target: Path) -> dict:
+    """1군·2군을 계산해 돌려준다. `sweep()` 은 이것을 찍기만 한다.
+
+    **왜 함수로 뺐는가.** `review_log_check.py` 가 「1군 전건이 리뷰 로그에 있는가」를
+    재려면 1군이 무엇인지 알아야 한다. 그 계산을 저쪽에 베껴 두면 **두 벌이 되고,
+    이 파일의 기준이 바뀌어도 저쪽은 옛 기준으로 초록을 낸다** — 이 seed 가 반복해
+    지적해 온 형태다. 그래서 계산은 여기 하나만 두고 저쪽은 불러 쓴다.
+    """
     canon, verses, _ = load_canon()
     text = target.read_text(encoding="utf-8")
     starts = line_starts(text)
@@ -201,8 +208,20 @@ def sweep(target: Path) -> int:
                 misses.append((lineno, " ⟂ ".join(bad),
                                is_scripture_shaped(norm, context), note))
 
-    tier_a = [(n, f, x) for n, f, a, x in misses if a]
-    tier_b = [(n, f, x) for n, f, a, x in misses if not a]
+    return dict(
+        canon=canon, verses=verses,
+        checked=checked, hits=hits, multiline=multiline, skipped=skipped,
+        misses=misses,
+        tier_a=[(n, f, x) for n, f, a, x in misses if a],
+        tier_b=[(n, f, x) for n, f, a, x in misses if not a],
+    )
+
+
+def sweep(target: Path) -> int:
+    r = collect(target)
+    checked, hits, multiline = r["checked"], r["hits"], r["multiline"]
+    skipped, misses = r["skipped"], r["misses"]
+    tier_a, tier_b = r["tier_a"], r["tier_b"]
 
     print(f"대조 {checked}건 (멀티라인 {multiline}건 포함) · "
           f"정본 실재 {hits}건 · 판단 필요 {len(misses)}건")
