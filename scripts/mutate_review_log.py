@@ -9,11 +9,17 @@
 각 변이는 **판정기가 재겠다고 선언한 축 하나씩**을 무너뜨린다. 전건에서 rc=1 이 나와야
 한다. 하나라도 rc=0 이면 그 축은 **선언만 있고 집행이 없는 것**이다.
 
+🚨 **rc 만 보면 부족하다.** 처음 판(rev.11)은 변이마다 `rc=1` 만 확인했는데, 그러면
+**엉뚱한 축이 대신 걸려도 통과**한다 — 아홉 축이 다 같은 `1` 을 내므로 rc 는 어느 축이
+집행됐는지 구별하지 못한다. `mutate_rahab_captions.py` 를 쓰면서 이 구멍이 드러나 여기도
+같은 규율로 올린다: 변이마다 **그 축이 내야 할 불일치 문구가 실제로 출력에 있는지**까지 본다.
+(`review_log_check.py` 는 축 키를 안 찍고 문구만 찍는다. 그래서 문구로 맞춘다 —
+문구가 바뀌면 이 파일이 먼저 빨강이 된다. 그것이 의도다.)
+
     python3 scripts/mutate_review_log.py
 """
 from __future__ import annotations
 
-import os
 import re
 import subprocess
 import sys
@@ -44,34 +50,37 @@ def row(grade: str, must_have: str = "") -> str:
 A, B, C = row("A"), row("B"), row("C")
 A_VERSE = row("A", "정본절=")
 
-MUTANTS: list[tuple[str, str, str, str]] = [
-    # (무너뜨리는 축, 설명, before, after)
-    ("전수성", "판정 행 하나를 통째로 지운다", C, ""),
-    ("잔재", "1군에 없는 조각을 판정한 행을 더한다", C,
+MUTANTS: list[tuple[str, str, str, str, str]] = [
+    # (무너뜨리는 축, 그 축이 내야 할 불일치 문구(정규식), 설명, before, after)
+    ("전수성", r"판정 없음 —", "판정 행 하나를 통째로 지운다", C, ""),
+    ("잔재", r"잔재 행 —", "1군에 없는 조각을 판정한 행을 더한다", C,
      C + "\n| 99 | C | `이 문자열은 seed 어디에도 없다` | 정본 어디에도 없음 | 잔재 시험 |"),
-    ("중복", "같은 조각을 두 번 판정한다", C, C + "\n" + C),
-    ("A·정본실재", "정본에 없는 조각을 A 로 올린다",
+    ("중복", r"같은 조각이 두 번", "같은 조각을 두 번 판정한다", C, C + "\n" + C),
+    ("A·정본실재", r"\[A\] 정본에 없다", "정본에 없는 조각을 A 로 올린다",
      C, C.replace("| C |", "| A |", 1)),
-    ("A·정본절", "A 행의 정본절을 엉뚱한 절로 바꾼다",
+    ("A·정본절", r"\[A\] (정본절 표기가 정본 표에 없다|.+ 본문에 그 조각이 없다)",
+     "A 행의 정본절을 엉뚱한 절로 바꾼다",
      A_VERSE, re.sub(r"정본절=`[^`]+`", "정본절=`수 2:1`", A_VERSE, count=1)),
-    ("A·근거부재", "A 행에서 정본절·정본파일 을 둘 다 뺀다",
+    ("A·근거부재", r"\[A\] 정본절= 또는 정본파일= 이 없다", "A 행에서 정본절·정본파일 을 둘 다 뺀다",
      A, re.sub(r"(정본절|정본파일)=`[^`]+`", "근거 없음", A, count=1)),
-    ("B·훼손전제", "정본에 실재하는 A 조각을 B 로 내린다",
+    ("B·훼손전제", r"\[B\] 훼손이라 했는데 정본에 그대로 있다", "정본에 실재하는 A 조각을 B 로 내린다",
      A, A.replace("| A |", "| B |", 1)),
-    ("B·정본대체", "B 행의 정본대체를 정본에 없는 문자열로 바꾼다",
+    ("B·정본대체", r"\[B\] 정본대체가 정본에 없다", "B 행의 정본대체를 정본에 없는 문자열로 바꾼다",
      B, re.sub(r"정본대체=`[^`]+`", "정본대체=`있지도 않은 정본 자구`", B, count=1)),
-    ("판정사유", "사람 판정 칸을 비운다", C,
+    ("판정사유", r"판정 사유가 비어 있다", "사람 판정 칸을 비운다", C,
      re.sub(r"\|\s*[^|]+\|\s*$", "| — |", C, count=1)),
 ]
 
 
-def run(path: Path) -> int:
-    return subprocess.run([sys.executable, str(CHECK), "--log", os.path.relpath(path, ROOT)],
-                          capture_output=True, text=True, cwd=ROOT).returncode
+def run(path: Path) -> tuple[int, str]:
+    # 판정기는 ROOT 기준 경로를 받는다. 임시 파일을 리포 안에 두지 않으려고 절대경로로 넘긴다.
+    p = subprocess.run([sys.executable, str(CHECK), "--log", str(path)],
+                       capture_output=True, text=True, cwd=ROOT)
+    return p.returncode, p.stdout
 
 
 def main() -> int:
-    base = run(LOG)
+    base, _ = run(LOG)
     print(f"기준선: rc={base}" + ("" if base == 0 else "  ⚠️ 기준선이 초록이 아니다"))
     print()
 
@@ -79,21 +88,22 @@ def main() -> int:
     with tempfile.TemporaryDirectory() as d:
         docs = Path(d) / "docs"
         docs.mkdir()
-        for axis, why, before, after in MUTANTS:
+        for axis, want, why, before, after in MUTANTS:
             assert SRC.count(before) == 1, (axis, SRC.count(before))
             # 🚨 변이가 원본과 같으면 그것은 검사가 아니라 **아무것도 아닌 실행**이다.
             # 실제로 한 번 이 형태가 나왔고, 하마터면 없는 구멍을 보고할 뻔했다.
             assert after != before, f"{axis}: 변이가 원본과 같다 — 무효 변이"
             p = docs / "MUTANT-LOG.md"
             p.write_text(SRC.replace(before, after), encoding="utf-8")
-            # 판정기는 ROOT 기준 상대경로를 받는다. 임시 파일을 리포 안에 두지 않으려고
-            # 절대경로로 넘기지 않고, ROOT 로부터의 상대경로를 계산해 준다.
-            rc = subprocess.run(
-                [sys.executable, str(CHECK), "--log", str(p)],
-                capture_output=True, text=True, cwd=ROOT).returncode
-            ok = rc == 1
+            rc, out = run(p)
+            # rc 와 **문구**를 함께 본다. rc 만 보면 엉뚱한 축이 대신 걸려도 통과한다.
+            ok = rc == 1 and re.search(want, out) is not None
             caught += ok
             print(f"{'✅' if ok else '❌'} {axis:12s} rc={rc}  — {why}")
+            if not ok:
+                hits = [ln.strip() for ln in out.splitlines() if ln.lstrip().startswith("✗")]
+                print(f"     🚨 겨냥한 문구가 없다: /{want}/")
+                print(f"        실제 불일치: {hits or '없음'}")
 
     print(f"\n--- 검출 {caught} / {len(MUTANTS)} ---")
     if caught != len(MUTANTS):
