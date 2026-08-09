@@ -63,7 +63,20 @@ ok, bad, blocked = st.ok, st.bad, st.blocked
 
 VERSES = "docs/verses-rahab.txt"
 GATES = "scripts/gates/rahab.yml"
+STRINGS = "docs/RAHAB-LOCKED-STRINGS.md"
 CRISIS = "{{crisis_resources.default}}"
+
+# 🚨 화면에서 정본과 비정본을 가르는 **유일한** 수단. 이 낱말이 내레이션에 붙지 않으면
+# 저자가 쓴 문장이 성경 자막과 같은 자격으로 화면에 선다. `RAHAB-LOCKED-STRINGS.md`
+# §3-1 이 rev.12 에서야 잠근 문자열이고, 그 전까지는 산문 한 줄이 전부였다.
+MARKER = "본문이 아닙니다"
+
+# n-verse 문턱. 공백·문장부호를 걷어낸 뒤의 **연속 6자**다. 근거는 실측이다 —
+# 확정한 네 문자열의 본문 최대 겹침이 4자("라합이그", 우연)이고, rev.12 초안이 실제로
+# 저지른 복사 「지붕에 올라가」는 공백을 걷으면 정확히 6자다. 곧 이 문턱은 **지금
+# 통과하면서 그 결함은 잡는** 자리에 있다. 낮추면 조사·어미가 걸려 거짓 FAIL 이 나고,
+# 높이면 저 결함이 빠져나간다.
+NAR_NGRAM = 6
 
 # 🚨 이 세 절만은 좌표를 **코드에 적는다.** §5-1-a 가 「화자 지문이 배제 절에 있다」고
 # 지목한 자리이고, 표기가 빠지면 수 2:19 「그의 피가 그의 머리로 돌아갈 것이요」가
@@ -245,18 +258,29 @@ def card_bodies(lines: list[str], s: int, e: int) -> dict[str, str]:
     return out
 
 
-def check_footers(lines: list[str]) -> list[st.Result]:
+def footer_table(slines: list[str]):
+    """F-6.5 문안 7종 — **정본은 `RAHAB-LOCKED-STRINGS.md` §1 이다.**
+
+    rev.11 까지는 seed §5-4 안에 근거 산문과 섞여 있었다. 옮기면서 seed 에는 사본을
+    남기지 않았으므로(포인터만 있다) 여기서 seed 를 읽으면 표를 **못 찾는다** —
+    `section_bounds` 가 `LookupError` 를 내고 main 이 그것을 rc 2(판정 불가)로 낸다.
+    조용히 0 종으로 세어 초록이 되는 길은 없다.
+    """
+    s, e = st.section_bounds(slines, "1. F-6.5")
+    return st.pick_table(st.parse_tables(slines, s, e), "id", "노출 위치", "LOCKED 문자열")
+
+
+def check_footers(lines: list[str], slines: list[str]) -> list[st.Result]:
     res: list[st.Result] = []
 
-    s4s, s4e = st.section_bounds(lines, "5-4.")
-    f_tbl = st.pick_table(st.parse_tables(lines, s4s, s4e), "id", "노출 위치", "LOCKED 문자열")
+    f_tbl = footer_table(slines)
     f_rows = [r for r in f_tbl.rows if st.strip_markup(r["id"])]
 
     # f-rows — 7종
-    res.append(ok("f-rows", f"§5-4 F-6.5 문자열 {len(f_rows)}종 — 7종")
+    res.append(ok("f-rows", f"§1 F-6.5 문자열 {len(f_rows)}종 — 7종")
                if len(f_rows) == 7 else
-               bad("f-rows", f"§5-4 가 {len(f_rows)}종이다 — 7종이어야 한다",
-                   [f"표 머리 SEED:{f_tbl.line}"]))
+               bad("f-rows", f"§1 이 {len(f_rows)}종이다 — 7종이어야 한다",
+                   [f"표 머리 STRINGS:{f_tbl.line}"]))
 
     # 노출 위치에서 카드 id 를 뽑는다. 카드가 아닌 행(종결 화면)은 None.
     assign: dict[str, str] = {}   # card_id -> footer 문안
@@ -286,12 +310,11 @@ def check_footers(lines: list[str]) -> list[st.Result]:
                    [f"{c}: {'footer 없음' if c in cards else '§7-2 에 없는 카드'}" for c in diff]))
 
     # f-cover — 🚨 부착 커버리지. rev.5·rev.7 이 두 번 틀린 자리다.
-    s7as, s7ae = st.section_bounds(lines, "7-2-a.")
-    bodies = card_bodies(lines, s7as, s7ae)
+    bodies = card_bodies(slines, *st.section_bounds(slines, "2. 동의 카드"))
     uncovered, wrong_tail = [], []
     for cid in cards:
         if cid not in bodies:
-            uncovered.append(f"{cid}: §7-2-a 에 카드 본문이 없다")
+            uncovered.append(f"{cid}: §2 에 카드 본문이 없다")
             continue
         want = norm(assign.get(cid, ""))
         got = norm(bodies[cid])
@@ -336,20 +359,115 @@ def check_footers(lines: list[str]) -> list[st.Result]:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# 비성경 내레이션 — `RAHAB-LOCKED-STRINGS.md` §3
+#
+# 🚨 **이 네 문자열은 rev.11 까지 아무도 재지 않았다.** seed §7-2 는 「비성경 내레이션
+#    1줄」이 필요하다고 판정만 하고 문안을 비워 두었고, 비어 있는 칸은 어떤 검사도
+#    걸리지 않는다 — 곧 **없는 것이 통과처럼 보이는** 자리였다. 잠그는 것과 재는 것을
+#    같은 판에 넣는다. 잠그기만 하면 다음 판이 조용히 바꿔도 아무 줄도 붉어지지 않는다.
+# ──────────────────────────────────────────────────────────────────────────
+
+ROUTE = re.compile(r'"([a-z0-9_]+)"')
+
+
+def narration_rows(slines: list[str]) -> list[dict]:
+    s, e = st.section_bounds(slines, "3. 비성경 내레이션")
+    tbl = st.pick_table(st.parse_tables(slines, s, e), "id", "언제 뜨는가", "LOCKED 문자열")
+    return [r for r in tbl.rows if st.strip_markup(r["id"])]
+
+
+def check_narration(lines: list[str], slines: list[str]) -> list[st.Result]:
+    res: list[st.Result] = []
+    rows = narration_rows(slines)
+    ids = [st.strip_markup(r["id"]) for r in rows]
+    text_of = {st.strip_markup(r["id"]): st.strip_markup(r["LOCKED 문자열"]).strip('"')
+               for r in rows}
+
+    # n-rows — 내레이션 3줄 + 표지 1 = 4행. 표지를 따로 세지 않으면 §3-1 이 적어 둔
+    #          「16종이 아니라 17종」이 다시 16종으로 돌아가도 아무 줄도 붉어지지 않는다.
+    want = ["rahab_nar_s1_address", "rahab_nar_s3_bridge",
+            "rahab_nar_s5_close", "rahab_nar_marker"]
+    missing = [i for i in want if i not in ids]
+    extra = [i for i in ids if i not in want]
+    res.append(ok("n-rows", f"§3 내레이션 {len(rows)}행 — 3줄 + 표지 1")
+               if not missing and not extra and len(rows) == 4 else
+               bad("n-rows", f"§3 이 {len(rows)}행이다 — 4행(3줄+표지)이어야 한다",
+                   [f"없다: {m}" for m in missing] + [f"모르는 id: {x}" for x in extra]))
+
+    # n-marker — 표지 문자열이 자구 그대로 잠겨 있는가
+    got_marker = text_of.get("rahab_nar_marker", "")
+    res.append(ok("n-marker", f"표지 문자열 {MARKER!r} 이 표에 잠겨 있다")
+               if norm(got_marker) == MARKER else
+               bad("n-marker", "표지 문자열이 검사기가 아는 자구와 다르다",
+                   [f"표: {got_marker!r} ≠ 코드: {MARKER!r}",
+                    "🚨 화면에서 정본과 비정본을 가르는 유일한 수단이다"]))
+
+    # n-forbid — R3 어휘
+    toks = forbidden_tokens()
+    hits = [f"{i}: {t!r}" for i in ids for t in toks if t in text_of[i]]
+    res.append(ok("n-forbid", f"내레이션 {len(ids)}종이 금지 토큰 {len(toks)}종을 쓰지 않는다")
+               if not hits else
+               bad("n-forbid", f"금지 토큰 사용 {len(hits)}건", hits))
+
+    # n-verse — 🚨 성경 자구 복사. rev.12 초안이 실제로 저지른 결함이다
+    #           (「지붕에 올라가」 — 하필 `s2_skip` 이 **빼는** 수 2:6 의 자구였다).
+    corpus = re.sub(r"[^0-9A-Za-z가-힣]", "", used_verses()[1])
+    grams = {corpus[i:i + NAR_NGRAM] for i in range(len(corpus) - NAR_NGRAM + 1)}
+    copied = []
+    for i in ids:
+        t = re.sub(r"[^0-9A-Za-z가-힣]", "", text_of[i])
+        hit = sorted({t[j:j + NAR_NGRAM] for j in range(len(t) - NAR_NGRAM + 1)} & grams)
+        if hit:
+            copied.append(f"{i}: {' · '.join(hit)}")
+    res.append(ok("n-verse", f"내레이션 {len(ids)}종에 본문 연속 {NAR_NGRAM}자 겹침 없음",
+                  ["⚠️ 자구 복사의 **하한**이다 — 자구를 안 겹치고 사건만 옮기는 문장은 통과한다"])
+               if not copied else
+               bad("n-verse", f"본문 자구 복사 의심 {len(copied)}건", copied))
+
+    # n-disclose — 🚨 내레이션을 부르는 경로의 카드가 그 사실을 말하는가.
+    #   §7-2-a 자신의 규칙이 「건너뛰기 문구는 최악을 적는다」인데, 성경만 보겠다고
+    #   건너뛴 사용자가 **저자가 쓴 문장을 더 받는다**는 것은 rev.11 까지 어느 카드도
+    #   말하지 않았다. 카드 이름으로 세면 `rahab_lineage_birth` 가 빠진다 —
+    #   route 가 `rahab_stigma` 와 같아서 이쪽을 거절해도 같은 줄이 뜬다. 그래서
+    #   **이름이 아니라 route 로** 역산한다.
+    routes = {m for r in rows for m in ROUTE.findall(r["언제 뜨는가"])}
+    s72s, s72e = st.section_bounds(lines, "7-2.")
+    c_tbl = st.pick_table(st.parse_tables(lines, s72s, s72e),
+                          "consent_card_id", "Scene", "skip_alternative_scene_id")
+    need = sorted({st.strip_markup(r["consent_card_id"]) for r in c_tbl.rows
+                   if st.strip_markup(r["consent_card_id"])
+                   and st.strip_markup(r["skip_alternative_scene_id"]).strip('"') in routes})
+    bodies = card_bodies(slines, *st.section_bounds(slines, "2. 동의 카드"))
+    # norm 을 거쳐 본다 — 카드 본문은 여러 줄로 접혀 있어, 접지 않으면 표지가
+    # 줄바꿈에 걸린 장을 「고지 없음」으로 오판한다. 실제로 그렇게 났다.
+    silent = [f"{c}: 거절하면 내레이션이 뜨는데 카드가 그 말을 하지 않는다"
+              for c in need if MARKER not in norm(bodies.get(c, ""))]
+    res.append(ok("n-disclose", f"내레이션을 부르는 카드 {len(need)}장 전건이 그 사실을 고지",
+                  [" · ".join(need)])
+               if not silent else
+               bad("n-disclose", f"미고지 {len(silent)}건 — 「최악을 적는다」 위반", silent))
+    return res
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # yml 층위 — designer 산출물
 # ──────────────────────────────────────────────────────────────────────────
 
-def check_yml(lines: list[str], content: str) -> list[st.Result]:
+def check_yml(lines: list[str], slines: list[str], content: str) -> list[st.Result]:
     files = st.scene_files(content)
     rel = os.path.relpath(content, ROOT)
     if not files:
         return [
             blocked("a-yml", f"자막 배열 대조 불가 — `{rel}/scene*.yml` 이 없다 (designer 산출물)"),
             blocked("f-yml", f"footer 실부착 대조 불가 — `{rel}/scene*.yml` 이 없다 (designer 산출물)"),
+            # 🚨 표기(서체·색)는 yml 이 생겨도 못 잰다. 여기서 재는 것은 **문자열이
+            #    실렸는가**뿐이고, 그것이 자막과 구별되게 그려지는지는 여전히 미완화 노출이다.
+            blocked("n-yml", f"내레이션 실적재 대조 불가 — `{rel}/scene*.yml` 이 없다 (designer 산출물)"),
         ]
     if st.load_yaml(files[0]) is None:
         return [blocked("a-yml", "PyYAML 이 없어 yml 을 읽지 못한다"),
-                blocked("f-yml", "PyYAML 이 없어 yml 을 읽지 못한다")]
+                blocked("f-yml", "PyYAML 이 없어 yml 을 읽지 못한다"),
+                blocked("n-yml", "PyYAML 이 없어 yml 을 읽지 못한다")]
 
     s, e = st.section_bounds(lines, "5-1-a.")
     tbl = st.pick_table(st.parse_tables(lines, s, e),
@@ -362,8 +480,7 @@ def check_yml(lines: list[str], content: str) -> list[st.Result]:
             (st.strip_markup(r["verse_ref"]),
              st.strip_markup(r["attribution_display_ko"])))
 
-    s4s, s4e = st.section_bounds(lines, "5-4.")
-    f_tbl = st.pick_table(st.parse_tables(lines, s4s, s4e), "id", "노출 위치", "LOCKED 문자열")
+    f_tbl = footer_table(slines)
     assign = {}
     for r in f_tbl.rows:
         m = re.search(CARD_IN_SLOT, r.get("노출 위치", ""))
@@ -402,6 +519,18 @@ def check_yml(lines: list[str], content: str) -> list[st.Result]:
                else ok("a-yml", f"{len(files)}개 Scene yml 의 자막 배열이 §5-1-a 와 일치"))
     res.append(bad("f-yml", f"(footer) yml 불일치 {len(foot_bad)}건", foot_bad) if foot_bad
                else ok("f-yml", f"{len(files)}개 Scene yml 의 동의 카드에 F-6.5 footer 가 붙었다"))
+
+    # n-yml — 내레이션 4종이 실제로 실렸는가. ⚠️ **문자열의 실재만 잰다.**
+    #   서체·색은 여기서 못 재고, 그 몫은 미완화 노출로 남는다(§4).
+    blob = norm(" ".join(read(os.path.relpath(p, ROOT)) for p in files))
+    nar_bad = [f"{i}: yml 어디에도 없다"
+               for i, t in ((st.strip_markup(r["id"]),
+                             st.strip_markup(r["LOCKED 문자열"]).strip('"'))
+                            for r in narration_rows(slines))
+               if norm(t) not in blob]
+    res.append(bad("n-yml", f"(내레이션) yml 미적재 {len(nar_bad)}건", nar_bad) if nar_bad
+               else ok("n-yml", f"§3 내레이션 4종이 {len(files)}개 Scene yml 에 실려 있다",
+                       ["⚠️ 문자열 실재만 잰다 — 서체·색 구별은 여전히 미측정"]))
     return res
 
 
@@ -413,21 +542,31 @@ def main(argv=None) -> int:
     # 가 §실측 표의 도구를 `python3 scripts/<tool> <입력>` 으로 **다시 돌린다.**
     ap.add_argument("seed_pos", nargs="?", default=None, help="검사할 seed (위치 인자)")
     ap.add_argument("--seed", default="docs/SEED-RAHAB.md")
+    ap.add_argument("--strings", default=STRINGS)
     ap.add_argument("--content", default="content/rahab")
     a = ap.parse_args(argv)
 
     a.seed = a.seed_pos or a.seed
     seed = a.seed if os.path.isabs(a.seed) else os.path.join(ROOT, a.seed)
+    strings = a.strings if os.path.isabs(a.strings) else os.path.join(ROOT, a.strings)
     content = a.content if os.path.isabs(a.content) else os.path.join(ROOT, a.content)
     if not os.path.exists(seed):
         sys.stderr.write(f"seed 없음: {seed}\n")
         return 2
+    if not os.path.exists(strings):
+        # 문안 정본이 없으면 footer·카드·내레이션은 **한 줄도** 잴 수 없다.
+        # 이것을 "검사할 게 없어서 통과"로 접으면 이 검사기가 존재할 이유가 없어진다.
+        sys.stderr.write(f"문안 정본 없음: {strings}\n")
+        return 2
 
     with open(seed, encoding="utf-8") as f:
         lines = f.read().splitlines()
+    with open(strings, encoding="utf-8") as f:
+        slines = f.read().splitlines()
 
     try:
-        results = check_captions(lines) + check_footers(lines) + check_yml(lines, content)
+        results = (check_captions(lines) + check_footers(lines, slines)
+                   + check_narration(lines, slines) + check_yml(lines, slines, content))
     except LookupError as ex:
         # 절·표를 못 찾은 것은 "문제 없음"이 아니라 판정 불가다.
         sys.stderr.write(f"판정 불가 — seed 구조가 예상과 다르다: {ex}\n")
