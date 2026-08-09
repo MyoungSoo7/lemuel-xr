@@ -12,7 +12,7 @@
 - **인물**: 라합 (여호수아 2장 · 여호수아 6장 발췌 · 마 1:5 · 약 2:25)
 - **축**: 낙인 채로의 편입 — 과거가 지워지지 않은 채 계보에 들어감 (`docs/PLAN.md` §2.2 Theme 20)
 - **자구 정본**: `docs/VERSES-RAHAB-GAE.md` (2026-08-06 대한성서공회 실측). 자막은 여기서만 인용한다
-- **비성경 노출 문자열 정본**: `docs/RAHAB-LOCKED-STRINGS.md` (17종 LOCKED)
+- **비성경 노출 문자열 정본**: `docs/RAHAB-LOCKED-STRINGS.md` (18종 LOCKED)
 - **게이트 입력**: `scripts/gates/rahab.yml` (`ruleset: newchar-v5` · `scene_count: 5`)
 
 ---
@@ -57,10 +57,13 @@
 
 ---
 
-## 1. 게임 컨셉 — `먼저 있었던 일` _(제목 미확정 · designer 제안)_
+## 1. 게임 컨셉 — `먼저 있었던 일`
 
-> ⚠️ 이 제목은 seed 에 확정값이 **없다.** designer 제안이며 저자 승인 전에는 가제다.
-> 채택 시 `docs/RAHAB-LOCKED-STRINGS.md` 에 LOCKED 로 등재해야 한다.
+> ✅ **저자 승인 2026-08-09**(seed rev.13 · D1). designer 제안을 그대로 채택했다.
+> 자구는 `docs/RAHAB-LOCKED-STRINGS.md` **§4** 에 `rahab_mission_title` 로 잠겼고,
+> `check_rahab_captions.py` 의 `t-rows`·`t-title`·`t-forbid`·`t-verse` 네 축이 매 실행 대조한다.
+> 🚨 **제목은 도달률 100% 인 유일한 비성경 문자열이다** — 자막보다 앞에 있고,
+> 동의 카드도 스킵도 그것을 줄이지 못한다. 잠근 판에서 축을 같이 붙인 이유다.
 
 ### 1-1. 핵심 메시지
 
@@ -140,13 +143,14 @@ Scene 1 제목만 2:11 자구 조각이고 나머지 넷은 **저자의 진술**
 
 | Scene | `exposure_grade` | `default_path`    | `llm_optin_only` | `trigger_categories`                                                         |
 | ----- | ---------------- | ----------------- | ---------------- | ---------------------------------------------------------------------------- |
-| 1     | **C**            | `static_curation` | `true`           | `sex_work_stigma`                                                            |
+| 1     | **C**            | `static_curation` | `true`           | `sex_work_stigma` · `collective_terror_response`                                                            |
 | 2     | **C**            | `static_curation` | `true`           | `sexual_vulnerability_context` · `home_intrusion_search`                     |
-| 3     | **C**            | `static_curation` | `true`           | `family_annihilation_risk`                                                   |
+| 3     | **C**            | `static_curation` | `true`           | `family_annihilation_risk` · `conditional_survival_pact`                                                   |
 | 4     | **C**            | `static_curation` | `true`           | `blood_guilt_attribution` · `height_suspension` · `family_annihilation_risk` |
 | 5     | **C**            | `static_curation` | `true`           | `sex_work_stigma` · `ethnic_labeling` · `pregnancy_childbirth`               |
 
-⚠️ **`trigger_categories` 8종 중 5종은 코퍼스 최초 등장이다** — 상위 정본이 없다(DP-R10).
+⚠️ **`trigger_categories` 10종 중 7종은 코퍼스 최초 등장이다** — 상위 정본이 없다(DP-R10).
+뒤의 둘(`conditional_survival_pact` · `collective_terror_response`)은 **seed rev.13 D3 신설**이다.
 ⚠️ **다섯 Scene 전부 C 인데 동의 카드 강도는 low_mid~mid 로 갈린다** — 등급과 카드 강도의
 대응 규칙이 없다(DP-R11). 둘 다 §10 에 미해소로 남긴다.
 
@@ -368,7 +372,7 @@ rev.2 의 "양 끝에 같은 낱말" 주장은 철회되었다.
 | DP-R7  | 라합을 예로 드는 것 자체에 대한 비판     | **미해소.** 이 문서가 해소하지 못한다                       |
 | DP-R8  | 예정론으로의 미끄러짐                    | 미션은 선택 교리 진술을 하지 않는다                         |
 | DP-R9  | 생존을 인과절로 서술하는 문제            | 토큰 사정거리 **밖**. 인간 검토로만 잡힌다                  |
-| DP-R10 | `trigger_categories` 정본 부재           | 8종 중 5종이 코퍼스 최초. 상위 정본 없음                    |
+| DP-R10 | `trigger_categories` 정본 부재           | **10종 중 7종**이 코퍼스 최초. rev.13 D3 이 둘을 더해 **더 급해졌다**                    |
 | DP-R11 | 등급 C 와 카드 강도의 대응 규칙 부재     | 미해소                                                      |
 | DP-R12 | F-6.6 문구 문제                          | **"F-6.6 적용"이라고 쓰지 않는다**                          |
 | DP-R13 | 위험 서열 필드 부재                      | 스키마에 자리가 없다                                        |
@@ -439,8 +443,18 @@ Scene(5) × 진입 모드(3) = **15패턴**이 상한이다.
 | `rahab_s{N}_{mode}`       | `rahab_s3_emotional`       | 정적 큐레이션 응답 캐시      |
 | `rahab_s{N}_{mode}_optin` | `rahab_s3_emotional_optin` | opt-in 응대의 사전 캐싱 후보 |
 
-⚠️ **사전 캐싱 15패턴을 미리 작성할지, 런타임 생성으로 둘지는 미결정이다.**
-seed 에 확정값이 없다 — 저자가 정한다.
+✅ **사전 캐싱으로 확정한다**(저자 결정 2026-08-09 · seed rev.13 D4). 15패턴을 배포 전에
+생성해 넣는다. 런타임 생성은 기각했다.
+
+**근거는 성능이 아니라 검수 순서다.** 런타임 생성은 **사람 검수를 사용자 뒤로 미룬다** —
+처음 그 조합을 만난 사용자가 아무도 읽어 보지 않은 문장을 먼저 받는다. 이 미션은 신학·
+정신건강 검토가 핵심 통제이고(§10 H6), 그 통제가 **사용자 노출 뒤에 오면 통제가 아니다.**
+15패턴은 사람이 전건 읽을 수 있는 분량이다 — 사건 분기 0건이 준 이점이 바로 그것이다.
+
+🚨 **seed 에는 캐시 키 형식이 없다.** 위 표의 `rahab_s{N}_{mode}` 는 **이 문서가 정한 것**이고,
+상류에 없는 값을 상류에 귀속시키지 않는다. seed rev.13 도 이 값을 만들지 않았다.
+⚠️ **「사전 작성한다」는 결정이지 산출물이 아니다.** 15패턴은 아직 **한 건도 없다** —
+`content/rahab/` 부재와 같은 자리다. 이 절이 초록으로 읽히면 안 된다.
 
 ### 5-3. faith_tone 3단
 
@@ -483,8 +497,14 @@ seed 에 확정값이 없다 — 저자가 정한다.
 | 11  | 진영 밖 격리          | 6:23       | 5     | **없음 (의도)**       |
 | 12  | 출산 언급             | 마 1:5     | 5     | `rahab_lineage_birth` |
 
-🚨 **12행을 카테고리 8종으로 접으면 두 행이 덮이지 않는다** — 5번(목숨 대신 + 침묵 조건)과
-6번(집단 공포 반응)이다. 11번은 **이름이 있는데 카드가 없다**(의도적 판단). 셋 다 §10 C10 이다.
+✅ **12행 전건이 카테고리 10종으로 덮인다**(seed rev.13 · D3). rev.12 까지는 5번(목숨 대신 +
+침묵 조건)과 6번(집단 공포 반응)이 덮이지 않았고, 저자가 두 종을 신설해 닫았다.
+
+🚨 **이 초록이 말하지 않는 것.** ① 6번은 **전용 카드가 여전히 없다** — `rahab_stigma` 에
+얹혀 있어 대상이 다른 두 위험의 동의를 하나로 받는다. ② 11번은 **이름이 있는데 카드가
+없다**(의도) — 절 생존 불변식이 카드를 금지하고, 형식상의 카드는 거절 델타가 공집합이라
+보호를 얻었다는 착각만 준다. ③ 두 표를 맞대는 **코드는 없다**(`trigger_categories` 는
+`newchar_gates.py` 에 0회) — 이 12/12 는 사람이 손으로 맞댄 값이다. 셋 다 §10 C10 존치.
 
 ### 6-2. 시각화·정서 부담
 
@@ -599,7 +619,7 @@ seed 에 확정값이 없다 — 저자가 정한다.
 | -------------------------- | -------------------------------------- | -------------------------------------- |
 | 1. seed 동결               | `docs/SEED-RAHAB.md` rev.12            | **완료**                               |
 | 2. 자구 정본               | `docs/VERSES-RAHAB-GAE.md`             | **완료**                               |
-| 3. 잠긴 문자열             | `docs/RAHAB-LOCKED-STRINGS.md` 17종    | **완료**                               |
+| 3. 잠긴 문자열             | `docs/RAHAB-LOCKED-STRINGS.md` 18종    | **완료**                               |
 | 4. 설계 검토 (이 문서)     | `docs/MVP-RAHAB.md`                    | **초안** ≤70%                          |
 | 5. 각본 · Scene yml        | `content/rahab/scene1~5.yml`           | **미착수** — 게이트 20개가 여기에 걸림 |
 | 6. wireframe               | 진입 모드 · 카드 6장 · 종결 화면       | 미착수                                 |
@@ -616,7 +636,7 @@ seed 에 확정값이 없다 — 저자가 정한다.
 | ----------------------------------------- | ---------------------------------------------------- |
 | `docs/SEED-RAHAB.md`                      | 동결 rev.12                                          |
 | `docs/VERSES-RAHAB-GAE.md`                | 자구 정본                                            |
-| `docs/RAHAB-LOCKED-STRINGS.md`            | 비성경 노출 문자열 17종                              |
+| `docs/RAHAB-LOCKED-STRINGS.md`            | 비성경 노출 문자열 18종                              |
 | `docs/verses-rahab.txt`                   | 전수 대조표 55행                                     |
 | `scripts/gates/rahab.yml`                 | 게이트 입력                                          |
 | **`docs/MVP-RAHAB.md`**                   | **이 문서 (초안)**                                   |
@@ -778,7 +798,7 @@ PASS 10 / FAIL 0 / BLOCKED 17 · rc=1
 
 ## 13. 사용자 통제권 — 동의 카드 6장
 
-### 13-1. 카드 목록 (seed §7-2 · §7-2-a)
+### 13-1. 카드 목록 (seed §7-2 · seed §7-2-a)
 
 | 카드 id               | 강도      | 덮는 Scene | 거절 시 실행 경로                         |
 | --------------------- | --------- | ---------- | ----------------------------------------- |

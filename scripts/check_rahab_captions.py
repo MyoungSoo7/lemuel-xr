@@ -33,6 +33,20 @@ rev.7 은 6장 중 5장) 두 번 다 **사람이 다시 세어서** 잡았다. �
       f-forbid footer 문안이 `scripts/gates/rahab.yml` 의 금지 토큰을 쓰지 않는다
       f-yml    Scene yml 의 카드에 footer 가 실제로 붙었는가 — **designer 산출물**
 
+    비성경 내레이션 (`RAHAB-LOCKED-STRINGS.md` §3 — rev.12 신설)
+      n-rows   §3 이 4행이다 — 내레이션 3줄 + 표지 1
+      n-marker 표지 자구 "본문이 아닙니다" 가 잠겨 있다
+      n-forbid 내레이션 문안이 금지 토큰을 쓰지 않는다
+      n-verse  내레이션이 성경 자구를 옮기지 않는다(연속 6자 n-gram)
+      n-disclose 내레이션을 부르는 route 의 카드가 그 사실을 고지한다
+      n-yml    Scene yml 에 내레이션이 실렸는가 — **designer 산출물**
+
+    미션 제목 (`RAHAB-LOCKED-STRINGS.md` §4 — 이 판 신설)
+      t-rows   §4 가 `rahab_mission_title` 1행이다
+      t-title  제목 자구가 "먼저 있었던 일" 이다
+      t-forbid 제목이 금지 토큰을 쓰지 않는다
+      t-verse  제목이 성경 자구를 옮기지 않는다 — 🚨 제목에는 표지를 붙일 자리가 없다
+
 **한 검사가 두 층위로 갈린다.** `content/rahab/scene*.yml` 은 designer 산출물이라 아직
 없다. 없는 쪽을 조용히 건너뛰면 그 검사는 "통과"로 보이므로 **문서 층위와 yml 층위를 각각
 한 줄로 낸다.** yml 이 없으면 그 줄은 PASS 가 아니라 `BLOCKED` 다.
@@ -70,6 +84,14 @@ CRISIS = "{{crisis_resources.default}}"
 # 저자가 쓴 문장이 성경 자막과 같은 자격으로 화면에 선다. `RAHAB-LOCKED-STRINGS.md`
 # §3-1 이 rev.12 에서야 잠근 문자열이고, 그 전까지는 산문 한 줄이 전부였다.
 MARKER = "본문이 아닙니다"
+
+# 🚨 미션 제목. `RAHAB-LOCKED-STRINGS.md` §4 가 이 판에서 잠근 것이고, seed 에는
+# 확정값이 **없었다** — `docs/MVP-RAHAB.md` §1 이 designer 제안으로 올린 가제를
+# 저자가 2026-08-09 에 승인했다. 제목은 **도달률 100%** 인 유일한 비성경 문자열이다:
+# 자막보다 앞에 있고, 동의 카드도 스킵도 그것을 줄이지 못한다. 여기에 자구를 적어
+# 두는 이유는 표만 잠그면 다음 판이 표를 통째로 바꿔도 아무 줄도 붉어지지 않기 때문이다.
+TITLE_ID = "rahab_mission_title"
+TITLE = "먼저 있었던 일"
 
 # n-verse 문턱. 공백·문장부호를 걷어낸 뒤의 **연속 6자**다. 근거는 실측이다 —
 # 확정한 네 문자열의 본문 최대 겹침이 4자("라합이그", 우연)이고, rev.12 초안이 실제로
@@ -450,6 +472,70 @@ def check_narration(lines: list[str], slines: list[str]) -> list[st.Result]:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# 미션 제목 — `RAHAB-LOCKED-STRINGS.md` §4
+#
+# 🚨 이 문자열은 **아무 통제도 줄이지 못하는 자리**에 있다. 동의 카드는 자막을 빼고
+#    스킵은 Scene 을 빼지만, 제목은 그 어느 것보다 먼저 읽힌다 — 곧 도달률 100% 다.
+#    §4 를 잠그는 같은 판에서 네 축을 넣는다. rev.12 가 배운 것이 그것이다:
+#    **잠그기만 하고 재지 않으면 정본이 하나 는 것이 아니라 사각지대가 하나 는다.**
+# ──────────────────────────────────────────────────────────────────────────
+
+
+def title_rows(slines: list[str]) -> list[dict]:
+    s, e = st.section_bounds(slines, "4. 미션 제목")
+    tbl = st.pick_table(st.parse_tables(slines, s, e),
+                        "id", "어디에 나가는가", "LOCKED 문자열")
+    return [r for r in tbl.rows if st.strip_markup(r["id"])]
+
+
+def check_title(slines: list[str]) -> list[st.Result]:
+    res: list[st.Result] = []
+    rows = title_rows(slines)
+    text_of = {st.strip_markup(r["id"]): st.strip_markup(r["LOCKED 문자열"]).strip('"')
+               for r in rows}
+
+    # t-rows — §4 는 1행이다. 제목이 둘이면 어느 것이 화면에 서는지 정본이 답하지 못한다.
+    ids = list(text_of)
+    res.append(ok("t-rows", f"§4 미션 제목 {len(rows)}행 — 1행")
+               if len(rows) == 1 and ids == [TITLE_ID] else
+               bad("t-rows", f"§4 가 {len(rows)}행이다 — {TITLE_ID} 1행이어야 한다",
+                   [f"본 id: {ids or '없음'}"]))
+
+    # t-title — 자구. 표만 있고 자구를 코드가 모르면 다음 판이 조용히 바꿀 수 있다.
+    got = text_of.get(TITLE_ID, "")
+    res.append(ok("t-title", f"제목 자구 {TITLE!r} 이 표에 잠겨 있다")
+               if norm(got) == TITLE else
+               bad("t-title", "제목 자구가 검사기가 아는 것과 다르다",
+                   [f"표: {got!r} ≠ 코드: {TITLE!r}",
+                    "🚨 도달률 100% 인 유일한 비성경 문자열이다"]))
+
+    # t-forbid — R3 어휘
+    toks = forbidden_tokens()
+    hits = [f"{i}: {t!r}" for i in ids for t in toks if t in text_of[i]]
+    res.append(ok("t-forbid", f"제목 {len(ids)}종이 금지 토큰 {len(toks)}종을 쓰지 않는다")
+               if not hits else
+               bad("t-forbid", f"금지 토큰 사용 {len(hits)}건", hits))
+
+    # t-verse — 🚨 내레이션(`n-verse`)보다 **더 강하게** 요구되는 축이다. 내레이션은
+    #   `rahab_nar_marker` 표지를 달고 뜨지만 제목에는 표지를 붙일 자리가 없다
+    #   (§4-2). 곧 제목이 자구를 옮기면 화면에 **표지 없는 성경 문장**이 서게 된다.
+    corpus = re.sub(r"[^0-9A-Za-z가-힣]", "", used_verses()[1])
+    grams = {corpus[i:i + NAR_NGRAM] for i in range(len(corpus) - NAR_NGRAM + 1)}
+    copied = []
+    for i in ids:
+        t = re.sub(r"[^0-9A-Za-z가-힣]", "", text_of[i])
+        hit = sorted({t[j:j + NAR_NGRAM] for j in range(len(t) - NAR_NGRAM + 1)} & grams)
+        if hit:
+            copied.append(f"{i}: {' · '.join(hit)}")
+    res.append(ok("t-verse", f"제목에 본문 연속 {NAR_NGRAM}자 겹침 없음",
+                  ["⚠️ 제목은 6자다 — n-gram 문턱과 길이가 같아 **전부 일치할 때만** 걸린다",
+                   "   부분 복사를 잡는 검사가 아니다"])
+               if not copied else
+               bad("t-verse", f"본문 자구 복사 의심 {len(copied)}건", copied))
+    return res
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # yml 층위 — designer 산출물
 # ──────────────────────────────────────────────────────────────────────────
 
@@ -566,7 +652,8 @@ def main(argv=None) -> int:
 
     try:
         results = (check_captions(lines) + check_footers(lines, slines)
-                   + check_narration(lines, slines) + check_yml(lines, slines, content))
+                   + check_narration(lines, slines) + check_title(slines)
+                   + check_yml(lines, slines, content))
     except LookupError as ex:
         # 절·표를 못 찾은 것은 "문제 없음"이 아니라 판정 불가다.
         sys.stderr.write(f"판정 불가 — seed 구조가 예상과 다르다: {ex}\n")

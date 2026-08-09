@@ -70,6 +70,7 @@ NAR_MARK = line_with("| `rahab_nar_marker`", src=SSRC)
 #    `rahab_lineage_birth` 는 route 가 낙인과 같아서 걸리는 장이라, 사람이 세면
 #    바로 이 장이 빠진다. 변이도 사람이 틀리는 자리를 겨눈다.
 CARD_LINEAGE_DISCLOSE = line_with("· 그 자리에는 성경 본문이 아닌 안내 문장", src=SSRC)
+TITLE_ROW = line_with("| `rahab_mission_title`", src=SSRC)
 
 # (무너뜨리는 축, 겨냥한 검사 키, 어느 정본을 변이시키는가, 설명, before, after)
 SEED_F, STR_F = "seed", "strings"
@@ -110,6 +111,17 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
     ("거절 고지", "n-disclose", STR_F,
      "🚨 계보 카드에서 고지 줄을 지운다 — route 가 낙인과 같아 사람이 세면 빠지는 장",
      CARD_LINEAGE_DISCLOSE, ""),
+    # ── 미션 제목 4축. 제목을 **잠그는 그 판에서** 변이를 같이 넣는다.
+    #    seed 에 확정값이 없던 자리라, 잠그기만 하면 다음 판이 「제안이었으니 바꿔도
+    #    된다」로 읽고 조용히 갈아 끼울 수 있다. 도달률 100% 인 문자열이다.
+    ("제목 행 수", "t-rows", STR_F, "§4 에서 제목 행을 지운다", TITLE_ROW, ""),
+    ("제목 자구", "t-title", STR_F, "🚨 저자가 승인한 제목을 비슷한 말로 바꾼다",
+     TITLE_ROW, TITLE_ROW.replace("먼저 있었던 일", "처음 있었던 일")),
+    ("제목 금지 토큰", "t-forbid", STR_F, "제목에 R3 어휘를 넣는다",
+     TITLE_ROW, TITLE_ROW.replace("먼저 있었던 일", "믿음으로 이겨내 보세요")),
+    ("제목 자구 복사", "t-verse", STR_F,
+     "🚨 제목에 성경 자구를 넣는다 — 제목에는 「본문이 아닙니다」 표지를 붙일 자리가 없다",
+     TITLE_ROW, TITLE_ROW.replace("먼저 있었던 일", "지붕에 올라가")),
 ]
 
 FAIL_LINE = re.compile(r"^\s*\[FAIL\s*\]\s*(\S+)")

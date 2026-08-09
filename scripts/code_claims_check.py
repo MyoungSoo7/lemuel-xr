@@ -59,10 +59,17 @@ PATHLIKE = re.compile(
     r"|\.(?:yml|yaml|kt|ts|tsx|py|md)$"
 )
 # 이 문서 자신의 절 정의: `### 5-4. …` / `## 10. …`
-SECTION_DEF = re.compile(r"^#{2,4}\s+(\d+(?:-\d+)?)\.")
-SECTION_REF = re.compile(r"§(\d+-\d+)")
+SECTION_DEF = re.compile(r"^#{2,4}\s+(\d+(?:-\d+)*(?:-[a-z])?)\.")
+# 🚨 초판은 `§(\d+-\d+)` 였다. 그래서 `§7-2-a` 를 **`§7-2` 로 잘라** 보고했다 —
+# 이 문서에 `§7-2` 가 없다는 판정은 맞았지만 **가리킨 좌표가 틀렸고**, 사람이
+# 원문을 찾아가면 문서에 없는 문자열을 찾게 된다. 꼬리까지 다 잡는다.
+SECTION_REF = re.compile(r"§(\d+(?:-\d+)+(?:-[a-z])?)")
 # 타 문서를 가리키는 § 는 건너뛴다 — 헌장 §2.1-b 처럼.
 FOREIGN = re.compile(r"헌장|\.md|SERIES-GRACE|FUNCTIONAL-SPEC|EMOTION-CLASSIFIER")
+# 🚨 FOREIGN 은 **줄 단위**라, 「seed §7-2」처럼 *참조 하나*에 붙은 한정어는 못 본다.
+# 한정어가 바로 앞에 오면 그 참조만 건너뛴다. 줄 전체를 면제하지 않는다 —
+# 같은 줄의 **한정어 없는** 참조는 그대로 이 문서 것으로 대조받아야 하기 때문이다.
+QUALIFIED = re.compile(r"(?:seed|SEED|MVP|로그|README|정본|사양)\s*§$")
 
 IDENT = re.compile(r"`([a-z][a-z0-9]*(?:_[a-z0-9]+){1,4})`")
 # 백틱 안에 **키와 값을 함께** 적으면 그건 값 형태에 대한 주장이다:
@@ -270,8 +277,11 @@ def check(target: Path) -> int:
 
     # ── 2. 자기 절 참조 ──────────────────────────────────────────────
     for lineno, raw in enumerate(lines, 1):
-        for ref in SECTION_REF.findall(raw):
+        for m in SECTION_REF.finditer(raw):
+            ref = m.group(1)
             if FOREIGN.search(raw):
+                continue
+            if QUALIFIED.search(raw[: m.start() + 1]):
                 continue
             if ref not in sections:
                 flag(lineno, f"§{ref} 는 이 문서에 정의된 적 없다"
