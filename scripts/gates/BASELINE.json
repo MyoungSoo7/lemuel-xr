@@ -253,6 +253,18 @@
         "t-tools:BLOCKED",
         "t-tools:BLOCKED"
       ]
+    },
+    "track-b:readiness": {
+      "rc": 1,
+      "tally": [
+        12,
+        2,
+        0
+      ],
+      "items": [
+        "jesus:FAIL",
+        "job:FAIL"
+      ]
     }
   }
 }

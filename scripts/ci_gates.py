@@ -55,6 +55,7 @@ def runners() -> list[tuple[str, list[str], str]]:
         name = cfg.stem
         out.append((f"gates:{name}", ["scripts/newchar_gates.py", "--character", name, "--json"], "json"))
     out.append(("ac-table:rahab", ["scripts/ac_table_check.py", "docs/SEED-RAHAB.md"], "text"))
+    out.append(("track-b:readiness", ["scripts/track_b_readiness.py"], "text"))
     return out
 
 
