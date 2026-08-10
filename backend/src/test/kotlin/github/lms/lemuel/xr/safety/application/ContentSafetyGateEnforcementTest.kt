@@ -88,6 +88,68 @@ class ContentSafetyGateEnforcementTest {
             .isEmpty()
     }
 
+    /**
+     * 위 테스트의 사각지대를 메운다 — **선언조차 하지 않으면 걸리지 않는 문제**.
+     *
+     * `R2 R3 축을 선언한 게이트는 집행 수단을 갖는다` 는 `safety_gates[].id` 가 R2/R3 을
+     * 표방한 게이트만 본다. 그래서 축을 *헤더 주석* 에만 적고 `safety_gates` 를 아예 두지
+     * 않으면 그 검사의 시야 밖으로 나간다. 선언하고 안 지키면 걸리는데, 안 하면 안 걸린다.
+     *
+     * 이건 가정이 아니라 이미 한 번 일어난 일이다. `application.yml` 의 기록:
+     * job.yml 은 "R3 — 갑절 회복을 결말로 쓰지 않는다" 를 헤더와 scene5 두 군데에 적고도
+     * 토큰이 0종이라 "결국 갑절로 회복됩니다" 가 모든 게이트를 통과했다(2026-08-05 실측).
+     * 그 교정은 scenarios/ 트리를 검사 대상에 *넣은* 것이었지, 산문 선언 자체를 잡는 것은
+     * 아니었다 — 그래서 같은 형태가 다른 파일에 그대로 남아 있다(현재 기준선 15건).
+     *
+     * 실측(2026-08-11): 전역 금칙 토큰 625종 중 '부활' 을 포함한 것은 0종이다.
+     * scenarios/jesus.yml 은 R3 을 "'너도 부활하라/극복하라' 압박 서사 절대 금지" 로
+     * 두 군데 적어 두었지만, 아래 네 문장은 전부 통과한다.
+     *   "당신도 이 무덤에서 걸어 나오셔야 합니다."
+     *   "예수님이 부활하셨듯 당신도 다시 일어날 것입니다."
+     *   "이제 당신 차례입니다 — 부활의 능력으로 회복하십시오."
+     *   "그 슬픔을 부활의 소망으로 극복하시면 됩니다."
+     * 대조군 "믿음이 부족해서 아직 회복이 없는 것입니다." 는 정상 차단된다 —
+     * 스캐너가 죽은 게 아니라 이 축에 토큰이 없는 것이다.
+     *
+     * 래칫이지 벽이 아니다. 기존 15건은 기준선으로 동결하고 **신규만 차단** 한다.
+     * 기준선에 있다는 것은 "괜찮다" 가 아니라 **"아직 산문뿐이다" 를 등재해 둔 것** 이다.
+     */
+    @Test
+    fun `주석으로 선언한 R2 R3 축은 safety_gates 로 집행된다 — 산문 전용 선언 차단`() {
+        val proseOnly = sceneFiles().flatMap { file ->
+            val enforced = gatesOf(file)
+                .mapNotNull { it["id"]?.toString() }
+                .flatMap { id -> AXIS.findAll(id.replace('_', ' ')).map { it.groupValues[1] } }
+                .toSet()
+            (commentAxes(file) - enforced).map { "${relPath(file)}:R$it" }
+        }.toSortedSet()
+
+        val baselineFile = proseOnlyBaselinePath()
+        val baseline = Files.readAllLines(baselineFile, StandardCharsets.UTF_8)
+            .map { it.trim() }.filter { it.isNotEmpty() }.toSortedSet()
+
+        val introduced = proseOnly.toSortedSet().apply { removeAll(baseline) }
+        val fixed = baseline.toSortedSet().apply { removeAll(proseOnly) }
+
+        println("prose-only-axes: current=${proseOnly.size} baseline=${baseline.size} introduced=${introduced.size} fixed=${fixed.size}")
+
+        assertThat(introduced)
+            .describedAs(
+                "안전 축을 주석에만 적고 safety_gates 로 집행하지 않는 파일이 새로 생겼다. " +
+                    "산문으로 선언된 축은 게이트가 아니다 — 같은 축 id 의 safety_gates 를 두고 " +
+                    "lint_forbidden_tokens 를 채우거나, 토큰으로 표현 불가하면 " +
+                    "enforcement: structural + structural_check 로 무엇이 집행하는지 적을 것.",
+            )
+            .isEmpty()
+
+        assertThat(fixed)
+            .describedAs(
+                "집행 수단이 생긴 축이 기준선에 남아 있다 — %s 에서 해당 줄을 지워 래칫을 조일 것.",
+                baselineFile,
+            )
+            .isEmpty()
+    }
+
     @Test
     fun `Scene 의 사용자 노출 텍스트가 자기 파일의 금칙 토큰에 걸리지 않는다`() {
         val offenders = mutableListOf<String>()
@@ -257,8 +319,21 @@ class ContentSafetyGateEnforcementTest {
         return (b + a).sortedBy { it.path }.toList()
     }
 
+    /**
+     * 주석 줄에서 표방된 R2/R3 축. YAML 파서는 주석을 버리므로 원문을 줄 단위로 읽는다.
+     * 줄이 `#` 로 시작할 때만 본다 — 본문 문자열 안의 "R3" 은 선언이 아니라 인용일 수 있다.
+     */
+    private fun commentAxes(file: File): Set<String> =
+        file.readLines(StandardCharsets.UTF_8)
+            .filter { it.trimStart().startsWith("#") }
+            .flatMap { line -> AXIS.findAll(line).map { it.groupValues[1] } }
+            .toSet()
+
     private fun baselinePath(): Path =
         moduleRoot().resolve("src/test/resources/safety/vacuous-safety-gates-baseline.txt")
+
+    private fun proseOnlyBaselinePath(): Path =
+        moduleRoot().resolve("src/test/resources/safety/prose-only-axis-baseline.txt")
 
     private fun relPath(f: File): String =
         repoRoot().relativize(f.toPath()).toString().replace('\\', '/')
@@ -276,6 +351,9 @@ class ContentSafetyGateEnforcementTest {
     private companion object {
         val WHITESPACE = Regex("\\s+")
         val EXTRA_USER_FACING_KEYS = setOf("static_text", "reflection_prompt")
+
+        /** 안전 축 표기. R1(위기 라우팅)·R5(footer)는 토큰이 아니라 구조로 집행되므로 뺀다. */
+        val AXIS = Regex("""\bR([23])\b""")
 
         /** 토로에 등급을 매기는 개념. Scene 4 분기에 하나라도 있으면 '정답' 이 생긴다. */
         val SCORING_KEY = Regex("^(score|scoring|correct|rank|ranking|best_choice|정답)$", RegexOption.IGNORE_CASE)
