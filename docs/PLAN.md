@@ -66,10 +66,12 @@
 [`docs/SERIES-GRACE.md`](SERIES-GRACE.md) 이고, 개별 MVP 문서보다 그 헌장이 상위다.
 착수 현황(2026-08-06) — **룻만 저작 완료**다. `docs/MVP-RUTH.md` · `content/ruth/scene1~5.yml` ·
 `scripts/gates/ruth.yml`(PASS 27/FAIL 0) · `docs/RUTH-LOCKED-STRINGS.md`(LOCKED 문자열 정본) 이 있고,
-**라합(20)은 저작 전 단계에 착수**했다 — `docs/SEED-RAHAB.md`(rev.10) · `docs/VERSES-RAHAB-GAE.md` ·
+**라합(20)은 저작 전 단계에 착수**했다 — `docs/SEED-RAHAB.md`(rev.14) · `docs/VERSES-RAHAB-GAE.md` ·
 `docs/verses-rahab.txt`(USED 24/EXCLUDED 31) · `docs/THEOLOGY-REFERENCES.md` §12 까지다.
-⚠️ **`docs/MVP-RAHAB.md` 와 `content/rahab/` 은 아직 없다.** seed 독립 채점이 0.8 을 넘기 전에는
-designer 를 투입하지 않는 규약이라, 라합을 "저작 착수"로 세지 않는다.
+🚨 **`docs/MVP-RAHAB.md` 는 c091d8c 부터 있다(955줄) — 저자 검토 전 초안이다.** 이 문단은 rev.10
+시점 상태를 두 판 동안 그대로 들고 있었다(seed rev.14 정정 AN). `content/rahab/` 은 아직 없다.
+seed 독립 채점이 0.8 을 넘기 전에는 designer 를 투입하지 않는 규약이고 rev.14 채점은 **0.37** 이라,
+라합을 "저작 착수"로 세지 않는다.
 **나머지 세 인물은 미착수**다. 다말·우리야의 아내의 착수 차단이던 인간 사인오프 3건은
 2026-08-05 사용자 결정으로 **전부 해소**되었다(SERIES-GRACE.md §7) — 배제선 조정은 "이번만 예외"가
 아니라 시리즈 안전 정책으로 문서화된 것이며, 시리즈 밖으로 자동 확장되지 않는다(§7.1).
