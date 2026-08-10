@@ -56,7 +56,7 @@ AC11 = line_with("| AC-11 |")
 AC12 = line_with("| AC-12 |")
 AC15 = line_with("| AC-15 |")
 TALLY = line_with("**합계 — PASS", "16건 중")
-PASS_BULLET = line_with("- **PASS 8**")
+PASS_BULLET = line_with("- **PASS 9**")
 EXPECT = line_with("기대 rc 가 `0` 이 아닌 한 줄")
 G10 = line_with("| `G10`", "955줄")
 TOOLS = line_with("PASS 10 · FAIL 0 · BLOCKED 17")
@@ -95,8 +95,8 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      "AC-12 의 실측을 문턱 위로 — 기준선에서 이미 빨강인 축이라 **사라지는지**로 잰다",
      AC12, AC12.replace("**0.37**", "**0.95**")),
     ("t-tally(수)", "t-tally", "FAIL",
-     "합계의 PASS 를 8 → 7 로 — 행에서 센 것과 어긋난다",
-     TALLY, TALLY.replace("PASS 8", "PASS 7")),
+     "합계의 PASS 를 9 → 8 로 — 행에서 센 것과 어긋난다",
+     TALLY, TALLY.replace("PASS 9", "PASS 8")),
     ("t-tally(목록)", "t-tally", "FAIL",
      "PASS 목록의 AC-15 를 AC-14 로 — 수는 그대로고 이름만 틀린 형태다",
      PASS_BULLET, PASS_BULLET.replace("AC-15", "AC-14")),
@@ -105,7 +105,7 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      EXPECT, EXPECT.replace("한 줄", "두 줄")),
     ("t-baseline", "t-baseline", "FAIL",
      "AC-2 의 baseline 을 rev.10 커밋으로 되돌린다 — 정정 AA 가 잡은 그 결함이다",
-     AC2, AC2.replace("--baseline 1796e20", "--baseline e39368c")),
+     AC2, re.sub(r"--baseline [0-9a-f]{7,40}", "--baseline e39368c", AC2)),
     ("t-tools", "t-tools", "FAIL",
      "본문이 인용한 러너 합계를 rev.11 의 옛 값으로 — 정정 AC 가 잡은 형태다",
      TOOLS, TOOLS.replace("PASS 10 · FAIL 0 · BLOCKED 17",
