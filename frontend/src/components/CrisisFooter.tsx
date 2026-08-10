@@ -1,6 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import {
+  CRISIS_DEFAULT,
+  CRISIS_LIFELINE,
+  CRISIS_RESOURCES,
+  telHref,
+} from "@/lib/crisis-resources";
 
 /**
  * 모든 사용자 facing 화면에 영구 노출되는 위기자원 footer.
@@ -14,10 +20,9 @@ import { useState } from "react";
  *   - fixed bottom — 모든 페이지 위에 떠있음.
  *   - 모바일·데스크톱·VR 브라우저 모두 가시.
  *
- * 번호 정본 (2026-08-02 교정): 자살예방 상담은 2024-01-01 자로 **109** 로 통합됐다
- * (보건복지부 "분산된 자살예방 상담전화 1월 1일부터 '109'로 통합 운영").
- * 구 번호 1393 은 정번호가 아니다. 1577-0199(정신건강)·129(보건복지)·생명의전화는
- * 폐지되지 않았고 각자 담당 분야 상담을 계속하므로 그대로 둔다.
+ * 번호는 `@/lib/crisis-resources` 가 정본이다. 이 파일에 숫자를 다시 적지 말 것 —
+ * 원래 여기 있던 번호 정본 주석도 그쪽으로 옮겼다. 프론트 전체에서 번호 리터럴이
+ * 있어도 되는 파일은 그 하나뿐이고 `scripts/check_frontend_hotline.py` 가 강제한다.
  */
 export function CrisisFooter() {
   const [expanded, setExpanded] = useState(false);
@@ -36,8 +41,16 @@ export function CrisisFooter() {
       >
         <span className="text-amber-400">●</span>
         <span className="font-medium">
-          위기 상태라면 — <a href="tel:109" className="underline font-bold">109</a>{" "}
-          자살예방 상담전화 (24시간, 무료)
+          위기 상태라면 —{" "}
+          <a href={telHref(CRISIS_DEFAULT)} className="underline font-bold">
+            {CRISIS_DEFAULT.tel}
+          </a>{" "}
+          {/*
+            접힌 줄의 이용 조건은 펼친 목록과 문안이 다르다("24시간, 무료" vs
+            "24시간 무료, 전화"). 통합하면서 note 로 갈아끼우지 않는다 — 숫자만
+            정본에서 읽고, 검토를 거친 문장은 있던 그대로 둔다.
+          */}
+          {CRISIS_DEFAULT.label} (24시간, 무료)
         </span>
         <span className="text-amber-400/60 text-xs">
           {expanded ? "▲" : "▼"}
@@ -47,24 +60,32 @@ export function CrisisFooter() {
       {expanded && (
         <div className="px-4 pb-3 pt-1 text-xs sm:text-sm text-white/80 max-w-2xl mx-auto space-y-2">
           <p>
-            지금 자해·자살에 대한 생각이 드시면 *혼자 견디지 마세요*. 즉시 도움을
-            받을 수 있는 곳이 있습니다:
+            지금 자해·자살에 대한 생각이 드시면 *혼자 견디지 마세요*. 즉시
+            도움을 받을 수 있는 곳이 있습니다:
           </p>
+          {/*
+            목록을 손으로 세 번 쓰지 않는다. 자원이 추가·삭제·교체될 때 여기서
+            한 줄만 빠뜨려도 그 자원은 조용히 사라진다 — 화면은 멀쩡해 보인다.
+          */}
           <ul className="space-y-1 pl-4">
+            {CRISIS_RESOURCES.map((r) => (
+              <li key={r.tel}>
+                <a href={telHref(r)} className="underline">
+                  {r.tel}
+                </a>{" "}
+                — {r.label} ({r.note})
+              </li>
+            ))}
             <li>
-              <a href="tel:109" className="underline">109</a> — 자살예방 상담전화 (24시간 무료, 전화)
-            </li>
-            <li>
-              <a href="tel:1577-0199" className="underline">1577-0199</a> — 정신건강위기상담전화 (24시간 무료)
-            </li>
-            <li>
-              <a href="tel:129" className="underline">129</a> — 보건복지상담센터 (24시간 무료)
-            </li>
-            <li>
-              <a href="https://www.lifeline.or.kr" target="_blank" rel="noreferrer" className="underline">
-                lifeline.or.kr
+              <a
+                href={CRISIS_LIFELINE.url}
+                target="_blank"
+                rel="noreferrer"
+                className="underline"
+              >
+                {CRISIS_LIFELINE.url.replace(/^https:\/\/www\./, "")}
               </a>{" "}
-              — 한국생명의전화 (온라인 채팅 상담)
+              — {CRISIS_LIFELINE.label} ({CRISIS_LIFELINE.note})
             </li>
           </ul>
           <p className="text-white/60">

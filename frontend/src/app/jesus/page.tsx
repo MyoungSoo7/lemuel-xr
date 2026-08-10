@@ -45,9 +45,10 @@ import { SceneBootState } from "@/components/SceneBootState";
  *    2026-08-11 백엔드 게이트 신설(jesus.yml safety_gates R3_no_resurrection_pressure, 55종).
  *  · R2 — Scene 5 겟세마네 흔들림 = 믿음의 결함 아님. 고난 미화 X.
  *    필수 footer 는 payload(extras.suffering_footer)에서 읽어 동의 게이트 위에 렌더한다.
- *  · R1 — Scene 7 outro 에 위기 라우팅(109·1577-0199) + 일기·트랙 A 안내.
- *    ⚠️ 번호가 jesus-monologues.ts 상수에 하드코딩돼 있다. yml 의 {{crisis_resources.default}}
- *    치환을 타지 않으므로, 상담번호 정책이 바뀌면 이 화면만 낡은 번호를 들고 남는다.
+ *  · R1 — Scene 7 outro 에 위기 라우팅 + 일기·트랙 A 안내.
+ *    번호는 jesus-monologues.ts 가 @/lib/crisis-resources 에서 읽는다(2026-08-11).
+ *    그전까지는 상수에 문자열로 박혀 있어 상담번호 정책이 바뀌면 이 화면만
+ *    낡은 번호를 들고 남는 상태였다.
  *  · R5 — 모든 echo/outro 에 "AI 보조 — 본문은 성경 참조" footer.
  */
 type Scene = JosephStartResponse;

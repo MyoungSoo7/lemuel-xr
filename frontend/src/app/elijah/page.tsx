@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
+import { CRISIS_DEFAULT, telHref } from "@/lib/crisis-resources";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import {
   startMission,
@@ -151,10 +152,10 @@ export default function ElijahPage() {
           ) : (
             <p>
               지금 실제로 그 마음이 크다면, 본문보다 연결이 먼저입니다 —{" "}
-              <a href="tel:109" className="underline font-bold">
-                109
+              <a href={telHref(CRISIS_DEFAULT)} className="underline font-bold">
+                {CRISIS_DEFAULT.tel}
               </a>{" "}
-              자살예방 상담전화 (24시간, 무료).
+              {CRISIS_DEFAULT.label} (24시간, 무료).
             </p>
           )}
         </section>

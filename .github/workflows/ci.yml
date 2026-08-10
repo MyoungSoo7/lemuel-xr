@@ -82,6 +82,11 @@ jobs:
               - 'ai/**'
             frontend:
               - 'frontend/**'
+              # 위기번호 게이트는 프론트 파일만 보는 게 아니다. 백엔드 대체값과
+              # 대조하는 축이 있어서, application.yml 의 default-contact 만 바꾼 PR 도
+              # 이 잡을 돌려야 드리프트가 잡힌다. 판정기 자신이 바뀔 때도 마찬가지다.
+              - 'backend/src/main/resources/application.yml'
+              - 'scripts/check_frontend_hotline.py'
 
   backend:
     needs: changes
@@ -258,6 +263,20 @@ jobs:
       - name: Type check
         working-directory: frontend
         run: npm run type-check
+
+      # 위기 상담번호 하드코딩 게이트 (2026-08-11 신설).
+      #
+      # 백엔드는 2026-08-02 부터 번호를 yml 에 안 적고 토큰만 쓴다
+      # (`ScenarioHotlineRatchetTest` 가 강제). 프론트는 그 규율 바깥이라
+      # 9개 파일이 번호를 각자 문자열로 들고 있었다. 한 군데를 놓치면 위기 상태의
+      # 사용자가 죽은 번호를 받는데, 그때 화면은 멀쩡해 보인다.
+      #
+      # 이 잡의 다른 스텝과 달리 `gate-baseline` 이 아니라 **진짜 합격·불합격**이다 —
+      # 정리를 끝냈으므로 실제로 초록이고, 빨강이면 그건 새 하드코딩이다.
+      # setup-python 을 따로 붙이지 않는다: ubuntu-latest 러너에 python3 가 이미
+      # 있고 이 스크립트의 외부 의존은 0 이다(표준 라이브러리만 쓴다).
+      - name: Crisis hotline hardcoding gate
+        run: python3 scripts/check_frontend_hotline.py
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3

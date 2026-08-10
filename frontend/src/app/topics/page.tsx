@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { CRISIS_RESOURCES } from "@/lib/crisis-resources";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   fetchTopics,
@@ -137,7 +138,7 @@ export default function TopicsPage() {
           <p className="text-[10px] text-[var(--color-warm)]/30 mt-4 leading-relaxed">
             * 본문 인용: 현대인의 성경 (생명의말씀사) — MVP 비공개 테스터 fair use.
             <br />
-            ** 위기 시 109 (자살예방 상담전화 24시간)
+            ** 위기 시 {CRISIS_RESOURCES[0].tel} ({CRISIS_RESOURCES[0].shortLabel} 24시간)
           </p>
         </section>
 

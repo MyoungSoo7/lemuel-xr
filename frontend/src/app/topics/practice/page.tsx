@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { CRISIS_LINE_FULL, CRISIS_LINE_SHORT } from "@/lib/crisis-resources";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   recordPractice,
@@ -138,7 +139,7 @@ export default function PracticePage() {
 
         {/* 하단 영구 위기 자원 라인 (§9) */}
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
-          위기 시: 109 (자살예방 상담전화) · 1577-0199 (정신건강위기상담) · 24시간
+          {CRISIS_LINE_FULL}
           <br />
           AI 보조 — storyteller, 본문은 성경 참조. 성경 이외 자료는 사용하지 않습니다.
         </p>
@@ -254,7 +255,7 @@ function PracticeCard({
             지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
           </p>
           <p className="text-xs text-red-300 mt-2 font-mono">
-            109 · 1577-0199 (24시간)
+            {CRISIS_LINE_SHORT}
           </p>
           <Link
             href="/topics"

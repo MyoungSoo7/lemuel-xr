@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * Jesus 7-Scene E2E — 트랙 B 정점(capstone) 완전 활성 full playthrough (요셉·모세·다윗 동급).
@@ -71,7 +72,7 @@ test.describe("Jesus 7-Scene mission (capstone)", () => {
     const outro = await page.locator("main").innerText();
     expect(outro.length).toBeGreaterThan(20);
     // R1 — 위기 라우팅 안내가 outro 에 노출된다
-    await expect(page.getByText(/109/).first()).toBeVisible();
+    await expect(page.getByText(CRISIS_DEFAULT.tel).first()).toBeVisible();
 
     await page.getByRole("button", { name: /미션 완료/ }).click();
     await page.waitForURL((url) => url.pathname === "/", { timeout: 15_000 });
