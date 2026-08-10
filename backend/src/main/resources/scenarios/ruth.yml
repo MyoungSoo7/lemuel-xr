@@ -1,0 +1,727 @@
+# 룻 (Theme 19) — 「무자격자가 속하게 되는 것」
+#
+# 핵심 메시지: **속하게 하는 것은 내가 한 일이 아니다.**
+# 구원 카테고리: 은혜로 받아들여짐 (공로 없음)
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️ 이 파일은 로드되지 않는다 (2026-08-11 현재)
+#   ScenarioYamlLoader.loadAll() 은 `Character.entries` 를 순회한다 — 디렉터리가 아니다.
+#   `Character` enum 에 RUTH 가 없으므로 이 파일은 읽히지 않고, 사용자 노출도 0이다.
+#   enum 에 한 줄을 넣는 것이 곧 노출이며, 그 한 줄이 docs/CONTENT-WORKFLOW.md 의
+#   신학·정신건강 검토자 2인 사인오프 게이트다. **아직 사인오프는 없다.**
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 상류 문서 (이 파일은 이들의 하류다 — 자구를 여기서 고치면 검사기가 빨개진다)
+#   설계        docs/MVP-RUTH.md
+#   런타임대본  docs/MVP-RUTH-CONTENT.md
+#   저작        content/ruth/scene1~5.yml · content/ruth/README.md
+#   고정 문자열 docs/RUTH-LOCKED-STRINGS.md   ← 동의 카드·마감 줄·면책 4줄의 정본
+#   성구 자구   docs/VERSES-RUTH-GAE.md (개역개정 실측) · 대조표 docs/verses-ruth.txt
+#
+# 신학 기준: 정통 개신교. 주연은 삼위일체 하나님이며 룻의 헌신은 배경이지 주제가 아니다.
+#   배제한 절은 부정된 절이 아니다. 배제는 총 20건이되 **§4-2 배제표에 EXCLUSION-DECL 로
+#   등재된 것은 18건**이고, 나머지 2건은 §16 축 배타 항목에 있다(2026-08-11 실측:
+#   `grep -c EXCLUSION-DECL docs/MVP-RUTH.md` = 18). "전건 §4-2 등재"는 틀린 말이므로 쓰지 않는다.
+#   확정하지 않은 논점 DP1~DP5(모압 여인의 총회 입회 등)는 확정하지 않은 채 둔다.
+#
+# 배제 중 이 파일에서 직접 집행되는 것
+#   · 룻 1:17 「나도 죽어 거기 묻힐 것이라」 — 동반사망 관념. 자막 없음 + 금칙 토큰.
+#   · 룻 1:21 후반 「여호와께서 나를 징벌하셨고」 — 탄식이 아니라 고통의 벌 귀속.
+#   · 룻 2:11 「네 남편이 죽은 후로」 — **무조건** 축약. 조건 분기로 두지 않는다.
+#   · 룻 2:12 후반 「네가 행한 일에 보답하시기를」·「온전한 상 주시기를」 — 보상 프레이밍.
+#   · 룻 4:11 「라헬과 레아」 · 4:12 「상속자를 주사」 — 출산에 의한 가문 형성.
+#   · 오벳의 출생 — 사실로 존재하되 렌더하지 않는다. 자막 0 · 에셋 0 · 나레이션 0.
+#     이유는 신학이 아니라 매체 판단이다(§4-3 DP3·DP5): 난임·자녀 상실 이력 사용자에게
+#     출산이 회복의 증거가 되는 순간 이 미션은 실패한다.
+#
+# 안전선
+#   R1 자해 발화 리스너 5/5 Scene 상시 · 발화 원문 미저장 · latch 범위는 미션.
+#      latch 이후에는 서사 자막도 종결 자막도 묵상 제안도 렌더하지 않는다.
+#   R2 고난을 신에게 귀속하지 않는다. 나오미의 탄식(1:20-21a)은 서사 내에서 반박도
+#      교정도 하지 않고, 대신 **화자 표기를 상시 노출**한다(SR-8). 1인칭 XR 에서 표기가
+#      없으면 그 문장은 사용자 자신의 문장으로 읽힌다.
+#   R3 회복 압박·공로·보상·평가 어휘 0건. 마감 세 줄의 주어는 사용자가 아니며
+#      faith_tone 을 적용하지 않는다(SR-9) — 걸면 3줄이 9줄이 되고 6줄이 미작성으로 남는다.
+#   R4 동의 카드 3장 2단. 스킵 목적지는 consent_card_id → skip_alternative_scene_id →
+#      (문자열이면) conditional_blocks[].id 쌍으로 계약한다.
+#   R5 기본 경로는 LLM 호출 0회로 완주된다. 묵상만 opt-in 이며 기본값은 off.
+#
+# ⚠️ 위기 연락처를 이 파일에 숫자로 적지 말 것.
+#   `{{crisis_resources.default}}` 토큰만 쓴다 — ScenePayloadAssembler → CrisisTokenResolver
+#   가 정본으로 치환하고 ScenarioHotlineRatchetTest 가 이를 강제한다. 숫자를 박으면
+#   상담번호 정책이 바뀌어도 이 화면만 낡은 번호를 들고 남는다.
+
+character: ruth
+title: 무자격자가 속하게 되는 것
+
+target_user: 상실을 겪었거나, 어디에도 속하지 못한다고 느끼는 사람
+
+ai_assist_footer: AI 보조 — 본문은 성경 참조 — storyteller 역할. 위기 시 {{crisis_resources.default}}.
+
+# ── 금칙 토큰 22종 ────────────────────────────────────────────────────────────
+# scripts/gates/ruth.yml 의 `forbidden` 과 **정확히 같은 집합**이다(하한이 아니라 동일성).
+# 22종 전부 이미 application.yml safety.forbidden-tokens.list 에 반영돼 있다
+# (2026-08-11 실측: 미반영 0건 / 전역 680종).
+#
+# 토큰을 최상위가 아니라 축(R2_*/R3_*) 게이트 **아래** 에 둔다 — 최상위에 두면 한 게이트는
+# 통과하고 다른 게이트는 축 0개로 공회전한다. 두 게이트가 서로의 눈을 가리고 초록이 된다.
+#
+# 1-2자 어간을 토큰으로 쓰지 않았다. 어간 단위로 자르면 정상 본문을 대량 오탐한다 —
+# 특히 "옳"은 헌장 §5-g 가 인용하는 다말 절을 친다.
+safety_gates:
+  - id: R2_no_companion_death_modeling
+    scenes: [1]
+    axis: 동반사망 관념의 모델링 금지
+    rationale: >-
+      룻 1:17 을 자막에서 뺀 것과 같은 축이다. 사별 사용자를 정면으로 겨냥하는 첫 미션이므로,
+      "따라 죽는다"를 헌신의 언어로 제시하지 않는다.
+    lint_forbidden_tokens:
+      - 나도 죽어
+      - 따라 죽
+      - 같이 묻히
+
+  - id: R3_no_merit_framing
+    scenes: [1, 3, 4]
+    axis: 공로화 금지 (헌장 §3-a)
+    rationale: >-
+      이 미션의 축이 "속하게 하는 것은 내가 한 일이 아니다"이므로, 룻의 성품·헌신·용기를
+      받아들여짐의 원인으로 제시하는 어휘를 전 구간에서 막는다.
+    lint_forbidden_tokens:
+      - 믿음이 좋아서
+      - 그만큼 헌신했으니
+      - 착해서
+      - 충성했으니
+      - 용기를 냈기 때문에
+
+  - id: R2_no_providence_attribution
+    scenes: [2]
+    axis: 섭리 설명 금지 (헌장 §3-b)
+    rationale: >-
+      나오미의 탄식은 그대로 둔다. 막는 것은 *미션 화자* 가 그 고통에 이유를 붙이는 문장이다.
+      탄식과 귀속은 다르다 — 룻 1:21 을 자른 지점이 정확히 그 경계다.
+    lint_forbidden_tokens:
+      - 하시려고 그 일을 허락
+      - 다 뜻이 있어
+      - 연단하시려고
+
+  - id: R3_no_recovery_pressure
+    scenes: [2]
+    axis: 회복 압박 금지
+    rationale: >-
+      애도 장면에서 회복을 과제로 제시하지 않는다. Scene 2 는 상실이 서술되는 자리이지
+      상실에서 벗어나는 자리가 아니다.
+    lint_forbidden_tokens:
+      - 이제 그만 일어나
+      - 감사하면 회복
+      - 믿음으로 이겨내
+      - 빨리 잊고
+
+  - id: R3_no_reward_framing
+    scenes: [5]
+    axis: 보상 프레이밍 금지 (헌장 §3-c)
+    rationale: >-
+      결말이 "견딘 값"으로 읽히면 이 미션은 실패한다. 룻 4:15 「일곱 아들보다 귀한」이
+      자막에 없는 것과 같은 축이며, 오벳 출생을 렌더하지 않는 이유도 여기에 있다.
+    lint_forbidden_tokens:
+      - 결국 보상받았
+      - 참으니 복이
+      - 일곱 아들보다 귀한
+
+  - id: R3_no_closing_line_evaluation
+    scenes: [5]
+    axis: 마감 줄 평가 어휘 금지
+    rationale: >-
+      마감 세 줄은 Scene 2 의 belonging_label 을 되읽는 유일한 지점이다. 사용자의 선택을
+      평가하는 어휘가 한 개라도 들어오면 애도의 거리가 채점표가 된다.
+      세 줄의 주어는 신 또는 장소이며 술어는 셋이 같다.
+    lint_forbidden_tokens:
+      - 곁을 지켰
+      - 물러섰지만
+      - 그래도 잘
+      - 덕분에
+
+# ── 기계로 집행되지 않는 선언 (정직하게 표시한다) ───────────────────────────
+# 아래 다섯은 토큰 lint 가 아니라 런타임 구현·설계 검토가 집행처다. 이 파일 안에서
+# 검사되는 것이 아니므로 `machine_enforced: false` 로 적는다 — 게이트인 척하지 않는다.
+declared_controls:
+  - id: R1_voice_self_harm_listener
+    machine_enforced: false
+    enforced_by: 런타임 음성 파이프라인
+    scenes: [1, 2, 3, 4, 5]
+    raw_utterance_stored: false
+    on_trigger: pause_fade_black_show_crisis_card
+    # 정본(docs/RUTH-LOCKED-STRINGS.md crisis_latch)은 키가 **3개**다. 하나만 옮겨
+    # 적으면 남은 둘은 런타임에 계약이 없는 상태가 된다. 이름도 정본과 같게 쓴다.
+    post_crisis_latch_scope: mission
+    post_crisis_render_policy: suppress_all_narrative_captions
+    crisis_card_position: terminal_screen
+    note: >-
+      latch 발동 이후에는 서사 자막·종결 자막·묵상 제안을 전부 렌더하지 않는다.
+      scene5 의 priority_order 둘째 항("종결 자막 도달 보장")은 위기가 없는 경로에 대한
+      보장이며 latch 를 뚫지 않는다. 두 줄 중 한쪽만 읽으면 반대로 구현된다.
+    unresolved: >-
+      ⚠️ post_crisis_render_policy 의 문자열이 지목하는 대상 집합이 이 미션에서는 비어 있다.
+      룻의 자막 15개는 전부 speaker: scripture_caption 이고 narrative 는 0개다(2026-08-11 실측).
+      문자열대로 구현하면 아무것도 억제되지 않는다 — 위 note 가 서술한 억제 범위와
+      정본 문자열이 서로 다른 것을 가리킨다. 정본(docs/RUTH-LOCKED-STRINGS.md 및
+      content/ruth/scene*.yml 5곳)을 고쳐야 하는 사안이므로 이 파일에서 단독 변경하지 않는다.
+      사용자 결정 대기.
+  - id: R4_consent_two_tier
+    machine_enforced: false
+    enforced_by: 프론트 동의 카드 렌더 + scripts/check_ruth_captions.py (content/ruth 대상)
+    note: 카드 3장 문안의 정본은 docs/RUTH-LOCKED-STRINGS.md 다.
+  - id: SR8_speaker_attribution_persistent
+    machine_enforced: false
+    enforced_by: 자막 렌더러 (대응 검사기 없음)
+    scenes: [2]
+    key_path: scenes[1].extras.speaker_attribution_persistent
+    note: >-
+      R2 축의 실질 집행 수단이다. 나오미의 탄식 1:20b·1:21a 는 반박하지 않고 그대로 두되,
+      화자 이름을 자막이 떠 있는 내내 붙여 둔다. 1인칭 XR 에서 표기가 빠지면 그 문장은
+      사용자 자신의 문장으로 읽힌다. **토큰 lint 로는 이 실패를 잡을 수 없다** —
+      금칙어가 하나도 없는 상태로 실패하기 때문이다. R2_no_providence_attribution 게이트가
+      초록인 것은 이 항목이 지켜졌다는 뜻이 아니다.
+
+  - id: R5_static_curation_default
+    machine_enforced: false
+    enforced_by: 묵상 opt-in UI (미구현)
+    # 저작 트리(content/ruth/scene*.yml)가 5개 Scene 전부에 들고 있는 키다.
+    # 런타임 파일에만 없으면 "기본 경로는 LLM 0회" 가 문서에만 있는 주장이 된다.
+    # ⚠️ 저작 트리는 Scene 마다 반복해 적지만 여기서는 미션 1회로 둔다 — 값이 5개 Scene
+    #    동일하기 때문이다. 자리가 다르므로 두 트리를 키 이름으로 단순 대조하면 어긋난다.
+    default_path: static_curation
+    llm_optin_only: true
+    meditation_offer:
+      mode: llm_optin
+      # YAML 1.1 에서 따옴표 없는 off 는 boolean false 로 파싱된다. 저작 트리
+      # (content/ruth/scene5.yml:199)와 같은 표기를 의도적으로 유지한다 — 두 트리가
+      # 다른 타입으로 읽히면 대조 자체가 무의미해진다.
+      default: off
+      suppressed_after_r1_latch: true
+    note: >-
+      묵상 제안 9종은 **아직 저작되지 않았다**. 기본값이 off 이고 R1 latch 이후 억제되는
+      층을 본편과 같은 확정도로 미리 채우면 opt-in 계약이 죽은 키가 된다.
+      opt-in UI 가 붙는 시점에 별건으로 저작하고 신학 검토를 받는다.
+  - id: F66_entry_state_gate
+    machine_enforced: false
+    enforced_by: 백엔드 진입 조회 (safety_alerts · emotion_logs)
+    trigger_conditions:
+      - source: safety_alerts
+        rule: severity='high' 이력 존재 (user_id 기준, category 무관)
+      - source: emotion_logs
+        rule: 최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)
+    on_trigger:
+      closing_line_force: null_variant
+      voice_intensity_preset: subtitle_only
+      scene4_skip_preoffered: true
+      skip_button_visual_emphasis: true
+    note: >-
+      임상 판정이 아니라 톤 완화다. **항목 수 2가 계약이다**(AC 29) —
+      둘째 항(F-6.2 축)이 빠지는 것이 알려진 오독 방향이다.
+
+# 5개 Scene 전부에 키가 있어야 한다(G7). 3개로 줄인 판은 G7 과 동시에 만족할 수 없다.
+# '5' 만 문자열이다 — 정수 자기참조(5)를 쓰면 타입 검사는 통과하면서 축약 블록을
+# 지목하지 못해 도달 불가가 된다. 검사는 초록, 사용자는 전문을 본다.
+skip_destinations:
+  "1": 3
+  "2": 3
+  "3": 4
+  "4": 5
+  "5": ruth_scene5_alt_short
+
+# 면책 4줄 + 위기 리마인더가 붙는 블록은 **6개**다. 파일이 아니라 블록 경로로 센다 —
+# scene5 는 environment 와 closing_screen 두 블록을 갖는다. 6번의 부모가 environment 가
+# 아닌 이유: closing_only 진입에서 environment 는 렌더되지 않는다. 안전층을 그 아래 두면
+# 렌더 안 되는 블록에 안전장치를 매다는 조용한 실패가 된다.
+suffering_disclaimer:
+  position: top_right
+  style: small_persistent
+  # 경로는 **이 파일에서 실제로 해석되는 형태**로 적는다. scene1.environment.* 처럼 적으면
+  # 6건 전부 미스가 난다 — scenes 는 맵이 아니라 리스트이고, environment 는 scene 직속이
+  # 아니라 extras 블록 아래에 있다(이 레포 관례: elijah 5 · job 5 · jesus 7 개 scene 전부
+  # 동일). 오버레이 자체는 아래 6곳에 전부 실재한다(2026-08-11 실측).
+  # 틀렸던 것은 오버레이가 아니라 이 목록이었다 — 없는 안전층을 있다고 적은 게 아니라,
+  # 있는 안전층을 못 찾는 주소를 적었다.
+  attached_block_paths:
+    - scenes[0].extras.environment.ui_overlays
+    - scenes[1].extras.environment.ui_overlays
+    - scenes[2].extras.environment.ui_overlays
+    - scenes[3].extras.environment.ui_overlays
+    - scenes[4].extras.environment.ui_overlays
+    - scenes[4].extras.closing_screen.ui_overlays
+  text_ko: |-
+    이 이야기는 고통에 이유를 붙이지 않습니다.
+    성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+    지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+    지금 힘드시면: {{crisis_resources.default}}
+
+# XR 안락성 — 헌장 §2.1-b 다섯 항. **동의 카드로 해제되지 않는다.**
+# 동의는 볼지 말지에 대한 것이지 연출 강도에 대한 것이 아니다.
+#
+# 키 이름은 저작 트리와 헌장이 쓰는 `staging_constraints` 를 정본으로 삼고,
+# comfort_constraints 는 별칭으로만 남긴다. 저작 트리는 5개 Scene 마다 같은 다섯 항을
+# 그 Scene 의 연출로 각각 풀어 쓴다(content/ruth/scene1~5.yml). 여기서 그 다섯 벌을
+# 다시 쓰지 않는 이유: 런타임 파일이 저작본을 옮겨 적으면 둘이 갈라진 뒤에도 양쪽 다
+# 그럴듯해 보인다. 미션 공통항만 여기 두고, Scene 별 적용은 저작본이 정본이다.
+#
+# ⚠️ 기계로 검사되지 않는다. 다섯 항 어느 것도 이 파일이나 테스트가 집행하지 못한다 —
+#    카메라 리그·오디오 거리·조명은 런타임 씬 구현에 있고 그쪽에 대응 검사기가 없다.
+#    Scene 4(exposure_grade C)가 다섯 항 전부를 동시에 건드리는 유일한 Scene 이다.
+staging_constraints:
+  machine_enforced: false
+  enforced_by: XR 런타임 씬 구현 검토 (자동 검사기 없음)
+  applies_to_scenes: [1, 2, 3, 4, 5]
+  per_scene_authoring: content/ruth/scene1~5.yml 의 staging_constraints
+  charter_ref: 헌장 §2.1-b
+  alias: comfort_constraints
+  released_by_consent: false
+  items:
+    - 관찰 지점은 사건 바깥의 고정 위치에 둔다
+    - 사용자 시점을 눕히거나 올려다보게 두지 않는다
+    - 신체 근접을 암시하는 근접 오디오를 쓰지 않는다
+    - 인물을 신체 부위로 프레이밍하지 않는다 (전신·원경만)
+    - 어둠은 조명 지시로만 표현한다
+  vision_occlusion: false
+  haptics: false
+  biometrics_used: false
+
+scenes:
+  # ── Scene 1 ────────────────────────────────────────────────────────────────
+  - id: 1
+    title: 갈림길
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 80
+    scripture_ref: ruth-1:8,1:9,1:16
+    next: 2
+    exposure_grade: B
+    trigger_warning:
+      level: mid
+      content:
+        - 사별
+        - 이별
+        - 낯선 땅으로의 이주
+      consent_card_id: ruth_entry_consent
+      covers_scenes: [1, 2]
+      skip_alternative_scene_id: 3
+      consent_card_ko: |-
+        이 이야기에는 사별한 사람들이 나옵니다.
+        남편을 잃은 두 여인과, 남편과 두 아들을 모두 잃은 한 여인입니다.
+        굶주림과, 낯선 땅에서 이방인으로 불리는 일이 나옵니다.
+        마지막은 성문에서 사람들이 축복하는 장면입니다. 한 아이가 태어나지만 그 장면은 화면에 나오지 않습니다.
+        · 중간에 한 여인이 밤에 홀로 한 남자 곁으로 가는 장면이 있습니다. 본문은 어떤 성적인 일도 서술하지 않으며, 이 장면은 그런 일을 재연하지 않습니다. 그 장면 직전에 다시 여쭙습니다.
+        · 전체 5-7분입니다. 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        · 지금 보지 않으셔도 이야기는 온전히 끝맺어집니다.
+        계속하시겠어요?
+        [계속한다]  [사별 장면은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        지금 힘드시면: {{crisis_resources.default}}
+      skip_bridge_narration_ko: 두 며느리 중 하나는 돌아가고, 하나는 남았다. 남은 사람의 이름은 룻이었다.
+    extras:
+      anchor: 모압에서 유다로 가는 길. 경계석 하나.
+      environment:
+        camera_rig: fixed_wide_at_roadside
+        time_of_day: overcast_noon
+        ambient: [바람, 마른 풀, 멀어지는 발소리]
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+      npcs:
+        - { name_ko: 나오미, framing: full_body_distant }
+        - {
+            name_ko: 오르바,
+            framing: full_body_distant,
+            motion: turn_away_only,
+          }
+        - { name_ko: 룻, framing: full_body_distant }
+      npc_note: >-
+        오르바는 돌아서는 동작만 한다. 배신 연출·비난 음악·어두운 색 보정을 쓰지 않는다 —
+        본문은 오르바를 정죄하지 않는다.
+      # 자동 진행 타임라인(at_sec)을 쓰지 않는다. content/ruth/scene1.yml 이
+      # auto_advance: false 를 선언하므로, 시간이 자막을 넘기는 구조를 같이 두면
+      # 구현자가 어느 쪽을 따를지 알 수 없고 대개 타임라인이 이긴다. 그러면 사별
+      # 사용자가 읽는 속도와 무관하게 넘어간다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 나오미
+          ref: 룻 1:8 중
+          text_ko: 너희는 각기 너희 어머니의 집으로 돌아가라 너희가 죽은 자들과 나를 선대한 것 같이 여호와께서 너희를 선대하시기를 원하며
+        - speaker_ko: 나오미
+          ref: 룻 1:9 중
+          text_ko: 여호와께서 너희에게 허락하사 각기 남편의 집에서 위로를 받게 하시기를 원하노라
+        - speaker_ko: 룻
+          ref: 룻 1:16 중
+          text_ko: 어머니께서 가시는 곳에 나도 가고 어머니께서 머무시는 곳에서 나도 머물겠나이다 어머니의 백성이 나의 백성이 되고 어머니의 하나님이 나의 하나님이 되시리니
+      # 배제 근거는 **주석으로만** 둔다. extras 는 ScenePayloadAssembler.kt:54 의
+      # `sc.extras?.let { p.putAll(it) }` 로 통째로 payload 에 복사되므로, 배제한 자구를
+      # YAML 값에 적으면 잘라낸 그 문자열이 클라이언트로 나간다. 저작 트리
+      # (content/ruth/*.yml)는 배제 자구를 값으로 0건 들고 있다 — 런타임만 깨면 안 된다.
+      #
+      # [배제] 룻 1:17 은 자막에 없다. 잘라낸 조각은 동반사망 관념의 모델링이며,
+      #        소속이라는 축은 1:16 에 전부 들어 있다. (docs/MVP-RUTH.md §4-2 E1)
+      interactions: []
+      branches: []
+
+  # ── Scene 2 ────────────────────────────────────────────────────────────────
+  - id: 2
+    title: 빈 손의 귀향
+    type: interaction
+    interaction: pick_one
+    duration_sec: 90
+    scripture_ref: ruth-1:19,1:20,1:21a
+    next: 3
+    exposure_grade: B
+    # G7 — 동의 키는 5개 Scene **전부** 에 있어야 한다. 이 Scene 은 자기 카드를 띄우지
+    # 않고 Scene 1 의 진입 카드(covers_scenes: [1, 2])에 덮인다. 그렇다고 키를 비워 두면
+    # "카드 없음"과 "다른 카드에 덮임"이 파일에서 구별되지 않는다 — 구현자는 앞의 것으로
+    # 읽고, 사별 장면 스킵을 고른 사용자가 이 Scene 에서 그대로 상실 서술을 만난다.
+    consent_coverage:
+      inherited: true
+      consent_card_id: ruth_entry_consent
+      covered_by_scene: 1
+      skip_alternative_scene_id: 3
+    extras:
+      anchor: 베들레헴 성읍 어귀. 보리 추수가 막 시작된 때.
+      environment:
+        camera_rig: fixed_wide_outside_gate
+        time_of_day: high_sun
+        crowd: distant_silhouette_only
+        ambient: [원거리 웅성임]
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+      npcs:
+        - {
+            name_ko: 나오미,
+            framing: full_body_distant,
+            placement: beside_ruth,
+          }
+        - { name_ko: 룻, framing: full_body_distant }
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      # SR-8 — 이 Scene 의 핵심 안전 장치. 나오미의 탄식 위에 화자 이름을 상시 표기한다.
+      # 1인칭 XR 에서 표기가 없으면 "전능자가 나를 심히 괴롭게 하셨다"가 사용자 자신의
+      # 문장으로 읽힌다. 페이드 없이 자막이 떠 있는 내내 붙어 있어야 한다.
+      speaker_attribution_persistent: true
+      captions:
+        - speaker_ko: 성읍 사람들
+          ref: 룻 1:19 중
+          text_ko: 이이가 나오미냐
+        - speaker_ko: 나오미
+          ref: 룻 1:20 중
+          text_ko: 나를 나오미라 부르지 말고 나를 마라라 부르라 이는 전능자가 나를 심히 괴롭게 하셨음이니라
+        - speaker_ko: 나오미
+          ref: 룻 1:21 중
+          text_ko: 내가 풍족하게 나갔더니 여호와께서 내게 비어 돌아오게 하셨느니라
+      lament_policy:
+        promoted_to_doctrine: false
+        corrected_in_narrative: false
+        note: >-
+          미션 화자는 나오미의 말을 교리로 승격하지도 교정하지도 않는다. 서사 내 반박·위로
+          대사가 0개인 것은 누락이 아니라 설계다. 비서사 안전층(면책 오버레이·위기
+          리마인더)은 예외이며 필수다.
+      # [배제] 룻 1:21 후반은 자막에 없다. (docs/MVP-RUTH.md §4-2 E3)
+      #
+      # ⚠️ 자른 경계를 「탄식 대 귀속」으로 적지 말 것 — 틀린다. 렌더되는 1:20b
+      #    「전능자가 나를 심히 괴롭게 하셨음이니라」와 1:21a 「여호와께서 내게 비어
+      #    돌아오게 하셨느니라」도 **똑같이 고통을 신에게 귀속한다.** 1:21 후반을
+      #    가르는 것은 귀속 여부가 아니라 **형벌 어휘**다.
+      #    실제 규칙: 탄식적 귀속은 두고 **형벌적** 귀속은 자른다.
+      #    이 이름을 정확히 붙여 두는 이유 — 「탄식 대 귀속」으로 읽은 다음 편집자는
+      #    1:20b 까지 잘라내거나(탄식층 소멸) 반대로 1:21 후반을 복원한다. 그리고
+      #    형벌 축이야말로 종교적 학대 생존자를 보호하는 축이다.
+      interactions:
+        - id: mourning_distance
+          type: pick_one
+          decision_key: belonging_label
+          prompt_ko: 지금 어디에 서 계시겠어요?
+          no_timer: true
+          no_default_selection: true
+          scoring: none
+          options:
+            - { value: stay_beside, label_ko: 곁에 남는다, next: 3 }
+            - { value: step_back, label_ko: 한 걸음 물러선다, next: 3 }
+          unselected_value: null
+          note: >-
+            미선택은 실패가 아니라 null 이다. 타이머가 없으므로 만료도 없다.
+            세 갈래 전부 Scene 3 으로 간다 — 서사·자막·에셋이 갈리지 않는다.
+            갈리는 것은 Scene 5 의 마감 한 줄뿐이다. 상실을 겪는 사람 곁에서 어떤 거리를
+            두는지에 정답을 주면 이 미션은 사용자의 애도 방식을 채점하는 기계가 된다.
+      branches: []
+      journal:
+        prefilled: true
+        llm_input: false
+        entries_ko:
+          - 오늘 나는 반박하지 않고 들었다.
+          - 누군가 자기 이름을 바꿔 부르는 것을 들었다.
+
+  # ── Scene 3 ────────────────────────────────────────────────────────────────
+  - id: 3
+    title: 이방 여인
+    type: interaction
+    interaction: grab_and_place
+    duration_sec: 110
+    scripture_ref: ruth-2:2,2:10,2:11,2:12
+    next: 4
+    exposure_grade: B
+    trigger_warning:
+      level: low_mid
+      content:
+        - 이방인 호칭
+        - 사별 언급
+        - 빈곤
+      consent_card_id: ruth_midpoint_consent
+      covers_scenes: [3, 5]
+      # skip 과 decline 은 다른 동작이다. skip 은 이 Scene 만 건너뛰고 계속 진행하며
+      # (skip_destinations["3"] = 4 와 같은 값), decline 은 카드 자체를 거절하는 것이라
+      # 종결 화면으로 간다. 하나만 적으면 나머지 하나가 구현자 재량이 된다.
+      skip_alternative_scene_id: 4
+      # 거절 시 종결 화면으로 간다. `closing` 센티널은 전 산출물 통틀어 정확히 1건이다.
+      declined_route: closing
+      skip_alternative_scene_id: 4
+      consent_card_ko: |-
+        여기서부터는 낯선 땅에서의 일입니다.
+        한 여인이 남의 밭에서 이삭을 줍고, 사람들은 그를 "모압 여인"이라고 부릅니다.
+        그 여인은 남편을 잃은 사람이고, 사람들이 그 일을 입에 올립니다.
+        이야기 끝에 한 아이가 태어나지만, 출산 장면도 아기도 화면에 나오지 않습니다.
+        · 약 3분입니다. 여기서 마치셔도 이야기는 온전히 끝맺어집니다.
+        계속하시겠어요?
+        [계속한다]  [여기서 마친다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        지금 힘드시면: {{crisis_resources.default}}
+    extras:
+      anchor: 보아스의 보리밭. 추수 중.
+      environment:
+        camera_rig: standing_height_field_edge
+        time_of_day: afternoon
+        ambient: [바람에 눕는 이삭, 원거리 추수 소리]
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+      npcs:
+        - { name_ko: 룻, framing: full_body_distant }
+        - {
+            name_ko: 보아스,
+            framing: full_body_distant,
+            low_angle_forbidden: true,
+          }
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 룻
+          ref: 룻 2:2 중
+          text_ko: 내가 밭으로 가서 내가 누구에게 은혜를 입으면 그를 따라서 이삭을 줍겠나이다
+        - speaker_ko: 룻
+          ref: 룻 2:10 중
+          text_ko: 나는 이방 여인이거늘 당신이 어찌하여 내게 은혜를 베푸시며 나를 돌보시나이까
+          axis_note: 이 미션 전체의 축이다 — 무자격의 자기 진술.
+        - speaker_ko: 보아스
+          ref: 룻 2:11 중
+          # 축약은 조건 분기가 아니라 무조건이다. 조건부로 두면 그 조건에 도달하는
+          # 사용자가 전문을 보게 되고, 검사는 조건 블록만 보므로 초록이 된다.
+          # 잘라낸 조각(E15)의 자구를 여기에 값으로 적지 않는다. 렌더되는 text_ko 와
+          # 같은 captions[] 원소 안에 두면 payload 한 덩어리로 함께 나가고,
+          # docs/RUTH-LOCKED-STRINGS.md:137(AC 28)이 "content/ruth 어디에도 있으면
+          # 안 된다"고 못박은 문자열이 런타임 경로로 되살아난다. 자구는 그 정본 파일에만.
+          shortened: true
+          shortening_unconditional: true
+          forbidden_fragment_ref: docs/RUTH-LOCKED-STRINGS.md#ruth_2_11.forbidden_fragment
+          text_ko: 네가 시어머니에게 행한 모든 것과 네 부모와 고국을 떠나 전에 알지 못하던 백성에게로 온 일이 내게 분명히 알려졌느니라
+        - speaker_ko: 보아스
+          ref: 룻 2:12 중
+          text_ko: 이스라엘의 하나님 여호와께서 그의 날개 아래에 보호를 받으러 온 네게
+      # [배제] 룻 2:12 후반 두 조각은 자막에 없다. (docs/MVP-RUTH.md §4-2 E12·E13)
+      #        절단은 그 배제표에 등재될 때만 집행된다 — 자막에서만 자르고 표에 안 올리면
+      #        나중에 복원해도 모든 검사가 초록이다.
+      #
+      # ⚠️ 이 절단을 「성경 절이 미션의 축과 부딪힌다」로 설명하지 말 것. 그렇게 쓰면
+      #    판단 기준이 뒤집힌다 — 미션의 축이 성경에 의해 재어지는 것이지 그 반대가 아니며,
+      #    docs/MVP-RUTH.md §4-4 의 「성경 본문의 권위를 낮추지 않는다」와 직접 부딪힌다.
+      #    이 절단은 **매체 판단**이다: 1인칭 XR 에서 이 어휘가 "받아들여짐은 내가 한 일의
+      #    값"으로 오독될 위험을 줄이려는 것이고, 절 자체를 공로 본문으로 판정한 것이 아니다.
+      #    개혁주의 정통은 하나님이 의롭다 하신 자의 행위에 **공로 없이 은혜로** 상 주신다고
+      #    본다(WCF 16.5-6 · 창 15:1 · 히 11:6). 이 절을 "공로 어휘"로 분류하는 것 자체가
+      #    논쟁점이며, 신학 검토자가 신규 DP6 로 등재를 요청했다 — 미해소.
+      interactions:
+        - id: gleaning
+          type: grab_and_place
+          prompt_ko: 떨어진 이삭을 주워 담아 보세요.
+          repeatable: true
+          scoring: none
+          yield_display: false
+          target_count: null
+          time_limit: null
+          biometrics_used: false
+          note: >-
+            몸을 굽히는 동작 자체가 의미다 — 남이 흘린 것을 줍는 자세가 곧 무자격의
+            자세다. 몇 개를 줍든 결과가 같다. 시점은 서 있는 높이를 유지한다
+            (굽히는 것은 아바타의 동작이지 사용자의 시야가 아니다).
+      # 무자격이 서술되는 자리에 사용자 선택지를 두지 않는다 (헌장 §2.0).
+      branches: []
+
+  # ── Scene 4 ────────────────────────────────────────────────────────────────
+  - id: 4
+    title: 타작 마당의 밤
+    type: interaction
+    interaction: scripture_reading
+    duration_sec: 60
+    scripture_ref: ruth-3:9,3:11
+    next: 5
+    exposure_grade: C
+    trigger_warning:
+      level: high
+      content:
+        - 밤·취약한 정황
+        - 권력 비대칭
+      consent_card_id: ruth_scene4_night_warning
+      covers_scenes: [4]
+      skip_alternative_scene_id: 5
+      # [계속한다]에도 [건너뛰기]에도 기본 포커스를 주지 않는다. 기본 포커스는 그 자체가 권유다.
+      default_focus: none
+      consent_card_ko: |-
+        다음 장면은 밤의 타작 마당입니다.
+        본문은 어떤 성적인 일도 서술하지 않으며, 이 장면은 그런 일을 재연하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        한 여인이 자기보다 힘 있는 사람 곁에서 밤을 보내고, 아침 전에 떠납니다.
+        · 약 1분입니다. 건너뛰셔도 이야기는 이어집니다.
+        계속하시겠어요?
+        [계속한다]  [건너뛰기 — 성문 장면으로 이동]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        지금 힘드시면: {{crisis_resources.default}}
+    extras:
+      anchor: 타작 마당. 곡식 단이 쌓여 있다.
+      # 이 Scene 에서만 다시 적는다. 등급 C 이고 방금 위에서 동의 카드를 한 장 더 받았기
+      # 때문에, "동의를 받았으니 연출을 열어도 된다"는 오독이 실제로 발생하는 유일한 자리다.
+      # 동의는 **볼지 말지** 에 대한 것이지 연출 강도에 대한 것이 아니다.
+      staging_constraints:
+        released_by_consent: false
+        charter_ref: 헌장 §2.1-b (다섯 항 전부 이 Scene 에 동시 적용)
+        machine_enforced: false
+      environment:
+        camera_rig: fixed_static_outside_floor
+        # 어둠은 조명 파라미터로만. 시야 차단을 쓰지 않는다.
+        time_of_day: night_lighting_only
+        spatial_audio_min_distance_m: 2
+        ambient: [멀리 밤벌레]
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+      npcs:
+        - { name_ko: 룻, framing: full_body_distant }
+        - { name_ko: 보아스, framing: full_body_distant }
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 룻
+          ref: 룻 3:9 중
+          text_ko: 나는 당신의 여종 룻이오니 당신의 옷자락을 펴 당신의 여종을 덮으소서 이는 당신이 기업을 무를 자가 됨이니이다
+        - speaker_ko: 보아스
+          ref: 룻 3:11 중
+          text_ko: 내 딸아 두려워하지 말라 내가 네 말대로 네게 다 행하리라 네가 현숙한 여자인 줄을 나의 성읍 백성이 다 아느니라
+      adaptation_count: 0
+      # [배제] 룻 3:14 의 자세 서술은 자막화하지 않는다. (docs/MVP-RUTH.md §4-2 E6)
+      #        3:14 의 어둠은 조명 지시로만 쓴다.
+      interactions: []
+      # 성적 취약 정황이 있는 자리에 사용자 선택지를 두지 않는다 (헌장 §2.0 · §2.2).
+      # 선택지를 두면 사용자가 그 상황의 행위자가 된다. 등급 C 에서 그것은 동의 카드로
+      # 상쇄되지 않는 종류의 문제다. 베드로 Scene 3(눅 22:62)이 같은 판례다.
+      branches: []
+
+  # ── Scene 5 ────────────────────────────────────────────────────────────────
+  - id: 5
+    title: 성문에서
+    type: outro
+    duration_sec: 90
+    scripture_ref: ruth-4:11,4:12
+    next: null
+    exposure_grade: B
+    # G7 — Scene 3 의 중간 카드(covers_scenes: [3, 5])에 덮인다.
+    # 스킵 목적지만 유일하게 정수가 아니다. 마지막 Scene 이므로 다음 Scene 이 없고,
+    # 대신 같은 Scene 안의 축약 블록(conditional_blocks[0].id)을 지목한다.
+    consent_coverage:
+      inherited: true
+      consent_card_id: ruth_midpoint_consent
+      covered_by_scene: 3
+      skip_alternative_scene_id: ruth_scene5_alt_short
+    extras:
+      anchor: 베들레헴 성문. 장로 열 명이 앉아 있다.
+      environment:
+        camera_rig: fixed_wide_plaza_edge
+        time_of_day: late_afternoon
+        ambient: [원거리 낭독, 원거리 웅성임]
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+      npcs:
+        - {
+            name_ko: 나오미,
+            framing: full_body_distant,
+            placement: beside_ruth,
+            lines: 0,
+            reaction_shot: false,
+          }
+        - { name_ko: 룻, framing: full_body_distant }
+        - { name_ko: 성문의 백성과 장로들, framing: full_body_distant }
+      # 자막에서 뺐는데 모델이 화면에 있으면 배제가 무효다.
+      baby_asset_present: false
+      birth_scene_rendered: false
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 성문의 백성과 장로들
+          ref: 룻 4:11 중
+          text_ko: 우리가 증인이 되나니
+        - speaker_ko: 성문의 백성과 장로들
+          ref: 룻 4:12 중
+          text_ko: 네 집이 다말이 유다에게 낳아준 베레스의 집과 같게 하시기를 원하노라
+      # [배제] 룻 4:11 후반(출산에 의한 가문 형성이며 그 인물은 출산 중 사망한다)과
+      #        4:12 의 상속자 조각은 자막에 없다. (docs/MVP-RUTH.md §4-2 E14·E11)
+      #        오벳의 출생은 사실로 존재하되 렌더하지 않는다 — 자막 0 · 에셋 0 · 나레이션 0.
+      #
+      # ⚠️ 오벳 출생 미렌더는 **§4-2 배제표에 등재돼 있지 않다**(2026-08-11 신학 검토 지적).
+      #    아래 baby_asset_present / birth_scene_rendered 를 읽는 검사기도 없다 —
+      #    scripts/ 와 backend/src/test/ 전체에 0건. 즉 이 미션에서 안전상 가장 무겁게
+      #    걸린 배제가, 등재도 집행도 없는 유일한 배제다. 이 파일 스스로 위에 적은
+      #    문장이 그대로 적용된다: 표에 안 올리면 복원해도 모든 검사가 초록이다. 미해소.
+      # ── 마감 세 줄 — 집합 크기 정확히 3 (AC 10) ──────────────────────────
+      # faith_tone 을 적용하지 않는다(SR-9). 걸면 3줄이 그대로 있는 채 9줄이 되고,
+      # 존재 검사만 하는 검사기는 통과하며, 사별 사용자가 받는 마지막 문장 6개가
+      # 미작성 상태로 남는다. 집합 크기를 재는 이유가 이것이다.
+      closing_lines:
+        selected_by: belonging_label
+        faith_tone_applied: false
+        variants:
+          stay_beside_ko: 곁에 남은 자리에도 그늘이 닿았다.
+          step_back_ko: 한 걸음 물러선 자리에도 그늘이 닿았다.
+          default_ko: 이 자리에도 그늘이 닿았다.
+        forced_null_when: F66_entry_state_gate
+      value_prompt: 무자격자가 속하게 되는 일을 오늘 어디서 보셨습니까?
+      linked_values: [belonging, grace, unearned_welcome]
+      crisis_reminder: "{{crisis_resources.default}}."
+      priority_order:
+        - R1 위기 카드
+        - 종결 자막 도달 보장
+        - 서사 진행
+      latch_note: >-
+        위 둘째 항은 위기가 없는 경로에서의 보장이다. R1 latch 가 걸린 경우에는 종결 자막도
+        렌더되지 않는다. 두 줄 중 한쪽만 읽으면 반대로 구현된다.
+      # ── 종결 화면 ────────────────────────────────────────────────────────
+      # 마감 한 줄 **다음에** 온다. 순서는 바뀌지 않는다.
+      # 세 경로가 모두 이 블록에 착지한다 — 덜 본 사람에게 덜한 결말을 주지 않는다.
+      closing_screen:
+        entry_mode: closing_only
+        environment_disabled: true
+        npc_disabled: true
+        interactions_disabled: true
+        reached_by:
+          - consent_declined_sentinel # ruth_midpoint_consent 거절 (closing 센티널)
+          - voluntary_exit_any_scene # Scene 1~5 상시 「나가기」
+          - full_path_completion # 마감 한 줄 다음
+        # exit_button 이 빠져 있었다. 이 화면은 R1 latch 가 착지하는 곳이기도 하고
+        # 「나가기」로 도달하는 곳이기도 하다 — 나가려고 눌러서 온 화면에 나가기가 없으면,
+        # 위기 상태의 사용자가 마지막 화면에 갇힌다. 다른 5개 블록에는 처음부터 있었다.
+        ui_overlays: [suffering_disclaimer, crisis_reminder, exit_button]
+        # SR-1 — 종결 자막은 리포 전체에 한 벌만 존재한다. Scene 3 의 2:12 자막과
+        # 같지 않고 메아리 관계다.
+        closing_caption:
+          ref: 룻 2:12 중
+          text_ko: 그의 날개 아래에 보호를 받으러 온 네게
+      # 스킵 목적지가 문자열이므로, 그 이름의 블록이 실제로 여기에 있어야 도달 가능하다.
+      conditional_blocks:
+        - id: ruth_scene5_alt_short
+          reached_by: skip_from_scene5
+          renders: [closing_lines, closing_screen]
+          captions: []
+          note: >-
+            축약 경로도 마감 한 줄과 종결 자막에는 도달한다. 성문 낭독 자막 2장만 생략된다.
