@@ -38,10 +38,16 @@ import { SceneBootState } from "@/components/SceneBootState";
  *
  * ─────────────── 안전선 (예수는 정점이라 특히 엄격) ───────────────
  *  · R4 — Scene 5(겟세마네·십자가, 고통·죽음) 진입 전 정서 경고 동의 카드 + 건너뛰기(→ Scene 6).
- *    jesus.yml Scene 5 trigger_warning(level medium, [suffering, death]) 을 프론트가 소비하는 지점.
+ *    ⚠️ 이 카드는 jesus.yml 의 trigger_warning 을 *읽지 않는다*. 문구·레벨·스킵 목적지가 전부
+ *    이 파일에 하드코딩돼 있다 (욥/솔로몬/엘리야는 payload.trigger_warning 으로 구동). 그래서
+ *    yml 의 level·content·consent_card_id·skip_alternative_scene_id 를 고쳐도 화면은 안 바뀐다.
  *  · R3 — Scene 6 부활을 "너도 부활/극복하라" 로 틀지 않는다. *이름이 불린다* 는 수동 은혜만.
+ *    2026-08-11 백엔드 게이트 신설(jesus.yml safety_gates R3_no_resurrection_pressure, 55종).
  *  · R2 — Scene 5 겟세마네 흔들림 = 믿음의 결함 아님. 고난 미화 X.
+ *    필수 footer 는 payload(extras.suffering_footer)에서 읽어 동의 게이트 위에 렌더한다.
  *  · R1 — Scene 7 outro 에 위기 라우팅(109·1577-0199) + 일기·트랙 A 안내.
+ *    ⚠️ 번호가 jesus-monologues.ts 상수에 하드코딩돼 있다. yml 의 {{crisis_resources.default}}
+ *    치환을 타지 않으므로, 상담번호 정책이 바뀌면 이 화면만 낡은 번호를 들고 남는다.
  *  · R5 — 모든 echo/outro 에 "AI 보조 — 본문은 성경 참조" footer.
  */
 type Scene = JosephStartResponse;
@@ -70,8 +76,13 @@ export default function JesusPage() {
   });
 
   const decide = useMutation({
-    mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
-      decideMission("jesus", scene!.sessionId, sceneId, decision),
+    mutationFn: ({
+      sceneId,
+      decision,
+    }: {
+      sceneId: number;
+      decision: unknown;
+    }) => decideMission("jesus", scene!.sessionId, sceneId, decision),
     onSuccess: (d, vars) => {
       // backend responseText 우선, 없으면 frontend fallback (jesus 는 항상 fallback).
       const local = buildLocalEcho(vars.sceneId, vars.decision);
@@ -123,6 +134,14 @@ export default function JesusPage() {
 
   const lines = field<Array<{ ref?: string; text?: string }>>("lines") ?? [];
 
+  // R2 필수 footer. jesus.yml Scene 5 extras.suffering_footer 를 *payload 에서* 읽는다.
+  // 2026-08-11 까지 이 페이지는 이 키를 한 번도 읽지 않았다 — yml 에는 2026-08-05 부터
+  // 있었고 욥 페이지는 렌더하는데(job/page.tsx) 예수 페이지만 빠져 있었다. 즉 고난 미화
+  // 방지 고지가 정작 *십자가 씬* 에서만 사용자에게 안 갔다. 프론트 상수(jesus-monologues.ts)
+  // 에도 이 문구는 없어서 다른 경로로도 새어 나가지 않았다 — 전수 확인.
+  // 프론트에 문구를 복사하지 않고 payload 에서 읽는 이유: 복사본은 yml 이 개정돼도 안 따라온다.
+  const sufferingFooter = field<string>("suffering_footer");
+
   return (
     <main className="min-h-screen flex flex-col p-4 sm:p-6">
       <header className="max-w-3xl mx-auto w-full mb-4">
@@ -149,13 +168,20 @@ export default function JesusPage() {
       <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950">
         <div className="absolute inset-0 flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
-            {scene.currentScene === 1 && "베들레헴 외곽의 밤. 별빛 아래 소박한 구유 — 하늘이 낮은 자리로 내려온다."}
-            {scene.currentScene === 2 && "갈릴리 언덕의 아침. 무리 가운데 앉아 팔복을 듣는다 — 비어 있음이 복이라 하신다."}
-            {scene.currentScene === 3 && "군중이 물러선 자리. 나병 환자에게 예수는 오히려 다가가신다 — 손을 내밀어 닿으신다."}
-            {scene.currentScene === 4 && "어둑한 다락방. 세 갈래 빛의 길이 갈린다 — 길·진리·생명, 어느 결핍으로 다가갈 것인가."}
-            {scene.currentScene === 5 && "감람산 겟세마네의 밤. 빛과 그림자로만 그려지는 잔 — 뜻대로 마옵시고."}
-            {scene.currentScene === 6 && "이른 새벽 동산 무덤. 어둠이 여명으로 밝아 온다 — 이름을 부르시는 음성."}
-            {scene.currentScene === 7 && "밝은 묵상의 자리. 발치에서 작은 물줄기가 흐르기 시작한다 — 생명의 강."}
+            {scene.currentScene === 1 &&
+              "베들레헴 외곽의 밤. 별빛 아래 소박한 구유 — 하늘이 낮은 자리로 내려온다."}
+            {scene.currentScene === 2 &&
+              "갈릴리 언덕의 아침. 무리 가운데 앉아 팔복을 듣는다 — 비어 있음이 복이라 하신다."}
+            {scene.currentScene === 3 &&
+              "군중이 물러선 자리. 나병 환자에게 예수는 오히려 다가가신다 — 손을 내밀어 닿으신다."}
+            {scene.currentScene === 4 &&
+              "어둑한 다락방. 세 갈래 빛의 길이 갈린다 — 길·진리·생명, 어느 결핍으로 다가갈 것인가."}
+            {scene.currentScene === 5 &&
+              "감람산 겟세마네의 밤. 빛과 그림자로만 그려지는 잔 — 뜻대로 마옵시고."}
+            {scene.currentScene === 6 &&
+              "이른 새벽 동산 무덤. 어둠이 여명으로 밝아 온다 — 이름을 부르시는 음성."}
+            {scene.currentScene === 7 &&
+              "밝은 묵상의 자리. 발치에서 작은 물줄기가 흐르기 시작한다 — 생명의 강."}
           </p>
         </div>
       </section>
@@ -170,7 +196,10 @@ export default function JesusPage() {
                   {scene1Incarnation}
                 </p>
                 <div className="mt-3">
-                  <NarrationAudioButton text={scene1Incarnation} onUnavailable="hide" />
+                  <NarrationAudioButton
+                    text={scene1Incarnation}
+                    onUnavailable="hide"
+                  />
                 </div>
               </div>
             )}
@@ -207,35 +236,48 @@ export default function JesusPage() {
         )}
 
         {/* Scene 4 — pick_one (길·진리·생명 3분기) */}
-        {sceneType === "pick_one" && Array.isArray(field<OptionLike[]>("options")) && (
-          <div className="space-y-3">
-            {field<string>("context_line") && (
-              <p className="text-xs text-[var(--color-warm)]/60 italic px-1">
-                {field<string>("context_line")}
-              </p>
-            )}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
-                <button
-                  key={o.id}
-                  onClick={() => advance(scene.currentScene, o.id)}
-                  disabled={decide.isPending}
-                  className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
-                >
-                  {o.label}
-                </button>
-              ))}
+        {sceneType === "pick_one" &&
+          Array.isArray(field<OptionLike[]>("options")) && (
+            <div className="space-y-3">
+              {field<string>("context_line") && (
+                <p className="text-xs text-[var(--color-warm)]/60 italic px-1">
+                  {field<string>("context_line")}
+                </p>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
+                  <button
+                    key={o.id}
+                    onClick={() => advance(scene.currentScene, o.id)}
+                    disabled={decide.isPending}
+                    className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                  >
+                    {o.label}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+        {/* Scene 5 — R2 고난 미화 방지 고지.
+            동의 게이트 *위* 에 둔다. 동의를 받은 뒤에 띄우면 "견뎌라"로 읽힐 수 있는
+            장면에 이미 들어간 뒤가 되고, 건너뛴 사람은 아예 못 본다. 판단 재료는
+            판단 전에 있어야 한다. 그래서 동의 여부와 무관하게 이 씬 내내 붙어 있다. */}
+        {sceneType === "contemplative" && sufferingFooter && (
+          <p className="text-xs text-[var(--color-warm)]/60 leading-relaxed max-w-prose mx-auto border-l-2 border-[var(--color-primary)]/30 pl-3">
+            {sufferingFooter}
+          </p>
         )}
 
         {/* Scene 5 — contemplative (겟세마네·십자가). R4 정서 경고 동의 게이트. */}
         {sceneType === "contemplative" && !passionConsented && (
           <div className="space-y-3 px-4 py-4 rounded-lg border border-[var(--color-primary)]/40 bg-black/30">
             <p className="text-sm text-[var(--color-warm)]/90">
-              다음 장면은 <strong>고통과 죽음(겟세마네·십자가)</strong> 을 다룹니다. 약 2분.
-              직접 묘사 없이 빛과 그림자·본문으로만 그려지지만, 지금이 버겁다면 이 장면은{" "}
-              <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 결말과 부활은 그대로 이어집니다.
+              다음 장면은 <strong>고통과 죽음(겟세마네·십자가)</strong> 을
+              다룹니다. 약 2분. 직접 묘사 없이 빛과 그림자·본문으로만
+              그려지지만, 지금이 버겁다면 이 장면은{" "}
+              <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 결말과 부활은
+              그대로 이어집니다.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
@@ -257,7 +299,9 @@ export default function JesusPage() {
         )}
         {sceneType === "contemplative" && passionConsented && (
           <button
-            onClick={() => advance(scene.currentScene, { value: "contemplate" })}
+            onClick={() =>
+              advance(scene.currentScene, { value: "contemplate" })
+            }
             disabled={decide.isPending}
             className="w-full py-4 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
           >
@@ -315,7 +359,9 @@ export default function JesusPage() {
       {history.length > 0 && (
         <details className="max-w-3xl mx-auto w-full mt-6 text-xs text-[var(--color-warm)]/40">
           <summary>진행 기록</summary>
-          <pre className="overflow-x-auto">{JSON.stringify(history, null, 2)}</pre>
+          <pre className="overflow-x-auto">
+            {JSON.stringify(history, null, 2)}
+          </pre>
         </details>
       )}
     </main>
@@ -338,7 +384,8 @@ function ScriptureReading({
   onComplete: () => void;
 }) {
   const [read, setRead] = useState<Set<number>>(new Set());
-  const list = lines.length > 0 ? lines : [{ text: "본문을 천천히 읽어 봅니다." }];
+  const list =
+    lines.length > 0 ? lines : [{ text: "본문을 천천히 읽어 봅니다." }];
   const allRead = read.size >= list.length;
 
   return (
@@ -360,13 +407,17 @@ function ScriptureReading({
                   : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
               }`}
             >
-              <span className="text-sm text-[var(--color-warm)]/90">{ln.text}</span>
+              <span className="text-sm text-[var(--color-warm)]/90">
+                {ln.text}
+              </span>
               {ln.ref && (
                 <span className="ml-2 text-[10px] text-[var(--color-warm)]/40 uppercase">
                   {ln.ref}
                 </span>
               )}
-              {done && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+              {done && (
+                <span className="ml-2 text-[var(--color-primary)]">✓</span>
+              )}
             </button>
           );
         })}
@@ -412,7 +463,9 @@ function GestureSequence({
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--color-warm)]/60">순서대로 몸짓을 이어가세요</p>
+      <p className="text-xs text-[var(--color-warm)]/60">
+        순서대로 몸짓을 이어가세요
+      </p>
       <div className="grid grid-cols-1 gap-3">
         {list.map((s, i) => {
           const isLast = i === list.length - 1;
@@ -426,7 +479,9 @@ function GestureSequence({
             >
               <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
               {s.label}
-              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+              {already && (
+                <span className="ml-2 text-[var(--color-primary)]">✓</span>
+              )}
             </button>
           );
         })}
