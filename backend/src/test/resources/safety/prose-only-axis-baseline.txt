@@ -1,6 +1,5 @@
 backend/src/main/resources/scenarios/elijah.yml:R3
 backend/src/main/resources/scenarios/jesus.yml:R2
-backend/src/main/resources/scenarios/jesus.yml:R3
 backend/src/main/resources/scenarios/job.yml:R2
 backend/src/main/resources/scenarios/joseph.yml:R2
 backend/src/main/resources/scenarios/moses.yml:R2
