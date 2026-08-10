@@ -18,6 +18,17 @@
     반대로 앞 단계만 있고 뒤가 없는 것(저작은 끝났는데 아직 못 논다)은 FAIL 이 아니다.
     그건 미완이지 위험이 아니다 — 세어서 보여 주기만 한다.
 
+역전을 과대 해석하지 말 것 (2026-08-11 교정):
+    이 스크립트는 *디렉터리에 파일이 있는지* 만 본다. 그래서 "앞 단계가 없다" 를
+    "안전 통제가 없다" 로 읽으면 틀린다 — 실제로 한 번 틀렸다. job 은 설계·게이트·저작
+    디렉터리가 전부 비었지만, 런타임 시나리오 파일 *안에* safety_gates 1개와 금칙 토큰
+    35종, 트리거 경고·동의 카드·스킵 경로를 직접 들고 있다. 통제가 없던 게 아니라
+    위치가 달랐다.
+    그래서 역전 사유 옆에 **자체 통제 보유 여부** 를 같이 찍는다. 통제가 없는 역전
+    (`자체통제 없음`)이 통제를 다른 위치에 둔 역전보다 훨씬 나쁘다.
+    단, 자체 통제가 있어도 역전은 역전이다 — 설계 문서·게이트 스위트·검토 기록이
+    없다는 사실 자체는 그대로다.
+
 이 초록이 말하지 않는 것:
     ① 산출물의 품질 — 파일이 있는지만 본다. 안에 뭐가 적혔는지는 안 읽는다.
     ② 사람 사인오프 — `docs/CONTENT-WORKFLOW.md` 는 신학·심리 검토자의 승인을
@@ -56,6 +67,24 @@ def enum_values() -> set[str]:
     return set(re.findall(r'^\s*[A-Z_]+\("([a-z_]+)"\)', body, re.M))
 
 
+def self_controls() -> dict[str, tuple[int, int]]:
+    """런타임 시나리오 파일이 *스스로* 들고 있는 (safety_gates 수, 금칙 토큰 수).
+
+    앞 단계 디렉터리가 비어도 여기 값이 있으면 그 인물은 무방비가 아니다.
+    파싱 실패는 0 이 아니라 판정 불가로 올린다 — 못 읽은 것을 '없음' 으로 세면
+    이 스크립트가 바로 그 오경보를 다시 낸다.
+    """
+    import yaml  # 이 함수에서만 필요하다. 나머지 판정은 표준 라이브러리로 충분하다.
+
+    out: dict[str, tuple[int, int]] = {}
+    for p in sorted((ROOT / "backend/src/main/resources/scenarios").glob("*.yml")):
+        doc = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+        gates = [g for g in (doc.get("safety_gates") or []) if isinstance(g, dict)]
+        tokens = sum(len(g.get("lint_forbidden_tokens") or []) for g in gates)
+        out[p.stem] = (len(gates), tokens)
+    return out
+
+
 def collect() -> dict[str, dict[str, bool]]:
     stages: dict[str, set[str]] = {
         "design": {
@@ -79,8 +108,12 @@ def collect() -> dict[str, dict[str, bool]]:
 def main() -> int:
     try:
         table = collect()
-    except (OSError, KeyError) as exc:
+        controls = self_controls()
+    except (OSError, KeyError, ImportError) as exc:
         print(f"[BLOCKED] 인물 목록을 만들지 못했다 — {exc}")
+        return 2
+    except Exception as exc:  # yaml 파싱 실패 등 — 못 읽은 것을 '없음' 으로 세지 않는다
+        print(f"[BLOCKED] 런타임 시나리오의 자체 통제를 읽지 못했다 — {exc}")
         return 2
 
     if not table:
@@ -122,7 +155,13 @@ def main() -> int:
     for name, has in sorted(table.items()):
         if name in inverted:
             gone = " · ".join(label_of[k] for k in inverted[name])
-            print(f"  [FAIL   ] {name} — 런타임에 올라와 있는데 앞 단계가 없다: {gone}")
+            n_gates, n_tokens = controls.get(name, (0, 0))
+            own = (
+                f"자체통제 게이트 {n_gates}·토큰 {n_tokens}"
+                if n_gates
+                else "자체통제 없음"
+            )
+            print(f"  [FAIL   ] {name} — 런타임에 올라와 있는데 앞 단계가 없다: {gone} ({own})")
         else:
             print(f"  [PASS   ] {name}")
 
