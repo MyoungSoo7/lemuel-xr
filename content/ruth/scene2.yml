@@ -33,7 +33,7 @@ crisis_reminder:
   always_visible: true
   text_ko: "지금 힘드시면: {{crisis_resources.default}}"
 
-post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
 post_crisis_latch_scope: mission
 crisis_card_position: terminal_screen
 

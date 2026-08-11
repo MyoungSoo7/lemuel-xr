@@ -153,19 +153,26 @@ declared_controls:
     # 정본(docs/RUTH-LOCKED-STRINGS.md crisis_latch)은 키가 **3개**다. 하나만 옮겨
     # 적으면 남은 둘은 런타임에 계약이 없는 상태가 된다. 이름도 정본과 같게 쓴다.
     post_crisis_latch_scope: mission
-    post_crisis_render_policy: suppress_all_narrative_captions
+    post_crisis_render_policy: suppress_all_captions_except_crisis_card
     crisis_card_position: terminal_screen
     note: >-
       latch 발동 이후에는 서사 자막·종결 자막·묵상 제안을 전부 렌더하지 않는다.
       scene5 의 priority_order 둘째 항("종결 자막 도달 보장")은 위기가 없는 경로에 대한
       보장이며 latch 를 뚫지 않는다. 두 줄 중 한쪽만 읽으면 반대로 구현된다.
-    unresolved: >-
-      ⚠️ post_crisis_render_policy 의 문자열이 지목하는 대상 집합이 이 미션에서는 비어 있다.
-      룻의 자막 15개는 전부 speaker: scripture_caption 이고 narrative 는 0개다(2026-08-11 실측).
-      문자열대로 구현하면 아무것도 억제되지 않는다 — 위 note 가 서술한 억제 범위와
-      정본 문자열이 서로 다른 것을 가리킨다. 정본(docs/RUTH-LOCKED-STRINGS.md 및
-      content/ruth/scene*.yml 5곳)을 고쳐야 하는 사안이므로 이 파일에서 단독 변경하지 않는다.
-      사용자 결정 대기.
+    resolved: >-
+      2026-08-11 해소. 옛 값 suppress_all_narrative_captions 는 「서사 자막」이라는 한 분류를
+      끈다는 부정형이었고, 그 분류는 이 미션에 0개(자막 15개 전부 scripture_caption),
+      리포 전체로 넓혀도 화자 표기 20여 종 중 narrative 는 0건이었다 — 끄겠다고 적은 대상을
+      가리키지도 못하는 문자열이었다. 사용자 결정으로 자막 분류가 아니라 문자열 정본 쪽을
+      고쳤다. 부정형인 한 분류가 하나 늘 때마다 같은 구멍이 다시 생기기 때문이다.
+      새 값은 긍정형이라 기본이 「끔」이고, 위 note 의 억제 범위와 같은 것을 가리킨다.
+      정본 docs/RUTH-LOCKED-STRINGS.md crisis_latch · 시드 docs/SEED-RAHAB.md §5 R1 ·
+      집행 scripts/check_ruth_captions.py AC 23(정본 3키 값 ↔ 5개 Scene 전건).
+    still_unresolved: >-
+      ⚠️ 이 3키를 읽는 런타임 코드는 여전히 0건이다(.kt · .tsx 전수). 문자열을 고쳐도
+      화면 동작은 달라지지 않았다 — 바뀐 것은 구현자에게 주는 계약 문언이다.
+      ⚠️ 상시 면책(disclaimer.style: small_persistent)이 pause_fade_black 이후에도 떠 있는지는
+      정본에도 시드에도 적혀 있지 않다. 새 값은 「자막류」까지만 주장하고 그 점에는 침묵한다.
   - id: R4_consent_two_tier
     machine_enforced: false
     enforced_by: 프론트 동의 카드 렌더 + scripts/check_ruth_captions.py (content/ruth 대상)

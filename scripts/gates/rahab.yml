@@ -33,8 +33,30 @@ doc_min_lines:
 trigger_scenes: [1, 2, 3, 4, 5]
 crisis_reminder_scenes: [1, 2, 3, 4, 5]
 
-# ── G2 — R1 자해 리스너 id. 값 계약(래치 7키)은 이 파일이 못 잡는다(seed §10 C7).
+# ── G2 — R1 자해 리스너 id.
 r1_listener_id: "R1_voice_self_harm_listener"
+
+# ── G2v — 래치 **키의 값**. seed §10 C7("집행 수단은 지금 없다")에 대한 응답이다.
+#    C7 이 지적한 형태 — 래치 3키가 통째로 빠지거나 `mission` 이 `session` 으로 잘못
+#    실려도 G2 는 초록 — 를 이 게이트가 잰다. G2 는 `safety_gates[].id` 하나만 본다.
+#
+#    ⚠️ 라합에는 아직 `content/rahab/scene*.yml` 이 없다. 그래서 이 게이트는 오늘
+#    **BLOCKED 다** — 계약은 선언됐고 잴 대상이 없다. 초록이 아니다.
+#    Scene 파일이 생기는 순간 이 8키가 5/5 에서 값까지 대조된다.
+#
+#    정본 문서(`docs/RUTH-LOCKED-STRINGS.md` 같은 것)가 라합에는 없으므로 여기에
+#    직접 적는다. 값의 상류는 `docs/SEED-RAHAB.md` §5 R1 의 8키 표다 — 그 표를
+#    고치면 **이 블록도 같이 고쳐야 한다.** 둘이 어긋나는 것을 잡는 도구는 없다.
+latch_contract:
+  scene_keys:
+    post_crisis_render_policy: suppress_all_captions_except_crisis_card
+    post_crisis_latch_scope: mission
+    crisis_card_position: terminal_screen
+  gate_keys:
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
 
 # ── G0b — 배제 자구 양방향 대조표. USED 24행 / EXCLUDED 31행.
 verses_file: docs/verses-rahab.txt

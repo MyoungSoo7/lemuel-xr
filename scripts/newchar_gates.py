@@ -135,7 +135,7 @@ LEGACY_BASELINE = frozenset({"joseph", "moses", "david"})
 # 여기 없는 게이트(G3·G4·G8·G10·G11 등)는 legacy 에도 그대로 적용된다 —
 # 그건 세 인물이 이미 100% 지키고 있음을 실측으로 확인한 항목이다.
 NEWCHAR_ONLY_GATES = frozenset(
-    {"G0a", "G1b", "G2", "G3b", "G3c", "G3d", "G5a-i", "G5a-ii", "G5d",
+    {"G0a", "G1b", "G2", "G2v", "G3b", "G3c", "G3d", "G5a-i", "G5a-ii", "G5d",
      "G5e", "G6d", "G9d", "G7", "G8", "G10"}
 )
 
@@ -858,6 +858,112 @@ def g2(c: Ctx) -> Result:
     return ok("G2", f"{len(files)}/{len(files)}")
 
 
+def _latch_canon(c: Ctx, spec: dict) -> dict:
+    """정본 md 의 첫 ```yaml 블록에서 래치 계약 매핑을 꺼낸다.
+
+    `check_ruth_captions.py::_load_canon` 과 같은 규약(첫 ```yaml 블록)을 쓴다.
+    **일부러 값을 여기에 사본으로 두지 않는다** — 사본을 두면 정본·설정·콘텐츠
+    셋을 손으로 맞춰야 하고, 그건 이 게이트가 잡으려는 실패 그 자체다."""
+    rel = str(spec["canon_doc"])
+    block = str(spec.get("canon_block", "crisis_latch"))
+    path = c.p(rel)
+    if not os.path.exists(path):
+        raise GateBlocked(f"래치 정본 문서가 없다: {rel}")
+    with open(path, encoding="utf-8") as fh:
+        m = re.search(r"^```yaml\n(.*?)^```", fh.read(), re.DOTALL | re.MULTILINE)
+    if not m:
+        raise GateBlocked(f"{rel} 에 ```yaml 데이터 블록이 없다")
+    try:
+        data = yaml.safe_load(m.group(1))
+    except yaml.YAMLError as e:
+        raise GateBlocked(f"{rel} 데이터 블록 파싱 실패: {e}") from e
+    got = (data or {}).get(block)
+    if not isinstance(got, dict) or not got:
+        raise GateBlocked(f"{rel} 의 `{block}` 이 비어 있거나 매핑이 아니다")
+    return got
+
+
+def g2v(c: Ctx) -> Result:
+    """§4 R1 — 위기 래치 **키의 값**이 Scene 전건에 실렸는가.
+
+    G2 는 `safety_gates[].id` 하나만 본다. 그래서 래치 3키가 통째로 빠지거나
+    `post_crisis_latch_scope` 가 `mission` 대신 `session` 으로 실려도 **G2 는
+    초록이었다**(`docs/SEED-RAHAB.md` C7 이 기록한 구멍). 룻 README 가 못박은 대로
+    「키 존재가 아니라 값이 계약이다」(`content/ruth/README.md:32`).
+
+    설정이 없으면 **BLOCKED 다 — PASS 가 아니다.** 선언하지 않은 인물에 대해
+    이 게이트는 재지 않았고, "재지 않았다"를 초록으로 적으면 그게 이 리포가
+    가장 싫어하는 형태가 된다.
+
+    설정 형태 (`scripts/gates/<인물>.yml`) — 둘 중 **하나만** 쓴다:
+
+        latch_contract:
+          canon_doc: docs/RUTH-LOCKED-STRINGS.md   # 정본 md 의 첫 ```yaml 블록
+          canon_block: crisis_latch                # 그 아래 매핑 = Scene 최상위 키·값
+
+        latch_contract:
+          scene_keys: { post_crisis_latch_scope: mission, ... }   # 정본 문서가 없는 인물
+          gate_keys:  { enforced_at: always, ... }                # safety_gates[] 안
+
+    이 게이트가 주장하지 않는 것: 값이 **옳다**는 것. 정본과 Scene 을 같이 고치면
+    통과한다 — 그때 남는 것은 정본의 diff 다(AC 23 과 같은 한계)."""
+    spec = c.cfg.get("latch_contract")
+    if not spec:
+        return blocked(
+            "G2v",
+            f"{c.name}: `latch_contract` 미선언 — 래치 키의 값을 재지 않았다. "
+            "통과가 아니라 판정 유보다(SEED-RAHAB C7)",
+        )
+    if not isinstance(spec, dict):
+        raise GateBlocked(f"`latch_contract` 가 매핑이 아니다 (실제 {type(spec).__name__})")
+    if "canon_doc" in spec and "scene_keys" in spec:
+        raise GateBlocked(
+            "`latch_contract` 에 canon_doc 과 scene_keys 가 같이 있다 — "
+            "출처가 둘이면 어느 쪽이 정본인지 게이트가 정할 수 없다. 하나만 남겨라"
+        )
+
+    if "canon_doc" in spec:
+        scene_keys = _latch_canon(c, spec)
+        source = f"{spec['canon_doc']} `{spec.get('canon_block', 'crisis_latch')}`"
+    else:
+        scene_keys = spec.get("scene_keys") or {}
+        source = f"{c.name}.yml `latch_contract.scene_keys`"
+        if not isinstance(scene_keys, dict) or not scene_keys:
+            raise GateBlocked("`latch_contract.scene_keys` 가 비어 있거나 매핑이 아니다")
+    gate_keys = spec.get("gate_keys") or {}
+    if not isinstance(gate_keys, dict):
+        raise GateBlocked(f"`latch_contract.gate_keys` 가 매핑이 아니다 (실제 {type(gate_keys).__name__})")
+
+    files = c.require_scenes()
+    bad: list[str] = []
+    for f in files:
+        rel = c.rel(f)
+        doc = c.yml(f)
+        for key, want in scene_keys.items():
+            got = collect_key(doc, key)
+            if not got:
+                bad.append(f"{rel}: `{key}` 없음 (계약값 {want!r})")
+            elif any(v != want for v in got):
+                bad.append(f"{rel}: `{key}` = {got!r} != {want!r}")
+        if not gate_keys:
+            continue
+        gates = [g for g in (doc.get("safety_gates") or []) if isinstance(g, dict)]
+        if not gates:
+            bad.append(f"{rel}: `safety_gates[]` 가 없다 — gate_keys 를 잴 대상이 없다")
+            continue
+        for key, want in gate_keys.items():
+            seen = [g[key] for g in gates if key in g]
+            if not seen:
+                bad.append(f"{rel}: `safety_gates[].{key}` 없음 (계약값 {want!r})")
+            elif any(v != want for v in seen):
+                bad.append(f"{rel}: `safety_gates[].{key}` = {seen!r} != {want!r}")
+
+    n = len(scene_keys) + len(gate_keys)
+    if bad:
+        return fail("G2v", f"{n}키 × {len(files)} Scene 중 {len(bad)}건 불일치 (정본 {source})", bad)
+    return ok("G2v", f"{n}키 × {len(files)}/{len(files)} Scene 값 일치 (정본 {source})")
+
+
 CRISIS_TOKEN = "crisis_resources.default"
 
 
@@ -1458,6 +1564,7 @@ GATES: list[tuple[str, Callable[[Ctx], Result], str, str]] = [
     ("G0d", g0d, "제품 말투 위험 문장 커버리지", AUTHOR),
     ("G1b", g1b, "마지막 Scene null 폴백 라우트", AUTHOR),
     ("G2", g2, "R1 상시 음성 리스너", AUTHOR),
+    ("G2v", g2v, "R1 위기 래치 키의 값", AUTHOR),
     ("G3", g3, "위기 번호 하드코딩 0건", AUTHOR),
     ("G3b", g3b, "위기 토큰 ≥2 Scene 존재", AUTHOR),
     ("G3c", g3c, "마지막 Scene 위기 토큰", AUTHOR),

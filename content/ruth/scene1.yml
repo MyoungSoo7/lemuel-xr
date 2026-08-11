@@ -56,7 +56,7 @@ crisis_reminder:
   text_ko: "지금 힘드시면: {{crisis_resources.default}}"
 
 # ── SR-3 R1 latch 3키 (값까지 5 Scene 동일) ──────────────────────────────────
-post_crisis_render_policy: suppress_all_narrative_captions
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
 post_crisis_latch_scope: mission
 crisis_card_position: terminal_screen
 

@@ -501,10 +501,20 @@ Scene 3 의 2:12 자막과 **같지 않고 메아리 관계다.** 리포 전체�
 - [ ] **정신건강** — 마감 세 줄이 사별 사용자에게 평가로 읽히지 않는가
 - [ ] **정신건강** — 등급 C Scene 4 의 동의·연출 조합이 충분한가
 - [ ] **부채** — 감정 분류기의 완곡 표현 미탐(§7-2). 출시 차단이 **아니고** 탐지 한계다
-- [ ] **안전** — `post_crisis_render_policy: suppress_all_narrative_captions` 가 이 미션에서
-      가리키는 대상이 공집합이다(자막 15개 전부 `scripture_caption`, `narrative` 0개).
-      문자열 정본을 고칠지 자막 분류를 고칠지 사용자 결정 필요 — `scenarios/ruth.yml`
-      `declared_controls[R1].unresolved` 참조
+- [x] **안전** — `post_crisis_render_policy` 의 값이 가리키는 대상이 공집합이던 문제.
+      옛 값 `suppress_all_narrative_captions` 는 「서사 자막」이라는 _한 분류_ 를 끈다는
+      부정형이었는데, 이 미션의 자막 15개는 전부 `scripture_caption` 이고 `narrative` 는
+      0개였다(리포 전체로 넓혀도 화자 표기 20여 종 중 `narrative` 는 0건). **2026-08-11
+      사용자 결정으로 문자열 정본 쪽을 고쳤다** — 자막 분류를 손대면 룻의 확정된 콘텐츠를
+      다시 여는 일이 되고, 부정형인 한 분류가 하나 늘 때마다 같은 구멍이 다시 생긴다.
+      새 값은 긍정형 `suppress_all_captions_except_crisis_card` 다(정본:
+      `docs/RUTH-LOCKED-STRINGS.md` `crisis_latch`, 사유는 그 위 주석 · 시드는
+      `docs/SEED-RAHAB.md` §5 R1). 집행은 AC 23 — 정본 3키 값 ↔ 5개 Scene 전건 대조,
+      돌연변이 1건으로 검증했다.
+      ⚠️ **남은 것 둘.** ① 이 3키를 읽는 런타임 코드는 여전히 **0건**이라 화면 동작은
+      달라지지 않았다. 바뀐 것은 구현자에게 주는 계약 문언이다. ② 상시 면책
+      (`disclaimer.style: small_persistent`)이 `pause_fade_black` 이후에도 떠 있는지는
+      어디에도 적혀 있지 않다 — 새 값은 「자막류」까지만 주장하고 그 점에는 침묵한다.
 - [ ] **안전** — 오벳 출생 미렌더는 **집행 없는 등재**다. 절 본문은 §4-2 E7·E8 로
       마커까지 붙어 등재돼 있고, 렌더 자체는 §14「채택하지 않은 설계」에 기각 사유와
       함께 기록돼 있다. 그러나 §14 에는 `EXCLUSION-DECL` 마커가 없어 세어지지 않고,

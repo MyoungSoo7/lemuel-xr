@@ -1,6 +1,6 @@
 # RUTH-LOCKED-STRINGS — 룻(Theme 19) 고정 문자열 정본
 
-> **이 파일이 정본이다.** `scripts/check_ruth_captions.py` 는 아래 데이터 블록을 *읽어서*
+> **이 파일이 정본이다.** `scripts/check_ruth_captions.py` 는 아래 데이터 블록을 _읽어서_
 > `content/ruth/*.yml` 과 대조한다. 검사기 안에는 이 값들의 사본이 없다.
 
 ## 왜 이 파일이 생겼나 (2026-08-06)
@@ -8,13 +8,13 @@
 `check_ruth_captions.py` 는 원래 이 값들을 자기 안에 하드코딩해 두고, 상류가 `SEED-RUTH.md`
 라고 적어 두었다. 그런데 **그 파일은 저장소에 존재한 적이 없다** — 작업 트리에도, git 전체
 이력에도 없다(`git log --all --diff-filter=A`). 즉 검사기가 자기 docstring 에서 경고하던
-*자기참조 검사* 가 실제 상태였다: 자막을 검사기와 콘텐츠 양쪽에서 같이 고치면 아무도 못 잡는다.
+_자기참조 검사_ 가 실제 상태였다: 자막을 검사기와 콘텐츠 양쪽에서 같이 고치면 아무도 못 잡는다.
 
 사용자 결정(2026-08-06)은 "상류 문서를 실제로 만들어" 였고, 이 파일이 그 상류다.
 
 **이 파일은 없던 내용을 지어내지 않았다.** 값은 전부 `check_ruth_captions.py` 의 상수에서
 기계적으로 덤프한 것이고, 그 상수들은 그 시점에 이미 `content/ruth/*.yml` 과 일치함이
-게이트 초록(검사 12 / FAIL 0)으로 확인돼 있었다. 한 일은 *내용을 만든 것* 이 아니라
+게이트 초록(검사 12 / FAIL 0)으로 확인돼 있었다. 한 일은 _내용을 만든 것_ 이 아니라
 **주인을 지정한 것** 이다. 사라진 `SEED-RUTH.md` 를 복원한 것도 아니다 — 이건 새 정본이다.
 
 ## 이 계약이 잡는 것과 못 잡는 것
@@ -23,8 +23,8 @@
   달라지면 검사기가 빨개진다.
 - **잡는다** — 검사기만 바뀐 경우. 이제 검사기에 문자열이 없으므로 애초에 바꿀 것이 없고,
   이 파일을 못 읽으면 검사기는 판정을 내지 않고 rc 126 으로 죽는다(초록으로 새지 않는다).
-- **못 잡는다** — 이 파일과 콘텐츠를 *같이* 고치는 경우. 그건 제3자가 없으면 원리적으로
-  불가능하다. 다만 그때는 정본 파일의 diff 가 남으므로 *검토 가능한 행위* 가 된다.
+- **못 잡는다** — 이 파일과 콘텐츠를 _같이_ 고치는 경우. 그건 제3자가 없으면 원리적으로
+  불가능하다. 다만 그때는 정본 파일의 diff 가 남으므로 _검토 가능한 행위_ 가 된다.
   이전 상태(검사기+콘텐츠 동시 수정)와의 차이가 정확히 이것이다.
 
 ## 값
@@ -51,15 +51,26 @@ disclaimer:
 ruth_2_11:
   short_text_ko: 네가 시어머니에게 행한 모든 것과 네 부모와 고국을 떠나 전에 알지 못하던 백성에게로 온 일이 내게 분명히 알려졌느니라
   forbidden_fragment: 네 남편이 죽은 후로
+# 2026-08-11 값 변경 — `suppress_all_narrative_captions` → 아래 값.
+#   부정형(「서사 자막이라는 *분류* 를 끈다」)은 분류가 하나라도 새로 생기면 조용히
+#   샌다. 실제로 이 리포의 화자 표기는 20종이 넘고(`scripture_caption` 57건 ·
+#   `narrator` 35건 · `system` 24건 …), 그중 `narrative` 라는 값은 **한 건도 없다** —
+#   즉 부정형 문자열은 자기가 끄겠다고 적은 분류를 리포에서 가리키지도 못했다.
+#   긍정형(「자막류는 전부 끄고 위기 카드만 남긴다」)은 분류가 늘어도 기본이 「끔」이다.
+#   ⚠️ 주장 범위는 **자막류**까지다. `disclaimer`(`style: small_persistent`)가
+#   `pause_fade_black` 이후에도 떠 있는지는 어디에도 적혀 있지 않다 — 미해소.
+#   ⚠️ 그리고 이 세 키를 읽는 런타임 코드는 지금 **0건**이다(`.kt`·`.tsx` 전수 0).
+#   문자열을 고쳐도 화면 동작은 달라지지 않는다. 바뀐 것은 계약 문언이고,
+#   집행하는 것은 AC 23(정본 ↔ 5개 Scene 값 대조)까지다.
 crisis_latch:
-  post_crisis_render_policy: suppress_all_narrative_captions
+  post_crisis_render_policy: suppress_all_captions_except_crisis_card
   post_crisis_latch_scope: mission
   crisis_card_position: terminal_screen
 consent_cards:
   ruth_entry_consent:
     covers:
-    - 1
-    - 2
+      - 1
+      - 2
     declined_route: 3
     text_ko: |-
       이 이야기에는 사별한 사람들이 나옵니다.
@@ -75,8 +86,8 @@ consent_cards:
       지금 힘드시면: {{crisis_resources.default}}
   ruth_midpoint_consent:
     covers:
-    - 3
-    - 5
+      - 3
+      - 5
     declined_route: closing
     text_ko: |-
       여기서부터는 낯선 땅에서의 일입니다.
@@ -90,7 +101,7 @@ consent_cards:
       지금 힘드시면: {{crisis_resources.default}}
   ruth_scene4_night_warning:
     covers:
-    - 4
+      - 4
     declined_route: 5
     text_ko: |-
       다음 장면은 밤의 타작 마당입니다.
@@ -103,18 +114,18 @@ consent_cards:
       음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
       지금 힘드시면: {{crisis_resources.default}}
 skip_destinations:
-  '1': 3
-  '2': 3
-  '3': 4
-  '4': 5
-  '5': ruth_scene5_alt_short
+  "1": 3
+  "2": 3
+  "3": 4
+  "4": 5
+  "5": ruth_scene5_alt_short
 f66_entry_gate:
   id: F66_entry_state_gate
   trigger_conditions:
-  - source: safety_alerts
-    rule: severity='high' 이력 존재 (user_id 기준, category 무관)
-  - source: emotion_logs
-    rule: 최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)
+    - source: safety_alerts
+      rule: severity='high' 이력 존재 (user_id 기준, category 무관)
+    - source: emotion_logs
+      rule: 최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)
   on_trigger:
     closing_line_force: null_variant
     voice_intensity_preset: subtitle_only
