@@ -80,8 +80,15 @@ def run(argv: list[str]) -> tuple[int, str]:
     return proc.returncode, proc.stdout + proc.stderr
 
 
-def observe(name: str, argv: list[str], mode: str) -> dict | None:
-    """러너 하나를 돌려 (rc, 집계, 비-PASS 항목) 을 뽑는다. 못 뽑으면 None — 판정 불가다."""
+def observe(name: str, argv: list[str], mode: str) -> tuple[dict, str] | None:
+    """러너 하나를 돌려 (기록, 원출력) 을 뽑는다. 못 뽑으면 None — 판정 불가다.
+
+    원출력을 함께 돌려주는 이유(2026-08-11): 드리프트가 났을 때 이 도구는 축 이름만
+    찍었다(`+ t-rc:FAIL`). 축 이름은 **어느 행이 틀렸는지 말해주지 않는다** — CI 로그를
+    보는 사람이 그 다음에 할 수 있는 일이 없다. 실제로 이 구멍 때문에 로컬 초록 · CI 빨강을
+    로그만으로 좁히지 못했다. 원출력은 기준선에 저장하지 않는다(줄 번호가 섞여 들어가면
+    문서를 한 줄 고칠 때마다 기준선이 흔들린다).
+    """
     try:
         rc, out = run(argv)
     except (subprocess.TimeoutExpired, OSError) as exc:
@@ -111,14 +118,27 @@ def observe(name: str, argv: list[str], mode: str) -> dict | None:
         tally = [int(m.group(1)), int(m.group(2)), int(m.group(3))]
         items = sorted(f"{axis}:{status}" for status, axis in AXIS_RE.findall(out))
 
-    return {"rc": rc, "tally": tally, "items": items}
+    return {"rc": rc, "tally": tally, "items": items}, out
 
 
 def fmt(tally: list[int]) -> str:
     return f"PASS {tally[0]} / FAIL {tally[1]} / BLOCKED {tally[2]}"
 
 
-def compare(name: str, now: dict, was: dict | None) -> str:
+RAW_CAP = 80
+
+
+def dump_raw(raw: str) -> None:
+    """드리프트 난 러너의 원출력을 찍는다 — 축 이름만으로는 행을 못 찾기 때문이다."""
+    lines = [ln for ln in raw.splitlines() if ln.strip()]
+    print("            ── 이 러너의 출력 (드리프트라서 전문을 찍는다) ──")
+    for ln in lines[:RAW_CAP]:
+        print(f"            │ {ln}")
+    if len(lines) > RAW_CAP:
+        print(f"            │ … {len(lines) - RAW_CAP}줄 더 있다 — 로컬에서 직접 돌려 볼 것")
+
+
+def compare(name: str, now: dict, was: dict | None, raw: str = "") -> str:
     """'ok' | 'drift' | 'new' — 표준출력에 사유를 찍는다."""
     if was is None:
         print(f"  [DRIFT  ] {name} — 기준선에 없는 러너다. --update 로 기록하라.")
@@ -138,6 +158,8 @@ def compare(name: str, now: dict, was: dict | None) -> str:
         print(f"            + {i}  (새로 빨강/판정불가가 됐다)")
     for i in gone:
         print(f"            - {i}  (해소됐다 — 기준선을 갱신해 기록으로 남겨라)")
+    if raw:
+        dump_raw(raw)
     return "drift"
 
 
@@ -170,9 +192,10 @@ def main() -> int:
         if got is None:
             blocked.append(name)
             continue
-        observed[name] = got
+        record, raw = got
+        observed[name] = record
         if not args.update:
-            verdicts.append(compare(name, got, base.get(name)))
+            verdicts.append(compare(name, record, base.get(name), raw))
 
     if args.update:
         merged = dict(base)
