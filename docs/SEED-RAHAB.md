@@ -1942,8 +1942,9 @@ Scene) · `consent_card_defined_in`(2/5 · 아래) · `next_scene_id`(4/5 · Sce
 
 **룻 5 Scene 전건과 자구가 같다**(`content/ruth/scene1.yml:53-56` 외 4). Scene 5 는
 `closing_screen.ui_overlays` 아래에 **같은 블록을 한 번 더** 둔다
-(`content/ruth/scene5.yml:190-193`).
-그 화면은 `entry_mode` 를 `closing_only` 로 둔다(`content/ruth/scene5.yml:190` — 2026-08-12 계보 자막 추가로 :157 에서 밀렸다).
+(`content/ruth/scene5.yml:224-227`).
+그 화면은 `entry_mode` 를 `closing_only` 로 둔다(`content/ruth/scene5.yml:200` — 2026-08-12 계보 자막
+추가로 :157 → :190 → :200 으로 두 번 밀렸다. 이 좌표는 자막을 넣을 때마다 밀린다).
 그 진입에서는 `environment` 가 렌더되지 않으므로, 안전층을 그 아래 두면
 **렌더 안 되는 블록에 안전장치를 매다는 조용한 실패**가 된다
 (`content/ruth/README.md:43`).
