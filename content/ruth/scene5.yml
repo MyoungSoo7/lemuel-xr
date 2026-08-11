@@ -175,9 +175,9 @@ closing_screen:
     id: ruth_closing_sr1
     verse_ref: "룻 2:12 중"
     speaker: scripture_caption
-    text_ko: "그의 날개 아래에 보호를 받으러 온 네게"
+    text_ko: "이스라엘의 하나님 여호와께서 그의 날개 아래에 보호를 받으러 온 네게"
     canonical: true
-    note: "SR-1 — 이 미션의 유일한 종결 자막 정본. Scene 3 의 2:12 자막과 같지 않고 메아리 관계다."
+    note: "SR-1 — 이 미션의 유일한 종결 자막 정본. 2026-08-11 주어 복원(사용자 결정): 앞 값은 b 에서 주어를 잘라낸 형태라 「그의」의 선행사가 화면에 없었고, 마지막 문장의 유일한 행위자가 사용자였다. 그 대가로 Scene 3 의 2:12 자막과 **글자까지 같아졌다** — 앞 판이 적었던 「같지 않고 메아리 관계다」는 이 변경으로 깨졌고, 깨진 채 둔다."
   ui_overlays:
     - id: ruth_closing_suffering_disclaimer
       position: top_right
