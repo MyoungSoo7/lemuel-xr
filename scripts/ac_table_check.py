@@ -82,6 +82,7 @@ MUT = re.compile(
     r"\s*·\s*rc=(\d+)")
 MUT_OUT = re.compile(r"---\s*검출\s*(\d+)\s*/\s*(\d+)\s*---")
 NO_MUT = "AC_TABLE_NO_MUT"          # 중첩 실행에서 t-mut 을 끈다 — 무한 재귀 차단
+RC_TAIL = 25                        # t-rc 불일치 때 붙일 판정기 출력 꼬리 줄 수
 
 
 def strip_md(s: str) -> str:
@@ -218,8 +219,13 @@ def check(target: Path, git_name: str | None = None) -> int:
             bad("t-rc", f"{r['ac']}({name}:{r['line']}) 실측 열이 rc 가 아니다"
                         f" — 「{r['measured']}」 · 실제 rc {rc}")
         elif int(declared.group(1)) != rc:
+            # 왜 출력을 붙이는가(2026-08-11): 이 축이 「선언 0 ≠ 지금 1」까지만 찍었더니,
+            # 로컬 초록 · CI 빨강인 상태에서 **CI 로그만으로는 그 판정기가 무엇을 잡았는지
+            # 알 수 없었다.** rc 는 어긋났다는 사실이고, 무엇이 어긋났는지는 출력에 있다.
+            tail = [ln for ln in out.splitlines() if ln.strip()][-RC_TAIL:]
+            detail = "".join(f"\n              │ {ln}" for ln in tail)
             bad("t-rc", f"{r['ac']}({name}:{r['line']}) 실측 {declared.group(1)}"
-                        f" ≠ 지금 실행 {rc} — `{r['cmd']}`")
+                        f" ≠ 지금 실행 {rc} — `{r['cmd']}`{detail}")
         else:
             ok("t-rc", f"{r['ac']} rc {rc}")
 

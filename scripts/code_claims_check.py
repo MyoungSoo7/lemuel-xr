@@ -40,6 +40,7 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
 import sys
@@ -81,9 +82,44 @@ KEYVAL = re.compile(r"`([a-z][a-z0-9_]{3,}):\s*(\[[^`\]]*\]|[^`\s][^`]*?)`")
 PLACEHOLDER = re.compile(r"[<>]|…|\.\.\.|\b[A-Z]{2,}\b")
 # **옛 오류를 일부러 인용한 줄**은 주장이 아니다. 개정 사유 표가 통째로 그렇다.
 # 지우지 않고 2군으로 내린다 — 조용히 빼면 진짜 결함이 그 뒤에 숨는다.
+#
+# ⚠️ 이 판정은 **낱말 매칭 + ±1줄 창**이다. 양쪽으로 다 틀린다. 하루에 둘 다 실측했다
+#    (2026-08-11). 둘 다 도구가 아니라 **문장 위치·낱말** 때문에 판정이 뒤집힌 사례다.
+#
+#    ① 너무 좁다 — `SEED-RAHAB.md:1105` 는 옛 값을 인용한 줄이 맞는데, 그걸 부정하는
+#       말("**0건**이다")이 같은 문단 **4줄 아래**에 있었다. 마크다운은 하드랩이라
+#       한 문단이 여러 물리 줄이다. 창이 안 닿아 1군으로 떴다.
+#    ② 너무 넓다 — `MVP-RUTH-CONTENT.md:498` 은 §4-2 상호참조 결함으로 1군이었는데,
+#       바로 위에 답변 산문을 채워 넣자("…아니다") 2군으로 내려갔다. 결함은 그대로다.
+#
+#    창을 문단 단위로 넓히는 쪽은 **택하지 않았다.** ②가 보여주듯 이 heuristic 의
+#    고장 방향은 이미 과다 강등이고, 넓히면 그쪽이 더 심해진다. 위 docstring 이 적은
+#    rev.8 사고(낱말 하나로 좌표 드리프트 6건 강등)도 같은 방향이다. ①은 문서 표기를
+#    고쳐서 해결했다(살아있는 `키: 값` 형태로 옛 값을 적지 않는다).
 DISCLAIMED = re.compile(
     r"0건|없다|없었다|적 없다|틀렸다|허위|오류|삭제|아니다|미착수|정정|재현되지")
 SEARCH_TREES = ("content", "backend", "frontend", "scripts")
+SCAN_SUFFIXES = {".yml", ".yaml", ".kt", ".ts", ".tsx", ".py", ".md"}
+
+# 🚨 빌드 산출물·의존성 트리는 「코드」가 아니다 (2026-08-11 신설).
+#
+# 초판은 `base.rglob("*")` 로 `frontend`·`backend` 를 통째로 훑었다. 그 결과 이 도구는
+# **사람마다 다른 답을 냈다** — 실측: 빌드 산출물이 있는 작업 트리 5351개 파일 대 깨끗한
+# 체크아웃 652개 파일. CI 는 이 잡에서 npm install 도 gradle build 도 하지 않으므로 늘
+# 후자를 본다.
+#
+# 이것이 이론적 위험이 아니라 실제로 틀린 답을 냈다. f385546 이 래치 정책 값을 바꾼 뒤
+# `docs/SEED-RAHAB.md:1105` 는 **옛 값을 인용한 채 남아 있었는데**, 로컬 실행은 그 주장을
+# 통과시켰다 — 8월 5일자 `backend/build/resources/main/scenarios/ruth.yml` 에 옛 값이
+# 그대로 들어 있었기 때문이다. 즉 **낡은 빌드 사본이 낡은 문서 주장을 옳아 보이게 했다.**
+# CI 만 빨갛고 로컬은 초록이었던 이유가 이것이다.
+#
+# `os.walk` 로 바꾼 것도 같은 이유다 — `rglob` 은 가지치기를 못 해서 제외할 트리도 일단
+# 다 걸어 들어간다. 정렬은 결정성 때문이다(파일시스템 순서는 macOS·Linux 가 다르다).
+PRUNE_DIRS = {
+    "node_modules", ".next", "build", "dist", "out", ".gradle",
+    "__pycache__", ".venv", "venv", ".git", "coverage", ".turbo",
+}
 
 # 이 낱말이 있는 줄은 "런타임이 X 를 못 잡는다" 는 주장으로 본다.
 NEGATIVE = re.compile(r"잡지 못한다|잡히지 않는다|맹목|미탐지|탐지되지 않는다|걸리지 않는다")
@@ -133,9 +169,12 @@ def load_trees() -> list[tuple[Path, str]]:
         base = ROOT / tree
         if not base.exists():
             continue
-        for p in base.rglob("*"):
-            if p.is_file() and p.suffix in {".yml", ".yaml", ".kt", ".ts", ".tsx", ".py", ".md"}:
-                files.append((p, p.read_text(encoding="utf-8", errors="replace")))
+        for dirpath, dirnames, filenames in os.walk(base):
+            dirnames[:] = sorted(d for d in dirnames if d not in PRUNE_DIRS)
+            for fn in sorted(filenames):
+                p = Path(dirpath) / fn
+                if p.suffix in SCAN_SUFFIXES:
+                    files.append((p, p.read_text(encoding="utf-8", errors="replace")))
     return files
 
 
