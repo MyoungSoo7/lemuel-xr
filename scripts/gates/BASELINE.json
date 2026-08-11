@@ -265,6 +265,28 @@
         "jesus:FAIL",
         "job:FAIL"
       ]
+    },
+    "captions:ruth": {
+      "rc": 0,
+      "tally": [
+        13,
+        0,
+        0
+      ],
+      "items": []
+    },
+    "captions:rahab": {
+      "rc": 2,
+      "tally": [
+        21,
+        0,
+        3
+      ],
+      "items": [
+        "a-yml:BLOCKED",
+        "f-yml:BLOCKED",
+        "n-yml:BLOCKED"
+      ]
     }
   }
 }

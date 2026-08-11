@@ -56,6 +56,16 @@ def runners() -> list[tuple[str, list[str], str]]:
         out.append((f"gates:{name}", ["scripts/newchar_gates.py", "--character", name, "--json"], "json"))
     out.append(("ac-table:rahab", ["scripts/ac_table_check.py", "docs/SEED-RAHAB.md"], "text"))
     out.append(("track-b:readiness", ["scripts/track_b_readiness.py"], "text"))
+    # 인물별 자막·정본 대조기. 위 glob 이 `scripts/gates/*.yml` 만 훑으므로 여기에
+    # 명시하지 않으면 **CI 에서 한 번도 돌지 않는다.**
+    #
+    # 2026-08-11 실측으로 그 상태였다: `check_ruth_captions.py` 는 13개 검사(AC 23 latch
+    # 3키 *값* 대조, AC 30 성구 자구 전수 포함)를 갖고 있으면서 어느 CI 경로에도
+    # 걸려 있지 않았다. 워크플로가 파이썬 쪽에서 부르는 것은 `ci_gates.py` 와
+    # `check_frontend_hotline.py` 둘뿐이다(.github/workflows/ci.yml:40 · :279).
+    # 존재하지만 돌지 않는 검사기는 검사기가 아니라 문서다.
+    out.append(("captions:ruth", ["scripts/check_ruth_captions.py", "--all"], "text"))
+    out.append(("captions:rahab", ["scripts/check_rahab_captions.py"], "text"))
     return out
 
 

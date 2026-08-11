@@ -530,6 +530,88 @@ def check_caption_fidelity() -> list[str]:
     return bad
 
 
+# ── AC 33 — 오벳 출생 미렌더 ──────────────────────────────────────────────
+#
+# 이 미션에서 안전상 가장 무겁게 걸린 배제인데 **집행이 없었다.**
+#
+# 등재는 돼 있다 — 절 본문은 `docs/MVP-RUTH.md` §4-2 E7(4:13)·E8(4:14) 로 마커까지
+# 붙어 있고, 렌더 자체는 §14「채택하지 않은 설계」에 기각 사유와 함께 적혀 있다.
+# 그런데 §14 는 산문 기록표라 마커가 없어 세어지지 않고, 저작 파일이 선언한
+# `baby_asset_present` / `birth_scene_rendered` 두 키를 **읽는 코드가 리포 전체에
+# 0건**이었다(2026-08-11 실측). 이 파일이 다른 곳에 적어 둔 문장이 그대로 적용된다:
+# 재는 쪽이 없으면 복원해도 모든 검사가 초록이다.
+#
+# ⚠️ 이 검사만 이 파일의 기존 스코프(`content/ruth` 저작 파일)를 **넘는다** — 런타임
+#    `backend/src/main/resources/scenarios/ruth.yml` 까지 본다. 저작과 런타임은 자동
+#    동기화되지 않고, 사용자에게 실제로 나가는 것은 런타임 파일이기 때문이다.
+#    저작만 재면 런타임에서 되살아나도 초록이다.
+#
+# 재는 것 / 재지 않는 것:
+#   · 잰다 — 두 키의 **값**(존재가 아니라 `False`), 저작 5파일 + 런타임 1파일의
+#     에셋 id 와 자막 자구에 출생 어휘가 없는가.
+#   · 재지 않는다 — 실제 3D 에셋 번들의 내용물. yml 이 참조하지 않는 에셋이
+#     빌드에 들어가는 경로는 이 검사의 사정권 밖이다.
+
+RUNTIME_SCENARIO = os.path.join(
+    REPO, "backend", "src", "main", "resources", "scenarios", "ruth.yml"
+)
+
+# 선언 2키 — 값까지 계약이다.
+OBED_DECL = {"baby_asset_present": False, "birth_scene_rendered": False}
+
+# 출생 어휘. `아이`·`태어나` 는 **넣지 않는다** — 진입 동의 카드가 "한 아이가
+# 태어나지만 그 장면은 화면에 나오지 않습니다" 로 미렌더를 *고지*하는 데 쓰고 있고,
+# 그 문장은 배제를 지키는 문장이지 어기는 문장이다. 고지를 위반으로 세면 게이트가
+# 시키는 수리가 "고지를 지우는 것"이 된다.
+OBED_TOKENS = ("오벳", "아기", "젖먹이", "신생아", "출산", "해산", "포대기",
+               "baby", "infant", "newborn", "cradle")
+
+
+def _obed_scan(label: str, doc, bad: list[str]) -> None:
+    """에셋 id 와 자막 자구에서 출생 어휘를 찾는다."""
+    for key in ("assets_shared", "assets_dedicated"):
+        for group in collect_key(doc, key):
+            for a in group or []:
+                low = str(a).lower()
+                for t in OBED_TOKENS:
+                    if t.lower() in low:
+                        bad.append(f"AC 33: {label} 에셋 id {a!r} 에 출생 어휘 {t!r}")
+    for c in captions_of(doc):
+        text = norm(c.get("text_ko") or "")
+        for t in OBED_TOKENS:
+            if t.lower() in text.lower():
+                bad.append(
+                    f"AC 33: {label} 자막 {c.get('id')!r} 에 출생 어휘 {t!r} — {text[:40]!r}"
+                )
+
+
+def check_obed() -> list[str]:
+    bad: list[str] = []
+
+    # ① 선언 2키의 값 — 저작(scene5) 과 런타임 양쪽.
+    targets = [("scene5.yml", load(SCENES[4]))]
+    if not os.path.exists(RUNTIME_SCENARIO):
+        bad.append(f"AC 33: 런타임 파일 부재 — {os.path.relpath(RUNTIME_SCENARIO, REPO)}")
+    else:
+        targets.append(("scenarios/ruth.yml", load(RUNTIME_SCENARIO)))
+
+    for label, doc in targets:
+        for key, want in OBED_DECL.items():
+            got = collect_key(doc, key)
+            if not got:
+                bad.append(f"AC 33: {label} 에 `{key}` 선언이 없다")
+            elif any(v is not want for v in got):
+                bad.append(f"AC 33: {label} `{key}` = {got!r} != {want!r}")
+
+    # ② 5개 저작 Scene + 런타임 — 에셋 id·자막에 출생 어휘 0건.
+    for i, path in enumerate(SCENES, start=1):
+        _obed_scan(f"Scene {i}", load(path), bad)
+    for label, doc in targets[1:]:
+        _obed_scan(label, doc, bad)
+
+    return bad
+
+
 # ── 진입 ───────────────────────────────────────────────────────────────────
 
 MODES = [
@@ -545,6 +627,7 @@ MODES = [
     ("exclusion-count", "AC 31 배제 선언 항목 수", check_exclusion_count),
     ("closing-safety", "AC 32 closing 화면 안전층", check_closing_safety),
     ("captions", "AC 14 자막 자구·표기 대조", check_caption_fidelity),
+    ("obed", "AC 33 오벳 출생 미렌더 (선언 2키 값 + 에셋·자막 0건)", check_obed),
 ]
 
 
@@ -559,17 +642,22 @@ def main() -> int:
     if not chosen:
         chosen = [m for m in MODES if m[0] == "captions"]
 
+    # 출력 형식은 `check_rahab_captions.py` · `newchar_gates.py` 와 같은
+    # `[STATUS] 축  설명` + 표준 집계 줄이다. 원래는 `PASS  <label>` / `--- 검사 N / FAIL M ---`
+    # 였는데, 그 형식은 `ci_gates.py` 의 TALLY_RE·AXIS_RE 어느 쪽에도 걸리지 않아
+    # **이 파일을 CI 러너로 등록할 수 없었다.** 형식이 등록을 막고 있었던 셈이다.
     failed = 0
     for flag, label, fn in chosen:
         problems = fn()
+        status = "FAIL   " if problems else "PASS   "
         if problems:
             failed += 1
-            print(f"FAIL  {label}")
-            for p in problems:
-                print(f"        {p}")
-        else:
-            print(f"PASS  {label}")
-    print(f"--- 검사 {len(chosen)} / FAIL {failed} ---")
+        print(f"  [{status}] {flag:<16} {label}")
+        for p in problems:
+            print(f"             - {p}")
+    print(f"--- PASS {len(chosen) - failed} / FAIL {failed} / BLOCKED 0 ---")
+    print("  ⚠️ 주장 범위: 선언된 정본과 대상 파일이 어긋나지 않았다 까지다.")
+    print("     정본과 대상을 *같이* 고치면 이 검사는 통과한다 — 그때 남는 것은 정본의 diff 다.")
     return 1 if failed else 0
 
 
