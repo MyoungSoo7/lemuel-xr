@@ -1943,7 +1943,7 @@ Scene) · `consent_card_defined_in`(2/5 · 아래) · `next_scene_id`(4/5 · Sce
 **룻 5 Scene 전건과 자구가 같다**(`content/ruth/scene1.yml:53-56` 외 4). Scene 5 는
 `closing_screen.ui_overlays` 아래에 **같은 블록을 한 번 더** 둔다
 (`content/ruth/scene5.yml:190-193`).
-그 화면은 `entry_mode` 를 `closing_only` 로 둔다(`content/ruth/scene5.yml:157`).
+그 화면은 `entry_mode` 를 `closing_only` 로 둔다(`content/ruth/scene5.yml:190` — 2026-08-12 계보 자막 추가로 :157 에서 밀렸다).
 그 진입에서는 `environment` 가 렌더되지 않으므로, 안전층을 그 아래 두면
 **렌더 안 되는 블록에 안전장치를 매다는 조용한 실패**가 된다
 (`content/ruth/README.md:43`).
@@ -2072,7 +2072,7 @@ routes:
 | 실재 관용구                              | 위치                                                                            | 표현 가능한 것       |
 | ---------------------------------------- | ------------------------------------------------------------------------------- | -------------------- |
 | `consent_declined_route: <id>` (카드별)  | `content/ruth/scene1.yml:37` · `scene3.yml:35` · `scene4.yml:34`                | **카드 하나**의 거절 |
-| `condition: consent_declined_or_skipped` | `content/ruth/scene5.yml:39` · `content/daniel/scene4.yml:33` · `scene5.yml:37` | 거절/스킵 **여부**   |
+| `condition: consent_declined_or_skipped` | `content/ruth/scene5.yml:47` · `content/daniel/scene4.yml:33` · `scene5.yml:37` | 거절/스킵 **여부**   |
 
 rev.5 정정: **위 표는 맞지만, rev.4 가 이 자리에 쓴 yaml 은 셋 다 실재하지 않았다.**
 `to:` 는 `content/` 전체에 0회, 최상위 `routes:` 도 0회(실재 routes 는 **전부**

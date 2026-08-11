@@ -132,6 +132,9 @@ F66_ID = CANON["f66_entry_gate"]["id"]
 F66_CONDITIONS = CANON["f66_entry_gate"]["trigger_conditions"]
 F66_ON_TRIGGER = CANON["f66_entry_gate"]["on_trigger"]
 
+# AC 34 — 계보 자막 (2026-08-12 신설)
+GENEALOGY = dict(CANON["genealogy_caption"])
+
 # AC 31 — 배제 선언 항목 수와 scope 구성
 EXCLUSION_TOTAL = CANON["exclusions"]["total"]
 EXCLUSION_SCOPES = dict(CANON["exclusions"]["by_scope"])
@@ -612,6 +615,69 @@ def check_obed() -> list[str]:
     return bad
 
 
+# ── AC 34 — 계보 자막 존재·자구 ───────────────────────────────────────────
+#
+# 왜 AC 14 로 부족한가: AC 14 는 **있는** 자막의 자구만 잰다. 자막을 지우면 아무도
+# 못 잡는다. 이 리포가 §4-2 에서 스스로 적은 함정과 같은 모양이다 — 재는 쪽이
+# 없으면 되돌려도 모든 검사가 초록이다. 그래서 존재를 따로 잰다.
+#
+# 재는 것 / 재지 않는 것:
+#   · 잰다 — 저작(`content/ruth/scene5.yml`) + 런타임(`scenarios/ruth.yml`) 양쪽의
+#     존재와 자구, 그리고 정본 자구가 `VERSES-RUTH-GAE.md` 4:17 의 부분문자열인가.
+#     마지막 항이 제3자 대조다. 정본 파일만 고쳐 성경에서 멀어지는 경로를 막는다.
+#   · 재지 않는다 — 화면에서의 **순서**. 이 자막이 SR-1 앞에 와야 한다는 것은
+#     헌장 §3-c 의 요구(마지막은 신의 행위)인데, 순서를 집행하는 코드는 없다.
+#     여기서 만들지 않은 이유는 저작 yml 의 재생 순서 표현이 파일마다 다르고
+#     그걸 이 검사기가 해석하기 시작하면 계약이 두 곳으로 갈라지기 때문이다.
+#     **미해소로 남긴다** — 초록이 순서까지 보증한다고 읽지 말 것.
+
+
+def check_genealogy() -> list[str]:
+    bad: list[str] = []
+    want_text = norm(GENEALOGY["text_ko"])
+    want_ref = str(GENEALOGY["verse_ref"]).strip()
+
+    # ① 정본 ↔ 성경. `중` 표기이므로 부분문자열이어야 한다.
+    src = gae_verses().get("4:17")
+    if src is None:
+        bad.append("AC 34: GAE 에 4:17 이 없다")
+    elif want_text not in src:
+        bad.append(f"AC 34: 정본 자구가 GAE 4:17 의 부분문자열이 아니다 — {want_text[:40]!r}")
+
+    # ② 정본 자구 자체가 AC 33 금지 토큰을 담지 않는가. 담기면 두 계약이 충돌한다.
+    for t in OBED_TOKENS:
+        if t.lower() in want_text.lower():
+            bad.append(f"AC 34: 정본 자구에 AC 33 금지 토큰 {t!r} — 두 계약이 충돌한다")
+
+    # ③ 저작 — id 로 찾고 자구·표기를 잰다.
+    caps = captions_of(load(SCENES[4]))
+    hit = [c for c in caps if str(c.get("id")) == str(GENEALOGY["id"])]
+    if not hit:
+        bad.append(f"AC 34: scene5.yml 에 계보 자막 {GENEALOGY['id']!r} 이 없다")
+    else:
+        for c in hit:
+            if norm(c.get("text_ko", "")) != want_text:
+                bad.append(f"AC 34: scene5.yml 자구 불일치 — {norm(c.get('text_ko',''))[:40]!r}")
+            if str(c.get("verse_ref", "")).strip() != want_ref:
+                bad.append(f"AC 34: scene5.yml 절 표기 불일치 — {c.get('verse_ref')!r}")
+
+    # ④ 런타임 — 사용자에게 실제로 나가는 파일. 키 이름이 저작과 달라(`ref`) 자구로 찾는다.
+    if not os.path.exists(RUNTIME_SCENARIO):
+        bad.append(f"AC 34: 런타임 파일 부재 — {os.path.relpath(RUNTIME_SCENARIO, REPO)}")
+    else:
+        rcaps = captions_of(load(RUNTIME_SCENARIO))
+        rhit = [c for c in rcaps if norm(c.get("text_ko", "")) == want_text]
+        if not rhit:
+            bad.append("AC 34: scenarios/ruth.yml 에 계보 자막이 없다 (저작만 반영된 상태)")
+        else:
+            for c in rhit:
+                ref = str(c.get("ref") or c.get("verse_ref") or "").strip()
+                if ref != want_ref:
+                    bad.append(f"AC 34: scenarios/ruth.yml 절 표기 불일치 — {ref!r}")
+
+    return bad
+
+
 # ── 진입 ───────────────────────────────────────────────────────────────────
 
 MODES = [
@@ -628,6 +694,7 @@ MODES = [
     ("closing-safety", "AC 32 closing 화면 안전층", check_closing_safety),
     ("captions", "AC 14 자막 자구·표기 대조", check_caption_fidelity),
     ("obed", "AC 33 오벳 출생 미렌더 (선언 2키 값 + 에셋·자막 0건)", check_obed),
+    ("genealogy", "AC 34 계보 자막 존재·자구 (저작+런타임+성경 대조)", check_genealogy),
 ]
 
 
