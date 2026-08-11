@@ -211,7 +211,11 @@ crisis_reminder_scenes: [1, 2, 3, 4, 5]
 # ── G0b — 배제 자구 양방향 대조표 ──────────────────────────────────────────
 verses_file: docs/verses-ruth.txt
 
-# ── 배제 선언 20항목 (seed §7-3 · AC 31 기대값 20) ─────────────────────────
+# ── 배제 선언 22항목 (seed §7-3 · AC 31 기대값 22) ─────────────────────────
+#
+# 2026-08-11 +2 — 룻 4:16·4:17 (E16·E17). 아래 「20」 을 말하는 문단은 그 이전
+# 상태를 논한 것이며 논지는 그대로 유효하다(값 단위 선언 대 scope 이중 선언).
+# 수만 20 → 22 로 옮겨 읽을 것.
 #
 # ⚠️ **seed §7-3 의 "선언 줄 수" 열과 AC 31 의 기대값이 서로 어긋난다 — 후자를 따랐다.**
 #    표의 열대로 룻기 본문 자구 16종을 `verse_text` + `content_leaf` 두 줄씩 선언하면
@@ -297,6 +301,16 @@ exclusions:
       expect: excluded_only,
     } # E14 룻 4:11b
   - { value: "네 남편이 죽은 후로", scope: verse_text, expect: excluded_only } # E15 룻 2:11a
+  # ── DP7 로 2026-08-11 등재. 4:13-17 은 렌더 층위에 한 조각도 없는데 배제 선언은
+  #    E7(4:13)·E8(4:14)·E9-a/b/c(4:15) 까지만 있었다. 4:16·4:17 은 같은 위험 계열
+  #    (나오미의 회복을 아기로 봉합)인데 선언이 없어, 누가 복원해도 모든 검사가
+  #    초록이었다 — 이 파일이 §4-2 에서 스스로 적은 함정 그대로다.
+  - { value: "아기를 받아 품에 품고", scope: verse_text, expect: excluded_only } # E16 룻 4:16
+  - {
+      value: "나오미에게 아들이 태어났다",
+      scope: verse_text,
+      expect: excluded_only,
+    } # E17 룻 4:17
   # ── 조각 1종 — 표층형. 계열 5 토큰과 같은 문자열이며 Scene 파일에서는
   #    `lint_forbidden_tokens`(NONUSER_KEYS 면제) 아래에만 산다.
   - { value: "나도 죽어", scope: content_leaf, expect: absent } # E1'

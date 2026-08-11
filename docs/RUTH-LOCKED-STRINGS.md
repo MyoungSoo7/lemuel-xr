@@ -141,9 +141,11 @@ f66_entry_gate:
     scene4_skip_preoffered: true
     skip_button_visual_emphasis: true
 exclusions:
-  total: 20
+  # 2026-08-11 +2 (DP7) — 룻 4:16·4:17 을 verse_text 로 등재. 앞 판은 4:13-17 이
+  #   렌더 층위에 한 조각도 없는데 선언은 4:13·4:14·4:15 까지만 있었다.
+  total: 22
   by_scope:
-    verse_text: 16
+    verse_text: 18
     content_leaf: 4
 ```
 
