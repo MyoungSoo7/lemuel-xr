@@ -385,8 +385,16 @@ def check(target: Path, git_name: str | None = None) -> int:
             ok("t-expect", f"기대≠0 {len(actual)}줄 {actual}")
 
     # ── t-baseline ──────────────────────────────────────────────────────────
+    # `--all` 이다. HEAD 계보만 걸으면 **squash 병합이 이 축을 조용히 죽인다** —
+    # 2026-08-12 PR #33 을 squash 로 병합하자 rev.14 를 담은 커밋이 main 의 파일
+    # 이력에서 사라져 이 축이 PASS 에서 BLOCKED 로 떨어졌다(판정 불가는 통과가
+    # 아니다). 그 커밋은 태그 `rahab-rev14-baseline` 으로 도달성을 유지시켰고,
+    # 여기서는 어느 ref 에서든 직전 판을 찾도록 바꾼다. 판정의 뜻은 그대로다 —
+    # 「선언된 baseline SHA 가 실제 직전 판의 커밋인가」.
+    # ⚠️ 얕은 클론이면 여전히 조용히 판정 불가다. ci.yml 의 fetch-depth: 0 이
+    #    이 축의 전제이고, 그 줄을 지우면 여기가 먼저 죽는다.
     prev = ""
-    for sha in git("log", "--format=%H", "--", f"docs/{name}").splitlines():
+    for sha in git("log", "--all", "--format=%H", "--", f"docs/{name}").splitlines():
         head = git("show", f"{sha}:docs/{name}").splitlines()
         hm = REV.search(head[0]) if head else None
         if hm and int(hm.group(1)) == cur_rev - 1:
