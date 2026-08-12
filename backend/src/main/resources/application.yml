@@ -359,6 +359,9 @@ grounding:
     cron: ${GROUNDING_EVAL_CRON:0 30 3 * * *} # 매일 03:30 KST
     version: ${GROUNDING_EVAL_VERSION:v1}
     embedding-model: ${GROUNDING_EVAL_EMBEDDING_MODEL:gemini-embedding-001}
+    # 1536 은 scripture_embeddings.embedding vector(1536) + pgvector HNSW 2000 차원 상한에 맞춘 값.
+    # 바꾸려면 마이그레이션이 함께 가야 한다. (GeminiEmbeddingAdapter 주석 참고)
+    embedding-dimensions: ${GROUNDING_EVAL_EMBEDDING_DIMENSIONS:1536}
     api-key: ${GEMINI_API_KEY:}
 
 # === XR 자산 ===

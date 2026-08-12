@@ -51,7 +51,9 @@ export default function MosesPage() {
   const [scene, setScene] = useState<Scene | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [echo, setEcho] = useState<DecisionEcho | null>(null);
-  const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(null);
+  const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(
+    null,
+  );
 
   const start = useMutation({
     mutationFn: () => startMission("moses", "web"),
@@ -59,8 +61,13 @@ export default function MosesPage() {
   });
 
   const decide = useMutation({
-    mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
-      decideMission("moses", scene!.sessionId, sceneId, decision),
+    mutationFn: ({
+      sceneId,
+      decision,
+    }: {
+      sceneId: number;
+      decision: unknown;
+    }) => decideMission("moses", scene!.sessionId, sceneId, decision),
     onSuccess: (d, vars) => {
       // backend responseText 우선, 없으면 frontend fallback (moses 는 항상 fallback).
       const local = buildLocalEcho(vars.sceneId, vars.decision);
@@ -137,12 +144,18 @@ export default function MosesPage() {
       <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950">
         <div className="absolute inset-0 flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
-            {scene.currentScene === 1 && "광야의 40년. 양 떼와 침묵 — 부름 받기 전의 시간."}
-            {scene.currentScene === 2 && "떨기나무에 불이 붙었으나 사위지 않는다. 신을 벗어라, 이 땅은 거룩하다."}
-            {scene.currentScene === 3 && "다섯 개의 변명이 손 안에 있다. 내려놓을 것인가, 품을 것인가."}
-            {scene.currentScene === 4 && "파라오 앞에 섰다. 손에는 지팡이. 어떻게 할 것인가."}
-            {scene.currentScene === 5 && "홍해가 앞을 막는다. 단 하나의 행동이 남았다."}
-            {scene.currentScene === 6 && "광야 40년은 기다림의 시간이었다. 함께 가시는 분은 이미 거기 계신다."}
+            {scene.currentScene === 1 &&
+              "광야의 40년. 양 떼와 침묵 — 부름 받기 전의 시간."}
+            {scene.currentScene === 2 &&
+              "떨기나무에 불이 붙었으나 사위지 않는다. 신을 벗어라, 이 땅은 거룩하다."}
+            {scene.currentScene === 3 &&
+              "다섯 개의 변명이 손 안에 있다. 내려놓을 것인가, 품을 것인가."}
+            {scene.currentScene === 4 &&
+              "파라오 앞에 섰다. 손에는 지팡이. 어떻게 할 것인가."}
+            {scene.currentScene === 5 &&
+              "홍해가 앞을 막는다. 단 하나의 행동이 남았다."}
+            {scene.currentScene === 6 &&
+              "광야 40년은 기다림의 시간이었다. 함께 가시는 분은 이미 거기 계신다."}
           </p>
         </div>
       </section>
@@ -157,7 +170,10 @@ export default function MosesPage() {
                   {scene1Wilderness}
                 </p>
                 <div className="mt-3">
-                  <NarrationAudioButton text={scene1Wilderness} onUnavailable="hide" />
+                  <NarrationAudioButton
+                    text={scene1Wilderness}
+                    onUnavailable="hide"
+                  />
                 </div>
               </div>
             )}
@@ -200,7 +216,9 @@ export default function MosesPage() {
         {/* Scene 3 — distribute (다섯 변명 카드 → throw/heart) */}
         {sceneType === "distribute" && (
           <ExcuseCards
-            cards={field<Array<OptionLike & { scripture?: string }>>("cards") ?? []}
+            cards={
+              field<Array<OptionLike & { scripture?: string }>>("cards") ?? []
+            }
             slots={field<string[]>("slots") ?? ["throw", "heart"]}
             pending={decide.isPending}
             onSubmit={(assignments) =>
@@ -213,20 +231,21 @@ export default function MosesPage() {
         )}
 
         {/* Scene 4 — pick_one */}
-        {sceneType === "pick_one" && Array.isArray(field<OptionLike[]>("options")) && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
-              <button
-                key={o.id}
-                onClick={() => advance(scene.currentScene, o.id)}
-                disabled={decide.isPending}
-                className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        )}
+        {sceneType === "pick_one" &&
+          Array.isArray(field<OptionLike[]>("options")) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
+                <button
+                  key={o.id}
+                  onClick={() => advance(scene.currentScene, o.id)}
+                  disabled={decide.isPending}
+                  className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                >
+                  {o.label}
+                </button>
+              ))}
+            </div>
+          )}
 
         {/* Scene 6 — outro */}
         {sceneType === "outro" && (
@@ -275,7 +294,9 @@ export default function MosesPage() {
       {history.length > 0 && (
         <details className="max-w-3xl mx-auto w-full mt-6 text-xs text-[var(--color-warm)]/40">
           <summary>진행 기록</summary>
-          <pre className="overflow-x-auto">{JSON.stringify(history, null, 2)}</pre>
+          <pre className="overflow-x-auto">
+            {JSON.stringify(history, null, 2)}
+          </pre>
         </details>
       )}
     </main>
@@ -323,7 +344,9 @@ function GestureSequence({
             >
               <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
               {s.label}
-              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+              {already && (
+                <span className="ml-2 text-[var(--color-primary)]">✓</span>
+              )}
             </button>
           );
         })}
@@ -387,7 +410,9 @@ function ReverenceGesture({
             >
               <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
               {s.label}
-              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+              {already && (
+                <span className="ml-2 text-[var(--color-primary)]">✓</span>
+              )}
             </button>
           );
         })}
@@ -430,7 +455,8 @@ function ExcuseCards({
   return (
     <div className="space-y-3">
       <p className="text-xs text-[var(--color-warm)]/60">
-        각 변명을 <strong>내려놓기</strong> 또는 <strong>가슴에 품기</strong> 로 배정하세요
+        각 변명을 <strong>내려놓기</strong> 또는 <strong>가슴에 품기</strong> 로
+        배정하세요
       </p>
       <div className="space-y-2">
         {list.map((c) => (
@@ -446,11 +472,17 @@ function ExcuseCards({
                 </span>
               )}
             </span>
+            {/*
+              두 버튼 다 `min-h-11`(44px, WCAG 2.5.5 / Apple HIG). 전에는 py-1.5 뿐이라
+              320px 에서 68×30·81×30 이었다(2026-08-12 실측). 다섯 카드 × 두 개라
+              열 개가 촘촘히 붙어 있어서, 작게 두면 옆 카드의 반대 선택을 누르기 쉽다 —
+              이 씬은 「변명을 내려놓는가 품는가」를 고르는 곳이라 오조작이 곧 오답이다.
+            */}
             <div className="flex gap-2 shrink-0">
               <button
                 onClick={() => set(c.id, throwSlot)}
                 disabled={pending}
-                className={`px-3 py-1.5 rounded-md border text-xs transition ${
+                className={`min-h-11 px-3 py-1.5 rounded-md border text-xs transition ${
                   assign[c.id] === "throw"
                     ? "border-[var(--color-primary)] bg-[var(--color-primary)]/20"
                     : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
@@ -461,7 +493,7 @@ function ExcuseCards({
               <button
                 onClick={() => set(c.id, heartSlot)}
                 disabled={pending}
-                className={`px-3 py-1.5 rounded-md border text-xs transition ${
+                className={`min-h-11 px-3 py-1.5 rounded-md border text-xs transition ${
                   assign[c.id] === "heart"
                     ? "border-[var(--color-primary)] bg-[var(--color-primary)]/20"
                     : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
@@ -502,7 +534,10 @@ function buildLocalEcho(
       priority === "all_throw" || priority === "all_heart" ? priority : "mixed";
     // 카드별 떨기나무 본문 응답(§3.4)을 outcome 뒤에 잇는다.
     const assignments = readAssignments(decision);
-    return { text: buildScene3Echo(pattern, assignments), scene3Pattern: pattern };
+    return {
+      text: buildScene3Echo(pattern, assignments),
+      scene3Pattern: pattern,
+    };
   }
   if (fromScene === 4) {
     const key = readValue(decision) as Scene4Choice | null;

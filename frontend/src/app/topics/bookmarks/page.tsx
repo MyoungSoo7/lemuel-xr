@@ -59,7 +59,7 @@ export default function BookmarksPage() {
             </p>
             <Link
               href="/topics"
-              className="inline-block mt-4 text-sm text-[var(--color-primary)] hover:underline"
+              className="inline-flex items-center min-h-11 mt-4 text-sm text-[var(--color-primary)] hover:underline"
             >
               주제에서 카드를 ♡ 로 담아보세요 →
             </Link>
@@ -95,7 +95,9 @@ function BookmarkCard({
   onPassageOpen: (ref: string) => void;
 }) {
   const qc = useQueryClient();
-  const character = card.anchorCharacter ? CHARACTER_LABEL[card.anchorCharacter] : null;
+  const character = card.anchorCharacter
+    ? CHARACTER_LABEL[card.anchorCharacter]
+    : null;
 
   const remove = useMutation({
     mutationFn: () => removeBookmark(card.topicContentId),
@@ -114,7 +116,13 @@ function BookmarkCard({
             disabled={remove.isPending}
             aria-label="북마크 빼기"
             aria-pressed={true}
-            className="text-base leading-none text-[var(--color-primary)] hover:opacity-70 transition disabled:opacity-40"
+            /*
+              `min-h-11 min-w-11` — 44px (WCAG 2.5.5 / Apple HIG). 전에는 글자 하나뿐이라
+              **15×16px** 이었다(2026-08-12 실측). 카드가 목록에 있어야만 그려지는 버튼이라
+              백엔드 없이 도는 검사에는 아예 안 잡혔다 — `tap-targets-data.spec.ts` 를
+              만들고 나서야 처음 드러났다.
+            */
+            className="min-h-11 min-w-11 flex items-center justify-center text-base leading-none text-[var(--color-primary)] hover:opacity-70 transition disabled:opacity-40"
           >
             ♥
           </button>
@@ -124,7 +132,7 @@ function BookmarkCard({
       {card.scriptureRef && (
         <button
           onClick={() => onPassageOpen(card.scriptureRef!)}
-          className="text-xs text-[var(--color-primary)] font-mono mt-2 hover:underline"
+          className="inline-flex items-center min-h-11 text-xs text-[var(--color-primary)] font-mono mt-2 hover:underline"
         >
           📖 {card.scriptureRef}
         </button>
