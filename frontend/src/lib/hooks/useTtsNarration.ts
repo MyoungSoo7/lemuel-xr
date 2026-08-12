@@ -78,6 +78,22 @@ export function useTtsNarration(voiceId?: string): UseTtsNarration {
       };
       audioRef.current = a;
     }
+    /*
+      react-hooks/immutability (플러그인 v7 의 React Compiler 규칙) 는 여기를
+      막는다 — ref 에 담긴 객체의 *속성 대입* 을 금지한다. (`a.pause()` 같은
+      메서드 호출은 안 걸리고, `a.src = ...` 만 걸린다.)
+
+      규칙이 틀린 건 아니지만 지금 고치지 않는다. 제대로 고치려면 요소를
+      재사용하지 말고 매 재생마다 `new Audio(url)` 로 만들어 — 속성 설정을 ref 에
+      넣기 *전에* 끝내고 — 저장하는 구조로 바꿔야 한다. 그건 동작이 바뀌는
+      변경인데, TTS 사이드카가 없으면 재생 경로를 실행해 볼 수가 없다.
+      돌려보지 못한 채 오디오 코드를 바꾸면 조용히 깨진다.
+
+      그래서 이 한 줄만 예외로 두고, 나머지 코드베이스에서는 이 규칙이 그대로
+      살아 있게 한다. 사이드카를 띄울 수 있게 되면 위 구조로 바꾸고 이 주석을
+      지울 것.
+    */
+    // eslint-disable-next-line react-hooks/immutability
     a.src = url;
     // play() 는 Promise — autoplay 차단 등으로 reject 될 수 있으므로 조용히 처리.
     a.play()

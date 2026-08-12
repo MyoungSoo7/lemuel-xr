@@ -257,9 +257,24 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      # `npm run lint` 는 Next 16 에서 제거된 `next lint` 를 호출해 현재 깨져 있어
-      # 여기 없다 — 고치는 것이 남은 일이다. Playwright 는 아래에서 돈다(백엔드가
-      # 필요 없는 두 스위트만).
+      # 린트 (2026-08-12 복구).
+      #
+      # Next 16 이 `next lint` 를 없앴는데 스크립트는 그대로여서, 이 리포는 그동안
+      # **린트가 한 번도 돌지 않았다.** 그냥 안 돈 게 아니라 깨진 줄 모르고 안 돌았다 —
+      # `next lint` 는 사라진 뒤 `lint` 를 프로젝트 디렉터리 인자로 읽어서
+      # "no such directory: frontend/lint" 라는 엉뚱한 말을 하고 죽었다.
+      # 규칙 세트를 끼워주던 것도 그 명령이었으므로 설정 파일조차 없었다.
+      #
+      # 이제 `eslint.config.mjs` 에 규칙을 명시하고 eslint 를 직접 부른다.
+      # `--max-warnings=0` 이다 — 지금 에러 0·경고 0 이라 조일 수 있고, 조여 두지
+      # 않으면 경고가 쌓이면서 린트가 다시 조용히 무의미해진다.
+      #
+      # 알려진 예외 1건: `useTtsNarration.ts` 의 `a.src = url` 에
+      # react-hooks/immutability 를 인라인으로 껐다. 이유는 그 파일 주석에 적었다.
+      - name: Lint
+        working-directory: frontend
+        run: npm run lint
+
       - name: Type check
         working-directory: frontend
         run: npm run type-check

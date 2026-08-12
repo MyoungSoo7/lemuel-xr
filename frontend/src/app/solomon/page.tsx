@@ -134,8 +134,19 @@ export default function SolomonPage() {
     if (!scene && !start.isPending && !start.isError) start.mutate();
   }, [scene, start]);
 
-  const payload = (scene?.scenePayload ?? {}) as Record<string, unknown>;
-  const extras = (payload.extras as Record<string, unknown> | undefined) ?? {};
+  /*
+    payload·extras 를 메모한다. 그냥 두면 `?? {}` 가 매 렌더 새 객체를 만들고,
+    그 객체가 아래 useMemo 의 의존성이라 **메모가 매 렌더 무효화된다** —
+    memo 를 적어 놓고 memo 를 못 받는 상태였다.
+  */
+  const payload = useMemo(
+    () => (scene?.scenePayload ?? {}) as Record<string, unknown>,
+    [scene?.scenePayload],
+  );
+  const extras = useMemo(
+    () => (payload.extras as Record<string, unknown> | undefined) ?? {},
+    [payload],
+  );
   const field = <T,>(key: string): T | undefined =>
     (extras[key] as T | undefined) ?? (payload[key] as T | undefined);
 
