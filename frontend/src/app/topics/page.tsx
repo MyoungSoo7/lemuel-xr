@@ -63,7 +63,7 @@ export default function TopicsPage() {
           <h1 className="text-2xl font-bold">일상 영적 양식</h1>
           <Link
             href="/"
-            className="text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
+            className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
           >
             ← 홈
           </Link>

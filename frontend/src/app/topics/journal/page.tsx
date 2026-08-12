@@ -56,7 +56,7 @@ export default function JournalGuidancePage() {
           <h1 className="text-2xl font-bold">일기와 조언</h1>
           <Link
             href="/topics"
-            className="text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
+            className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
           >
             ← 주제
           </Link>
@@ -110,7 +110,7 @@ export default function JournalGuidancePage() {
             <button
               onClick={() => fromText.mutate()}
               disabled={fromText.isPending || (!text.trim() && !selectedEmotion)}
-              className="px-4 py-2 rounded-md text-sm bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/25 disabled:opacity-40 transition"
+              className="inline-flex items-center justify-center min-h-11 px-4 py-2 rounded-md text-sm bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/25 disabled:opacity-40 transition"
             >
               {fromText.isPending ? "조언 받는 중..." : "성경 조언 받기"}
             </button>

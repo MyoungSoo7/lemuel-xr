@@ -34,16 +34,26 @@ test.describe("하이브리드 — 위기 푸터가 본문을 덮지 않는다",
         바꿀 때마다 검사가 같이 흔들리고, 정작 물어야 할 것을 안 묻게 된다.
 
         끝까지 스크롤한 뒤에 본다 — 덮임은 문서 맨 아래에서만 드러난다.
+
+        스크롤과 두 상자 읽기를 **한 번의 evaluate 안에서** 끝내는 것이 중요하다.
+        전에는 `locator.boundingBox()` 로 따로 읽었는데, 그 API 는 대상 요소를 필요하면
+        **화면 안으로 스크롤한다**. 즉 바로 앞줄에서 맞춰 놓은 「맨 아래」 상태를 측정
+        행위 자체가 되돌린다. /david 는 `main` 이 `min-h-screen`(정확히 한 화면)이라
+        main 을 보이게 하는 순간 스크롤이 0 으로 돌아갔고, 그래서 **깔리지 않았는데
+        48px 깔렸다고** 나왔다(2026-08-12, 프로덕션 빌드에서 3/3 재현. 같은 상태를
+        evaluate 안에서 재면 3/3 이 0). 개발 서버에서는 초록이라 안 보이던 결함이다.
+        재는 행위가 재려는 상태를 바꾸면 그 초록도 빨강도 믿을 수 없다.
       */
-      const occlusion = async () => {
-        await page.evaluate(() =>
-          window.scrollTo(0, document.body.scrollHeight),
-        );
-        const main = await page.locator("main").first().boundingBox();
-        const bar = await footer.boundingBox();
-        if (!main || !bar) throw new Error("main/footer 를 못 찾았다");
-        return main.y + main.height - bar.y; // > 0 이면 그만큼 깔렸다
-      };
+      const occlusion = () =>
+        page.evaluate(() => {
+          window.scrollTo(0, document.body.scrollHeight);
+          const main = document.querySelector("main")?.getBoundingClientRect();
+          const bar = document
+            .querySelector('[aria-label="위기 상담 자원 안내"]')
+            ?.getBoundingClientRect();
+          if (!main || !bar) throw new Error("main/footer 를 못 찾았다");
+          return main.y + main.height - bar.y; // > 0 이면 그만큼 깔렸다
+        });
 
       // ① 접힌 상태. iPhone SE 폭(320px)에서는 이 줄이 두 줄로 접혀 49px 가 된다.
       expect(

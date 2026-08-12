@@ -129,7 +129,7 @@ export default function HomePage() {
                 key={p}
                 type="button"
                 onClick={() => setText(p)}
-                className="text-xs px-3 py-1 rounded-full border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
+                className="inline-flex items-center min-h-11 text-xs px-3 py-1 rounded-full border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
               >
                 {p}
               </button>

@@ -37,7 +37,7 @@ export default function EcclesiastesPage() {
           <h1 className="text-2xl font-bold">전도서와 인생</h1>
           <Link
             href="/topics"
-            className="text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
+            className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
           >
             ← 주제
           </Link>
