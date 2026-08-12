@@ -175,3 +175,41 @@ for (const { route, anchor } of CASES) {
     ).toEqual([]);
   });
 }
+
+/**
+ * **빈 목록도 화면이다.** 2026-08-13 추가.
+ *
+ * 위 세 경우는 전부 「데이터가 있는」 화면이고, 빈 상태는 어느 검사에도 안 잡힌다.
+ * `tap-targets.spec.ts` 는 백엔드가 없어 응답이 영영 안 오고, 그동안 `isLoading` 이
+ * 참이라 **빈 상태 UI 는 렌더되지도 않는다.** 위 `CASES` 는 반대로 목록을 채워 넣으니
+ * 역시 안 그려진다. 즉 빈 상태는 구조적으로 사각이었고, 실제로 백엔드가 `[]` 를
+ * 돌려주자 여기 링크가 **202×20** 으로 드러났다(2026-08-12 실측).
+ *
+ * 「응답이 없다」와 「응답이 비었다」는 다른 화면이다. 후자를 재는 자리가 여기다.
+ */
+test(`/topics/bookmarks (빈 목록) — 모든 터치 타깃이 ${MIN}px 이상이다`, async ({
+  page,
+}) => {
+  await page.route("**/api/content/bookmarks", (r) =>
+    r.fulfill({ status: 200, contentType: "application/json", body: "[]" }),
+  );
+  await page.goto("/topics/bookmarks");
+  await page.waitForLoadState("networkidle");
+
+  // 빈 상태가 실제로 그려졌는지부터. 안 그려졌으면 아래 측정은 무의미하다.
+  await expect(
+    page.getByRole("link", { name: /카드를 ♡ 로 담아보세요/ }),
+    `빈 상태 UI 가 안 나왔다 — 아직 로딩 중이거나 가로채기가 빗나갔다. ` +
+      `이 상태의 통과는 무의미하다.`,
+  ).toBeVisible();
+
+  const { total, small } = await measure(page);
+  expect(total, "잴 타깃이 하나도 없다").toBeGreaterThan(0);
+  expect(
+    small,
+    `${MIN}px 미만 타깃 (전체 ${total} 개 중 ${small.length} 개):\n` +
+      small
+        .map((s) => `  ${s.tag} "${s.text}" ${s.w}×${s.h} — ${s.cls}`)
+        .join("\n"),
+  ).toEqual([]);
+});
