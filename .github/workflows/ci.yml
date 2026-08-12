@@ -347,11 +347,9 @@ jobs:
       #     env(safe-area-inset-*) 을 전부 0 으로 준다.
       #   · 성능(LCP·번들·프레임) 은 재지 않는다. 레이아웃만 잰다.
       #   · 미션 화면(요셉·다윗·엘리야·욥·예수·모세·솔로몬)의 씬 내부는 백엔드가 있어야
-      #     열리므로 **여기서는 안 열린다.** 전용 게이트 `mission-tap-targets.spec.ts` 가
-      #     있지만 백엔드가 필요해 이 잡에 넣지 않았다. 2026-08-12 에 백엔드를 띄우고
-      #     처음 재서 세 군데를 고쳤는데(/elijah 상담번호 26×17, /moses 68×30,
-      #     /solomon 36×26), **그 세 군데는 CI 가 지켜 주지 않는다** — 백엔드를 띄운
-      #     곳에서 그 스펙을 돌려야 지켜진다.
+      #     열리므로 **여기서는 안 열린다.** 그 자리는 2026-08-13 부터 아래
+      #     `mission-e2e` 잡이 맡는다 — 백엔드를 실제로 띄우고 같은 검사를 돌린다.
+      #     이 잡이 초록이어도 미션 씬은 여기서 재지 않았다는 뜻이다.
       #   · `tap-targets-data` 의 픽스처는 실제 응답을 받아 적은 사본이라 서버 계약이
       #     바뀌면 같이 낡는다. 계약 검증이 아니라 「응답이 오면 무엇이 그려지는가」다.
       - name: Install Playwright browsers
@@ -417,3 +415,143 @@ jobs:
             ghcr.io/myoungsoo7/lemuel-xr-frontend:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  # 미션 씬 게이트 — 백엔드를 실제로 띄우고 잰다 (2026-08-13 신설).
+  #
+  # 이 리포에서 유일하게 **백엔드가 붙은 채로 도는 잡**이다. 별도 잡인 이유는 명확하다:
+  # `frontend` 잡은 백엔드 없이 도는 검사만 모아 둔 곳이고, 거기에 DB 서비스 컨테이너와
+  # bootRun 을 얹으면 백엔드 없이도 잡히는 결함의 판정까지 백엔드 기동 실패에 묶인다.
+  #
+  # 여기서 도는 `mission-tap-targets.spec.ts` 는 7개 인물 미션 씬 안쪽의 44px 터치 타깃을
+  # 잰다. 이 검사가 CI 밖에 있던 동안 무엇이 방치됐는지가 이 잡의 존재 이유다 —
+  # 2026-08-12 에 손으로 백엔드를 띄우고 처음 재서 세 군데를 고쳤는데
+  # (/elijah 위기 확인 씬 상담번호 링크 26×17 · /moses 변명 배정 68×30 · /solomon
+  # 음성/자막 강도 36×26), **고친 뒤에도 그 세 군데를 지키는 것은 아무것도 없었다.**
+  # 앱이 「이 사용자가 위험할 수 있다」고 판단한 화면에서 전화 거는 링크가 제일 작았던
+  # 결함이라, 손으로만 재는 상태를 남겨 둘 수 없다.
+  #
+  # ⚠️ 이 잡을 넣기 전에 스펙 자체를 고쳐야 했다. 스펙의 방어는 분모(`measured > 0`)
+  #    하나였는데, **백엔드를 내리고 돌려 보니 7개 인물이 전부 초록이었다**(2026-08-13 실측).
+  #    백엔드가 없으면 `SceneBootState` 가 「세션을 시작하지 못했습니다」 화면과 `다시 시도`
+  #    버튼(min-h-11 이라 44px 준수)을 그리고 위기 푸터·내비도 같이 그려져서, 분모가 0 이
+  #    아니게 된다. 씬은 한 줄도 안 열렸는데 검사는 통과한다 — 이 잡이 서비스 컨테이너
+  #    설정 하나 틀린 채로 영원히 초록일 수 있었다는 뜻이다. 지금 스펙은
+  #    `/api/game/{인물}/start` 가 200 으로 왔는지를 네트워크에서 직접 본다.
+  #
+  # 이 초록이 **주장하지 않는 것**: 씬 분기 전부가 아니라 첫 버튼을 따라간 한 갈래다.
+  # 엔진은 Chromium 이고 뷰포트는 둘(아래 주석 참조)이다. 문구·흐름의 적절성은 사람 몫이다.
+  mission-e2e:
+    needs: changes
+    # 백엔드(시나리오 yml 포함)든 프론트든 바뀌면 돈다. 씬을 그리는 데 둘 다 필요해서,
+    # 한쪽만 트리거로 두면 나머지 한쪽 변경이 이 게이트를 우회한다.
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      # docker-compose.yml 과 같은 이미지·자격증명을 쓴다. 순정 postgres 는 안 된다 —
+      # V6 마이그레이션이 `CREATE EXTENSION vector` 를 하고, 없으면 Flyway 가 거기서 죽는다.
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_DB: lemuel_xr
+          POSTGRES_USER: xr
+          POSTGRES_PASSWORD: xr1234
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U xr -d lemuel_xr"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # 백엔드를 띄운다. `AI_GENERATION_ENABLED: false` 인 이유는 AI 사이드카를 여기
+      # 띄우지 않기 때문이다 — 켜 두면 씬마다 30초 타임아웃을 기다린다. 이 잡이 재는 것은
+      # 레이아웃이지 생성 품질이 아니므로 정해진 묵상문 폴백으로 충분하다.
+      # 나머지 설정(JWT_SECRET·INTERNAL_TOKEN·SAFETY_CRISIS_DEFAULT_CONTACT)은
+      # application.yml 의 dev 기본값을 그대로 쓴다.
+      - name: Start backend
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/lemuel_xr?charSet=UTF8&characterEncoding=UTF-8
+          SPRING_DATASOURCE_USERNAME: xr
+          SPRING_DATASOURCE_PASSWORD: xr1234
+          AI_GENERATION_ENABLED: "false"
+        run: |
+          gradle --no-daemon bootRun > /tmp/backend.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/actuator/health && echo "backend up after ${i}x5s" && exit 0
+            sleep 5
+          done
+          echo "백엔드가 300초 안에 안 떴다:"; tail -200 /tmp/backend.log; exit 1
+
+      - name: Install deps
+        working-directory: frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      # `frontend` 잡과 같은 이유로 프로덕션 빌드에 대고 잰다 (dev 서버에서만 초록인
+      # 측정 결함이 실제로 있었다 — /david, 2026-08-12).
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      # `BACKEND_INTERNAL_URL` 은 런타임 값이다 — `frontend/src/app/api/[...path]/route.ts`
+      # 가 요청마다 읽는다. 빌드 때가 아니라 여기서 줘야 프록시가 위 백엔드를 가리킨다.
+      # 기본값(`http://lemuel-xr-backend:8080`)은 K8s 서비스명이라 러너에서는 안 풀린다.
+      - name: Start production server
+        working-directory: frontend
+        env:
+          BACKEND_INTERNAL_URL: http://localhost:8080
+        run: |
+          npm run start > /tmp/next-start.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:3000/ && echo "up after ${i}x2s" && exit 0
+            sleep 2
+          done
+          echo "프론트가 60초 안에 안 떴다:"; cat /tmp/next-start.log; exit 1
+
+      # 뷰포트 둘만 돈다. 넷 다 돌리면 인물 7 × 프로젝트 4 × 씬 12단계라 러너에서
+      # 15분을 넘기는데, 남는 둘(iPhone 15 · Pixel 7)은 이 축에서 SE 와 같은 것을 잰다 —
+      # 엔진이 같은 Chromium 이고 폭도 SE 보다 넓다. 320px(SE)이 이 리포의 최악 폭이고,
+      # desktop chromium 은 레이아웃 분기가 달라 남겼다. 돌연변이(솔로몬 강도 버튼에서
+      # 44px 클래스 제거) 로 재 보니 두 뷰포트가 같은 위반을 잡았다 — 높이(26px)로
+      # 걸리는 결함은 폭과 무관하기 때문이다. 폭으로만 걸리는 결함은 SE 몫이다.
+      - name: Mission scene tap target e2e
+        working-directory: frontend
+        env:
+          BASE_URL: http://localhost:3000
+        run: |
+          npx playwright test tests/e2e/mission-tap-targets.spec.ts \
+            --project=chromium --project=mobile-iphone-se
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-mission
+          path: frontend/playwright-report/
+          retention-days: 7
+
+      # 빨강일 때 백엔드 로그를 남긴다. 이 잡의 실패는 「44px 위반」과 「백엔드가 씬을
+      # 못 줬다」 두 갈래인데, 로그가 없으면 둘을 구별하는 데 재실행이 필요하다.
+      - name: Backend log (on failure)
+        if: failure()
+        run: tail -300 /tmp/backend.log
