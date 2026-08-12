@@ -41,34 +41,52 @@ export function CrisisFooter() {
 
   const panel = (
     <>
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        /*
-          `min-h-11` = 44px. 손가락으로 누르는 유일한 상시 컨트롤이고, 그 뒤에 있는 것이
-          상담 번호다. WCAG 2.5.5 / Apple HIG 의 최소 타깃이 44px 다 — 이 버튼만은
-          그 밑으로 내려가지 않게 바닥을 박는다.
-        */
-        className="w-full min-h-11 px-4 py-2 flex items-center justify-center gap-2 text-xs sm:text-sm hover:bg-white/5 transition"
-        aria-expanded={expanded}
-      >
-        <span className="text-amber-400">●</span>
-        <span className="font-medium">
-          위기 상태라면 —{" "}
-          <a href={telHref(CRISIS_DEFAULT)} className="underline font-bold">
-            {CRISIS_DEFAULT.tel}
-          </a>{" "}
-          {/*
-            접힌 줄의 이용 조건은 펼친 목록과 문안이 다르다("24시간, 무료" vs
-            "24시간 무료, 전화"). 통합하면서 note 로 갈아끼우지 않는다 — 숫자만
-            정본에서 읽고, 검토를 거친 문장은 있던 그대로 둔다.
-          */}
-          {CRISIS_DEFAULT.label} (24시간, 무료)
-        </span>
-        <span className="text-amber-400/60 text-xs">
+      {/*
+        전화 걸기와 목록 펼치기를 **분리한 것이 요점**이다.
+
+        전에는 이 줄 전체가 「펼치기」 버튼 하나였고, 번호는 그 안에 박힌 인라인 링크였다.
+        320px 에서 실측하면 펼치기 타깃은 44px 인데 **전화를 거는 타깃은 23×15px** 였다
+        (2026-08-12). 즉 이 앱에서 제일 급한 동작이 제일 누르기 어려운 것이었다 —
+        손가락이 빗나가면 전화 대신 목록이 펼쳐진다.
+
+        그래서 줄의 본체를 `tel:` 링크로 돌리고, 펼치기는 오른쪽의 별도 버튼으로 뺐다.
+        둘 다 `min-h-11`(44px, WCAG 2.5.5 / Apple HIG) 이다.
+
+        주의 — `items-stretch` 때문에 **줄 전체의 높이를 정하는 것은 아래 토글 버튼의
+        `min-h-11`** 이다. 링크 쪽 `min-h-11` 을 지워도 버튼이 잡아 준 44px 로 늘어나서
+        검사가 통과한다(2026-08-12 변이 검증). 반대로 버튼의 `min-h-11 min-w-11` 을
+        지우면 33×44 가 되어 7개 화면 전부 빨개진다. 「화살표만 작아지겠지」 하고
+        버튼 쪽을 건드리면 **전화 거는 링크의 높이까지 같이 무너진다.**
+      */}
+      <div className="flex items-stretch">
+        <a
+          href={telHref(CRISIS_DEFAULT)}
+          className="flex-1 min-h-11 px-4 py-2 flex items-center justify-center gap-2 text-xs sm:text-sm hover:bg-white/5 transition"
+        >
+          <span className="text-amber-400">●</span>
+          <span className="font-medium">
+            위기 상태라면 —{" "}
+            <span className="underline font-bold">{CRISIS_DEFAULT.tel}</span>{" "}
+            {/*
+              접힌 줄의 이용 조건은 펼친 목록과 문안이 다르다("24시간, 무료" vs
+              "24시간 무료, 전화"). 통합하면서 note 로 갈아끼우지 않는다 — 숫자만
+              정본에서 읽고, 검토를 거친 문장은 있던 그대로 둔다.
+            */}
+            {CRISIS_DEFAULT.label} (24시간, 무료)
+          </span>
+        </a>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="min-h-11 min-w-11 px-3 flex items-center justify-center text-amber-400/60 text-xs hover:bg-white/5 transition"
+          aria-expanded={expanded}
+          aria-label={
+            expanded ? "위기 자원 목록 접기" : "위기 자원 목록 펼치기"
+          }
+        >
           {expanded ? "▲" : "▼"}
-        </span>
-      </button>
+        </button>
+      </div>
 
       {expanded && (
         /*

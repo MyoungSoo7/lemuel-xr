@@ -74,7 +74,7 @@ export default function ValuesPage() {
   return (
     <main className="min-h-screen px-6 py-10 max-w-3xl mx-auto">
       <header className="mb-8">
-        <Link href="/" className="text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70">
+        <Link href="/" className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70">
           ← 홈
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold mt-2">자기만의 7 가치</h1>

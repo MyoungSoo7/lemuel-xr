@@ -257,9 +257,9 @@ jobs:
         working-directory: frontend
         run: npm ci
 
-      # 타입 체크만 게이트한다. `npm run lint` 는 Next 16 에서 제거된
-      # `next lint` 를 호출해 현재 깨져 있고, Playwright e2e 는 백엔드가 떠
-      # 있어야 하므로(playwright.config.ts 주석 참조) 별도 작업으로 남긴다.
+      # `npm run lint` 는 Next 16 에서 제거된 `next lint` 를 호출해 현재 깨져 있어
+      # 여기 없다 — 고치는 것이 남은 일이다. Playwright 는 아래에서 돈다(백엔드가
+      # 필요 없는 두 스위트만).
       - name: Type check
         working-directory: frontend
         run: npm run type-check
@@ -277,6 +277,67 @@ jobs:
       # 있고 이 스크립트의 외부 의존은 0 이다(표준 라이브러리만 쓴다).
       - name: Crisis hotline hardcoding gate
         run: python3 scripts/check_frontend_hotline.py
+
+      # 모바일 레이아웃 게이트 (2026-08-12 신설).
+      #
+      # 이걸 붙이는 이유. 이 프론트는 데스크탑 Chrome 하나로만 검증돼 왔고, 그래서
+      # **모바일에서 위기 상담 푸터가 본문을 최대 157px 덮고 있었는데 아무도 몰랐다.**
+      # 덮인 쪽이 화면 아래라 눈으로는 멀쩡해 보인다. 손으로 돌리는 검사는 안 돌린
+      # 검사와 같으므로 여기에 넣는다.
+      #
+      # 두 스위트만 돈다. 둘 다 **백엔드 없이** 판정된다 — 로컬에서 백엔드를 내린 채
+      # 60/60 초록을 확인했다(2026-08-12, 프로덕션 빌드). 그래서 서비스 컨테이너가 없다.
+      #   · mobile-hybrid — 푸터가 본문을 덮는가 / PWA manifest·아이콘이 실제로 200 인가
+      #   · tap-targets  — 터치 타깃이 44px 이상인가 (WCAG 2.5.5 / Apple HIG)
+      #
+      # ⚠️ 이 초록이 **덮지 않는 것** (조용히 빠진 게 아니라 알고 뺀 것):
+      #   · 엔진은 넷 다 Chromium 이다. Safari(WebKit) 는 한 번도 안 돌렸다 —
+      #     이 리포의 Playwright 가 받는 WebKit 빌드가 `webkit-mac-15` 하나뿐이라
+      #     개발 기기(macOS 26.6)에서 newPage() 가 멈춘다. `playwright.config.ts` 의
+      #     `PW_WEBKIT=1` 로 여는 opt-in 프로젝트가 있고, ubuntu 러너에서는 돌 수도
+      #     있으나 **확인하지 않았다.** iPhone 프로젝트가 재는 것은 뷰포트·DPR·터치·UA 지
+      #     Safari 엔진이 아니다.
+      #   · 실기기 안전영역(노치·홈 인디케이터) 은 미검증이다. Playwright 의 기기 에뮬레이션은
+      #     env(safe-area-inset-*) 을 전부 0 으로 준다.
+      #   · 성능(LCP·번들·프레임) 은 재지 않는다. 레이아웃만 잰다.
+      #   · 미션 화면(요셉·다윗·엘리야·욥·예수·모세·솔로몬)의 씬 내부는 백엔드가 있어야
+      #     열리므로 여기서 한 번도 안 열린다.
+      - name: Install Playwright browsers
+        working-directory: frontend
+        run: npx playwright install --with-deps chromium
+
+      # 프로덕션 빌드에 대고 잰다. 개발 서버로 재면 안 된다 — `/david` 는 dev 에서
+      # 초록인데 프로덕션 빌드에서만 드러나는 측정 결함이 있었다(2026-08-12).
+      - name: Build
+        working-directory: frontend
+        run: npm run build
+
+      # `npm run start` 를 띄우고 응답할 때까지 기다린다. 곧바로 테스트를 걸면
+      # 첫 스펙이 커넥션 거부로 죽는다. 60초를 넘기면 로그를 남기고 실패시킨다 —
+      # 조용히 넘어가면 그 다음 빨강의 원인을 엉뚱한 데서 찾게 된다.
+      - name: Start production server
+        working-directory: frontend
+        run: |
+          npm run start > /tmp/next-start.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl -sf -o /dev/null http://localhost:3000/ && echo "up after ${i}x2s" && exit 0
+            sleep 2
+          done
+          echo "서버가 60초 안에 안 떴다:"; cat /tmp/next-start.log; exit 1
+
+      - name: Mobile layout + tap target e2e
+        working-directory: frontend
+        env:
+          BASE_URL: http://localhost:3000
+        run: npx playwright test mobile-hybrid tap-targets
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: frontend/playwright-report/
+          retention-days: 7
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
