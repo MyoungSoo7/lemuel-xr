@@ -117,6 +117,18 @@ tasks.withType<Test> {
         .withPropertyName("authoringContent")
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
+    // 같은 이유로 `docs/` 도 입력이다. 문서를 계약으로 읽는 테스트가 여럿 있다 —
+    // CrisisKeywordDocContractTest(docs/EMOTION-CLASSIFIER.md),
+    // RuntimeExposureSignoffTest(docs/RUTH-RUNTIME-SIGNOFF.md 의 사인오프 두 줄).
+    //
+    // 2026-08-12 에 이걸로 한 번 속았다: 사인오프 대장을 고쳐 놓고 :test 를 돌렸는데
+    // Gradle 이 UP-TO-DATE 로 건너뛰고 **직전 실행의 초록을 그대로 다시 보여줬다.**
+    // 게이트를 무력화하는 편집을 해 놓고 초록을 받은 셈이라, 판정기를 mutation 으로
+    // 검증하는 절차 자체가 무의미해진다. CI 는 매번 새 체크아웃이라 안 겪지만,
+    // 그건 로컬에서 거짓 초록을 봐도 된다는 뜻이 아니다.
+    inputs.dir(rootProject.layout.projectDirectory.dir("../docs"))
+        .withPropertyName("designDocs")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 // === 근거성 골든셋을 jar 에 넣는다 ======================================
