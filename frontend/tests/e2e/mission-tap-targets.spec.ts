@@ -21,9 +21,20 @@ import { test, expect, Page } from "@playwright/test";
  *
  * 한계 —
  *   · 분기마다 다 들어가지 않는다. 첫 버튼을 따라간 한 갈래만 본다.
- *   · **백엔드가 있어야 돈다.** 그래서 CI 의 프론트 잡에는 넣지 않았다(거기엔 백엔드가
- *     없다). 백엔드를 띄운 곳에서 돌려야 의미가 있고, 안 돌면 이 세 군데는 지켜지지
- *     않는다는 뜻이다. 조용히 초록이 되지 않도록 아래에서 분모를 함께 본다.
+ *   · **백엔드가 있어야 돈다.** 2026-08-13 에 백엔드 딸린 전용 잡(`mission-e2e`)으로
+ *     CI 에 들어갔다.
+ *
+ * ⚠️ 2026-08-13 — 이 파일이 스스로 경계했던 「조용한 초록」에 이 파일이 걸려 있었다.
+ *
+ * 원래 방어는 분모(`measured > 0`) 하나였다. 백엔드를 내리고 돌려 보니 **7개 인물이
+ * 전부 초록이었다.** 백엔드가 없으면 `SceneBootState` 가 「세션을 시작하지 못했습니다」
+ * 화면과 `다시 시도` 버튼(min-h-11, 44px 준수)을 그리고, 위기 푸터·내비도 같이 그려진다.
+ * 즉 분모는 0 이 아니다 — 씬은 한 줄도 안 열렸는데 분모는 채워진다. 2026-08-06 에
+ * 먹통 화면을 고치려고 넣은 그 에러 UI 가, 공교롭게 이 검사의 유일한 방어를 무력화했다.
+ *
+ * 그래서 분모 대신 **씬이 실제로 왔는지** 를 본다: `/api/game/{인물}/start` 가 200 으로
+ * 응답했는지 네트워크에서 직접 확인한다. 백엔드가 안 떴거나 프록시가 어긋나면 그
+ * 자리에서 빨개진다. 분모 검사는 그대로 두되(다른 것을 잡는다) 그 앞에 이 관문을 둔다.
  */
 
 const MIN = 44;
@@ -71,7 +82,25 @@ for (const route of CHARACTERS) {
   test(`${route} — 씬을 넘겨 가며 모든 터치 타깃이 ${MIN}px 이상이다`, async ({
     page,
   }) => {
+    // 이동 *전* 에 건다 — start 는 마운트 직후 나가므로 goto 뒤에 걸면 놓친다.
+    const character = route.slice(1);
+    const started = page
+      .waitForResponse(
+        (r) => r.url().includes(`/api/game/${character}/start`) && r.ok(),
+        { timeout: 20_000 },
+      )
+      .catch(() => null);
+
     await page.goto(route);
+
+    expect(
+      await started,
+      `${route} — /api/game/${character}/start 가 200 으로 오지 않았다. ` +
+        `씬이 안 열렸다는 뜻이고, 이 스펙이 재는 것은 씬 안쪽이므로 이대로 통과하면 ` +
+        `그 초록은 거짓이다. 백엔드가 떠 있는지, 프록시(BACKEND_INTERNAL_URL)가 ` +
+        `맞는지 확인할 것.`,
+    ).not.toBeNull();
+
     await page.waitForLoadState("networkidle");
 
     const violations: string[] = [];
@@ -79,8 +108,9 @@ for (const route of CHARACTERS) {
 
     for (let step = 0; step < STEPS; step++) {
       const { total, small } = await measure(page);
-      // 분모를 함께 본다. 백엔드가 없거나 씬을 못 받아 아무것도 안 그려지면
-      // 「작은 것 0 개」가 참이 되어 검사가 조용히 통과한다 — 그 초록은 거짓이다.
+      // 분모도 함께 본다. 위 관문(start 200)이 백엔드 부재를 막고, 이 줄은 그 다음 —
+      // 응답은 왔는데 화면이 아무것도 안 그린 경우를 막는다. 아무것도 없으면
+      // 「작은 것 0 개」가 참이 되어 검사가 조용히 통과한다.
       if (total > 0) measured++;
       for (const s of small) {
         violations.push(
@@ -102,8 +132,8 @@ for (const route of CHARACTERS) {
 
     expect(
       measured,
-      `${route} 에서 잴 타깃이 한 단계도 없었다 — 씬이 안 그려졌다는 뜻이고, ` +
-        `이 통과는 무의미하다. 백엔드가 떠 있는지 확인할 것.`,
+      `${route} 에서 잴 타깃이 한 단계도 없었다 — start 는 200 이었는데 화면이 ` +
+        `아무것도 안 그렸다는 뜻이고, 이 통과는 무의미하다.`,
     ).toBeGreaterThan(0);
 
     expect(violations, `${MIN}px 미만 타깃:\n${violations.join("\n")}`).toEqual(
