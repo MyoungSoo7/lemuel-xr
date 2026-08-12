@@ -28,6 +28,7 @@ rc 규약(`scripts/gates/tests/run.sh` 와 동일): 0=PASS · 1=FAIL · ≥126 �
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -710,6 +711,40 @@ def check_genealogy() -> list[str]:
                 ref = str(c.get("ref") or c.get("verse_ref") or "").strip()
                 if ref != want_ref:
                     bad.append(f"AC 34: scenarios/ruth.yml {want_ref} 절 표기 불일치 — {ref!r}")
+
+    # ⑤ 순서 — 계보는 SR-1 **앞**이어야 한다 (헌장 §3-c: 마지막 Scene 은 결과가 아니라
+    #    신의 행위로 닫는다). 계보는 결과 진술이므로 마지막 자리에 오면 그 계약이 깨진다.
+    #
+    #    직접 "인덱스 비교" 를 하지 않는 이유: SR-1 은 자막 목록이 아니라
+    #    `closing_screen.closing_caption` 에 있어 같은 리스트에 들어 있지 않다. 대신 두
+    #    가지를 잰다 — ⓐ 두 자막이 **본문 자막 목록 안에** 한 그룹으로 있고 4:21 이 4:22
+    #    앞일 것, ⓑ `closing_screen` 서브트리 어디에도 계보 자구가 없을 것. 런타임이
+    #    본문을 먼저 재생하고 종결 화면으로 넘어가므로, 이 둘이면 앞뒤가 고정된다.
+    for label, path in (("scene5.yml", SCENES[4]), ("scenarios/ruth.yml", RUNTIME_SCENARIO)):
+        if not os.path.exists(path):
+            continue
+        doc = load(path)
+        groups = [
+            [norm(c.get("text_ko", "")) for c in (g or []) if isinstance(c, dict)]
+            for g in collect_key(doc, "captions")
+        ]
+        holding = [g for g in groups if any(t in GENEALOGY_TEXTS for t in g)]
+        if not holding:
+            continue  # ③·④ 가 이미 부재로 잡았다
+        if len(holding) > 1:
+            bad.append(f"AC 34: {label} 계보 자막이 자막 목록 {len(holding)}곳에 흩어져 있다")
+        seq = [t for t in holding[0] if t in GENEALOGY_TEXTS]
+        want_seq = [norm(c["text_ko"]) for c in GENEALOGY_CAPTIONS]
+        if seq != want_seq:
+            bad.append(f"AC 34: {label} 계보 자막 순서가 4:21 → 4:22 가 아니다 — {[s[:12] for s in seq]}")
+        for closing in collect_key(doc, "closing_screen"):
+            for t in GENEALOGY_TEXTS:
+                if t in json.dumps(closing, ensure_ascii=False):
+                    bad.append(
+                        f"AC 34: {label} closing_screen 안에 계보 자구가 있다 — "
+                        "계보는 SR-1 앞이어야 한다 (헌장 §3-c)"
+                    )
+                    break
 
     return bad
 
