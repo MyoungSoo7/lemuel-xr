@@ -21,6 +21,10 @@ import {
   type Scene4LastStone,
 } from "@/lib/content/david-monologues";
 import { SceneBootState } from "@/components/SceneBootState";
+import {
+  TriggerWarningGate,
+  readTriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 /**
  * David 미션 — Phase 2 완전 활성 (요셉·모세 동급).
@@ -54,9 +58,13 @@ export default function DavidPage() {
   const [history, setHistory] = useState<string[]>([]);
   const [echo, setEcho] = useState<DecisionEcho | null>(null);
   const [lastStone, setLastStone] = useState<Scene4LastStone | null>(null);
-  // R4 — Scene 5(골리앗 폭력·PULSE_HARD 햅틱) 진입 전 정서 부담 경고 카드 동의 게이트.
-  // david.yml Scene 5 extras.violence_warning=true 를 프론트가 실제로 소비하는 지점.
-  // 동의(들어간다) 전에는 throw 버튼을 렌더하지 않으며, 건너뛰기는 화면 위에 노출한다.
+  // R4 — trigger_warning 이 있는 씬은 동의 전 상호작용을 렌더하지 않는다.
+  //
+  // 2026-08-12 까지 이 게이트는 `extras.violence_warning` 이라는 **레거시 boolean** 으로
+  // 떴다. david.yml 이 그 줄에 스스로 "legacy flag — 구조화된 trigger_warning 병행
+  // (하위 호환)" 이라고 적어 둔, 이행하다 만 상태였다. 그래서 yml 의 구조화된
+  // trigger_warning(level·content·skip_alternative_scene_id)을 고쳐도 화면은 안 바뀌었다.
+  // 이제 payload.trigger_warning 으로 구동한다. violence_warning 플래그는 더 읽지 않는다.
   const [violenceConsented, setViolenceConsented] = useState(false);
 
   const start = useMutation({
@@ -65,8 +73,13 @@ export default function DavidPage() {
   });
 
   const decide = useMutation({
-    mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
-      decideMission("david", scene!.sessionId, sceneId, decision),
+    mutationFn: ({
+      sceneId,
+      decision,
+    }: {
+      sceneId: number;
+      decision: unknown;
+    }) => decideMission("david", scene!.sessionId, sceneId, decision),
     onSuccess: (d, vars) => {
       // backend responseText 우선, 없으면 frontend fallback (david 는 항상 fallback).
       const local = buildLocalEcho(vars.sceneId, vars.decision);
@@ -118,6 +131,10 @@ export default function DavidPage() {
     decide.mutate({ sceneId, decision });
   };
 
+  // R4 — 게이트 여부는 payload 가 정한다. 씬 타입이나 레거시 플래그를 조건으로 쓰지 않는다.
+  const warning = readTriggerWarning(payload);
+  const needsConsent = !!warning && !violenceConsented;
+
   return (
     <main className="min-h-screen flex flex-col p-4 sm:p-6">
       <header className="max-w-3xl mx-auto w-full mb-4">
@@ -144,141 +161,146 @@ export default function DavidPage() {
       <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950">
         <div className="absolute inset-0 flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
-            {scene.currentScene === 1 && "양 떼 곁의 새벽. 어린 시인 다윗의 수금이 울린다 — 시편 23편이 흐른다."}
-            {scene.currentScene === 2 && "형 엘리압이 비웃는다. 모욕이 가슴을 스친다 — 어떻게 응답할 것인가."}
-            {scene.currentScene === 3 && "사울이 자기 갑옷을 입힌다. 무겁고, 낯설다. 남의 갑옷인가, 나의 걸음인가."}
-            {scene.currentScene === 4 && "시냇가에서 다섯 돌을 고른다 — 공포·모욕·외로움·신뢰·기도. 무엇을 마지막으로 쥘 것인가."}
-            {scene.currentScene === 5 && "골리앗이 앞을 막는다. 떨림 속에, 단 하나의 나아감이 남았다."}
-            {scene.currentScene === 6 && "거인은 넘어졌다. 그러나 오늘의 너를 재촉하지 않는다 — 솔직한 한 줄이 남았다."}
+            {scene.currentScene === 1 &&
+              "양 떼 곁의 새벽. 어린 시인 다윗의 수금이 울린다 — 시편 23편이 흐른다."}
+            {scene.currentScene === 2 &&
+              "형 엘리압이 비웃는다. 모욕이 가슴을 스친다 — 어떻게 응답할 것인가."}
+            {scene.currentScene === 3 &&
+              "사울이 자기 갑옷을 입힌다. 무겁고, 낯설다. 남의 갑옷인가, 나의 걸음인가."}
+            {scene.currentScene === 4 &&
+              "시냇가에서 다섯 돌을 고른다 — 공포·모욕·외로움·신뢰·기도. 무엇을 마지막으로 쥘 것인가."}
+            {scene.currentScene === 5 &&
+              "골리앗이 앞을 막는다. 떨림 속에, 단 하나의 나아감이 남았다."}
+            {scene.currentScene === 6 &&
+              "거인은 넘어졌다. 그러나 오늘의 너를 재촉하지 않는다 — 솔직한 한 줄이 남았다."}
           </p>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {/* Scene 1 — contemplative (시편 23 도입 내레이션 렌더 후 계속) */}
-        {sceneType === "contemplative" && (
+        {needsConsent && warning ? (
+          /* R4 동의 게이트. 동의 전에는 이 씬의 상호작용(throw 버튼)을 렌더하지 않는다. */
+          <TriggerWarningGate
+            warning={warning}
+            pending={decide.isPending}
+            continueLabel="준비됐어요 · 들어갈게요"
+            fallbackProse={
+              <p>
+                이 장면에는 거인 앞의 대치와 강한 심장 박동(진동) 연출이
+                있습니다. 지금이 버겁다면 이 장면은{" "}
+                <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 결말과
+                오늘의 한 줄은 그대로 이어집니다.
+              </p>
+            }
+            onContinue={() => setViolenceConsented(true)}
+            onSkip={() => advance(scene.currentScene, { value: "skip" })}
+          />
+        ) : (
           <>
-            {scene.currentScene === 1 && (
-              <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                  {scene1Psalm23}
-                </p>
-                <div className="mt-3">
-                  <NarrationAudioButton text={scene1Psalm23} onUnavailable="hide" />
+            {/* Scene 1 — contemplative (시편 23 도입 내레이션 렌더 후 계속) */}
+            {sceneType === "contemplative" && (
+              <>
+                {scene.currentScene === 1 && (
+                  <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
+                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                      {scene1Psalm23}
+                    </p>
+                    <div className="mt-3">
+                      <NarrationAudioButton
+                        text={scene1Psalm23}
+                        onUnavailable="hide"
+                      />
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setEcho(null);
+                    advance(scene.currentScene, "next");
+                  }}
+                  className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+                  disabled={decide.isPending}
+                >
+                  {decide.isPending ? "..." : "계속 →"}
+                </button>
+              </>
+            )}
+
+            {/* Scene 2 — pick_one (형의 비웃음) */}
+            {sceneType === "pick_one" &&
+              Array.isArray(field<OptionLike[]>("options")) && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
+                    <button
+                      key={o.id}
+                      onClick={() => advance(scene.currentScene, o.id)}
+                      disabled={decide.isPending}
+                      className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                    >
+                      {o.label}
+                    </button>
+                  ))}
                 </div>
+              )}
+
+            {/* Scene 3 — gesture_sequence (사울 갑옷) */}
+            {sceneType === "gesture_sequence" && (
+              <GestureSequence
+                steps={field<OptionLike[]>("steps") ?? []}
+                pending={decide.isPending}
+                onComplete={() =>
+                  advance(scene.currentScene, { value: "armor_removed" })
+                }
+              />
+            )}
+
+            {/* Scene 4 — distribute (5돌 = 5감정, 집는 순서 기록) */}
+            {sceneType === "distribute" && (
+              <StonePicker
+                stones={field<OptionLike[]>("stones") ?? []}
+                pending={decide.isPending}
+                onComplete={(order) =>
+                  advance(scene.currentScene, {
+                    priority: `last_${lastStoneOf(order)}`,
+                    order,
+                  })
+                }
+              />
+            )}
+
+            {/* Scene 5 — two_handed_throw (골리앗, 단일 나아감). 동의 뒤에만 여기에 온다. */}
+            {sceneType === "two_handed_throw" && (
+              <button
+                onClick={() => advance(scene.currentScene, { value: "throw" })}
+                disabled={decide.isPending}
+                className="w-full py-4 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+              >
+                {decide.isPending ? "..." : "물맷돌을 던진다 →"}
+              </button>
+            )}
+
+            {/* Scene 6 — outro */}
+            {sceneType === "outro" && (
+              <div className="text-center space-y-4">
+                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
+                  {outroText}
+                </p>
+                <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
+                  * AI 보조 — 본문은 성경 참조 *
+                </p>
+                <button
+                  onClick={() =>
+                    completeMission("david", scene.sessionId, "completed").then(
+                      () => (location.href = "/"),
+                    )
+                  }
+                  className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
+                >
+                  미션 완료
+                </button>
               </div>
             )}
-            <button
-              onClick={() => {
-                setEcho(null);
-                advance(scene.currentScene, "next");
-              }}
-              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-              disabled={decide.isPending}
-            >
-              {decide.isPending ? "..." : "계속 →"}
-            </button>
           </>
-        )}
-
-        {/* Scene 2 — pick_one (형의 비웃음) */}
-        {sceneType === "pick_one" && Array.isArray(field<OptionLike[]>("options")) && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
-              <button
-                key={o.id}
-                onClick={() => advance(scene.currentScene, o.id)}
-                disabled={decide.isPending}
-                className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {/* Scene 3 — gesture_sequence (사울 갑옷) */}
-        {sceneType === "gesture_sequence" && (
-          <GestureSequence
-            steps={field<OptionLike[]>("steps") ?? []}
-            pending={decide.isPending}
-            onComplete={() => advance(scene.currentScene, { value: "armor_removed" })}
-          />
-        )}
-
-        {/* Scene 4 — distribute (5돌 = 5감정, 집는 순서 기록) */}
-        {sceneType === "distribute" && (
-          <StonePicker
-            stones={field<OptionLike[]>("stones") ?? []}
-            pending={decide.isPending}
-            onComplete={(order) =>
-              advance(scene.currentScene, {
-                priority: `last_${lastStoneOf(order)}`,
-                order,
-              })
-            }
-          />
-        )}
-
-        {/* Scene 5 — two_handed_throw (골리앗, 단일 나아감) */}
-        {sceneType === "two_handed_throw" &&
-          field<boolean>("violence_warning") === true &&
-          !violenceConsented && (
-            <div className="space-y-3 px-4 py-4 rounded-lg border border-[var(--color-primary)]/40 bg-black/30">
-              <p className="text-sm text-[var(--color-warm)]/90">
-                이 장면에는 거인 앞의 대치와 강한 심장 박동(진동) 연출이 있습니다.
-                지금이 버겁다면 이 장면은 <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도
-                결말과 오늘의 한 줄은 그대로 이어집니다.
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <button
-                  onClick={() => setViolenceConsented(true)}
-                  disabled={decide.isPending}
-                  className="px-4 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-                >
-                  준비됐어요 · 들어갈게요
-                </button>
-                <button
-                  onClick={() => advance(scene.currentScene, { value: "skip" })}
-                  disabled={decide.isPending}
-                  className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90"
-                >
-                  이 장면은 건너뛸게요 →
-                </button>
-              </div>
-            </div>
-          )}
-        {sceneType === "two_handed_throw" &&
-          (field<boolean>("violence_warning") !== true || violenceConsented) && (
-            <button
-              onClick={() => advance(scene.currentScene, { value: "throw" })}
-              disabled={decide.isPending}
-              className="w-full py-4 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-            >
-              {decide.isPending ? "..." : "물맷돌을 던진다 →"}
-            </button>
-          )}
-
-        {/* Scene 6 — outro */}
-        {sceneType === "outro" && (
-          <div className="text-center space-y-4">
-            <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-              {outroText}
-            </p>
-            <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
-              * AI 보조 — 본문은 성경 참조 *
-            </p>
-            <button
-              onClick={() =>
-                completeMission("david", scene.sessionId, "completed").then(
-                  () => (location.href = "/"),
-                )
-              }
-              className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
-            >
-              미션 완료
-            </button>
-          </div>
         )}
 
         {decide.isError && (
@@ -306,7 +328,9 @@ export default function DavidPage() {
       {history.length > 0 && (
         <details className="max-w-3xl mx-auto w-full mt-6 text-xs text-[var(--color-warm)]/40">
           <summary>진행 기록</summary>
-          <pre className="overflow-x-auto">{JSON.stringify(history, null, 2)}</pre>
+          <pre className="overflow-x-auto">
+            {JSON.stringify(history, null, 2)}
+          </pre>
         </details>
       )}
     </main>
@@ -338,7 +362,9 @@ function GestureSequence({
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-[var(--color-warm)]/60">순서대로 몸짓을 이어가세요</p>
+      <p className="text-xs text-[var(--color-warm)]/60">
+        순서대로 몸짓을 이어가세요
+      </p>
       <div className="grid grid-cols-1 gap-3">
         {list.map((s, i) => {
           const isLast = i === list.length - 1;
@@ -352,7 +378,9 @@ function GestureSequence({
             >
               <span className="text-[var(--color-warm)]/50 mr-2">{i + 1}.</span>
               {s.label}
-              {already && <span className="ml-2 text-[var(--color-primary)]">✓</span>}
+              {already && (
+                <span className="ml-2 text-[var(--color-primary)]">✓</span>
+              )}
             </button>
           );
         })}
@@ -396,7 +424,8 @@ function StonePicker({
   return (
     <div className="space-y-3">
       <p className="text-xs text-[var(--color-warm)]/60">
-        다섯 돌을 하나씩 집어 자루에 담으세요. <strong>마지막으로 쥔 감정</strong> 이 오늘의 한 줄을 엽니다.
+        다섯 돌을 하나씩 집어 자루에 담으세요.{" "}
+        <strong>마지막으로 쥔 감정</strong> 이 오늘의 한 줄을 엽니다.
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
         {list.map((s) => {
@@ -448,7 +477,8 @@ function buildLocalEcho(
   }
   if (fromScene === 4) {
     const priority = readPriority(decision);
-    const stone = (priority?.replace(/^last_/, "") ?? null) as Scene4LastStone | null;
+    const stone = (priority?.replace(/^last_/, "") ??
+      null) as Scene4LastStone | null;
     if (stone && stone in scene4LastStone) {
       return { text: scene4LastStone[stone], lastStone: stone };
     }

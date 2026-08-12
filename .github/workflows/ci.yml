@@ -87,6 +87,11 @@ jobs:
               # 이 잡을 돌려야 드리프트가 잡힌다. 판정기 자신이 바뀔 때도 마찬가지다.
               - 'backend/src/main/resources/application.yml'
               - 'scripts/check_frontend_hotline.py'
+              # R4 동의 게이트 배선 판정기도 같은 이유로 시나리오 yml 을 입력으로 갖는다.
+              # 어떤 씬에 trigger_warning 을 새로 붙인 PR 이 프론트를 안 건드리면
+              # 이 잡이 안 돌고, 화면 없는 경고(= 안 뜨는 동의 카드)가 그대로 머지된다.
+              - 'backend/src/main/resources/scenarios/**'
+              - 'scripts/check_frontend_trigger_warning.py'
 
   backend:
     needs: changes
@@ -292,6 +297,23 @@ jobs:
       # 있고 이 스크립트의 외부 의존은 0 이다(표준 라이브러리만 쓴다).
       - name: Crisis hotline hardcoding gate
         run: python3 scripts/check_frontend_hotline.py
+
+      # R4 동의 게이트 배선 게이트 (2026-08-12 신설).
+      #
+      # 시나리오 yml 의 `trigger_warning` 은 저작자·안전 검토자가 쓰는 자리다.
+      # 여기 적으면 화면이 경고 카드를 띄우고 건너뛸 길을 연다 — 는 것이 규약인데,
+      # 전수 조사에서 그 규약이 세 갈래로 깨져 있었다: jesus 는 payload 를 안 읽고
+      # 씬 타입으로 분기, david 는 레거시 boolean, **joseph 은 카드 자체가 없었다.**
+      #
+      # 이 실패는 빨갛지 않다. 화면은 돌고 백엔드 테스트도 초록이다 — 그 테스트는
+      # skip 목적지가 실재하는지만 보지 화면이 그 길을 쓰는지는 안 본다. 그래서
+      # 안전 검토자가 yml 을 고치면 *고쳐진 줄 알고* 넘어간다. 아무것도 안 바뀌는데.
+      #
+      # 재는 범위는 "화면이 payload 를 읽는가" 까지다. 카드가 실제로 렌더되는지는
+      # 백엔드가 붙은 e2e 만 잡을 수 있고, 문구의 적절성은 사람이 판정한다.
+      # 위와 같은 이유로 setup-python 을 붙이지 않는다 (표준 라이브러리만 쓴다).
+      - name: R4 consent gate wiring
+        run: python3 scripts/check_frontend_trigger_warning.py
 
       # 모바일 레이아웃 게이트 (2026-08-12 신설).
       #

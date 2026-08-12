@@ -106,7 +106,85 @@ class ScenarioYamlLoaderTest {
                 assertThat(skipTo)
                     .describedAs("%s scene %d — skip 경로가 트리거 씬 자신 또는 그 이전을 가리킨다", c, scene.id)
                     .isGreaterThan(scene.id)
+
+                /*
+                  백엔드에는 "skip" 결정에 대한 별도 분기가 없다 — 결정을 기록하고 next 를 따라간다.
+                  그래서 프론트의 건너뛰기는 *본문을 렌더하지 않고 그냥 진행* 하는 것으로 구현돼 있고,
+                  두 값이 어긋나면 건너뛴 사람이 skip_alternative_scene_id 가 아니라 next 로 간다.
+                  조용히 어긋난다 — 화면도 안 죽고 로그도 안 남는다. 그래서 여기서 못 박는다.
+
+                  둘을 갈라야 할 진짜 이유가 생기면, 이 단언을 지우기 전에 백엔드에 skip 분기를 먼저 넣어라.
+                */
+                assertThat(skipTo)
+                    .describedAs(
+                        "%s scene %d — skip_alternative_scene_id(%d) 와 next(%s) 가 다르다. " +
+                            "백엔드는 skip 을 따로 처리하지 않으므로 건너뛴 사용자는 next 로 간다",
+                        c, scene.id, skipTo, scene.next,
+                    )
+                    .isEqualTo(scene.next)
             }
+        }
+    }
+
+    /**
+     * R4 게이트가 붙어 있어야 하는 씬 — yml 에서 `trigger_warning` 이 사라지면 여기서 빨개진다.
+     *
+     * 위의 무결성 루프는 *있는* 경고만 검사한다. 경고를 통째로 지우면 검사할 게 없어져서
+     * 전부 초록으로 통과한다 — 즉 안전 통제를 제거하는 편집이 가장 조용하다. 그 구멍을 막는다.
+     *
+     * 대상 3씬은 2026-08-12 프론트 전수 조사에서 배선이 깨져 있던 곳이다
+     * (jesus 는 payload 미독취 · david 는 레거시 boolean · joseph 은 카드 자체 부재).
+     * yml 쪽 선언이 이 테스트로 고정되고, 화면이 그 선언을 읽는지는
+     * `scripts/check_frontend_trigger_warning.py` 가 CI 에서 따로 본다. 둘 다 있어야 배선이 산다.
+     *
+     * 여기서 문구의 적절성은 재지 않는다 — 그건 사람(정신건강 검토)의 몫이다.
+     */
+    @Test
+    fun `수난·골리앗·재회 씬에 R4 트리거 경고가 선언돼 있다`() {
+        data class Expected(
+            val character: Character,
+            val sceneId: Int,
+            val content: List<String>,
+            val what: String,
+        )
+
+        val cases = listOf(
+            Expected(Character.JESUS, 5, listOf("suffering", "death"), "겟세마네·십자가"),
+            Expected(Character.DAVID, 5, listOf("violence"), "골리앗 전투"),
+            Expected(Character.JOSEPH, 4, listOf("betrayal", "family_trauma"), "형제 재회"),
+        )
+
+        for (e in cases) {
+            val scene = loader.forCharacter(e.character).scene(e.sceneId)
+
+            @Suppress("UNCHECKED_CAST")
+            val tw = scene.extras?.get("trigger_warning") as? Map<String, Any?>
+            assertThat(tw)
+                .describedAs(
+                    "%s scene %d(%s) — trigger_warning 이 없다. 동의 게이트가 사라진다",
+                    e.character, e.sceneId, e.what,
+                )
+                .isNotNull()
+            requireNotNull(tw)
+
+            assertThat(tw["level"] as? String)
+                .describedAs("%s scene %d — level 이 있어야 화면이 강도를 표시한다", e.character, e.sceneId)
+                .isNotBlank()
+
+            @Suppress("UNCHECKED_CAST")
+            val content = tw["content"] as? List<String>
+            assertThat(content)
+                .describedAs("%s scene %d — content 태그", e.character, e.sceneId)
+                .containsAll(e.content)
+
+            // 건너뛸 길이 없으면 그건 경고가 아니라 통보다. 목적지 무결성은 위 루프가 이미 본다.
+            assertThat(tw["skip_alternative_scene_id"] as? Int)
+                .describedAs("%s scene %d — skip_alternative_scene_id", e.character, e.sceneId)
+                .isNotNull()
+
+            assertThat(tw["consent_card_id"] as? String)
+                .describedAs("%s scene %d — consent_card_id", e.character, e.sceneId)
+                .isNotBlank()
         }
     }
 

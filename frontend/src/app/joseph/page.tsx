@@ -20,6 +20,10 @@ import {
 } from "@/lib/content/joseph-monologues";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import { SceneBootState } from "@/components/SceneBootState";
+import {
+  TriggerWarningGate,
+  readTriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 type Scene = JosephStartResponse;
 
@@ -36,7 +40,20 @@ export default function JosephPage() {
   const [scene, setScene] = useState<Scene | null>(null);
   const [history, setHistory] = useState<string[]>([]);
   const [echo, setEcho] = useState<DecisionEcho | null>(null);
-  const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(null);
+  const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(
+    null,
+  );
+  /*
+    R4 — trigger_warning 이 있는 씬은 동의 전 상호작용을 렌더하지 않는다.
+
+    2026-08-12 까지 이 화면에는 **동의 카드가 아예 없었다.** joseph.yml Scene 4(형제 재회)는
+    level medium · content [betrayal, family_trauma] · skip_alternative_scene_id 5 를
+    선언해 두고 있었는데, 화면에는 경고도 건너뛰기도 없어 가족 배신 트라우마 씬으로
+    곧장 들어갔다. yml 은 건너뛸 길까지 마련해 뒀는데 그 문이 화면에 없었다.
+    job·elijah·solomon 은 같은 필드를 이미 읽고 있었으므로 "규약이 아직 없어서" 가
+    아니라 이 화면만 빠져 있었던 것이다.
+  */
+  const [consented, setConsented] = useState(false);
 
   const start = useMutation({
     mutationFn: () => startJoseph("web"),
@@ -44,8 +61,13 @@ export default function JosephPage() {
   });
 
   const decide = useMutation({
-    mutationFn: ({ sceneId, decision }: { sceneId: number; decision: unknown }) =>
-      decideJoseph(scene!.sessionId, sceneId, decision),
+    mutationFn: ({
+      sceneId,
+      decision,
+    }: {
+      sceneId: number;
+      decision: unknown;
+    }) => decideJoseph(scene!.sessionId, sceneId, decision),
     onSuccess: (d, vars) => {
       // 결정 직후 — backend 의 responseText 우선, 없으면 frontend hardcode fallback.
       // Phase 2-A 마이그레이션 패턴: 점진 전환, frontend fallback 은 backend 가 매칭 못
@@ -53,8 +75,10 @@ export default function JosephPage() {
       const localFallback = buildLocalEcho(vars.sceneId, vars.decision);
       const text = d.responseText ?? localFallback?.text ?? null;
       if (text) setEcho({ fromScene: vars.sceneId, text });
-      if (localFallback?.scene3Pattern) setScene3Pattern(localFallback.scene3Pattern);
+      if (localFallback?.scene3Pattern)
+        setScene3Pattern(localFallback.scene3Pattern);
 
+      setConsented(false); // R4 — 다음 씬 진입 시 동의 게이트 초기화
       setScene(d);
       setHistory((h) => [...h, JSON.stringify(d.scenePayload.title)]);
     },
@@ -86,7 +110,14 @@ export default function JosephPage() {
   const title = (payload.title as string) ?? "Scene";
   const rawType = (payload.type as string) ?? "";
   const sceneType =
-    rawType === "interaction" ? ((payload.interaction as string) ?? "") : rawType;
+    rawType === "interaction"
+      ? ((payload.interaction as string) ?? "")
+      : rawType;
+
+  // R4 — 게이트 여부는 payload 가 정한다. 씬 번호를 조건으로 쓰지 않는다:
+  // yml 이 다른 씬에 경고를 붙이면 그 씬도 자동으로 닫혀야 한다.
+  const warning = readTriggerWarning(payload);
+  const needsConsent = !!warning && !consented;
 
   return (
     <main className="min-h-screen flex flex-col p-4 sm:p-6">
@@ -113,104 +144,160 @@ export default function JosephPage() {
       {/* Scene 배경 이미지 */}
       <section
         className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-cover bg-center"
-        style={{ backgroundImage: `url(/images/scenes/${scene.currentScene}.jpg)` }}
+        style={{
+          backgroundImage: `url(/images/scenes/${scene.currentScene}.jpg)`,
+        }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
         <div className="relative h-full flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
-            {sceneType === "cinematic" && "파라오의 꿈을 해석한다. 7년 풍년과 7년 흉년이 다가온다."}
-            {sceneType === "pick_one" && scene.currentScene === 2 && "이집트 전체 곡식 중 얼마를 저장할 것인가?"}
-            {sceneType === "distribute" && "흉년 — 농민·이주민·상인 중 어느 줄에 곡식을 먼저 줄 것인가?"}
-            {sceneType === "pick_one" && scene.currentScene === 4 && "형제들이 곡식을 구하러 왔다. 어떻게 응대할 것인가?"}
-            {sceneType === "outro" && "여기까지 온 당신의 결정이 누군가의 양식이 된다."}
+            {sceneType === "cinematic" &&
+              "파라오의 꿈을 해석한다. 7년 풍년과 7년 흉년이 다가온다."}
+            {sceneType === "pick_one" &&
+              scene.currentScene === 2 &&
+              "이집트 전체 곡식 중 얼마를 저장할 것인가?"}
+            {sceneType === "distribute" &&
+              "흉년 — 농민·이주민·상인 중 어느 줄에 곡식을 먼저 줄 것인가?"}
+            {sceneType === "pick_one" &&
+              scene.currentScene === 4 &&
+              "형제들이 곡식을 구하러 왔다. 어떻게 응대할 것인가?"}
+            {sceneType === "outro" &&
+              "여기까지 온 당신의 결정이 누군가의 양식이 된다."}
           </p>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {sceneType === "cinematic" && (
+        {needsConsent && warning ? (
+          /* R4 동의 게이트. 동의 전에는 이 씬의 선택지를 렌더하지 않는다.
+             문구는 화면이 소유한다 — joseph.yml 에 consent_card_ko 가 없다.
+             내용은 그 씬의 forgiveness_note("정답 없음 / 즉시 용서 못 함은 결함 아님 /
+             현실의 학대·배신 상황에선 화해보다 안전이 우선")에 맞춘다. */
+          <TriggerWarningGate
+            warning={warning}
+            pending={decide.isPending}
+            continueLabel="준비됐어요 · 들어갈게요"
+            fallbackProse={
+              <p>
+                다음 장면은 <strong>가족의 배신과 재회</strong> 를 다룹니다.
+                형제들이 다시 앞에 섭니다. 비슷한 일을 겪었다면 지금이 버거울 수
+                있습니다 — <strong>건너뛰어도 괜찮습니다</strong>. 건너뛰어도
+                이야기는 온전히 이어집니다. 어느 선택도 정답이 아니고, 지금 바로
+                용서하지 못하는 마음은 믿음의 결함이 아닙니다.
+              </p>
+            }
+            onContinue={() => setConsented(true)}
+            onSkip={() =>
+              decide.mutate({
+                sceneId: scene.currentScene,
+                decision: { value: "skip" },
+              })
+            }
+          />
+        ) : (
           <>
-            {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}
-            {scene.currentScene === 1 && (
-              <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                  {scene1Dream}
+            {sceneType === "cinematic" && (
+              <>
+                {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}
+                {scene.currentScene === 1 && (
+                  <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
+                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                      {scene1Dream}
+                    </p>
+                    <div className="mt-3">
+                      <NarrationAudioButton
+                        text={scene1Dream}
+                        onUnavailable="hide"
+                      />
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setEcho(null); // cinematic → 다음 진입 시 echo 클리어
+                    decide.mutate({
+                      sceneId: scene.currentScene,
+                      decision: "next",
+                    });
+                  }}
+                  className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
+                  disabled={decide.isPending}
+                >
+                  {decide.isPending ? "..." : "계속 →"}
+                </button>
+              </>
+            )}
+
+            {sceneType === "pick_one" && Array.isArray(payload.options) && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {(payload.options as Array<{ id: string; label: string }>).map(
+                  (o) => (
+                    <button
+                      key={o.id}
+                      onClick={() =>
+                        decide.mutate({
+                          sceneId: scene.currentScene,
+                          decision: o.id,
+                        })
+                      }
+                      disabled={decide.isPending}
+                      className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                    >
+                      {o.label}
+                    </button>
+                  ),
+                )}
+              </div>
+            )}
+
+            {sceneType === "distribute" && Array.isArray(payload.queues) && (
+              <div className="space-y-2">
+                <p className="text-xs text-[var(--color-warm)]/60">
+                  한 줄에 모든 곡식을 우선 분배할 줄 선택
                 </p>
-                <div className="mt-3">
-                  <NarrationAudioButton text={scene1Dream} onUnavailable="hide" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(payload.queues as Array<{ id: string; label: string }>).map(
+                    (q) => (
+                      <button
+                        key={q.id}
+                        onClick={() =>
+                          decide.mutate({
+                            sceneId: scene.currentScene,
+                            decision: { priority: q.id },
+                          })
+                        }
+                        disabled={decide.isPending}
+                        className="px-4 py-5 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                      >
+                        {q.label}
+                      </button>
+                    ),
+                  )}
                 </div>
               </div>
             )}
-            <button
-              onClick={() => {
-                setEcho(null); // cinematic → 다음 진입 시 echo 클리어
-                decide.mutate({ sceneId: scene.currentScene, decision: "next" });
-              }}
-              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
-              disabled={decide.isPending}
-            >
-              {decide.isPending ? "..." : "계속 →"}
-            </button>
-          </>
-        )}
 
-        {sceneType === "pick_one" && Array.isArray(payload.options) && (
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {(payload.options as Array<{ id: string; label: string }>).map((o) => (
-              <button
-                key={o.id}
-                onClick={() => decide.mutate({ sceneId: scene.currentScene, decision: o.id })}
-                disabled={decide.isPending}
-                className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
-              >
-                {o.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        {sceneType === "distribute" && Array.isArray(payload.queues) && (
-          <div className="space-y-2">
-            <p className="text-xs text-[var(--color-warm)]/60">
-              한 줄에 모든 곡식을 우선 분배할 줄 선택
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(payload.queues as Array<{ id: string; label: string }>).map((q) => (
+            {sceneType === "outro" && (
+              <div className="text-center space-y-4">
+                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
+                  {outroText}
+                </p>
+                <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
+                  * AI 보조 — 본문은 성경 참조 *
+                </p>
                 <button
-                  key={q.id}
                   onClick={() =>
-                    decide.mutate({
-                      sceneId: scene.currentScene,
-                      decision: { priority: q.id },
-                    })
+                    completeJoseph(scene.sessionId, "completed").then(
+                      () => (location.href = "/"),
+                    )
                   }
-                  disabled={decide.isPending}
-                  className="px-4 py-5 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                  className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
                 >
-                  {q.label}
+                  미션 완료
                 </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {sceneType === "outro" && (
-          <div className="text-center space-y-4">
-            <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-              {outroText}
-            </p>
-            <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
-              * AI 보조 — 본문은 성경 참조 *
-            </p>
-            <button
-              onClick={() =>
-                completeJoseph(scene.sessionId, "completed").then(() => (location.href = "/"))
-              }
-              className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
-            >
-              미션 완료
-            </button>
-          </div>
+              </div>
+            )}
+          </>
         )}
 
         {decide.isError && (
@@ -223,7 +310,9 @@ export default function JosephPage() {
       {history.length > 0 && (
         <details className="max-w-3xl mx-auto w-full mt-6 text-xs text-[var(--color-warm)]/40">
           <summary>진행 기록</summary>
-          <pre className="overflow-x-auto">{JSON.stringify(history, null, 2)}</pre>
+          <pre className="overflow-x-auto">
+            {JSON.stringify(history, null, 2)}
+          </pre>
         </details>
       )}
     </main>
