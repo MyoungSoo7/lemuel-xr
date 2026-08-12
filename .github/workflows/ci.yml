@@ -285,10 +285,19 @@ jobs:
       # 덮인 쪽이 화면 아래라 눈으로는 멀쩡해 보인다. 손으로 돌리는 검사는 안 돌린
       # 검사와 같으므로 여기에 넣는다.
       #
-      # 두 스위트만 돈다. 둘 다 **백엔드 없이** 판정된다 — 로컬에서 백엔드를 내린 채
-      # 60/60 초록을 확인했다(2026-08-12, 프로덕션 빌드). 그래서 서비스 컨테이너가 없다.
-      #   · mobile-hybrid — 푸터가 본문을 덮는가 / PWA manifest·아이콘이 실제로 200 인가
-      #   · tap-targets  — 터치 타깃이 44px 이상인가 (WCAG 2.5.5 / Apple HIG)
+      # 세 스위트가 돈다. 전부 **백엔드 없이** 판정된다 — 그래서 서비스 컨테이너가 없다.
+      #   · mobile-hybrid    — 푸터가 본문을 덮는가 / PWA manifest·아이콘이 실제로 200 인가
+      #   · tap-targets      — 터치 타깃이 44px 이상인가 (WCAG 2.5.5 / Apple HIG)
+      #   · tap-targets-data — 같은 검사를, **응답을 가로채 채워 넣은 상태**에서
+      #
+      # 세 번째가 왜 생겼는가. `tap-targets` 만 있을 때 이 잡은 **잴 것이 없어서** 초록이었다.
+      # 이 앱의 누르는 것 상당수는 백엔드가 응답해야 그려진다(`/topics/journal` 의 감정 칩은
+      # `catalog?.catalog ?? []`). 백엔드가 없으면 버튼이 0 개고, 0 개면 「44px 미만이 없다」가
+      # 참이라 검사는 통과한다. 백엔드를 띄우고 같은 검사를 돌리자 그 자리에서 12 개가
+      # 빨개졌다(2026-08-12). 초록이 초록의 이유를 보증하지 않는 경우다.
+      # `tap-targets-data` 는 픽스처가 화면에 닿았는지 먼저 확인하고(안 닿으면 거기서 실패)
+      # 분모까지 함께 본다. 스펙 파일을 이름으로 명시하는 이유는 `tap-targets` 라는 인자가
+      # 부분일치라 의도치 않은 파일까지 끌어오기 때문이다.
       #
       # ⚠️ 이 초록이 **덮지 않는 것** (조용히 빠진 게 아니라 알고 뺀 것):
       #   · 엔진은 넷 다 Chromium 이다. Safari(WebKit) 는 한 번도 안 돌렸다 —
@@ -301,7 +310,13 @@ jobs:
       #     env(safe-area-inset-*) 을 전부 0 으로 준다.
       #   · 성능(LCP·번들·프레임) 은 재지 않는다. 레이아웃만 잰다.
       #   · 미션 화면(요셉·다윗·엘리야·욥·예수·모세·솔로몬)의 씬 내부는 백엔드가 있어야
-      #     열리므로 여기서 한 번도 안 열린다.
+      #     열리므로 **여기서는 안 열린다.** 전용 게이트 `mission-tap-targets.spec.ts` 가
+      #     있지만 백엔드가 필요해 이 잡에 넣지 않았다. 2026-08-12 에 백엔드를 띄우고
+      #     처음 재서 세 군데를 고쳤는데(/elijah 상담번호 26×17, /moses 68×30,
+      #     /solomon 36×26), **그 세 군데는 CI 가 지켜 주지 않는다** — 백엔드를 띄운
+      #     곳에서 그 스펙을 돌려야 지켜진다.
+      #   · `tap-targets-data` 의 픽스처는 실제 응답을 받아 적은 사본이라 서버 계약이
+      #     바뀌면 같이 낡는다. 계약 검증이 아니라 「응답이 오면 무엇이 그려지는가」다.
       - name: Install Playwright browsers
         working-directory: frontend
         run: npx playwright install --with-deps chromium
@@ -329,7 +344,11 @@ jobs:
         working-directory: frontend
         env:
           BASE_URL: http://localhost:3000
-        run: npx playwright test mobile-hybrid tap-targets
+        run: |
+          npx playwright test \
+            tests/e2e/mobile-hybrid.spec.ts \
+            tests/e2e/tap-targets.spec.ts \
+            tests/e2e/tap-targets-data.spec.ts
 
       - name: Upload Playwright report
         if: failure()
