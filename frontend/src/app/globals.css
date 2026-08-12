@@ -6,10 +6,33 @@
   --color-warm: #f6f1e8;
 }
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
+html {
+  /* iOS 는 세로→가로 회전 시 본문 글씨를 제멋대로 키운다. 자막 길이로 줄바꿈을
+     맞춰 둔 화면에서 그 자동 확대는 레이아웃을 흐트러뜨린다. 사용자가 직접 하는
+     확대(핀치)는 그대로 열어 둔다 — 막는 것은 브라우저의 자동 보정뿐이다. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* 이 앱은 어두운 배경 하나로 간다. 알려주지 않으면 모바일 브라우저가 입력창·
+     스크롤바를 밝은 테마로 그려 배경과 충돌한다. */
+  color-scheme: dark;
+}
 body {
   background: var(--color-deep);
   color: var(--color-warm);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Pretendard", "Apple SD Gothic Neo", sans-serif;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Pretendard",
+    "Apple SD Gothic Neo",
+    sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 좌우 안전영역 — 가로 모드의 노치가 본문 첫 글자를 먹는다. 하단은 위기 푸터가
+     자기 몫으로 따로 처리한다(CrisisFooter.tsx). */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
