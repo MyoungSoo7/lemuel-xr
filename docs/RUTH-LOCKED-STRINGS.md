@@ -1,6 +1,6 @@
 # RUTH-LOCKED-STRINGS — 룻(Theme 19) 고정 문자열 정본
 
-> **이 파일이 정본이다.** `scripts/check_ruth_captions.py` 는 아래 데이터 블록을 *읽어서*
+> **이 파일이 정본이다.** `scripts/check_ruth_captions.py` 는 아래 데이터 블록을 _읽어서_
 > `content/ruth/*.yml` 과 대조한다. 검사기 안에는 이 값들의 사본이 없다.
 
 ## 왜 이 파일이 생겼나 (2026-08-06)
@@ -8,13 +8,13 @@
 `check_ruth_captions.py` 는 원래 이 값들을 자기 안에 하드코딩해 두고, 상류가 `SEED-RUTH.md`
 라고 적어 두었다. 그런데 **그 파일은 저장소에 존재한 적이 없다** — 작업 트리에도, git 전체
 이력에도 없다(`git log --all --diff-filter=A`). 즉 검사기가 자기 docstring 에서 경고하던
-*자기참조 검사* 가 실제 상태였다: 자막을 검사기와 콘텐츠 양쪽에서 같이 고치면 아무도 못 잡는다.
+_자기참조 검사_ 가 실제 상태였다: 자막을 검사기와 콘텐츠 양쪽에서 같이 고치면 아무도 못 잡는다.
 
 사용자 결정(2026-08-06)은 "상류 문서를 실제로 만들어" 였고, 이 파일이 그 상류다.
 
 **이 파일은 없던 내용을 지어내지 않았다.** 값은 전부 `check_ruth_captions.py` 의 상수에서
 기계적으로 덤프한 것이고, 그 상수들은 그 시점에 이미 `content/ruth/*.yml` 과 일치함이
-게이트 초록(검사 12 / FAIL 0)으로 확인돼 있었다. 한 일은 *내용을 만든 것* 이 아니라
+게이트 초록(검사 12 / FAIL 0)으로 확인돼 있었다. 한 일은 _내용을 만든 것_ 이 아니라
 **주인을 지정한 것** 이다. 사라진 `SEED-RUTH.md` 를 복원한 것도 아니다 — 이건 새 정본이다.
 
 ## 이 계약이 잡는 것과 못 잡는 것
@@ -23,8 +23,8 @@
   달라지면 검사기가 빨개진다.
 - **잡는다** — 검사기만 바뀐 경우. 이제 검사기에 문자열이 없으므로 애초에 바꿀 것이 없고,
   이 파일을 못 읽으면 검사기는 판정을 내지 않고 rc 126 으로 죽는다(초록으로 새지 않는다).
-- **못 잡는다** — 이 파일과 콘텐츠를 *같이* 고치는 경우. 그건 제3자가 없으면 원리적으로
-  불가능하다. 다만 그때는 정본 파일의 diff 가 남으므로 *검토 가능한 행위* 가 된다.
+- **못 잡는다** — 이 파일과 콘텐츠를 _같이_ 고치는 경우. 그건 제3자가 없으면 원리적으로
+  불가능하다. 다만 그때는 정본 파일의 diff 가 남으므로 _검토 가능한 행위_ 가 된다.
   이전 상태(검사기+콘텐츠 동시 수정)와의 차이가 정확히 이것이다.
 
 ## 값
@@ -34,8 +34,45 @@
 
 ```yaml
 closing_caption:
-  text_ko: 그의 날개 아래에 보호를 받으러 온 네게
+  # 2026-08-11 값 변경 — 주어를 되살린다. 앞 값은 2:12b 에서 주어까지 잘라낸
+  #   「그의 날개 아래에 보호를 받으러 온 네게」였다. 그 자름의 대가가 둘이었다:
+  #   ① 「그의」가 가리킬 말이 화면에 없다(선행사 부재).
+  #   ② 미션의 마지막 문장에서 유일하게 남은 행위자가 **사용자**였다.
+  #   b 전문은 주어가 「이스라엘의 하나님 여호와께서」다. 사용자 결정(2026-08-11).
+  # ⚠️ 이 값은 `content/ruth/scene3.yml` 의 2:12 자막과 **글자까지 같아졌다.**
+  #   앞 판이 「같지 않고 메아리 관계다」라고 적었던 그 계약은 이 변경으로 깨진다.
+  #   깨진 채로 두는 것이 결정이다 — 되돌리려면 주어를 다시 잘라야 하기 때문이다.
+  #   자름과 구별 중 자름을 버렸다. 집행하는 검사기는 없었다(산문 계약이었다).
+  text_ko: 이스라엘의 하나님 여호와께서 그의 날개 아래에 보호를 받으러 온 네게
   verse_ref: 룻 2:12 중
+# 2026-08-12 신설(사용자 결정) — 다윗 계보를 렌더한다. 사유: 이 계보가 예수의
+#   족보이므로 이야기의 목적에 해당한다. 앞 판은 이 절을 렌더하지 않는 선택을
+#   해 놓고 그 선택을 어느 문서에도 적지 않았다.
+#
+# 같은 날 두 번 바뀌었다. 첫 값은 4:17 후반 한 줄(「그는 다윗의 아버지인 이새의
+#   아버지였더라」)이었다. 「오벳」이 AC 33 금지 토큰이라 정식 계보를 피한 결과였는데,
+#   그 값은 「그는」의 선행사가 화면에 없었다 — 4:16·4:17 전반이 E16·E17 로 배제돼
+#   있기 때문이다. 앞 자막(4:12)이 유다·베레스를 부르므로 그쪽에 붙어 읽힐 수도
+#   있었다. 그 독해는 사실이 아니다. 사용자 결정(② · 2026-08-12)으로 정식 계보
+#   4:21-22 로 바꾼다. 4:21 을 함께 싣는 이유는 4:22 만으로는 오벳이 화면 어디에도
+#   정의되지 않아 **같은 결함이 이름만 바꿔 남기** 때문이다. 4:21 이 보아스에서
+#   시작해 이야기 안의 인물과 계보를 잇는다.
+#
+# ⚠️ 이 값은 AC 33(출생 미렌더)을 **한 지점 무르게 한다.** 무른 방식을 적어 둔다 —
+#   토큰 목록에서 「오벳」을 **빼지 않았다.** 뺐다면 어디서든 허용된다. 대신 이 정본
+#   자구와 **글자까지 같은 자막에서만** 그 토큰을 봐준다. 다른 자막·에셋 id 에
+#   「오벳」이 나오면 AC 33 은 그대로 빨개진다. 출산 장면·아기 에셋은 여전히 0이고
+#   `baby_asset_present`/`birth_scene_rendered` 도 false 그대로다.
+#   무른 것은 **이름 하나의 등장**이지 출생 렌더가 아니다.
+genealogy_captions:
+  - id: subtitle_ruth_4_21
+    scene_id: 5
+    text_ko: 살몬은 보아스를 낳았고 보아스는 오벳을 낳았고
+    verse_ref: 룻 4:21
+  - id: subtitle_ruth_4_22
+    scene_id: 5
+    text_ko: 오벳은 이새를 낳고 이새는 다윗을 낳았더라
+    verse_ref: 룻 4:22
 closing_lines:
   stay_beside: 곁에 남은 자리에도 그늘이 닿았다.
   step_back: 한 걸음 물러선 자리에도 그늘이 닿았다.
@@ -51,15 +88,26 @@ disclaimer:
 ruth_2_11:
   short_text_ko: 네가 시어머니에게 행한 모든 것과 네 부모와 고국을 떠나 전에 알지 못하던 백성에게로 온 일이 내게 분명히 알려졌느니라
   forbidden_fragment: 네 남편이 죽은 후로
+# 2026-08-11 값 변경 — `suppress_all_narrative_captions` → 아래 값.
+#   부정형(「서사 자막이라는 *분류* 를 끈다」)은 분류가 하나라도 새로 생기면 조용히
+#   샌다. 실제로 이 리포의 화자 표기는 20종이 넘고(`scripture_caption` 57건 ·
+#   `narrator` 35건 · `system` 24건 …), 그중 `narrative` 라는 값은 **한 건도 없다** —
+#   즉 부정형 문자열은 자기가 끄겠다고 적은 분류를 리포에서 가리키지도 못했다.
+#   긍정형(「자막류는 전부 끄고 위기 카드만 남긴다」)은 분류가 늘어도 기본이 「끔」이다.
+#   ⚠️ 주장 범위는 **자막류**까지다. `disclaimer`(`style: small_persistent`)가
+#   `pause_fade_black` 이후에도 떠 있는지는 어디에도 적혀 있지 않다 — 미해소.
+#   ⚠️ 그리고 이 세 키를 읽는 런타임 코드는 지금 **0건**이다(`.kt`·`.tsx` 전수 0).
+#   문자열을 고쳐도 화면 동작은 달라지지 않는다. 바뀐 것은 계약 문언이고,
+#   집행하는 것은 AC 23(정본 ↔ 5개 Scene 값 대조)까지다.
 crisis_latch:
-  post_crisis_render_policy: suppress_all_narrative_captions
+  post_crisis_render_policy: suppress_all_captions_except_crisis_card
   post_crisis_latch_scope: mission
   crisis_card_position: terminal_screen
 consent_cards:
   ruth_entry_consent:
     covers:
-    - 1
-    - 2
+      - 1
+      - 2
     declined_route: 3
     text_ko: |-
       이 이야기에는 사별한 사람들이 나옵니다.
@@ -75,8 +123,8 @@ consent_cards:
       지금 힘드시면: {{crisis_resources.default}}
   ruth_midpoint_consent:
     covers:
-    - 3
-    - 5
+      - 3
+      - 5
     declined_route: closing
     text_ko: |-
       여기서부터는 낯선 땅에서의 일입니다.
@@ -90,7 +138,7 @@ consent_cards:
       지금 힘드시면: {{crisis_resources.default}}
   ruth_scene4_night_warning:
     covers:
-    - 4
+      - 4
     declined_route: 5
     text_ko: |-
       다음 장면은 밤의 타작 마당입니다.
@@ -103,27 +151,29 @@ consent_cards:
       음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
       지금 힘드시면: {{crisis_resources.default}}
 skip_destinations:
-  '1': 3
-  '2': 3
-  '3': 4
-  '4': 5
-  '5': ruth_scene5_alt_short
+  "1": 3
+  "2": 3
+  "3": 4
+  "4": 5
+  "5": ruth_scene5_alt_short
 f66_entry_gate:
   id: F66_entry_state_gate
   trigger_conditions:
-  - source: safety_alerts
-    rule: severity='high' 이력 존재 (user_id 기준, category 무관)
-  - source: emotion_logs
-    rule: 최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)
+    - source: safety_alerts
+      rule: severity='high' 이력 존재 (user_id 기준, category 무관)
+    - source: emotion_logs
+      rule: 최근 3일 연속 감정강도 9+ (F-6.2 임계값 공유)
   on_trigger:
     closing_line_force: null_variant
     voice_intensity_preset: subtitle_only
     scene4_skip_preoffered: true
     skip_button_visual_emphasis: true
 exclusions:
-  total: 20
+  # 2026-08-11 +2 (DP7) — 룻 4:16·4:17 을 verse_text 로 등재. 앞 판은 4:13-17 이
+  #   렌더 층위에 한 조각도 없는데 선언은 4:13·4:14·4:15 까지만 있었다.
+  total: 22
   by_scope:
-    verse_text: 16
+    verse_text: 18
     content_leaf: 4
 ```
 

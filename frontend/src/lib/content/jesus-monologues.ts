@@ -40,7 +40,7 @@
  * 정신건강 안전선 (lemuel-mental-health-safety) — §4.3 확정과 R1~R5 는 양립한다.
  * 형벌 대속·특수구속 확정이 *고난 미화(R2)* 나 *회복 강요(R3)* 의 근거가 되어선 안 된다.
  *
- *  - R1 (위기): outro 는 위기 안내(109·1577-0199)를 상시 프레임과 함께 두고,
+ *  - R1 (위기): outro 는 위기 안내(@/lib/crisis-resources)를 상시 프레임과 함께 두고,
  *    소망을 *지금의 회복 속도와 분리* 해 제시. 십자가·부활을 "이겨내야 할 과제" 로 던지지 않음.
  *  - R2 (고난 가스라이팅) 금지: 겟세마네의 흔들림을 *믿음의 결함이 아님* 으로 명시.
  *    "고난이 좋은 것 / 견디면 강해진다" 톤 배제. 고통의 의미를 사용자에게 강요하지 않음.
@@ -51,6 +51,8 @@
  *    동의 카드 + 건너뛰기(→ Scene 6) 게이트로 감싼다 (david Scene 5 패턴).
  *  - R5 (AI opt-out): 모든 echo/outro 에 "AI 보조 — 본문은 성경 참조" footer.
  */
+
+import { CRISIS_RESOURCES } from "@/lib/crisis-resources";
 
 /**
  * Scene 1 — 성육신(요 1:14). jesus.yml Scene 1 static_monologue 를 프론트로 배선.
@@ -197,7 +199,7 @@ export const scene7Recovery: Record<RecoveryKey, string> = {
  */
 export const scene7CrisisReminder =
   "지금 많이 힘들다면, 혼자 견디지 않아도 됩니다. " +
-  "자살예방상담 109 · 정신건강상담 1577-0199 (24시간). " +
+  `자살예방상담 ${CRISIS_RESOURCES[0].tel} · 정신건강상담 ${CRISIS_RESOURCES[1].tel} (24시간). ` +
   "다음 걸음으로 트랙 A 시편 22편(버림받음의 부르짖음) 이나 오늘의 일기 한 줄도 좋습니다.";
 
 /**

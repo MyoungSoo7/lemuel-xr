@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { CRISIS_LINE_FULL, CRISIS_LINE_SHORT } from "@/lib/crisis-resources";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   fetchJournalGuidance,
@@ -128,7 +129,7 @@ export default function JournalGuidancePage() {
             <p className="text-xs text-[var(--color-warm)]/70 mt-1 leading-relaxed">
               지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
             </p>
-            <p className="text-xs text-red-300 mt-2 font-mono">109 · 1577-0199 (24시간)</p>
+            <p className="text-xs text-red-300 mt-2 font-mono">{CRISIS_LINE_SHORT}</p>
             <Link
               href="/topics/journal"
               className="inline-block mt-2 text-xs text-[var(--color-primary)] hover:underline"
@@ -145,7 +146,7 @@ export default function JournalGuidancePage() {
 
         {/* 하단 영구 위기 자원 + AI footer */}
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
-          위기 시: 109 (자살예방 상담전화) · 1577-0199 (정신건강위기상담) · 24시간
+          {CRISIS_LINE_FULL}
           <br />
           {catalog?.aiFooter ??
             "AI 보조 — 본문은 성경 참조. 성경 외 자료는 조언 근거로 쓰지 않습니다."}

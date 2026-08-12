@@ -1,0 +1,304 @@
+{
+  "note": "게이트 판정의 **현재 상태 기록**이다. 초록 목표치가 아니다. 이 값과 달라지면 CI 가 멈춘다 — 나아졌을 때도 멈춘다(기록을 강제하기 위해).",
+  "rc_convention": "0=PASS · 1=FAIL · 2=BLOCKED(판정 불가) · 126+=실행 실패",
+  "runners": {
+    "gates:abraham": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:daniel": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:david": {
+      "rc": 1,
+      "tally": [
+        3,
+        1,
+        24
+      ],
+      "items": [
+        "G0a:BLOCKED",
+        "G0b:BLOCKED",
+        "G0c:BLOCKED",
+        "G0d:BLOCKED",
+        "G0e:BLOCKED",
+        "G10:BLOCKED",
+        "G1b:BLOCKED",
+        "G2:BLOCKED",
+        "G2v:BLOCKED",
+        "G3:FAIL",
+        "G3b:BLOCKED",
+        "G3c:BLOCKED",
+        "G3d:BLOCKED",
+        "G5a-i:BLOCKED",
+        "G5a-ii:BLOCKED",
+        "G5b:BLOCKED",
+        "G5c:BLOCKED",
+        "G5d:BLOCKED",
+        "G5e:BLOCKED",
+        "G6:BLOCKED",
+        "G6d:BLOCKED",
+        "G7:BLOCKED",
+        "G8:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:elijah": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:esther": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:jacob": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:joseph": {
+      "rc": 1,
+      "tally": [
+        3,
+        1,
+        24
+      ],
+      "items": [
+        "G0a:BLOCKED",
+        "G0b:BLOCKED",
+        "G0c:BLOCKED",
+        "G0d:BLOCKED",
+        "G0e:BLOCKED",
+        "G10:BLOCKED",
+        "G1b:BLOCKED",
+        "G2:BLOCKED",
+        "G2v:BLOCKED",
+        "G3:FAIL",
+        "G3b:BLOCKED",
+        "G3c:BLOCKED",
+        "G3d:BLOCKED",
+        "G5a-i:BLOCKED",
+        "G5a-ii:BLOCKED",
+        "G5b:BLOCKED",
+        "G5c:BLOCKED",
+        "G5d:BLOCKED",
+        "G5e:BLOCKED",
+        "G6:BLOCKED",
+        "G6d:BLOCKED",
+        "G7:BLOCKED",
+        "G8:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:moses": {
+      "rc": 1,
+      "tally": [
+        3,
+        1,
+        24
+      ],
+      "items": [
+        "G0a:BLOCKED",
+        "G0b:BLOCKED",
+        "G0c:BLOCKED",
+        "G0d:BLOCKED",
+        "G0e:BLOCKED",
+        "G10:BLOCKED",
+        "G1b:BLOCKED",
+        "G2:BLOCKED",
+        "G2v:BLOCKED",
+        "G3:FAIL",
+        "G3b:BLOCKED",
+        "G3c:BLOCKED",
+        "G3d:BLOCKED",
+        "G5a-i:BLOCKED",
+        "G5a-ii:BLOCKED",
+        "G5b:BLOCKED",
+        "G5c:BLOCKED",
+        "G5d:BLOCKED",
+        "G5e:BLOCKED",
+        "G6:BLOCKED",
+        "G6d:BLOCKED",
+        "G7:BLOCKED",
+        "G8:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "gates:peter": {
+      "rc": 1,
+      "tally": [
+        26,
+        1,
+        1
+      ],
+      "items": [
+        "G0e:FAIL",
+        "G2v:BLOCKED"
+      ]
+    },
+    "gates:rahab": {
+      "rc": 1,
+      "tally": [
+        10,
+        0,
+        18
+      ],
+      "items": [
+        "G0a:BLOCKED",
+        "G11:BLOCKED",
+        "G1b:BLOCKED",
+        "G2:BLOCKED",
+        "G2v:BLOCKED",
+        "G3:BLOCKED",
+        "G3b:BLOCKED",
+        "G3c:BLOCKED",
+        "G3d:BLOCKED",
+        "G4:BLOCKED",
+        "G5a-i:BLOCKED",
+        "G5a-ii:BLOCKED",
+        "G5d:BLOCKED",
+        "G5e:BLOCKED",
+        "G6:BLOCKED",
+        "G7:BLOCKED",
+        "G8:BLOCKED",
+        "G9:BLOCKED"
+      ]
+    },
+    "gates:ruth": {
+      "rc": 1,
+      "tally": [
+        27,
+        1,
+        0
+      ],
+      "items": [
+        "G0e:FAIL"
+      ]
+    },
+    "gates:solomon": {
+      "rc": 1,
+      "tally": [
+        23,
+        0,
+        5
+      ],
+      "items": [
+        "G0b:BLOCKED",
+        "G0e:BLOCKED",
+        "G2v:BLOCKED",
+        "G9:BLOCKED",
+        "G9d:BLOCKED"
+      ]
+    },
+    "ac-table:rahab": {
+      "rc": 1,
+      "tally": [
+        34,
+        1,
+        7
+      ],
+      "items": [
+        "t-mut:BLOCKED",
+        "t-thresh:FAIL",
+        "t-tools:BLOCKED",
+        "t-tools:BLOCKED",
+        "t-tools:BLOCKED",
+        "t-tools:BLOCKED",
+        "t-tools:BLOCKED",
+        "t-tools:BLOCKED"
+      ]
+    },
+    "track-b:readiness": {
+      "rc": 1,
+      "tally": [
+        12,
+        2,
+        0
+      ],
+      "items": [
+        "jesus:FAIL",
+        "job:FAIL"
+      ]
+    },
+    "captions:ruth": {
+      "rc": 0,
+      "tally": [
+        14,
+        0,
+        0
+      ],
+      "items": []
+    },
+    "captions:rahab": {
+      "rc": 2,
+      "tally": [
+        21,
+        0,
+        3
+      ],
+      "items": [
+        "a-yml:BLOCKED",
+        "f-yml:BLOCKED",
+        "n-yml:BLOCKED"
+      ]
+    }
+  }
+}

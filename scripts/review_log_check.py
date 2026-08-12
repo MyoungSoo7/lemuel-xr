@@ -41,6 +41,7 @@ import quote_sweep as qs  # noqa: E402  — 1군 정의는 저 파일 하나뿐�
 ROOT = qs.ROOT
 LOG = "docs/RAHAB-REVIEW-LOG.md"
 SEED = "docs/SEED-RAHAB.md"
+LOCKED = "docs/RAHAB-LOCKED-STRINGS.md"
 
 GRADES = {"A", "B", "C"}
 # 로그 행: | 01 | A | `조각` | 근거… | 판정… |
@@ -74,25 +75,37 @@ def fields(cell: str) -> dict[str, str]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="1군 전건 사람 판정 기록 확인 (AC-2b)")
-    ap.add_argument("--seed", default=SEED)
+    # 🚨 대상은 **여럿**이다. rev.12 가 잠긴 비성경 문자열을 `RAHAB-LOCKED-STRINGS.md`
+    # 로 옮기면서 1군이 두 문서로 갈라졌다. 한쪽만 재면 다른 쪽 1군은 **판정 없이도
+    # 초록**이 되고, 그것이 이 판정기가 막으라고 만들어진 바로 그 구멍이다.
+    ap.add_argument("--seed", nargs="+", default=[SEED, LOCKED])
     ap.add_argument("--log", default=LOG)
     a = ap.parse_args()
 
-    seed_p, log_p = ROOT / a.seed, ROOT / a.log
-    if not seed_p.exists():
-        sys.stderr.write(f"seed 없음: {seed_p}\n")
-        return 2
+    targets = [ROOT / s for s in a.seed]
+    log_p = ROOT / a.log
+    for p in targets:
+        if not p.exists():
+            sys.stderr.write(f"seed 없음: {p}\n")
+            return 2
     if not log_p.exists():
         sys.stderr.write(f"리뷰 로그가 없다: {log_p} — 판정 불가\n")
         return 2
 
-    r = qs.collect(seed_p)
-    canon, verses = r["canon"], r["verses"]
     # 1군 조각. 같은 조각이 여러 줄에 있으면 줄 목록을 모은다 —
     # 판정은 **조각 단위**다. 줄 번호로 키를 잡으면 문서를 한 줄만 밀어도 전부 미아가 된다.
-    tier_a: dict[str, list[int]] = {}
-    for lineno, frag, _note in r["tier_a"]:
-        tier_a.setdefault(frag, []).append(lineno)
+    # 문서가 여럿이므로 줄 표시에 파일 이름을 붙인다. 같은 조각이 두 문서에 있으면
+    # 판정은 한 건이면 족하다 — **조각 단위**라는 규칙이 문서 경계를 넘어서도 같다.
+    tier_a: dict[str, list[str]] = {}
+    n_occ = 0
+    canon = verses = None
+    for p in targets:
+        r = qs.collect(p)
+        if canon is None:
+            canon, verses = r["canon"], r["verses"]
+        n_occ += len(r["tier_a"])
+        for lineno, frag, _note in r["tier_a"]:
+            tier_a.setdefault(frag, []).append(f"{p.name}:{lineno}")
 
     rows, dup = {}, []
     for line in log_p.read_text(encoding="utf-8").splitlines():
@@ -115,7 +128,7 @@ def main() -> int:
     missing = [f for f in tier_a if f not in rows]
     stale = [f for f in rows if f not in tier_a]
     for f in missing:
-        problems.append(f"판정 없음 — SEED:{tier_a[f]} {f[:70]}")
+        problems.append(f"판정 없음 — {' '.join(tier_a[f])} {f[:70]}")
     for f in stale:
         problems.append(f"잔재 행 — 이번 1군에 없는 조각을 판정하고 있다: {f[:70]}")
 
@@ -169,7 +182,6 @@ def main() -> int:
         if not e["verdict"] or e["verdict"] in {"-", "—"}:
             problems.append(f"[{g}] 판정 사유가 비어 있다: {frag[:60]}")
 
-    n_occ = len(r["tier_a"])
     n1, nlog = len(tier_a), len(rows) - len(stale)
     # 출현 수와 고유 조각 수를 **둘 다** 찍는다. 같은 조각이 두 줄에 있으면
     # `quote_sweep` 은 2 로 세고 판정은 1 건이면 족하다 — 한쪽만 찍으면

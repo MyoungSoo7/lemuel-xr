@@ -47,7 +47,8 @@
 ## 안전 제약축 (R1~R5 요약)
 
 - **R1** — 음성 자해 감지 리스너 `R1_voice_self_harm_listener` 5/5 Scene 상시(발화 원문 미저장). 발동 시 latch 는 **미션 범위**이며, latch 이후에는 서사 자막이 전부 억제되고 종결 자막도 렌더되지 않는다. 묵상 제안(opt-in)도 제시하지 않는다.
-  - ⚠️ **부채** — 사별 특이형 동반사망 표현이 `docs/EMOTION-CLASSIFIER.md` 3단 사전 어디에도 없다. 룻은 사별 사용자를 정면으로 겨냥하는 첫 미션이다. `scripts/gates/ruth.yml` 의 `release_blockers` 에 `resolved: false` 로 등재했다 — **게이트 초록과 무관하게 출시를 막는 항목**이다.
+  - ~~⚠️ **부채** — 사별 특이형 동반사망 표현이 `docs/EMOTION-CLASSIFIER.md` 3단 사전 어디에도 없다.~~ **2026-08-06 해소** — 4종이 `docs/EMOTION-CLASSIFIER.md` §3 사전과 `application.yml` 런타임 regex 양쪽에 들어갔고, 둘이 어긋나면 `CrisisKeywordDocContractTest` 가 양방향으로 깨진다. `scripts/gates/ruth.yml` 의 `release_blockers` 는 `resolved: true` · `resolved_at: 2026-08-06` 이다. (이 줄은 2026-08-11 까지 `resolved: false` · 「출시를 막는 항목」이라고 적혀 있었다 — **닷새간 낡은 상태였다.**)
+    - ⚠️ **다만 완전 해소는 아니다.** `마지막으로 정리` 는 일상어 오탐이 너무 흔해 **의도적으로 재현율을 포기했다** — 그 표현만 쓰는 사용자는 medium 에 걸리지 않는다. 실패 방향이 오탐에서 미탐으로 바뀐 것이지 없어진 것이 아니다(`scripts/gates/ruth.yml` `release_blockers[0].caveat`).
 - **R2** — 고난을 신의 징벌·연단으로 귀속하는 문장 0건. Scene 2 는 나오미의 탄식을 **서사 내에서 반박하지도 교정하지도 않고**, 대신 화자 표기를 상시 노출해 사용자 자신의 문장으로 읽히지 않게 한다(SR-8). 비서사 안전층(면책 오버레이)은 예외이며 필수다.
 - **R3** — 회복 압박 금지. 마감 세 줄에는 `faith_tone` 3단을 적용하지 않는다 — 3줄이 그대로 있는 채 9줄로 불어나는 것이 정확히 이 미션이 피하는 형태다. 인터랙션 어디에도 점수·판정·타이머가 없고, 미선택은 실패가 아니라 `null` 이다.
 - **R4** — 동의 카드 **3장** 2단 구조. 카드1(진입, 사별) → 카드2(중간, 이방·빈곤) → 카드3(Scene 4 직전 재확인). 스킵 목적지는 `consent_card_id` → `skip_alternative_scene_id` → (문자열이면) `conditional_blocks[].id` 의 **쌍**으로 계약한다.

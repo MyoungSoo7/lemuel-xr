@@ -1,0 +1,14 @@
+backend/src/main/resources/scenarios/elijah.yml:R3
+backend/src/main/resources/scenarios/jesus.yml:R2
+backend/src/main/resources/scenarios/job.yml:R2
+backend/src/main/resources/scenarios/joseph.yml:R2
+backend/src/main/resources/scenarios/moses.yml:R2
+backend/src/main/resources/scenarios/solomon.yml:R2
+backend/src/main/resources/scenarios/solomon.yml:R3
+content/esther/scene1.yml:R2
+content/esther/scene1.yml:R3
+content/esther/scene2.yml:R2
+content/esther/scene2.yml:R3
+content/esther/scene4.yml:R2
+content/esther/scene4.yml:R3
+content/esther/scene5.yml:R2

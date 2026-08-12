@@ -28,6 +28,7 @@ rc 규약(`scripts/gates/tests/run.sh` 와 동일): 0=PASS · 1=FAIL · ≥126 �
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import sys
@@ -131,6 +132,19 @@ SKIP_DESTINATIONS = {int(k): v for k, v in CANON["skip_destinations"].items()}
 F66_ID = CANON["f66_entry_gate"]["id"]
 F66_CONDITIONS = CANON["f66_entry_gate"]["trigger_conditions"]
 F66_ON_TRIGGER = CANON["f66_entry_gate"]["on_trigger"]
+
+# AC 34 — 계보 자막 (2026-08-12 신설). 4:21-22 두 줄이다.
+GENEALOGY_CAPTIONS = [dict(c) for c in CANON["genealogy_captions"]]
+GENEALOGY_TEXTS = {str(c["text_ko"]).rstrip("\n") for c in GENEALOGY_CAPTIONS}
+
+# AC 33 의 금지 토큰 중, **계보 자막에서만** 예외인 것.
+#
+# ⚠️ 목록에서 빼지 않는 이유. 빼면 어디서든 허용된다 — 에셋 id 에도, 다른 Scene 의
+#    자막에도. 사용자 결정(② · 2026-08-12)이 무른 것은 「정식 계보에 이름이 불리는
+#    것」이지 「출생을 렌더해도 된다」가 아니다. 그래서 예외의 사정권을 정본 자구와
+#    **글자까지 같은 자막 한 종류**로 묶는다. 그 자구는 AC 34 가 성경 4:21·4:22 와
+#    완전일치로 잠근다 — 즉 예외를 넓히려면 정본을 고쳐야 하고, 그러면 diff 가 남는다.
+GENEALOGY_EXEMPT_TOKENS = ("오벳",)
 
 # AC 31 — 배제 선언 항목 수와 scope 구성
 EXCLUSION_TOTAL = CANON["exclusions"]["total"]
@@ -530,6 +544,211 @@ def check_caption_fidelity() -> list[str]:
     return bad
 
 
+# ── AC 33 — 오벳 출생 미렌더 ──────────────────────────────────────────────
+#
+# 이 미션에서 안전상 가장 무겁게 걸린 배제인데 **집행이 없었다.**
+#
+# 등재는 돼 있다 — 절 본문은 `docs/MVP-RUTH.md` §4-2 E7(4:13)·E8(4:14) 로 마커까지
+# 붙어 있고, 렌더 자체는 §14「채택하지 않은 설계」에 기각 사유와 함께 적혀 있다.
+# 그런데 §14 는 산문 기록표라 마커가 없어 세어지지 않고, 저작 파일이 선언한
+# `baby_asset_present` / `birth_scene_rendered` 두 키를 **읽는 코드가 리포 전체에
+# 0건**이었다(2026-08-11 실측). 이 파일이 다른 곳에 적어 둔 문장이 그대로 적용된다:
+# 재는 쪽이 없으면 복원해도 모든 검사가 초록이다.
+#
+# ⚠️ 이 검사만 이 파일의 기존 스코프(`content/ruth` 저작 파일)를 **넘는다** — 런타임
+#    `backend/src/main/resources/scenarios/ruth.yml` 까지 본다. 저작과 런타임은 자동
+#    동기화되지 않고, 사용자에게 실제로 나가는 것은 런타임 파일이기 때문이다.
+#    저작만 재면 런타임에서 되살아나도 초록이다.
+#
+# 재는 것 / 재지 않는 것:
+#   · 잰다 — 두 키의 **값**(존재가 아니라 `False`), 저작 5파일 + 런타임 1파일의
+#     에셋 id 와 자막 자구에 출생 어휘가 없는가.
+#   · 재지 않는다 — 실제 3D 에셋 번들의 내용물. yml 이 참조하지 않는 에셋이
+#     빌드에 들어가는 경로는 이 검사의 사정권 밖이다.
+
+RUNTIME_SCENARIO = os.path.join(
+    REPO, "backend", "src", "main", "resources", "scenarios", "ruth.yml"
+)
+
+# 선언 2키 — 값까지 계약이다.
+OBED_DECL = {"baby_asset_present": False, "birth_scene_rendered": False}
+
+# 출생 어휘. `아이`·`태어나` 는 **넣지 않는다** — 진입 동의 카드가 "한 아이가
+# 태어나지만 그 장면은 화면에 나오지 않습니다" 로 미렌더를 *고지*하는 데 쓰고 있고,
+# 그 문장은 배제를 지키는 문장이지 어기는 문장이다. 고지를 위반으로 세면 게이트가
+# 시키는 수리가 "고지를 지우는 것"이 된다.
+#
+# 2026-08-12 — 「오벳」에 예외가 하나 생겼다(사용자 결정 ②). 목록에서 **빼지 않았다** —
+# 위 GENEALOGY_EXEMPT_TOKENS 를 볼 것. 예외의 사정권은 정본 계보 자구와 글자까지 같은
+# 자막뿐이고, 에셋 id 와 다른 자막에서는 그대로 금지다. 그 자구는 AC 34 가 성경
+# 4:21·4:22 와 완전일치로 잠근다 — 예외를 넓히려면 정본을 고쳐야 하고 diff 가 남는다.
+OBED_TOKENS = ("오벳", "아기", "젖먹이", "신생아", "출산", "해산", "포대기",
+               "baby", "infant", "newborn", "cradle")
+
+
+def _obed_scan(label: str, doc, bad: list[str]) -> None:
+    """에셋 id 와 자막 자구에서 출생 어휘를 찾는다."""
+    for key in ("assets_shared", "assets_dedicated"):
+        for group in collect_key(doc, key):
+            for a in group or []:
+                low = str(a).lower()
+                for t in OBED_TOKENS:
+                    if t.lower() in low:
+                        bad.append(f"AC 33: {label} 에셋 id {a!r} 에 출생 어휘 {t!r}")
+    for c in captions_of(doc):
+        text = norm(c.get("text_ko") or "")
+        # 계보 자막(정본과 **글자까지 같은** 것)에서만 GENEALOGY_EXEMPT_TOKENS 를 봐준다.
+        # 나머지 토큰은 계보 자막에서도 그대로 금지다 — 예외는 이름 하나지 자막 전체가
+        # 아니다. `아기`·`출산` 이 계보 줄에 섞여 들어오면 여전히 빨개진다.
+        skip = GENEALOGY_EXEMPT_TOKENS if text in GENEALOGY_TEXTS else ()
+        for t in OBED_TOKENS:
+            if t in skip:
+                continue
+            if t.lower() in text.lower():
+                bad.append(
+                    f"AC 33: {label} 자막 {c.get('id')!r} 에 출생 어휘 {t!r} — {text[:40]!r}"
+                )
+
+
+def check_obed() -> list[str]:
+    bad: list[str] = []
+
+    # ① 선언 2키의 값 — 저작(scene5) 과 런타임 양쪽.
+    targets = [("scene5.yml", load(SCENES[4]))]
+    if not os.path.exists(RUNTIME_SCENARIO):
+        bad.append(f"AC 33: 런타임 파일 부재 — {os.path.relpath(RUNTIME_SCENARIO, REPO)}")
+    else:
+        targets.append(("scenarios/ruth.yml", load(RUNTIME_SCENARIO)))
+
+    for label, doc in targets:
+        for key, want in OBED_DECL.items():
+            got = collect_key(doc, key)
+            if not got:
+                bad.append(f"AC 33: {label} 에 `{key}` 선언이 없다")
+            elif any(v is not want for v in got):
+                bad.append(f"AC 33: {label} `{key}` = {got!r} != {want!r}")
+
+    # ② 5개 저작 Scene + 런타임 — 에셋 id·자막에 출생 어휘 0건.
+    for i, path in enumerate(SCENES, start=1):
+        _obed_scan(f"Scene {i}", load(path), bad)
+    for label, doc in targets[1:]:
+        _obed_scan(label, doc, bad)
+
+    return bad
+
+
+# ── AC 34 — 계보 자막 존재·자구 ───────────────────────────────────────────
+#
+# 왜 AC 14 로 부족한가: AC 14 는 **있는** 자막의 자구만 잰다. 자막을 지우면 아무도
+# 못 잡는다. 이 리포가 §4-2 에서 스스로 적은 함정과 같은 모양이다 — 재는 쪽이
+# 없으면 되돌려도 모든 검사가 초록이다. 그래서 존재를 따로 잰다.
+#
+# 재는 것 / 재지 않는 것:
+#   · 잰다 — 저작(`content/ruth/scene5.yml`) + 런타임(`scenarios/ruth.yml`) 양쪽의
+#     존재와 자구, 그리고 정본 자구가 `VERSES-RUTH-GAE.md` 의 해당 절과 **완전일치**
+#     하는가. 두 줄 다 `중` 표기가 아니라 절 전문이므로 부분문자열이 아니라 등호다.
+#     이 항이 제3자 대조다 — 정본 파일만 고쳐 성경에서 멀어지는 경로를 막는다.
+#     동시에 AC 33 예외의 사정권도 이 등호가 잠근다(예외는 정본 자구와 같은 자막뿐).
+#   · 잰다 — 두 줄이 **함께** 있는가. 4:22 만 남기면 오벳이 화면 어디에도 정의되지
+#     않아 첫 판(4:17 후반)이 가졌던 선행사 결함이 이름만 바꿔 되살아난다. 그래서
+#     정본이 두 줄이고, 한 줄이라도 없으면 빨개진다.
+#   · 재지 않는다 — 화면에서의 **순서**. 이 자막들이 SR-1 앞에 와야 한다는 것은
+#     헌장 §3-c 의 요구(마지막은 신의 행위)인데, 순서를 집행하는 코드는 없다.
+#     여기서 만들지 않은 이유는 저작 yml 의 재생 순서 표현이 파일마다 다르고
+#     그걸 이 검사기가 해석하기 시작하면 계약이 두 곳으로 갈라지기 때문이다.
+#     **미해소로 남긴다** — 초록이 순서까지 보증한다고 읽지 말 것.
+
+
+def check_genealogy() -> list[str]:
+    bad: list[str] = []
+    gae = gae_verses()
+    authored = captions_of(load(SCENES[4]))
+    runtime_exists = os.path.exists(RUNTIME_SCENARIO)
+    if not runtime_exists:
+        bad.append(f"AC 34: 런타임 파일 부재 — {os.path.relpath(RUNTIME_SCENARIO, REPO)}")
+        rcaps: list[dict] = []
+    else:
+        rcaps = captions_of(load(RUNTIME_SCENARIO))
+
+    for want in GENEALOGY_CAPTIONS:
+        cid = str(want["id"])
+        want_text = norm(want["text_ko"])
+        want_ref = str(want["verse_ref"]).strip()
+        m = re.search(r"(\d+:\d+)", want_ref)
+        vno = m.group(1) if m else None
+
+        # ① 정본 ↔ 성경. 절 전문이므로 완전일치다.
+        src = gae.get(vno) if vno else None
+        if src is None:
+            bad.append(f"AC 34: GAE 에 {want_ref} 가 없다")
+        elif want_text != src:
+            bad.append(f"AC 34: {cid} 정본 자구가 GAE {vno} 와 완전일치가 아니다 — {want_text[:40]!r}")
+
+        # ② 정본 자구가 AC 33 금지 토큰을 담는가. 계보 예외 토큰만 봐준다 —
+        #    나머지가 들어오면 두 계약이 충돌하는 것이므로 여기서 막는다.
+        for t in OBED_TOKENS:
+            if t in GENEALOGY_EXEMPT_TOKENS:
+                continue
+            if t.lower() in want_text.lower():
+                bad.append(f"AC 34: {cid} 정본 자구에 AC 33 금지 토큰 {t!r} — 두 계약이 충돌한다")
+
+        # ③ 저작 — id 로 찾고 자구·표기를 잰다.
+        hit = [c for c in authored if str(c.get("id")) == cid]
+        if not hit:
+            bad.append(f"AC 34: scene5.yml 에 계보 자막 {cid!r} 이 없다")
+        for c in hit:
+            if norm(c.get("text_ko", "")) != want_text:
+                bad.append(f"AC 34: scene5.yml {cid} 자구 불일치 — {norm(c.get('text_ko',''))[:40]!r}")
+            if str(c.get("verse_ref", "")).strip() != want_ref:
+                bad.append(f"AC 34: scene5.yml {cid} 절 표기 불일치 — {c.get('verse_ref')!r}")
+
+        # ④ 런타임 — 사용자에게 실제로 나가는 파일. 키 이름이 저작과 달라(`ref`) 자구로 찾는다.
+        if runtime_exists:
+            rhit = [c for c in rcaps if norm(c.get("text_ko", "")) == want_text]
+            if not rhit:
+                bad.append(f"AC 34: scenarios/ruth.yml 에 {want_ref} 계보 자막이 없다 (저작만 반영된 상태)")
+            for c in rhit:
+                ref = str(c.get("ref") or c.get("verse_ref") or "").strip()
+                if ref != want_ref:
+                    bad.append(f"AC 34: scenarios/ruth.yml {want_ref} 절 표기 불일치 — {ref!r}")
+
+    # ⑤ 순서 — 계보는 SR-1 **앞**이어야 한다 (헌장 §3-c: 마지막 Scene 은 결과가 아니라
+    #    신의 행위로 닫는다). 계보는 결과 진술이므로 마지막 자리에 오면 그 계약이 깨진다.
+    #
+    #    직접 "인덱스 비교" 를 하지 않는 이유: SR-1 은 자막 목록이 아니라
+    #    `closing_screen.closing_caption` 에 있어 같은 리스트에 들어 있지 않다. 대신 두
+    #    가지를 잰다 — ⓐ 두 자막이 **본문 자막 목록 안에** 한 그룹으로 있고 4:21 이 4:22
+    #    앞일 것, ⓑ `closing_screen` 서브트리 어디에도 계보 자구가 없을 것. 런타임이
+    #    본문을 먼저 재생하고 종결 화면으로 넘어가므로, 이 둘이면 앞뒤가 고정된다.
+    for label, path in (("scene5.yml", SCENES[4]), ("scenarios/ruth.yml", RUNTIME_SCENARIO)):
+        if not os.path.exists(path):
+            continue
+        doc = load(path)
+        groups = [
+            [norm(c.get("text_ko", "")) for c in (g or []) if isinstance(c, dict)]
+            for g in collect_key(doc, "captions")
+        ]
+        holding = [g for g in groups if any(t in GENEALOGY_TEXTS for t in g)]
+        if not holding:
+            continue  # ③·④ 가 이미 부재로 잡았다
+        if len(holding) > 1:
+            bad.append(f"AC 34: {label} 계보 자막이 자막 목록 {len(holding)}곳에 흩어져 있다")
+        seq = [t for t in holding[0] if t in GENEALOGY_TEXTS]
+        want_seq = [norm(c["text_ko"]) for c in GENEALOGY_CAPTIONS]
+        if seq != want_seq:
+            bad.append(f"AC 34: {label} 계보 자막 순서가 4:21 → 4:22 가 아니다 — {[s[:12] for s in seq]}")
+        for closing in collect_key(doc, "closing_screen"):
+            for t in GENEALOGY_TEXTS:
+                if t in json.dumps(closing, ensure_ascii=False):
+                    bad.append(
+                        f"AC 34: {label} closing_screen 안에 계보 자구가 있다 — "
+                        "계보는 SR-1 앞이어야 한다 (헌장 §3-c)"
+                    )
+                    break
+
+    return bad
+
+
 # ── 진입 ───────────────────────────────────────────────────────────────────
 
 MODES = [
@@ -545,6 +764,8 @@ MODES = [
     ("exclusion-count", "AC 31 배제 선언 항목 수", check_exclusion_count),
     ("closing-safety", "AC 32 closing 화면 안전층", check_closing_safety),
     ("captions", "AC 14 자막 자구·표기 대조", check_caption_fidelity),
+    ("obed", "AC 33 오벳 출생 미렌더 (선언 2키 값 + 에셋·자막 0건)", check_obed),
+    ("genealogy", "AC 34 계보 자막 존재·자구 (저작+런타임+성경 대조)", check_genealogy),
 ]
 
 
@@ -559,17 +780,22 @@ def main() -> int:
     if not chosen:
         chosen = [m for m in MODES if m[0] == "captions"]
 
+    # 출력 형식은 `check_rahab_captions.py` · `newchar_gates.py` 와 같은
+    # `[STATUS] 축  설명` + 표준 집계 줄이다. 원래는 `PASS  <label>` / `--- 검사 N / FAIL M ---`
+    # 였는데, 그 형식은 `ci_gates.py` 의 TALLY_RE·AXIS_RE 어느 쪽에도 걸리지 않아
+    # **이 파일을 CI 러너로 등록할 수 없었다.** 형식이 등록을 막고 있었던 셈이다.
     failed = 0
     for flag, label, fn in chosen:
         problems = fn()
+        status = "FAIL   " if problems else "PASS   "
         if problems:
             failed += 1
-            print(f"FAIL  {label}")
-            for p in problems:
-                print(f"        {p}")
-        else:
-            print(f"PASS  {label}")
-    print(f"--- 검사 {len(chosen)} / FAIL {failed} ---")
+        print(f"  [{status}] {flag:<16} {label}")
+        for p in problems:
+            print(f"             - {p}")
+    print(f"--- PASS {len(chosen) - failed} / FAIL {failed} / BLOCKED 0 ---")
+    print("  ⚠️ 주장 범위: 선언된 정본과 대상 파일이 어긋나지 않았다 까지다.")
+    print("     정본과 대상을 *같이* 고치면 이 검사는 통과한다 — 그때 남는 것은 정본의 diff 다.")
     return 1 if failed else 0
 
 

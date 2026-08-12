@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * Elijah 5-Scene E2E — 백엔드에만 있던 elijah 런타임에 프론트 문(門)을 낸 뒤의 완주 검증.
@@ -42,10 +43,12 @@ test.describe("Elijah 5-Scene mission", () => {
     // 동의 전에는 죽음 갈구 본문이 노출되면 안 된다
     await expect(page.getByText(/여호와여 이제 됐습니다/)).toHaveCount(0);
     // crisis_check 씬이므로 위기 연결이 본문보다 위에 있어야 한다.
-    // 전역 CrisisFooter(layout) 에도 109 링크가 상시 있으므로 main 안으로 한정한다 —
+    // 전역 CrisisFooter(layout) 에도 같은 링크가 상시 있으므로 main 안으로 한정한다 —
     // 즉 "씬 자체가" 위기 자원을 올렸는지를 본다.
+    // 번호는 화면과 같은 정본(@/lib/crisis-resources)에서 읽는다. 여기에 숫자를 박으면
+    // 번호가 바뀌었을 때 화면과 테스트가 같이 낡아 초록인 채로 틀린다.
     await expect(
-      page.getByRole("main").getByRole("link", { name: "109" }),
+      page.getByRole("main").getByRole("link", { name: CRISIS_DEFAULT.tel }),
     ).toBeVisible();
 
     await page.getByRole("button", { name: "계속한다" }).click();

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { classifyEmotion, type ClassifyResponse } from "@/lib/api/emotion";
 import Link from "next/link";
+import { CRISIS_LINE_SHORT } from "@/lib/crisis-resources";
 
 const EMOTION_LABEL: Record<string, string> = {
   ANXIOUS: "불안",
@@ -108,7 +109,7 @@ export default function HomePage() {
             큐티가 일상 영적 양식, 민방위교육이 비상 대비 훈련이라면 — Lemuel XR
             은 *절망 비상* 에 대비하는 영적 단련 프로그램입니다.
             <br />
-            의료·임상 도구가 아닙니다. 위기 신호 시 109 · 1577-0199 (24시간).
+            의료·임상 도구가 아닙니다. 위기 신호 시 {CRISIS_LINE_SHORT}.
           </p>
         </header>
 
