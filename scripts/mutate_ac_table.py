@@ -44,7 +44,15 @@ def line_with(*needles: str) -> str:
     무너진 축이 어긋난다(`mutate_rahab_captions.py` 가 세운 규율)."""
     hits = [ln for ln in SRC.splitlines() if all(n in ln for n in needles)]
     if len(hits) != 1:
-        raise AssertionError(f"{needles} 를 담은 줄이 {len(hits)}개다 — 1개여야 한다")
+        # 🚨 여기는 **import 시점**이라 맨 아래 `main()` 의 except 가 못 잡는다. 그대로
+        #    두면 AssertionError 가 rc `1` 로 나가는데, 이 러너의 `1` 은 「돌았고 못 잡은
+        #    축이 있다」는 뜻이다. **안 돈 것이 돈 것으로 읽힌다** — 실제로 rev.14 가
+        #    이 자리에서 그렇게 되었다(아래 `TOOLS` 주석). §8-1 rc 규약의 **126(실행
+        #    실패)** 으로 끊어, 「러너를 못 돌렸다」와 「러너가 구멍을 찾았다」를 가른다.
+        sys.stderr.write(
+            f"실행 실패: 변이 대상 확정 실패 — {needles} 를 담은 줄이 "
+            f"{len(hits)}개다(1개여야 한다). seed 문안이 바뀌었으면 이 needle 을 고칠 것.\n")
+        raise SystemExit(126)
     return hits[0]
 
 
@@ -59,7 +67,16 @@ TALLY = line_with("**합계 — PASS", "16건 중")
 PASS_BULLET = line_with("- **PASS 9**")
 EXPECT = line_with("기대 rc 가 `0` 이 아닌 한 줄")
 G10 = line_with("| `G10`", "955줄")
-TOOLS = line_with("PASS 10 · FAIL 0 · BLOCKED 17")
+# 🚨 rev.15 정정 — 이 needle 은 seed 에 **한 번도 없던 문자열**이었다(`·` 구분).
+#    `ac_table_check.py` 가 **출력할 때** 구분자를 `·` 로 정규화하는데, rev.14 가 그
+#    출력을 보고 needle 을 적었다. seed 원문은 `/` 다. 그래서 이 러너는 커밋된 순간부터
+#    import 에서 죽었고(§9 의 「검출 15 / 15 · rc=0」은 그 상태로 적혀 있었다), 게다가
+#    죽는 rc 가 `1` 이라 「돌았는데 못 잡았다」와 구별되지 않았다. 위 `line_with` 가
+#    이제 126 으로 끊는다.
+# 🚨 겨냥은 **판정되는 줄**이어야 한다. 3152 행(rev.10~12 기록)은 판정기가 일부러
+#    BLOCKED 로 두는 칸이라, 거기를 변이시키면 `t-tools` 는 빨강을 내지 않는다.
+#    2671 행(지금 실행의 합계)이 실제로 판정되는 자리다.
+TOOLS = line_with("**합계 PASS 10 / FAIL 0 / BLOCKED 18")
 MUT14 = "검출 14 / 14"
 
 # (겨냥한 축, 검사 키, 기대, 설명, before, after)
@@ -108,8 +125,8 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      AC2, re.sub(r"--baseline [0-9a-f]{7,40}", "--baseline e39368c", AC2)),
     ("t-tools", "t-tools", "FAIL",
      "본문이 인용한 러너 합계를 rev.11 의 옛 값으로 — 정정 AC 가 잡은 형태다",
-     TOOLS, TOOLS.replace("PASS 10 · FAIL 0 · BLOCKED 17",
-                          "PASS 7 · FAIL 0 · BLOCKED 20")),
+     TOOLS, TOOLS.replace("PASS 10 / FAIL 0 / BLOCKED 18",
+                          "PASS 7 / FAIL 0 / BLOCKED 20")),
     ("t-lines", "t-lines", "FAIL",
      "`G10` 행의 줄 수를 955 → 956 으로 — 정정 AB 가 잡은 형태다",
      G10, G10.replace("955줄", "956줄")),

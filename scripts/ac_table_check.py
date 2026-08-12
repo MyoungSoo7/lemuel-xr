@@ -428,18 +428,14 @@ def check(target: Path, git_name: str | None = None) -> int:
         blk("t-tools", "합계를 내는 판정기가 이 표에 없다 — 잴 것이 없다")
     else:
         tally_lineno = tally_line[0] if tally_line else -1
-        # 문단 단위로 옛 판 표식을 본다 — 한 줄 위에 「rev.10 이 …」가 있는 형태가 많다.
-        para: list[int] = []
-        paras: dict[int, list[int]] = {}
-        for i, raw in enumerate(lines, 1):
-            if raw.strip():
-                para.append(i)
-            else:
-                for j in para:
-                    paras[j] = para
-                para = []
-        for j in para:
-            paras[j] = para
+        # 옛 판 표식은 **바로 앞 줄까지만** 본다 — 「한 줄 위에 rev.10 이 …」가 실제
+        # 형태다(3341→3342).
+        # 🚨 rev.15 정정 — 여기는 원래 **문단 전체**를 봤다. 그러면 뒤에 붙은 판 기록이
+        #    앞의 **현재 합계**를 면제시킨다: 2671 의 「합계 PASS 10 / FAIL 0 / BLOCKED 18」
+        #    은 같은 문단 2679 의 「rev.10 최초 실행은 …」 때문에 면제 대상이었고, 그
+        #    값이 낡는 순간 FAIL 이 아니라 BLOCKED(「사람이 볼 것」)로 조용히 빠졌다.
+        #    이 seed 에서 가장 많이 인용되는 수치가 정확히 무방비였다. `mutate_ac_table.py`
+        #    의 `t-tools` 변이가 그것을 드러냈다(검출 14/15).
         seen = 0
         for i, raw in enumerate(lines, 1):
             if i not in live or i == tally_lineno:
@@ -456,7 +452,7 @@ def check(target: Path, git_name: str | None = None) -> int:
                     old = [int(x) for x in
                            re.findall(r"rev\.(\d+)[\s·]*$", raw[:rm.start()][-14:])]
                     if not raw.lstrip().startswith("|"):
-                        ctx = " ".join(lines[j - 1] for j in paras.get(i, [i]))
+                        ctx = " ".join(lines[max(0, i - 2):i])
                         old += [int(x) for x in re.findall(
                             r"(?<!도구 )rev\.(\d+)\s*(?:이|가|까지|최초|시점|에서)", ctx)]
                     if any(n < cur_rev for n in old):
