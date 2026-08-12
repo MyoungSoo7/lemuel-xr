@@ -4,6 +4,8 @@
 > 런타임 산출물(`backend/src/main/resources/scenarios/ruth.yml`)로 옮기는 **런타임 대본**이다.
 > `docs/CONTENT-WORKFLOW.md` 의 신학·정신건강 검토자 2인 사인오프는 **아직 없다.**
 > 이 문서 어디에도 "검토를 통과했다" 는 진술이 없다.
+> 사인오프 대장은 `docs/RUTH-RUNTIME-SIGNOFF.md` 이고, 그 두 줄은 `RuntimeExposureSignoffTest`
+> 가 읽는다 — 2026-08-12 부터 이 게이트는 문장이 아니라 테스트다.
 >
 > **런타임 노출은 아직 닫혀 있다** — `Character` enum 에 `RUTH` 가 없고,
 > `ScenarioYamlLoader.loadAll()` 은 `Character.entries` 만 순회한다(`ScenarioYamlLoader.kt:28`).
