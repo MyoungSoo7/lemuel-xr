@@ -150,13 +150,28 @@ export default function ElijahPage() {
           {crisisReminder ? (
             <p>{crisisReminder}</p>
           ) : (
-            <p>
-              지금 실제로 그 마음이 크다면, 본문보다 연결이 먼저입니다 —{" "}
-              <a href={telHref(CRISIS_DEFAULT)} className="underline font-bold">
-                {CRISIS_DEFAULT.tel}
-              </a>{" "}
-              {CRISIS_DEFAULT.label} (24시간, 무료).
-            </p>
+            /*
+              번호를 문장 안의 인라인 링크로 두지 않는다.
+
+              이 블록은 앱이 「이 사용자가 위험할 수 있다」고 판단한 씬에서만 뜬다.
+              그런데 320px 에서 재 보면 그 전화 링크가 **26×17px** 였다 — 앱을 통틀어
+              제일 작은 타깃이 하필 제일 급한 동작이었다(2026-08-12 실측).
+              CrisisFooter 에서 고친 23×15 와 같은 결함이 씬 안에 또 있었던 것이다.
+              문장은 그대로 두되 번호는 줄에서 떼어내 44px 짜리 블록으로 만든다
+              (WCAG 2.5.5 / Apple HIG).
+            */
+            <>
+              <p>지금 실제로 그 마음이 크다면, 본문보다 연결이 먼저입니다.</p>
+              <a
+                href={telHref(CRISIS_DEFAULT)}
+                className="mt-2 min-h-11 px-4 flex items-center justify-center gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 font-bold hover:bg-amber-500/20 transition"
+              >
+                <span className="underline">{CRISIS_DEFAULT.tel}</span>
+                <span className="font-normal">
+                  {CRISIS_DEFAULT.label} (24시간, 무료)
+                </span>
+              </a>
+            </>
           )}
         </section>
       )}

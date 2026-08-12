@@ -68,13 +68,21 @@ export default function ValuesPage() {
   }
 
   const values = data?.values ?? {};
-  const stats = data?.stats ?? { totalPractices7d: 0, countByValue: {}, cdrIndex: 0, tier: "—" };
+  const stats = data?.stats ?? {
+    totalPractices7d: 0,
+    countByValue: {},
+    cdrIndex: 0,
+    tier: "—",
+  };
   const definedCount = Object.keys(values).length;
 
   return (
     <main className="min-h-screen px-6 py-10 max-w-3xl mx-auto">
       <header className="mb-8">
-        <Link href="/" className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70">
+        <Link
+          href="/"
+          className="inline-flex items-center min-h-11 min-w-11 pr-3 text-xs text-[var(--color-warm)]/40 hover:text-[var(--color-warm)]/70"
+        >
           ← 홈
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold mt-2">자기만의 7 가치</h1>
@@ -91,8 +99,8 @@ export default function ValuesPage() {
 
       {definedCount === 0 && (
         <div className="mb-6 px-4 py-3 rounded-lg border border-amber-500/30 bg-amber-500/5 text-sm">
-          아직 가치를 하나도 정의하지 않으셨네요. 7가지 중 *하나라도* 시작해 보세요 —
-          어렵게 잡지 말고 *내가 지키고 싶은 것* 한 줄.
+          아직 가치를 하나도 정의하지 않으셨네요. 7가지 중 *하나라도* 시작해
+          보세요 — 어렵게 잡지 말고 *내가 지키고 싶은 것* 한 줄.
         </div>
       )}
 
@@ -145,7 +153,7 @@ export default function ValuesPage() {
                   <button
                     type="button"
                     onClick={() => setEditing(id)}
-                    className="text-xs px-3 py-1.5 rounded border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
+                    className="min-h-11 text-xs px-3 py-1.5 rounded border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
                   >
                     {def ? "수정" : "정의하기"}
                   </button>
@@ -154,7 +162,7 @@ export default function ValuesPage() {
                       type="button"
                       onClick={() => practiceMutation.mutate(id)}
                       disabled={practiceMutation.isPending}
-                      className="text-xs px-3 py-1.5 rounded bg-[var(--color-primary)] text-black font-medium disabled:opacity-50 hover:bg-[var(--color-primary)]/90"
+                      className="min-h-11 text-xs px-3 py-1.5 rounded bg-[var(--color-primary)] text-black font-medium disabled:opacity-50 hover:bg-[var(--color-primary)]/90"
                     >
                       오늘 실천 +1
                     </button>
@@ -220,7 +228,9 @@ function EditValueForm({
       />
       <select
         value={anchor}
-        onChange={(e) => setAnchor(e.target.value as ValueDef["anchor_character"] | "")}
+        onChange={(e) =>
+          setAnchor(e.target.value as ValueDef["anchor_character"] | "")
+        }
         className="w-full px-3 py-2 rounded bg-black/30 border border-[var(--color-primary)]/30 text-sm focus:outline-none focus:border-[var(--color-primary)]"
       >
         <option value="">연결 인물 (선택 안 함)</option>

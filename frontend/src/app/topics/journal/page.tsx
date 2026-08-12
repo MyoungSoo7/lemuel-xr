@@ -62,8 +62,8 @@ export default function JournalGuidancePage() {
           </Link>
         </div>
         <p className="text-xs text-[var(--color-warm)]/40 mt-2">
-          기준1 — 오늘의 감정을 성경 앞에 그대로 두는 자리. 감정을 고르거나, 일기를 적으면 *성경 구절과
-          성찰 질문* 을 드립니다.
+          기준1 — 오늘의 감정을 성경 앞에 그대로 두는 자리. 감정을 고르거나,
+          일기를 적으면 *성경 구절과 성찰 질문* 을 드립니다.
         </p>
       </header>
 
@@ -81,7 +81,13 @@ export default function JournalGuidancePage() {
                   setSelectedEmotion(g.emotion);
                   byEmotion.mutate(g.emotion);
                 }}
-                className={`text-sm px-3 py-1.5 rounded-full border transition ${
+                /*
+                  `min-h-11`(44px, WCAG 2.5.5 / Apple HIG). 이 칩들은 백엔드 카탈로그로만
+                  그려져서(`emotions = catalog?.catalog ?? []`) 백엔드 없이 도는 CI 에서는
+                  아예 렌더되지 않았고, 그래서 44px 검사가 **잴 것이 없어서** 통과했다.
+                  백엔드를 띄우고 재니 50×34 였다(2026-08-12).
+                */
+                className={`min-h-11 text-sm px-3 py-1.5 rounded-full border transition ${
                   selectedEmotion === g.emotion
                     ? "border-[var(--color-primary)] bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
                     : "border-[var(--color-primary)]/20 text-[var(--color-warm)]/70 hover:border-[var(--color-primary)]/50"
@@ -109,7 +115,9 @@ export default function JournalGuidancePage() {
           <div className="flex items-center gap-3 mt-3">
             <button
               onClick={() => fromText.mutate()}
-              disabled={fromText.isPending || (!text.trim() && !selectedEmotion)}
+              disabled={
+                fromText.isPending || (!text.trim() && !selectedEmotion)
+              }
               className="inline-flex items-center justify-center min-h-11 px-4 py-2 rounded-md text-sm bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/25 disabled:opacity-40 transition"
             >
               {fromText.isPending ? "조언 받는 중..." : "성경 조언 받기"}
@@ -127,12 +135,15 @@ export default function JournalGuidancePage() {
               잠시 멈추고, 함께 안전을 살펴봐요.
             </p>
             <p className="text-xs text-[var(--color-warm)]/70 mt-1 leading-relaxed">
-              지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
+              지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은
+              24시간 열려 있어요.
             </p>
-            <p className="text-xs text-red-300 mt-2 font-mono">{CRISIS_LINE_SHORT}</p>
+            <p className="text-xs text-red-300 mt-2 font-mono">
+              {CRISIS_LINE_SHORT}
+            </p>
             <Link
               href="/topics/journal"
-              className="inline-block mt-2 text-xs text-[var(--color-primary)] hover:underline"
+              className="inline-flex items-center min-h-11 mt-2 text-xs text-[var(--color-primary)] hover:underline"
             >
               일기(#1)로 마음을 먼저 적어보기 →
             </Link>
@@ -141,7 +152,10 @@ export default function JournalGuidancePage() {
 
         {/* 조언 표시 */}
         {result?.guidance && !result.crisis.routed && (
-          <GuidanceView guidance={result.guidance} safetyFooter={result.safetyFooter} />
+          <GuidanceView
+            guidance={result.guidance}
+            safetyFooter={result.safetyFooter}
+          />
         )}
 
         {/* 하단 영구 위기 자원 + AI footer */}
@@ -181,7 +195,9 @@ function GuidanceView({
 }) {
   return (
     <section className="mb-6 rounded-lg border border-[var(--color-primary)]/20 p-4">
-      <p className="text-xs text-[var(--color-primary)]">감정 · {guidance.emotionLabel}</p>
+      <p className="text-xs text-[var(--color-primary)]">
+        감정 · {guidance.emotionLabel}
+      </p>
 
       {/* R2/R3 — 인증 문구 (정죄·압박 배제) */}
       <p className="text-sm text-[var(--color-warm)]/80 mt-2 leading-relaxed">
@@ -199,7 +215,9 @@ function GuidanceView({
       <div className="mt-4 space-y-3">
         {guidance.verses.map((v) => (
           <div key={v.ref}>
-            <p className="text-xs text-[var(--color-primary)] font-mono">📖 {v.ref}</p>
+            <p className="text-xs text-[var(--color-primary)] font-mono">
+              📖 {v.ref}
+            </p>
             <blockquote className="text-sm text-[var(--color-warm)]/90 italic leading-relaxed border-l-2 border-[var(--color-primary)]/40 pl-3 mt-1">
               {v.text}
             </blockquote>

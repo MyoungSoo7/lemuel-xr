@@ -472,7 +472,13 @@ function ConsentGate({
                 key={v}
                 type="button"
                 onClick={() => onIntensity(v)}
-                className={`text-xs px-3 py-1 rounded-full border transition ${
+                /*
+                  `min-h-11 min-w-11` — 44px (WCAG 2.5.5 / Apple HIG). 전에는 py-1 뿐이라
+                  320px 에서 「약」이 36×26 이었다(2026-08-12 실측). 이건 장식이 아니라
+                  **자극 강도를 낮추는 손잡이**다. 정서 부담 경고를 읽고 강도를 내리려는
+                  사람이 제일 작은 버튼을 정확히 눌러야 했다.
+                */
+                className={`min-h-11 min-w-11 text-xs px-3 py-1 rounded-full border transition ${
                   active
                     ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
                     : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
