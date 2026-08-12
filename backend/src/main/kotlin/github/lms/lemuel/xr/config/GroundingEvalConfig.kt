@@ -38,7 +38,11 @@ class GroundingEvalConfig {
         require(props.apiKey.isNotBlank()) {
             "grounding.eval.enabled=true 인데 임베딩 API 키가 없다 — GEMINI_API_KEY 주입 필요"
         }
-        return GeminiEmbeddingAdapter(apiKey = props.apiKey, model = props.embeddingModel)
+        return GeminiEmbeddingAdapter(
+            apiKey = props.apiKey,
+            model = props.embeddingModel,
+            outputDimensionality = props.embeddingDimensions,
+        )
     }
 
     @Bean
@@ -61,6 +65,9 @@ class GroundingEvalConfig {
 
 /**
  * @property cron 기본 매일 03:30 KST. 하루 1회면 모델 드리프트 감지엔 충분하고 비용은 무시할 수준이다.
+ * @property embeddingDimensions 임베딩 차원. 기본 1536 은 `scripture_embeddings.embedding vector(1536)`
+ *   와 pgvector HNSW 의 2000 차원 상한에 맞춘 값이다. 자세한 근거는
+ *   [GeminiEmbeddingAdapter] 문서 주석 참고. 이 값을 바꾸면 스키마도 함께 가야 한다.
  */
 @ConfigurationProperties(prefix = "grounding.eval")
 data class GroundingEvalProperties(
@@ -68,5 +75,6 @@ data class GroundingEvalProperties(
     val cron: String = "0 30 3 * * *",
     val version: String = GoldenSet.DEFAULT_VERSION,
     val embeddingModel: String = "gemini-embedding-001",
+    val embeddingDimensions: Int = GeminiEmbeddingAdapter.DEFAULT_DIMENSIONS,
     val apiKey: String = "",
 )
