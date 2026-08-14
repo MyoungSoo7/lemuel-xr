@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { splitForTts, TTS_MAX_CHARS } from "./splitForTts";
+import {
+  splitForTts,
+  TTS_BACKEND_MAX_CHARS,
+  TTS_MAX_CHARS,
+  TTS_SECONDS_PER_CHAR,
+  TTS_TIMEOUT_SECONDS,
+} from "./splitForTts";
 import {
   buildScene3Echo,
   scene3AssignmentsToPattern,
@@ -95,7 +101,7 @@ describe("splitForTts", () => {
           scene3AssignmentsToPattern(assignments),
           assignments,
         );
-        if (text.length > TTS_MAX_CHARS) 넘던_조합 += 1;
+        if (text.length > TTS_BACKEND_MAX_CHARS) 넘던_조합 += 1;
         for (const chunk of splitForTts(text)) {
           expect(chunk.length).toBeLessThanOrEqual(TTS_MAX_CHARS);
         }
@@ -103,6 +109,45 @@ describe("splitForTts", () => {
       // 고칠 것이 실제로 있었음을 못박아 둔다. 콘텐츠가 짧아져 0이 되면 이 테스트가
       // 지켜 주는 것이 없어지므로 그때 다시 판단하라는 뜻이다.
       expect(넘던_조합).toBe(7);
+    });
+
+    /**
+     * 두 번째 층이다. 위 테스트는 *검증기* 400 만 막아 준다. 실제로 사람이 못 듣던
+     * 이유는 그게 아니라 합성 타임아웃이었다 — 사이드카는 298.5초에 성공했는데
+     * 백엔드가 300초에 먼저 포기하고 다 만든 오디오를 버렸다. 검증기만 보면 통과인
+     * 조각이 런타임에 통째로 사라지므로, 시간 예산도 같이 못박는다.
+     */
+    it("전수 32조합의 모든 조각이 합성 타임아웃 안에 끝난다", () => {
+      const 예산초 = TTS_TIMEOUT_SECONDS * 0.85; // 15% 는 큐·전송·변동 몫으로 남긴다
+      for (const assignments of 조합) {
+        const text = buildScene3Echo(
+          scene3AssignmentsToPattern(assignments),
+          assignments,
+        );
+        for (const chunk of splitForTts(text)) {
+          expect(chunk.length * TTS_SECONDS_PER_CHAR).toBeLessThan(예산초);
+        }
+      }
+    });
+
+    it("고치기 전 상한(500자)이었다면 절반 넘는 조합이 타임아웃에 걸렸다", () => {
+      // 이 숫자가 이 커밋이 무엇을 고쳤는지에 대한 유일한 기록이다. 상한을 되돌리면
+      // 위 테스트가 깨지는 게 아니라 *이 테스트* 가 먼저 이유를 말해 준다.
+      // 여유분 없이 타임아웃 그대로 재는 것에 주의 — "여유가 모자란" 조합이 아니라
+      // "실제로 못 끝내는" 조합의 수다.
+      const 못_끝내는 = 조합.filter((assignments) => {
+        const text = buildScene3Echo(
+          scene3AssignmentsToPattern(assignments),
+          assignments,
+        );
+        return splitForTts(text, TTS_BACKEND_MAX_CHARS).some(
+          (c) => c.length * TTS_SECONDS_PER_CHAR >= TTS_TIMEOUT_SECONDS,
+        );
+      });
+      // 15 는 *하한* 이다. 실제로 관측된 실패는 400자 조각(합성 298.5초)이었는데,
+      // 순수 합성 시간만 보면 300초 아래라 여기 안 잡힌다 — 큐·전송 몫이 남은
+      // 1.5초를 먹었다. 즉 현실의 피해는 이 수보다 넓었다.
+      expect(못_끝내는).toHaveLength(15);
     });
 
     it("전부 내려놓기(716자)는 여러 조각이 되고, 전부 품기는 통짜 그대로다", () => {
