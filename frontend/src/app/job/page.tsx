@@ -147,39 +147,49 @@ export default function JobPage() {
         </section>
       )}
 
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 bg-gradient-to-b from-stone-950 via-stone-900 to-slate-900/60 p-5">
-        {needsConsent ? (
-          <ConsentGate
-            warning={warning!}
-            pending={decide.isPending}
-            onContinue={() => setConsented(true)}
-            onSkip={() => advance(scene.currentScene, { value: "skip" })}
-          />
-        ) : (
-          <div className="space-y-4">
-            {staticText && (
-              <>
-                <p className="text-base leading-relaxed whitespace-pre-line text-[var(--color-warm)]/90">
-                  {staticText}
+      {/* Scene 배경 이미지 */}
+      <section
+        className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative bg-cover bg-center bg-stone-950"
+        style={{
+          backgroundImage: `url(/images/scenes/job/${scene.currentScene}.jpg)`,
+        }}
+      >
+        {/* 요셉 쪽과 달리 본문이 이미지 위에 직접 얹히므로 오버레이를 훨씬 진하게 깐다 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-950/85 via-stone-950/75 to-slate-900/85" />
+        <div className="relative z-10 p-5">
+          {needsConsent ? (
+            <ConsentGate
+              warning={warning!}
+              pending={decide.isPending}
+              onContinue={() => setConsented(true)}
+              onSkip={() => advance(scene.currentScene, { value: "skip" })}
+            />
+          ) : (
+            <div className="space-y-4">
+              {staticText && (
+                <>
+                  <p className="text-base leading-relaxed whitespace-pre-line text-[var(--color-warm)]/90">
+                    {staticText}
+                  </p>
+                  <div className="flex justify-start">
+                    <NarrationAudioButton
+                      text={staticText}
+                      onUnavailable="hide"
+                    />
+                  </div>
+                </>
+              )}
+              {reflectionPrompt && (
+                <p className="text-sm italic text-[var(--color-warm)]/70 border-l-2 border-[var(--color-primary)]/40 pl-3 whitespace-pre-line">
+                  {reflectionPrompt}
                 </p>
-                <div className="flex justify-start">
-                  <NarrationAudioButton
-                    text={staticText}
-                    onUnavailable="hide"
-                  />
-                </div>
-              </>
-            )}
-            {reflectionPrompt && (
-              <p className="text-sm italic text-[var(--color-warm)]/70 border-l-2 border-[var(--color-primary)]/40 pl-3 whitespace-pre-line">
-                {reflectionPrompt}
+              )}
+              <p className="text-[10px] text-[var(--color-warm)]/40 text-right">
+                * AI 보조 — 본문은 성경 참조 *
               </p>
-            )}
-            <p className="text-[10px] text-[var(--color-warm)]/40 text-right">
-              * AI 보조 — 본문은 성경 참조 *
-            </p>
-          </div>
-        )}
+            </div>
+          )}
+        </div>
       </section>
 
       {!needsConsent && (

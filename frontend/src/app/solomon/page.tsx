@@ -244,20 +244,30 @@ export default function SolomonPage() {
         </section>
       )}
 
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 bg-gradient-to-b from-amber-950/40 via-stone-900 to-stone-950 p-5">
-        {needsConsent ? (
-          <ConsentGate
-            warning={warning!}
-            intensityOptions={field<string[]>("intensity_toggle")}
-            captionsOnly={captionsOnly}
-            onIntensity={(v) => setCaptionsOnly(v === "captions_only")}
-            pending={decide.isPending}
-            onContinue={() => setConsented(true)}
-            onSkip={() => skipScene(scene.currentScene)}
-          />
-        ) : (
-          <ScriptBeats beats={beats} audio={!captionsOnly} />
-        )}
+      {/* Scene 배경 이미지 */}
+      <section
+        className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative bg-cover bg-center bg-stone-950"
+        style={{
+          backgroundImage: `url(/images/scenes/solomon/${scene.currentScene}.jpg)`,
+        }}
+      >
+        {/* 요셉 쪽과 달리 본문이 이미지 위에 직접 얹히므로 오버레이를 훨씬 진하게 깐다 */}
+        <div className="absolute inset-0 bg-gradient-to-b from-amber-950/80 via-stone-900/85 to-stone-950/90" />
+        <div className="relative z-10 p-5">
+          {needsConsent ? (
+            <ConsentGate
+              warning={warning!}
+              intensityOptions={field<string[]>("intensity_toggle")}
+              captionsOnly={captionsOnly}
+              onIntensity={(v) => setCaptionsOnly(v === "captions_only")}
+              pending={decide.isPending}
+              onContinue={() => setConsented(true)}
+              onSkip={() => skipScene(scene.currentScene)}
+            />
+          ) : (
+            <ScriptBeats beats={beats} audio={!captionsOnly} />
+          )}
+        </div>
       </section>
 
       {!needsConsent && (

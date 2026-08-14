@@ -157,9 +157,15 @@ export default function DavidPage() {
         </section>
       )}
 
-      {/* Scene 배경 — david 전용 이미지 없으면 grad placeholder */}
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950">
-        <div className="absolute inset-0 flex items-end p-5">
+      {/* Scene 배경 이미지 */}
+      <section
+        className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-cover bg-center bg-stone-900"
+        style={{
+          backgroundImage: `url(/images/scenes/david/${scene.currentScene}.jpg)`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+        <div className="relative h-full flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
             {scene.currentScene === 1 &&
               "양 떼 곁의 새벽. 어린 시인 다윗의 수금이 울린다 — 시편 23편이 흐른다."}

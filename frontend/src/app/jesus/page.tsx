@@ -177,9 +177,15 @@ export default function JesusPage() {
         </section>
       )}
 
-      {/* Scene 배경 — jesus 전용 이미지 없으면 grad placeholder */}
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-950">
-        <div className="absolute inset-0 flex items-end p-5">
+      {/* Scene 배경 이미지 */}
+      <section
+        className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-cover bg-center bg-slate-900"
+        style={{
+          backgroundImage: `url(/images/scenes/jesus/${scene.currentScene}.jpg)`,
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />
+        <div className="relative h-full flex items-end p-5">
           <p className="text-sm text-[var(--color-warm)]/80 italic max-w-prose">
             {scene.currentScene === 1 &&
               "베들레헴 외곽의 밤. 별빛 아래 소박한 구유 — 하늘이 낮은 자리로 내려온다."}
