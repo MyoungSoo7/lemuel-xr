@@ -5,6 +5,7 @@ import github.lms.lemuel.xr.tts.application.port.out.TtsJobQueuePort
 import github.lms.lemuel.xr.tts.application.port.out.TtsSynthesisPort
 import github.lms.lemuel.xr.tts.domain.TtsCache
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
@@ -44,7 +45,7 @@ class SynthesizeTtsUseCaseTest {
     @Test
     fun `캐시 미스면 PENDING 자리표를 먼저 저장하고 큐에 넘긴다`() {
         whenever(cache.findById(any())).thenReturn(Optional.empty())
-        whenever(sidecar.synthesize("안녕", "narrator-male-low", 1.0))
+        whenever(sidecar.synthesize("안녕", "narrator-male-low", 1.0, "ko"))
             .thenReturn(
                 TtsSynthesisPort.SynthesisResult("https://r2/audio/abc.wav", 1500, "xtts-v2"),
             )
@@ -93,7 +94,7 @@ class SynthesizeTtsUseCaseTest {
         verify(cache).save(captor.capture())
         assertThat(captor.firstValue.hitCount).isEqualTo(5)
         assertThat(captor.firstValue.lastHitAt).isNotNull()
-        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull())
+        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull(), any())
         verify(queue, never()).submit(any(), any())
     }
 
@@ -107,14 +108,14 @@ class SynthesizeTtsUseCaseTest {
         assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Pending::class.java)
         // 핵심: 큐에 또 넣지 않는다. 안 그러면 같은 문장이 워커를 n번 붙잡는다.
         verify(queue, never()).submit(any(), any())
-        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull())
+        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull(), any())
     }
 
     @Test
     fun `FAILED 엔트리는 재시도 대상이다`() {
         val failed = TtsCache.pendingEntry("key", "v", LocalDateTime.now()).failed()
         whenever(cache.findById(any())).thenReturn(Optional.of(failed))
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
         queueRunsInline()
 
@@ -132,7 +133,7 @@ class SynthesizeTtsUseCaseTest {
             null, LocalDateTime.now(), null, TtsCache.READY,
         )
         whenever(cache.findById(any())).thenReturn(Optional.of(hollow))
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
         queueRunsInline()
 
@@ -151,7 +152,7 @@ class SynthesizeTtsUseCaseTest {
         val r = uc.submit("안녕", "v", 1.0)
 
         assertThat(r).isEqualTo(SynthesizeTtsUseCase.Submission.Rejected(8))
-        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull())
+        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull(), any())
 
         // 자리표를 PENDING 으로 방치하면 아무도 처리 안 하는데 폴링만 도는 유령이 된다.
         val captor = argumentCaptor<TtsCache>()
@@ -162,7 +163,7 @@ class SynthesizeTtsUseCaseTest {
     @Test
     fun `워커가 실패하면 FAILED 로 기록된다`() {
         whenever(cache.findById(any())).thenReturn(Optional.empty())
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenThrow(RuntimeException("사이드카 다운"))
         queueRunsInline()
 
@@ -203,7 +204,7 @@ class SynthesizeTtsUseCaseTest {
     @Test
     fun `동일 입력은 동일 캐시키 다른 입력은 다른키`() {
         whenever(cache.findById(any())).thenReturn(Optional.empty())
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
         queueRunsInline()
 
@@ -222,12 +223,130 @@ class SynthesizeTtsUseCaseTest {
     @Test
     fun `null voiceId 와 null rate 도 안정적 키 생성`() {
         whenever(cache.findById(any())).thenReturn(Optional.empty())
-        whenever(sidecar.synthesize(eq("안녕"), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(eq("안녕"), anyOrNull(), anyOrNull(), any()))
             .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
         queueRunsInline()
 
         val r = uc.submit("안녕", null, null)
 
         assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Pending::class.java)
+    }
+
+    // ── 언어 (ko · en) ──────────────────────────────────────────────────────
+
+    @Test
+    fun `language 를 생략하면 사이드카에 ko 로 간다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e", "ko"))
+        queueRunsInline()
+
+        uc.submit("안녕", "v", 1.0)
+
+        val lang = argumentCaptor<String>()
+        verify(sidecar).synthesize(any(), anyOrNull(), anyOrNull(), lang.capture())
+        assertThat(lang.firstValue).isEqualTo("ko")
+    }
+
+    @Test
+    fun `en 요청은 사이드카까지 en 으로 전달된다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e", "en"))
+        queueRunsInline()
+
+        uc.submit("David and Goliath", "v", 1.0, "en")
+
+        val lang = argumentCaptor<String>()
+        verify(sidecar).synthesize(any(), anyOrNull(), anyOrNull(), lang.capture())
+        assertThat(lang.firstValue).isEqualTo("en")
+    }
+
+    @Test
+    fun `대소문자와 공백은 정규화한다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e", "en"))
+        queueRunsInline()
+
+        uc.submit("hello", "v", 1.0, " EN ")
+
+        val lang = argumentCaptor<String>()
+        verify(sidecar).synthesize(any(), anyOrNull(), anyOrNull(), lang.capture())
+        assertThat(lang.firstValue).isEqualTo("en")
+    }
+
+    @Test
+    fun `지원하지 않는 언어는 큐에 들어가기 전에 거절한다`() {
+        // 사이드카까지 갔다면 400 이 워커 안에서 터져 사용자에겐 이유 없는 failed 로만 보인다.
+        assertThatThrownBy { uc.submit("hola", "v", 1.0, "es") }
+            .isInstanceOf(IllegalArgumentException::class.java)
+
+        verify(queue, never()).submit(any(), any())
+        verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull(), any())
+        verify(cache, never()).save(any())
+    }
+
+    @Test
+    fun `같은 문장이라도 언어가 다르면 캐시키가 갈린다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
+        queueRunsInline()
+
+        val ko = uc.submit("Amen", "v", 1.0, "ko") as SynthesizeTtsUseCase.Submission.Pending
+        val en = uc.submit("Amen", "v", 1.0, "en") as SynthesizeTtsUseCase.Submission.Pending
+
+        // 갈리지 않으면 먼저 구워진 쪽이 이기고 나머지는 엉뚱한 언어를 캐시 히트로 받는다.
+        assertThat(ko.jobId).isNotEqualTo(en.jobId)
+    }
+
+    @Test
+    fun `ko 키는 언어 접두가 없던 시절과 같다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
+        queueRunsInline()
+
+        val r = uc.submit("안녕", "narrator-male-low", 1.0, "ko")
+
+        // 옛 규칙: sha256("안녕|narrator-male-low|1.0"). 이게 깨지면 기존 캐시가 통째로 무효가 된다.
+        val legacy = java.util.HexFormat.of().formatHex(
+            java.security.MessageDigest.getInstance("SHA-256")
+                .digest("안녕|narrator-male-low|1.0".toByteArray(Charsets.UTF_8)),
+        )
+        assertThat((r as SynthesizeTtsUseCase.Submission.Pending).jobId).isEqualTo(legacy)
+    }
+
+    @Test
+    fun `사이드카가 다른 언어를 돌려주면 저장하지 않고 실패로 떨어뜨린다`() {
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        // en 을 요청했는데 ko 오디오가 왔다 — 저장하면 잘못된 오디오가 캐시에 눌러앉는다.
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("https://r2/ko.wav", 1500, "xtts-v2", "ko"))
+        queueRunsInline()
+
+        uc.submit("David", "v", 1.0, "en")
+
+        val saved = argumentCaptor<TtsCache>()
+        verify(cache, times(2)).save(saved.capture())
+        val last = saved.lastValue
+        assertThat(last.status).isEqualTo(TtsCache.FAILED)
+        assertThat(last.audioUrl).isNull()
+    }
+
+    @Test
+    fun `언어를 안 돌려주는 옛 사이드카와도 동작한다`() {
+        // 새 백엔드 + 옛 사이드카가 공존하는 롤아웃 구간. language 키가 아예 없다.
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("https://r2/a.wav", 1500, "xtts-v2", null))
+        queueRunsInline()
+
+        uc.submit("안녕", "v", 1.0, "ko")
+
+        val saved = argumentCaptor<TtsCache>()
+        verify(cache, times(2)).save(saved.capture())
+        assertThat(saved.lastValue.status).isEqualTo(TtsCache.READY)
     }
 }

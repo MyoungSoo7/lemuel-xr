@@ -18,10 +18,14 @@ class TtsSynthesisSidecarAdapterTest {
 
     private var server: HttpServer? = null
 
+    /** 스텁이 마지막으로 받은 요청 본문. 무엇을 보냈는지까지 검증하기 위해 기록한다. */
+    private var lastRequestBody: String? = null
+
     private fun startStub(status: Int, body: String?): String {
         val srv = HttpServer.create(InetSocketAddress("127.0.0.1", 0), 0)
         server = srv
         srv.createContext("/synthesize") { exchange ->
+            lastRequestBody = exchange.requestBody.readBytes().toString(StandardCharsets.UTF_8)
             val bytes = body?.toByteArray(StandardCharsets.UTF_8) ?: ByteArray(0)
             exchange.responseHeaders.add("Content-Type", "application/json")
             exchange.sendResponseHeaders(status, if (bytes.isEmpty()) -1L else bytes.size.toLong())
@@ -48,11 +52,37 @@ class TtsSynthesisSidecarAdapterTest {
         )
         val client = TtsSynthesisSidecarAdapter(base)
 
-        val r = client.synthesize("안녕하세요", "narrator-male-low", 1.0)
+        val r = client.synthesize("안녕하세요", "narrator-male-low", 1.0, "ko")
 
         assertThat(r.audioUrl).isEqualTo("https://r2/audio/x.wav")
         assertThat(r.durationMs).isEqualTo(1234)
         assertThat(r.engine).isEqualTo("xtts-v2")
+    }
+
+    @Test
+    fun `language 를 실제로 전송한다`() {
+        // 이 키가 빠져 있던 동안 사이드카는 자기 기본값(ko)으로만 합성했고, 영어 문장도
+        // 한국어로 읽혔다. 어댑터가 정말 보내는지는 wire 를 봐야만 알 수 있다.
+        val base = startStub(
+            200,
+            """{"audioUrl":"u","durationMs":1,"engine":"xtts-v2","language":"en"}""",
+        )
+        val client = TtsSynthesisSidecarAdapter(base)
+
+        val r = client.synthesize("David and Goliath", "narrator-male-low", 1.0, "en")
+
+        assertThat(lastRequestBody).contains("\"language\":\"en\"")
+        assertThat(r.language).isEqualTo("en")
+    }
+
+    @Test
+    fun `옛 사이드카처럼 language 가 없는 응답이면 null 이다`() {
+        val base = startStub(200, """{"audioUrl":"u","durationMs":1,"engine":"xtts-v2"}""")
+        val client = TtsSynthesisSidecarAdapter(base)
+
+        val r = client.synthesize("안녕", "narrator-male-low", 1.0, "ko")
+
+        assertThat(r.language).isNull()
     }
 
     @Test
@@ -64,7 +94,7 @@ class TtsSynthesisSidecarAdapterTest {
         )
         val client = TtsSynthesisSidecarAdapter(base)
 
-        val r = client.synthesize("텍스트", null, null)
+        val r = client.synthesize("텍스트", null, null, "ko")
 
         assertThat(r.audioUrl).isEqualTo("https://r2/audio/y.wav")
     }
@@ -75,7 +105,7 @@ class TtsSynthesisSidecarAdapterTest {
         val base = startStub(200, null)
         val client = TtsSynthesisSidecarAdapter(base)
 
-        assertThatThrownBy { client.synthesize("안녕", "v", 1.0) }
+        assertThatThrownBy { client.synthesize("안녕", "v", 1.0, "ko") }
             .isInstanceOf(AppException::class.java)
             .satisfies({ e ->
                 assertThat((e as AppException).code).isEqualTo(ErrorCode.E_TTS_UPSTREAM_FAIL)
@@ -87,7 +117,7 @@ class TtsSynthesisSidecarAdapterTest {
         val base = startStub(500, """{"error":"boom"}""")
         val client = TtsSynthesisSidecarAdapter(base)
 
-        assertThatThrownBy { client.synthesize("안녕", "v", 1.0) }
+        assertThatThrownBy { client.synthesize("안녕", "v", 1.0, "ko") }
             .isInstanceOf(AppException::class.java)
             .satisfies({ e ->
                 assertThat((e as AppException).code).isEqualTo(ErrorCode.E_TTS_UPSTREAM_FAIL)
@@ -107,7 +137,7 @@ class TtsSynthesisSidecarAdapterTest {
         val base = startStub(200, """{"audioUrl":"$dataUrl","durationMs":5707,"engine":"xtts-v2"}""")
         val client = TtsSynthesisSidecarAdapter(base)
 
-        val r = client.synthesize("주는 나의 목자시니 내게 부족함이 없으리로다.", "narrator-male-low", 1.0)
+        val r = client.synthesize("주는 나의 목자시니 내게 부족함이 없으리로다.", "narrator-male-low", 1.0, "ko")
 
         assertThat(payload.length).isGreaterThan(262144) // 기본 한도를 실제로 넘겼는지부터 확인
         assertThat(r.audioUrl).hasSize(dataUrl.length)
@@ -123,7 +153,7 @@ class TtsSynthesisSidecarAdapterTest {
         val base = startStub(200, """{"audioUrl":"$dataUrl","durationMs":5707,"engine":"xtts-v2"}""")
         val client = TtsSynthesisSidecarAdapter(base, 262144)
 
-        assertThatThrownBy { client.synthesize("주는 나의 목자시니", "narrator-male-low", 1.0) }
+        assertThatThrownBy { client.synthesize("주는 나의 목자시니", "narrator-male-low", 1.0, "ko") }
             .isInstanceOf(AppException::class.java)
             .satisfies({ e ->
                 assertThat((e as AppException).code).isEqualTo(ErrorCode.E_TTS_UPSTREAM_FAIL)
@@ -135,7 +165,7 @@ class TtsSynthesisSidecarAdapterTest {
         // 살아있지 않은 포트 → connection refused → generic Exception catch 분기.
         val client = TtsSynthesisSidecarAdapter("http://127.0.0.1:1")
 
-        assertThatThrownBy { client.synthesize("안녕", "v", 1.0) }
+        assertThatThrownBy { client.synthesize("안녕", "v", 1.0, "ko") }
             .isInstanceOf(AppException::class.java)
             .satisfies({ e ->
                 assertThat((e as AppException).code).isEqualTo(ErrorCode.E_TTS_UPSTREAM_FAIL)

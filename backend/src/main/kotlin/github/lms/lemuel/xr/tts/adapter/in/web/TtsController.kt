@@ -3,6 +3,7 @@ package github.lms.lemuel.xr.tts.adapter.`in`.web
 import github.lms.lemuel.xr.tts.application.SynthesizeTtsUseCase
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -32,7 +33,7 @@ class TtsController(
     // 5000 이든 500 이든 아무 것도 막지 못하는 장식이었다.
     @PostMapping("/synthesize")
     fun synthesize(@Valid @RequestBody req: SynthesizeRequest): ResponseEntity<SynthesizeResponse> =
-        when (val r = synthesizeUc.submit(req.text, req.voiceId, req.speakingRate)) {
+        when (val r = synthesizeUc.submit(req.text, req.voiceId, req.speakingRate, req.language)) {
             is SynthesizeTtsUseCase.Submission.Ready ->
                 ResponseEntity.ok(
                     SynthesizeResponse(STATUS_READY, r.audioUrl, r.durationMs, true, null),
@@ -107,6 +108,15 @@ class TtsController(
         @field:NotBlank @field:Size(max = 500) val text: String,
         @field:Size(max = 50) val voiceId: String?,
         val speakingRate: Double?,
+        /**
+         * `ko` 또는 `en`. 생략하면 `ko`.
+         *
+         * 여기서 400 으로 거르는 것이 중요하다. 합성은 202 뒤 워커 스레드에서 일어나므로,
+         * 잘못된 언어를 통과시키면 사이드카의 400 이 **워커 안에서** 터지고 사용자에게는
+         * 이유를 알 수 없는 `failed` 폴링 결과로만 보인다.
+         */
+        @field:Pattern(regexp = "(?i)^(ko|en)$", message = "language 는 ko 또는 en 만 지원한다")
+        val language: String? = null,
     )
 
     /**
