@@ -12,9 +12,10 @@ import java.time.Duration
 @Component
 class TtsSynthesisSidecarAdapter(
     @Value("\${tts.base-url}") baseUrl: String,
+    @Value("\${tts.max-response-bytes:16777216}") maxResponseBytes: Int = DEFAULT_MAX_RESPONSE_BYTES,
 ) : TtsSynthesisPort {
 
-    private val client: WebClient = WebClient.builder().baseUrl(baseUrl).build()
+    private val client: WebClient = SidecarHttp.client(baseUrl, maxResponseBytes)
     private val timeout: Duration = Duration.ofSeconds(30)
 
     override fun synthesize(text: String, voiceId: String?, speakingRate: Double?): TtsSynthesisPort.SynthesisResult =
@@ -34,4 +35,13 @@ class TtsSynthesisSidecarAdapter(
                 resp["engine"] as String?,
             )
         }
+
+    companion object {
+        /**
+         * 16MiB. 사이드카는 오디오를 base64 data URL 로 인라인해서 돌려주므로
+         * 응답이 WAV 원본의 약 4/3 크기가 된다 — 긴 나레이션(수십 초)까지 여유 있게 받는 값.
+         * WebClient 기본값 256KB 로는 짧은 한 문장(실측 357KB)도 못 받는다. [SidecarHttp.client] 참조.
+         */
+        const val DEFAULT_MAX_RESPONSE_BYTES: Int = 16 * 1024 * 1024
+    }
 }

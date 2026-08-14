@@ -53,6 +53,8 @@ ai:
   base-url: ${AI_BASE_URL:http://localhost:8000}
   timeout-ms: 30000
   internal-token: ${AI_INTERNAL_TOKEN:dev-internal-token-rotate-in-prod}
+  # 긴 생성 응답이 WebClient 기본 한도(256KB)를 넘으면 사이드카는 200 인데 백엔드만 502 가 된다.
+  max-response-bytes: ${AI_MAX_RESPONSE_BYTES:4194304}
   # 2026-05-22 정착: lemuel-xr 정체성 = *영적 비상 대비 훈련* (큐티+민방위).
   # 임상·치료 영역 X → AI 생성 활성화 default. Prompt guard 가 *큐티 톤* 강제.
   generation:
@@ -79,6 +81,9 @@ ai:
 # === TTS 사이드카 (Coqui XTTS-v2, self-hosted) ===
 tts:
   base-url: ${TTS_BASE_URL:http://localhost:5002}
+  # 사이드카가 WAV 를 base64 data URL 로 인라인해 돌려주므로 응답이 크다 (실측: 5.7초 문장 = 357KB).
+  # WebClient 기본 한도 256KB 로는 *모든* 합성이 DataBufferLimitException → 502 가 된다.
+  max-response-bytes: ${TTS_MAX_RESPONSE_BYTES:16777216}
   cache-ttl-seconds: 86400
   storage:
     bucket: ${TTS_BUCKET:lemuel-xr-tts}
