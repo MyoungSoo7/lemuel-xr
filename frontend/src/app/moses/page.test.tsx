@@ -19,6 +19,9 @@ import {
   scene5Monologue,
   scene6OutroByScene3,
 } from "@/lib/content/moses-monologues";
+// 위기 문구 픽스처는 정본에서 만든다 — 번호를 여기 적으면 정본이 바뀔 때
+// 테스트만 옛 번호를 지키고 초록이 유지된다.
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * Moses 미션 화면 — 씬 1~6 상태 기계.
@@ -630,6 +633,37 @@ describe("Moses Scene 6 — 회복 (outro)", () => {
       "href",
       "/joseph",
     );
+  });
+
+  /*
+    moses.yml Scene 6 은 `crisis_reminder` 를 선언하고 백엔드
+    `CrisisTokenResolver` 가 `{{crisis_resources.default}}` 를 정본 번호로 치환해
+    내려보낸다. 2026-08-14 까지 이 화면은 그 값을 읽지 않았다 — 치환까지 끝난
+    안내가 payload 안에서 그대로 버려졌다.
+
+    CI 는 이걸 못 잡는다. `check_frontend_hotline.py` 는 "번호를 하드코딩했나" 만
+    보고, 아무것도 안 그리는 화면은 하드코딩이 아니라서 초록이다. 화면에 뜨는지는
+    테스트만 잰다.
+  */
+  it("payload 의 위기 안내를 결말에 낸다", async () => {
+    // 문구는 백엔드가 만든다. 화면은 그대로 실어 나르기만 해야 한다.
+    const reminder = `지금 이 순간이 무겁다면, ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
+    mockStart.mockResolvedValue({
+      sessionId: SESSION,
+      userId: "guest-1",
+      currentScene: 6,
+      scenePayload: { ...SCENE6_PAYLOAD, crisis_reminder: reminder },
+      responseText: null,
+    });
+    renderPage();
+
+    expect(await screen.findByRole("note")).toHaveTextContent(reminder);
+  });
+
+  it("안내가 없으면 빈 상자를 만들지 않는다", async () => {
+    await bootAt(6, "회복");
+
+    expect(screen.queryByRole("note")).toBeNull();
   });
 });
 

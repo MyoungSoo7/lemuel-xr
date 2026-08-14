@@ -23,6 +23,7 @@ import {
   type Scene4Choice,
 } from "@/lib/content/moses-monologues";
 import { SceneBootState } from "@/components/SceneBootState";
+import { CrisisReminder } from "@/components/CrisisReminder";
 
 /**
  * Moses 미션 — Phase 2 완전 활성 (요셉과 동급).
@@ -114,6 +115,8 @@ export default function MosesPage() {
   const field = <T,>(key: string): T | undefined =>
     (extras[key] as T | undefined) ?? (payload[key] as T | undefined);
 
+  const crisisReminder = field<string>("crisis_reminder");
+
   const advance = (sceneId: number, decision: unknown) => {
     decide.mutate({ sceneId, decision });
   };
@@ -126,6 +129,14 @@ export default function MosesPage() {
         </p>
         <h1 className="text-2xl font-bold mt-1">{title}</h1>
       </header>
+
+      {/*
+        R1 — yml 이 선언하고 백엔드가 정본 번호로 치환해 내려보낸 위기 안내.
+        읽지 않으면 outro 에 위기 자원이 한 줄도 뜨지 않는다(2026-08-14 까지 이
+        화면이 그랬다). `check_frontend_hotline.py` 는 "번호가 하드코딩됐나" 만
+        보므로 없는 것은 잡지 못한다.
+      */}
+      <CrisisReminder text={crisisReminder} />
 
       {/* Decision echo — 직전 결정의 모놀로그 / 아웃컴 */}
       {echo && (

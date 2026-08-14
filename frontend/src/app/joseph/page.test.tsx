@@ -26,6 +26,9 @@ vi.mock("@/lib/api/game", () => ({
 }));
 
 import { startJoseph, decideJoseph, completeJoseph } from "@/lib/api/game";
+// 위기 문구 픽스처는 정본에서 만든다. 번호를 여기에 적으면 정본이 바뀔 때
+// 테스트만 옛 번호를 지키고 초록을 유지한다 — check_frontend_hotline.py 가 막는 것.
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 import JosephPage from "./page";
 
 const SESSION = "sess-joseph";
@@ -207,6 +210,59 @@ describe("요셉 미션 — 씬 상태 기계", () => {
 
     expect(await screen.findByText(/이집트는 살았다/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "미션 완료" })).toBeEnabled();
+  });
+});
+
+describe("요셉 미션 — outro 위기 안내 (joseph.yml crisis_reminder)", () => {
+  /*
+    joseph.yml Scene 5 는 `extras.crisis_reminder` 를 선언하고, 백엔드
+    `CrisisTokenResolver` 가 `{{crisis_resources.default}}` 를 DB 정본 번호로
+    치환해서 내려보낸다. 그런데 2026-08-14 까지 이 화면은 그 값을 **읽지도
+    않았다** — 치환까지 끝난 안내 문구가 payload 안에서 그대로 버려졌고,
+    배신·가족 트라우마를 다룬 미션의 결말에 위기 자원이 한 줄도 안 떴다.
+
+    CI 가 못 잡은 이유가 이 테스트의 존재 이유다. `check_frontend_hotline.py` 는
+    "번호를 하드코딩했나" 를 보지 "번호가 뜨나" 는 보지 않는다 — 없는 것은
+    하드코딩이 아니므로 초록이다. 화면에 뜨는지는 오직 테스트만 잰다.
+  */
+  it("outro 는 payload 의 위기 안내를 그대로 낸다", async () => {
+    // 문구는 백엔드가 만든다. 화면이 문안을 지어내면 안전 검토가 무의미해지므로
+    // 픽스처 문자열이 **그대로** 나오는지를 본다.
+    const reminder = `지금 이 순간이 무겁다면, ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
+    vi.mocked(startJoseph).mockResolvedValue(
+      scene(5, {
+        title: "결말",
+        type: "outro",
+        extras: { crisis_reminder: reminder },
+      }),
+    );
+    renderPage();
+
+    expect(await screen.findByRole("note")).toHaveTextContent(reminder);
+  });
+
+  it("최상위로 펼쳐져 내려와도 읽는다", async () => {
+    /*
+      ScenePayloadAssembler 는 표준 필드는 payload 최상위로 펼치고 `extras:` 블록만
+      중첩해 둔다. yml 이 어느 쪽에 쓰였느냐로 안내가 사라지면 안 되므로 두 경로를
+      다 받는다 — 다른 화면(elijah·job·solomon)의 `extras[key] ?? payload[key]` 와
+      같은 규칙이다.
+    */
+    const reminder = `혼자 두지 않겠습니다. ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
+    vi.mocked(startJoseph).mockResolvedValue(
+      scene(5, { title: "결말", type: "outro", crisis_reminder: reminder }),
+    );
+    renderPage();
+
+    expect(await screen.findByRole("note")).toHaveTextContent(reminder);
+  });
+
+  it("안내가 없는 씬은 빈 상자를 만들지 않는다", async () => {
+    vi.mocked(startJoseph).mockResolvedValue(SCENE5);
+    renderPage();
+
+    await screen.findByText(/이집트는 살았다/);
+    expect(screen.queryByRole("note")).toBeNull();
   });
 });
 

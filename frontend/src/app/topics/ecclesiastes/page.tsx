@@ -43,7 +43,8 @@ export default function EcclesiastesPage() {
           </Link>
         </div>
         <p className="text-xs text-[var(--color-warm)]/40 mt-2">
-          기준4 — *해 아래 유한함* 을 정직하게 인정하는 자리. 전 3:1 &ldquo;범사에 기한이 있다&rdquo;.
+          기준4 — *해 아래 유한함* 을 정직하게 인정하는 자리. 전 3:1
+          &ldquo;범사에 기한이 있다&rdquo;.
         </p>
       </header>
 
@@ -64,7 +65,9 @@ export default function EcclesiastesPage() {
                     : "border-[var(--color-primary)]/20 hover:border-[var(--color-primary)]/60"
                 }`}
               >
-                <p className="text-xs text-[var(--color-primary)] font-mono">📖 {c.chapterRef}</p>
+                <p className="text-xs text-[var(--color-primary)] font-mono">
+                  📖 {c.chapterRef}
+                </p>
                 <p className="font-semibold mt-1 text-sm">{c.title}</p>
               </button>
             ))}
@@ -132,7 +135,9 @@ function ReflectionSection({
   return (
     <section className="mb-6 rounded-lg border border-[var(--color-primary)]/20 p-4">
       {/* 성경 본문 (성경만 근거) */}
-      <p className="text-xs text-[var(--color-primary)] font-mono">📖 {category.chapterRef}</p>
+      <p className="text-xs text-[var(--color-primary)] font-mono">
+        📖 {category.chapterRef}
+      </p>
       <blockquote className="text-sm text-[var(--color-warm)]/90 italic leading-relaxed border-l-2 border-[var(--color-primary)]/40 pl-3 mt-2">
         {category.verse}
       </blockquote>
@@ -200,8 +205,8 @@ function ReflectionSection({
       {/* §4.4 결론 회피 금지 — 전 12:13 결론 함께 보기 */}
       <div className="mt-4 rounded-md border border-[var(--color-primary)]/20 bg-[var(--color-primary)]/5 p-3">
         <p className="text-xs text-[var(--color-warm)]/80 leading-relaxed">
-          &ldquo;일의 결국을 다 들었으니 하나님을 경외하고 그의 명령들을 지킬지어다 이것이 모든 사람의
-          본분이니라&rdquo; (전 12:13)
+          &ldquo;일의 결국을 다 들었으니 하나님을 경외하고 그의 명령들을
+          지킬지어다 이것이 모든 사람의 본분이니라&rdquo; (전 12:13)
         </p>
         <label className="flex items-center gap-2 mt-2 text-xs text-[var(--color-warm)]/70">
           <input
@@ -218,7 +223,10 @@ function ReflectionSection({
           onClick={() => mutation.mutate()}
           disabled={
             mutation.isPending ||
-            (!futility.trim() && !meaning.trim() && !season && !conclusionViewed)
+            (!futility.trim() &&
+              !meaning.trim() &&
+              !season &&
+              !conclusionViewed)
           }
           className="px-4 py-2 rounded-md text-sm bg-[var(--color-primary)]/15 border border-[var(--color-primary)]/40 hover:bg-[var(--color-primary)]/25 disabled:opacity-40 transition"
         >
@@ -236,12 +244,20 @@ function ReflectionSection({
             잠시 멈추고, 함께 안전을 살펴봐요.
           </p>
           <p className="text-xs text-[var(--color-warm)]/70 mt-1 leading-relaxed">
-            전도서의 &ldquo;헛됨&rdquo;은 인생을 포기하라는 말이 아닙니다. 지금 마음이 많이
-            힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
+            전도서의 &ldquo;헛됨&rdquo;은 인생을 포기하라는 말이 아닙니다. 지금
+            마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려
+            있어요.
           </p>
-          <p className="text-xs text-red-300 mt-2 font-mono">{CRISIS_LINE_SHORT}</p>
+          <p className="text-xs text-red-300 mt-2 font-mono">
+            {CRISIS_LINE_SHORT}
+          </p>
+          {/*
+            문구가 「일기(#1)」 라고 말하므로 목적지도 일기여야 한다. 여기는
+            `/topics/practice`(실천 목록)를 가리키고 있었다 — 위기 순간에 제시되는
+            유일한 다음 행동이 엉뚱한 화면으로 가고 있었다.
+          */}
           <Link
-            href="/topics/practice"
+            href="/topics/journal"
             className="inline-block mt-2 text-xs text-[var(--color-primary)] hover:underline"
           >
             일기(#1)로 마음을 먼저 적어보기 →

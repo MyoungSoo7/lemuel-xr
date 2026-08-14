@@ -10,6 +10,11 @@ import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { ClassifyResponse } from "@/lib/api/emotion";
 import HomePage from "./page";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다 —
+// `scripts/check_frontend_hotline.py` 가 화면·테스트·주석 전부를 검사한다.
+// (이 자리들은 소프트 패턴이 같은 줄의 문맥 단어를 요구해서 게이트를 통과하고
+//  있었지만, 그건 규칙의 취지가 아니라 정규식의 빈틈이다.)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 // 백엔드로 나가는 유일한 통로를 여기서 끊는다 (그 밑은 client.ts 의 axios).
 vi.mock("@/lib/api/emotion", () => ({
@@ -95,7 +100,7 @@ describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
     // 문장과 번호가 *분류를 시도하기 전에* 이미 시야에 있어야 한다.
     renderHome();
     expect(screen.getByText(/의료·임상 도구가 아닙니다/)).toBeInTheDocument();
-    expect(screen.getByText(/109/)).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(CRISIS_DEFAULT.tel))).toBeInTheDocument();
   });
 
   it("입력이 비어 있으면 제출 버튼이 잠겨 있다", () => {

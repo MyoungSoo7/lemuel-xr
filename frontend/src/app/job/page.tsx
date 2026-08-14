@@ -11,6 +11,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import { CrisisReminder } from "@/components/CrisisReminder";
 
 /**
  * Job 미션 — 너의 비탄은 부끄러운 것이 아니다.
@@ -141,11 +142,12 @@ export default function JobPage() {
         )}
       </header>
 
-      {crisisReminder && (
-        <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-amber-500/40 bg-amber-500/10 text-sm text-[var(--color-warm)]/90">
-          {crisisReminder}
-        </section>
-      )}
+      {/*
+        원래 여기 있던 블록을 그대로 옮긴 것이다. 손으로 베낀 사본이 화면마다
+        갈라진 것이 이번 결함의 원인이라(7개 시나리오가 선언, 3개 화면만 렌더)
+        렌더를 한 벌로 모았다.
+      */}
+      <CrisisReminder text={crisisReminder} />
 
       {/* Scene 배경 이미지 */}
       <section

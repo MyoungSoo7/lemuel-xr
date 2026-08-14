@@ -664,6 +664,48 @@ describe("David 미션 화면", () => {
     });
   });
 
+  describe("outro 위기 안내 (david.yml crisis_reminder)", () => {
+    /*
+      david.yml Scene 6 은 `extras.crisis_reminder` 를 선언하고, 백엔드
+      `CrisisTokenResolver` 가 `{{crisis_resources.default}}` 를 DB 정본 번호로
+      치환해 내려보낸다. 그런데 2026-08-14 까지 이 화면은 그 값을 **읽지도
+      않았다** — 치환까지 끝난 안내가 payload 안에서 그대로 버려졌고, 폭력
+      경고(Scene 5)를 지나온 미션의 결말에 위기 자원이 한 줄도 안 떴다.
+
+      CI 가 못 잡은 자리다. `check_frontend_hotline.py` 는 "번호를 하드코딩했나"
+      를 보지 "번호가 뜨나" 는 보지 않는다 — 없는 것은 하드코딩이 아니므로
+      초록이다. 화면에 뜨는지는 테스트만 잰다.
+    */
+    it("결말 화면이 payload 의 위기 안내를 낸다", async () => {
+      startMock.mockResolvedValue(sceneResponse(6));
+      renderPage();
+
+      await screen.findByRole("heading", { name: "회복" });
+      // 문구는 백엔드가 만든다. 화면이 문안을 다듬으면 안전 검토가 무의미해지므로
+      // 픽스처 문자열이 그대로 나오는지 본다.
+      const extras = PAYLOADS[6].extras as { crisis_reminder: string };
+      expect(screen.getByRole("note")).toHaveTextContent(
+        extras.crisis_reminder,
+      );
+    });
+
+    it("안내가 없는 결말은 빈 상자를 만들지 않는다", async () => {
+      // 테두리만 남은 상자는 "안내가 있는 줄 알았는데 비어 있다" 는 인상을 준다.
+      startMock.mockResolvedValue(
+        customScene(6, {
+          sceneId: 6,
+          title: "회복",
+          type: "outro",
+          next: null,
+        }),
+      );
+      renderPage();
+
+      await screen.findByRole("heading", { name: "회복" });
+      expect(screen.queryByRole("note")).toBeNull();
+    });
+  });
+
   describe("백엔드가 이상한 것을 줘도 화면이 비지 않는다", () => {
     it("decide 가 실패하면 오류를 말하고 현재 씬은 그대로 남는다", async () => {
       decideMock.mockRejectedValueOnce(new Error("결정 저장 실패"));

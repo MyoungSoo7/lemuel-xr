@@ -20,6 +20,7 @@ import {
 } from "@/lib/content/joseph-monologues";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import { SceneBootState } from "@/components/SceneBootState";
+import { CrisisReminder } from "@/components/CrisisReminder";
 import {
   TriggerWarningGate,
   readTriggerWarning,
@@ -114,6 +115,16 @@ export default function JosephPage() {
       ? ((payload.interaction as string) ?? "")
       : rawType;
 
+  /*
+    ScenePayloadAssembler 는 yml 의 표준 필드는 payload 최상위로 펼치고, `extras:`
+    블록은 `payload.extras` 아래에 그대로 둔다. joseph.yml 의 `crisis_reminder` 는
+    extras 안이므로 최상위만 보면 못 찾는다. 다른 화면(elijah·job·solomon)이
+    `extras[key] ?? payload[key]` 순으로 보는 것과 같은 이유다.
+  */
+  const extras = (payload.extras as Record<string, unknown>) ?? {};
+  const crisisReminder = (extras.crisis_reminder ??
+    payload.crisis_reminder) as string | undefined;
+
   // R4 — 게이트 여부는 payload 가 정한다. 씬 번호를 조건으로 쓰지 않는다:
   // yml 이 다른 씬에 경고를 붙이면 그 씬도 자동으로 닫혀야 한다.
   const warning = readTriggerWarning(payload);
@@ -127,6 +138,14 @@ export default function JosephPage() {
         </p>
         <h1 className="text-2xl font-bold mt-1">{title}</h1>
       </header>
+
+      {/*
+        R1 — yml 이 선언하고 백엔드가 정본 번호로 치환해 내려보낸 위기 안내.
+        읽지 않으면 outro 에 위기 자원이 한 줄도 뜨지 않는다(2026-08-14 까지 이
+        화면이 그랬다). `check_frontend_hotline.py` 는 "번호가 하드코딩됐나" 만
+        보므로 없는 것은 잡지 못한다.
+      */}
+      <CrisisReminder text={crisisReminder} />
 
       {/* Decision echo — 직전 결정의 모놀로그 / 아웃컴 */}
       {echo && (

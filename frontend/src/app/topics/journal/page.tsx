@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { CRISIS_LINE_FULL, CRISIS_LINE_SHORT } from "@/lib/crisis-resources";
+import {
+  CRISIS_DEFAULT,
+  CRISIS_LINE_FULL,
+  CRISIS_LINE_SHORT,
+  telHref,
+} from "@/lib/crisis-resources";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   fetchJournalGuidance,
@@ -141,12 +146,23 @@ export default function JournalGuidancePage() {
             <p className="text-xs text-red-300 mt-2 font-mono">
               {CRISIS_LINE_SHORT}
             </p>
-            <Link
-              href="/topics/journal"
+            {/*
+              여기는 이미 일기 화면이다. 다른 두 화면(전도서·실천)의 위기 카드는
+              「일기로 먼저 적어보기」로 사용자를 이 페이지로 보내지만, 이 페이지에서
+              같은 링크를 내면 자기 자신을 가리킨다 — 눌러도 아무 데도 못 가고,
+              위기 순간에 제시되는 유일한 다음 행동이 죽는다.
+
+              그래서 여기서는 이동이 아니라 **행동**을 준다. 전화 링크는 상시 노출
+              푸터에도 있지만, 그건 접힌 한 줄이고 이 카드는 지금 사용자가 보고 있는
+              자리다. 44px(WCAG 2.5.5 / Apple HIG) — CrisisFooter 가 2026-08-12 에
+              23×15px 였던 것과 같은 실수를 반복하지 않는다.
+            */}
+            <a
+              href={telHref(CRISIS_DEFAULT)}
               className="inline-flex items-center min-h-11 mt-2 text-xs text-[var(--color-primary)] hover:underline"
             >
-              일기(#1)로 마음을 먼저 적어보기 →
-            </Link>
+              {CRISIS_DEFAULT.label} {CRISIS_DEFAULT.tel} 지금 전화하기 →
+            </a>
           </div>
         )}
 
