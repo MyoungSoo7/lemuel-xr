@@ -26,6 +26,10 @@ const config = [
       "node_modules/**",
       "playwright-report/**",
       "test-results/**",
+      // vitest 커버리지 HTML 리포트. istanbul 이 만든 벤더 JS 가 들어 있어서
+      // 빼두지 않으면 `--max-warnings=0` 이 남의 코드 때문에 빨개진다.
+      // (`.gitignore` 는 eslint flat config 에 영향을 주지 않는다 — 별도로 적어야 한다.)
+      "coverage/**",
       "next-env.d.ts",
       "tsconfig.tsbuildinfo",
     ],
