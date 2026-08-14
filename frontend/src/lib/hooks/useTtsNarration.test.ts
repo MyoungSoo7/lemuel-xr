@@ -501,3 +501,160 @@ describe("useTtsNarration — graceful degradation", () => {
     expect(만들어진오디오).toHaveLength(0);
   });
 });
+
+/**
+ * 긴 본문(500자 초과) 은 조각으로 나뉘어 *차례로* 합성되고 이어서 재생된다.
+ *
+ * 실물은 모세 3씬 echo 다 — 카드를 내려놓을수록 응답이 붙어 최대 716자가 되고,
+ * 그대로 보내면 백엔드 상한(500)에 걸려 400 이 났다. 버튼은 onUnavailable="hide"
+ * 라 조용히 사라졌으므로, 카드를 많이 내려놓은 사람만 소리를 못 들었다.
+ */
+describe("useTtsNarration — 상한을 넘는 본문", () => {
+  /** 상한(500)을 넘되 문단 경계가 있는 본문. 두 조각으로 갈린다. */
+  const 긴본문 = `${"가".repeat(300)}\n\n${"나".repeat(300)}`;
+
+  it("조각마다 합성하고 이어 붙여 한 번의 낭독으로 들려준다", async () => {
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+
+    // 보낸 조각은 둘 다 상한 이하여야 한다 — 이게 400 을 막는 지점이다.
+    expect(mockSynthesize).toHaveBeenCalledTimes(2);
+    for (const [보낸글] of mockSynthesize.mock.calls) {
+      expect(보낸글.length).toBeLessThanOrEqual(500);
+    }
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+
+    // 첫 조각이 끝나면 idle 이 아니라 다음 조각으로 이어져야 한다.
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    await waitFor(() =>
+      expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/2.mp3"),
+    );
+    expect(result.current.status).toBe("playing");
+
+    // 마지막 조각까지 끝나야 idle 이다.
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("상한 이하인 본문은 쪼개지 않고 원문 그대로 보낸다", async () => {
+    // 캐시 키가 sha256(본문) 이라, 짧은 글까지 쪼개면 이미 데워 둔 캐시를 전부
+    // 놓쳐 첫 재생이 다시 수십 초가 된다.
+    const 짧은본문 = "여호와는 나의 목자시니\n\n내게 부족함이 없으리로다.";
+    mockSynthesize.mockResolvedValue(응답("https://cdn/x.mp3"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(짧은본문);
+    });
+
+    expect(mockSynthesize).toHaveBeenCalledTimes(1);
+    expect(mockSynthesize).toHaveBeenCalledWith(짧은본문, undefined);
+  });
+
+  it("중간 조각이 실패하면 앞부분만 읽어 주지 않고 조용히 unavailable", async () => {
+    // 문맥이 끊긴 채 앞부분만 들리는 것이 아무 소리도 안 나는 것보다 나쁘다.
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce({
+        status: "failed",
+        audioUrl: null,
+        durationMs: null,
+        cached: false,
+        jobId: null,
+      });
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+
+    expect(result.current.status).toBe("unavailable");
+    expect(만들어진오디오).toHaveLength(0);
+  });
+
+  it("조각을 기다리는 중 stop() 하면 남은 조각을 더 합성하지 않는다", async () => {
+    mockSynthesize.mockResolvedValueOnce(대기중("job-1"));
+    mockPoll.mockResolvedValue({
+      status: "pending",
+      audioUrl: null,
+      durationMs: null,
+      cached: false,
+      jobId: "job-1",
+    });
+    const { result } = renderHook(() => useTtsNarration());
+
+    let 요청: Promise<void>;
+    act(() => {
+      요청 = result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("synthesizing"));
+
+    act(() => {
+      result.current.stop();
+    });
+    await act(async () => {
+      await 요청!;
+    });
+
+    // 첫 조각 한 번만 요청됐고, 둘째 조각으로 넘어가지 않았다.
+    expect(mockSynthesize).toHaveBeenCalledTimes(1);
+    expect(만들어진오디오).toHaveLength(0);
+  });
+
+  it("정지하면 남은 조각도 버린다 — 다음 조각이 유령처럼 울리지 않는다", async () => {
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+
+    act(() => {
+      result.current.stop();
+    });
+    expect(result.current.status).toBe("idle");
+
+    // 정지 뒤 늦게 도착한 ended 가 다음 조각을 틀어서는 안 된다.
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("같은 긴 본문을 다시 들으면 재합성 없이 조각들을 그대로 다시 재생한다", async () => {
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+    act(() => {
+      result.current.stop();
+    });
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+
+    expect(mockSynthesize).toHaveBeenCalledTimes(2); // 재합성 없음
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+  });
+});
