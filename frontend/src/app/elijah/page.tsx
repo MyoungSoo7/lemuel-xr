@@ -14,7 +14,7 @@ import {
 import { SceneBootState } from "@/components/SceneBootState";
 import {
   TriggerWarningGate,
-  type TriggerWarning,
+  readTriggerWarning,
 } from "@/components/TriggerWarningGate";
 
 /**
@@ -124,7 +124,7 @@ export default function ElijahPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
-  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
   const anchor = field<string>("anchor");

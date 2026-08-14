@@ -300,7 +300,9 @@ async function bootToScene1() {
 
 /** 동의 게이트가 있는 씬(3·4)에서 카드를 통과한다 — 게이트 자체를 재는 테스트가 아닐 때 쓴다. */
 async function consent(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(await screen.findByRole("button", { name: "계속한다" }));
+  await user.click(
+    await screen.findByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+  );
 }
 
 beforeEach(() => {
@@ -462,10 +464,10 @@ describe("Solomon Scene 3 — R4 동의 게이트 (두 여인 재판)", () => {
     expect(screen.queryByText(/\[계속한다\]/)).toBeNull();
     expect(screen.queryByText(/음성\/자막 강도: \[/)).toBeNull();
     expect(
-      screen.getByRole("button", { name: "계속한다" }),
+      screen.getByRole("button", { name: "준비됐어요 · 들어갈게요" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "건너뛰기 →" }),
+      screen.getByRole("button", { name: "이 장면은 건너뛸게요 →" }),
     ).toBeInTheDocument();
     // 위기 자원 줄은 산문에 남아야 한다 (서버가 치환한 정본).
     expect(
@@ -492,7 +494,9 @@ describe("Solomon Scene 3 — R4 동의 게이트 (두 여인 재판)", () => {
     mockDecide.mockResolvedValue(sceneResponse(4));
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "건너뛰기 →" }));
+    await user.click(
+      await screen.findByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
 
     expect(mockDecide).toHaveBeenCalledWith("solomon", SESSION, 3, {
       value: "skip",
@@ -769,7 +773,9 @@ describe("Solomon — 끝까지 걸어가기", () => {
     mockStart.mockResolvedValue(sceneResponse(3));
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "건너뛰기 →" }));
+    await user.click(
+      await screen.findByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
 
     // Scene 4 — 라벨 없이 통과
     await screen.findByText("잠깐 — 다음 장면 안내");
@@ -816,11 +822,16 @@ describe("Solomon — payload 가 얇을 때도 길이 막히지 않는다", () 
     expect(screen.queryByText(/내려놓아도 좋습니다/)).toBeNull();
   });
 
-  it("[구멍] consent_card_ko 가 없으면 경고 카드가 *문구 없이* 뜬다", async () => {
-    // 이 화면은 카드 본문을 payload 정본에만 의존한다. level·content 는 읽지도 않고,
-    // 공용 TriggerWarningGate 의 fallbackProse 같은 대체 문구도 없다.
-    // 그래서 정본 문구가 빠진 yml(예: david·joseph 형태) 을 이 화면에 물리면
-    // 사용자는 *무엇에 대한 경고인지 모른 채* 계속/건너뛰기를 고르게 된다.
+  it("consent_card_ko 가 없어도 카드는 문구와 트리거 종류를 갖춘 채 뜬다", async () => {
+    /*
+      예전 이 화면은 카드 본문을 payload 정본에만 의존했다. level·content 는
+      읽지도 않았고(로컬 TriggerWarning 타입에 `content` 가 아예 없었다) 대체
+      문구도 없었다. 그래서 정본 문구가 빠진 yml(david·joseph 형태) 을 물리면
+      사용자는 *무엇에 대한 경고인지 모른 채* 계속/건너뛰기를 골라야 했다.
+
+      공용 게이트로 옮기면서 세 가지가 한꺼번에 돌아온다 — 화면 소유 산문,
+      한국어 트리거 태그, 건너뛰기 목적지.
+    */
     mockStart.mockResolvedValue({
       ...sceneResponse(3),
       scenePayload: {
@@ -838,12 +849,15 @@ describe("Solomon — payload 가 얇을 때도 길이 막히지 않는다", () 
       await screen.findByText("잠깐 — 다음 장면 안내"),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "계속한다" }),
+      screen.getByRole("button", { name: "준비됐어요 · 들어갈게요" }),
     ).toBeInTheDocument();
-    // 경고의 내용(레벨·트리거 종류)은 어디에도 나오지 않는다.
-    expect(screen.queryByText(/영아 상실/)).toBeNull();
-    expect(screen.queryByText(/medium/)).toBeNull();
-    // 그래도 본문은 확실히 가려져 있다 — 게이트 자체는 작동한다.
+    expect(screen.getByText("영아 상실")).toBeInTheDocument();
+    expect(
+      screen.getByText(/정서 강도: 중간 · 건너뛰면 Scene 4 으로 이어집니다/),
+    ).toBeInTheDocument();
+    // 원문 토큰이 사용자에게 그대로 새지는 않는다.
+    expect(screen.queryByText(/infant_loss/)).toBeNull();
+    // 본문은 여전히 가려져 있다.
     expect(screen.queryByText(/그 때에 두 여자가/)).toBeNull();
   });
 });
@@ -858,7 +872,9 @@ describe("Solomon — 동의 게이트에서의 실패 처리", () => {
     mockDecide.mockRejectedValue(new Error("502 Bad Gateway"));
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "건너뛰기 →" }));
+    await user.click(
+      await screen.findByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
 
     // 요약 자막은 이미 떠 있는데(= 건너뛴 것처럼 보이는데) 실제로는 씬이 안 넘어갔다.
     expect(

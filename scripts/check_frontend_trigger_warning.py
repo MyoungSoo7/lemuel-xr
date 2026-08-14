@@ -33,6 +33,9 @@ skip 목적지가 실재하는 씬인지만 보지 화면이 그 길을 쓰는�
      `payload.trigger_warning` 을 (직접 또는 readTriggerWarning 으로) 읽는가.
   B. 그 화면에 건너뛰기 경로(`"skip"` 결정)가 있는가.
   C. 폐기된 레거시 플래그(`violence_warning`)를 게이트 조건으로 다시 읽지 않는가.
+  D. **선언 자체가 실어 나를 수 있는 모양인가** — 빈 선언(`trigger_warning:` 만)과
+     스칼라 선언(`trigger_warning: true`)을 거부한다. 둘 다 화면 코드는 멀쩡한데
+     경고만 사라지는 경로라, 프론트 쪽에서는 잡을 수 없다 (scan_declarations 참조).
 
 이 판정기가 재지 **않는** 것
 ────────────────────────────
@@ -55,8 +58,11 @@ ROOT = Path(__file__).resolve().parent.parent
 SCENARIOS = ROOT / "backend" / "src" / "main" / "resources" / "scenarios"
 APP = ROOT / "frontend" / "src" / "app"
 
-TRIGGER_LINE = re.compile(r"^\s*trigger_warning:\s*$")
+# `trigger_warning:` 선언 줄. 뒤에 값이 붙었으면 group("inline") 에 잡힌다.
+TRIGGER_LINE = re.compile(r"^(?P<indent>\s*)trigger_warning:(?P<inline>.*)$")
 SCENE_ID_LINE = re.compile(r"^\s*-\s*id:\s*(\d+)\s*$")
+# 주석·빈 줄은 블록 본문 판정에서 건너뛴다.
+SKIP_LINE = re.compile(r"^\s*(#.*)?$")
 
 # payload 를 읽는 두 형태 — 직접 접근, 그리고 공용 헬퍼.
 READS_PAYLOAD = re.compile(r"payload\.trigger_warning|readTriggerWarning\s*\(")
@@ -66,23 +72,72 @@ HAS_SKIP = re.compile(r'["\']skip["\']')
 LEGACY_FLAG = re.compile(r'["\']violence_warning["\']')
 
 
-def scenes_with_warning(path: Path) -> list[int]:
-    """yml 에서 trigger_warning 이 붙은 씬 id 목록.
+def scan_declarations(path: Path) -> tuple[list[int], list[str]]:
+    """yml 에서 trigger_warning 선언을 훑는다 → (정상 선언 씬 id 목록, 위반 설명 목록).
 
     PyYAML 을 쓰지 않는다 — 이 잡(frontend)에는 setup-python 이 붙어 있지 않고
-    러너 기본 python3 에 pyyaml 이 있다는 보장이 없다. 우리가 볼 것은 키의
-    존재 여부뿐이라 줄 단위 스캔으로 충분하다.
+    러너 기본 python3 에 pyyaml 이 있다는 보장이 없다. 줄 단위 스캔으로 충분하다.
+
+    ─────────────── 왜 선언의 *모양* 까지 보나 ───────────────
+
+    프론트에서는 이 두 경우를 구별할 수 없기 때문이다:
+
+      · `trigger_warning:` 키만 적고 값을 비운 경우 — SnakeYAML 이 null 을 싣고
+        `spring.jackson.default-property-inclusion: non_null` (application.yml) 이
+        그 키를 JSON 에서 통째로 지운다. 화면에 도착하는 모양은 **선언이 아예 없는
+        씬과 완전히 같다.** 저작자는 경고를 붙였다고 믿고, 화면엔 아무것도 안 뜨고,
+        예전 이 판정기는 "화면이 payload 를 읽는가" 만 봤으므로 초록이었다.
+        joseph 사고와 같은 결말이 yml 한 줄로 재현된다.
+
+      · `trigger_warning: true` 같은 스칼라 — 게이트는 열리지만 무엇을 경고하는지
+        (level·content·건너뛰기 목적지) 아무것도 못 싣는다. 게다가 예전 정규식은
+        줄 끝이 비어야만 매치해서 이 줄은 **선언으로 세지도 않았다** — 그 시나리오는
+        판정 대상에서 통째로 빠졌다.
+
+    yml 을 직접 읽는 이 자리가 두 경우를 볼 수 있는 유일한 곳이다.
     """
     ids: list[int] = []
+    violations: list[str] = []
+    lines = path.read_text(encoding="utf-8").splitlines()
     current: int | None = None
-    for line in path.read_text(encoding="utf-8").splitlines():
+
+    for i, line in enumerate(lines):
         m = SCENE_ID_LINE.match(line)
         if m:
             current = int(m.group(1))
             continue
-        if TRIGGER_LINE.match(line) and current is not None:
-            ids.append(current)
-    return ids
+
+        m = TRIGGER_LINE.match(line)
+        if not m or current is None:
+            continue
+
+        rel = f"{path.name} 씬 {current}"
+        inline = m.group("inline").split("#", 1)[0].strip()
+        if inline:
+            violations.append(
+                f"{rel} — `trigger_warning: {inline}` 스칼라 선언\n"
+                f"        → level·content·skip_alternative_scene_id 를 실을 수 없다. "
+                f"화면에는 무엇을 경고하는지 없는 빈 카드가 뜬다. 블록으로 적어라."
+            )
+            continue
+
+        # 블록 선언 — 바로 아래에 더 깊은 들여쓰기의 본문이 있어야 한다.
+        indent = len(m.group("indent"))
+        body = next(
+            (ln for ln in lines[i + 1 :] if not SKIP_LINE.match(ln)),
+            None,
+        )
+        if body is None or (len(body) - len(body.lstrip())) <= indent:
+            violations.append(
+                f"{rel} — `trigger_warning:` 이 비어 있다\n"
+                f"        → 값이 null 이면 백엔드 non_null 직렬화가 키를 통째로 지운다. "
+                f"화면에는 *선언이 없는 씬과 똑같이* 도착해 경고가 조용히 사라진다."
+            )
+            continue
+
+        ids.append(current)
+
+    return ids, violations
 
 
 def main() -> int:
@@ -96,7 +151,8 @@ def main() -> int:
 
     for yml in sorted(SCENARIOS.glob("*.yml")):
         char = yml.stem
-        gated = scenes_with_warning(yml)
+        gated, yml_violations = scan_declarations(yml)
+        violations.extend(yml_violations)
         if not gated:
             continue
 
@@ -147,8 +203,9 @@ def main() -> int:
         return 1
 
     print("--- 위반 0 ---")
-    print("  ⚠️ 이 초록의 주장 범위: 화면이 payload 를 *읽는다* 까지다.")
-    print("     카드가 실제로 렌더되는지·문구가 적절한지는 재지 않는다.")
+    print("  ⚠️ 이 초록의 주장 범위: 선언이 실어 나를 수 있는 모양이고 화면이")
+    print("     payload 를 *읽는다* 까지다. 카드가 실제로 렌더되는지·문구가")
+    print("     적절한지는 재지 않는다 — 그건 프론트 유닛 테스트와 사람의 몫이다.")
     return 0
 
 

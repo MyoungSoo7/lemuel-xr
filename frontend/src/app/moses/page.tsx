@@ -26,7 +26,7 @@ import { SceneBootState } from "@/components/SceneBootState";
 import { CrisisReminder } from "@/components/CrisisReminder";
 import {
   TriggerWarningGate,
-  type TriggerWarning,
+  readTriggerWarning,
 } from "@/components/TriggerWarningGate";
 
 /**
@@ -136,7 +136,7 @@ export default function MosesPage() {
     그래서 yml 이 아직 선언하지 않아도 배선을 먼저 깔아 둔다. 지금은 아무 씬도
     이 경로를 타지 않지만, 넣는 순간 동작한다.
   */
-  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
   const advance = (sceneId: number, decision: unknown) => {
