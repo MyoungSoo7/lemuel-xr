@@ -134,9 +134,7 @@ describe("NarrationAudioButton", () => {
     await screen.findByRole("button", { name: "듣기 정지" });
   });
 
-  it("서버가 합성 중이면 '준비 중…' 을 띄우되 버튼을 잠그지 않는다", async () => {
-    // 첫 재생은 수십 초가 걸릴 수 있다. 그동안 잠가 버리면 기다리기 싫은 사용자가
-    // 빠져나올 방법이 없다 — 눌러서 취소할 수 있어야 한다.
+  it("서버가 합성 중이면 '준비 중…' 을 띄우고 버튼을 잠근다", async () => {
     const user = userEvent.setup();
     mockSynthesize.mockResolvedValue(대기중());
     mockPoll.mockResolvedValue({ ...대기중(), status: "pending" });
@@ -144,30 +142,28 @@ describe("NarrationAudioButton", () => {
 
     await user.click(screen.getByRole("button"));
 
-    const 준비중 = await screen.findByRole("button", {
-      name: "음성 준비 중 — 눌러서 취소",
-    });
-    expect(준비중).toBeEnabled();
+    const 준비중 = await screen.findByRole("button", { name: "음성 준비 중" });
+    expect(준비중).toBeDisabled();
     expect(준비중).toHaveTextContent("준비 중…");
   });
 
-  it("합성 대기 중 누르면 취소되고 원래 라벨로 돌아온다", async () => {
+  it("합성 대기 중 한 번 더 눌러도 취소되지 않는다", async () => {
+    // 고령자는 반응이 없으면 한 번 더 누른다. 그 탭이 방금 시작한 수십 초짜리
+    // 합성을 취소해 버리면, 기다리다 지치는 것보다 나쁜 결과(영영 무음)가 된다.
+    // 활성인 채 글자만 바뀌는 버튼이 e2e 워커의 걸음을 태워 /moses 가 마지막 씬에
+    // 못 닿았던 회귀(2026-08-14)도 같은 뿌리다.
     const user = userEvent.setup();
     mockSynthesize.mockResolvedValue(대기중());
     mockPoll.mockResolvedValue({ ...대기중(), status: "pending" });
     render(<NarrationAudioButton text="본문" />);
 
     await user.click(screen.getByRole("button"));
-    const 준비중 = await screen.findByRole("button", {
-      name: "음성 준비 중 — 눌러서 취소",
-    });
+    const 준비중 = await screen.findByRole("button", { name: "음성 준비 중" });
 
     await user.click(준비중);
 
-    expect(
-      await screen.findByRole("button", { name: "듣기 — 음성으로 듣기" }),
-    ).toBeEnabled();
-    // 취소는 재요청이 아니다.
+    // 여전히 준비 중이다 — idle 로 돌아가지도, 다시 요청하지도 않는다.
+    expect(screen.getByRole("button")).toHaveAccessibleName("음성 준비 중");
     expect(mockSynthesize).toHaveBeenCalledTimes(1);
   });
 
