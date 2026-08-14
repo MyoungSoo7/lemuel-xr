@@ -2,6 +2,11 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다. 픽스처도 기대값도 정본에서
+// 파생시킨다 — 번호가 개정되면 이 파일은 정본을 따라 움직이고,
+// 화면이 낡은 번호를 렌더하면 그때 빨개진다.
+// (`scripts/check_frontend_hotline.py`)
+import { CRISIS_DEFAULT, telHref } from "@/lib/crisis-resources";
 
 /*
   엘리야 미션 화면 테스트.
@@ -110,7 +115,7 @@ const SCENE5 = scene(5, {
   value_prompt: "오늘 1분 호흡 + 따뜻한 한 끼 — 가장 작은 마음 지키기.",
   extras: {
     static_text: "신의 마지막 말씀: 7000명이 남았다.",
-    crisis_reminder: "자살예방 상담전화 109.",
+    crisis_reminder: `${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`,
     next_scene_suggestion: "시편 88 — 답 없는 시편",
   },
 });
@@ -322,14 +327,16 @@ describe("엘리야 미션 — R4 동의 게이트 (elijah.yml Scene 2)", () => 
 });
 
 describe("엘리야 미션 — 위기 연결", () => {
-  it("crisis_check 씬은 동의 전에도 109 를 전화 링크로 올려 둔다", async () => {
+  it("crisis_check 씬은 동의 전에도 기본 상담번호를 전화 링크로 올려 둔다", async () => {
     // 본문은 가려도 위기 연결은 가리지 않는다. 이 순서가 뒤집히면 제일 급한 사람이 막힌다.
     vi.mocked(startMission).mockResolvedValue(SCENE2);
     renderPage();
 
-    const tel = await screen.findByRole("link", { name: /109/ });
-    expect(tel).toHaveAttribute("href", "tel:109");
-    expect(tel).toHaveTextContent("자살예방 상담전화");
+    const tel = await screen.findByRole("link", {
+      name: new RegExp(CRISIS_DEFAULT.tel),
+    });
+    expect(tel).toHaveAttribute("href", telHref(CRISIS_DEFAULT));
+    expect(tel).toHaveTextContent(CRISIS_DEFAULT.label);
     expect(
       screen.getByText(
         "지금 실제로 그 마음이 크다면, 본문보다 연결이 먼저입니다.",
@@ -342,7 +349,7 @@ describe("엘리야 미션 — 위기 연결", () => {
     renderPage();
 
     expect(
-      await screen.findByText("자살예방 상담전화 109."),
+      await screen.findByText(`${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`),
     ).toBeInTheDocument();
     // 정본 문구가 있으면 화면 소유 안내문은 중복 노출하지 않는다.
     expect(screen.queryByText(/본문보다 연결이 먼저입니다/)).toBeNull();
@@ -355,7 +362,9 @@ describe("엘리야 미션 — 위기 연결", () => {
     expect(
       await screen.findByRole("button", { name: "계속 →" }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: /109/ })).toBeNull();
+    expect(
+      screen.queryByRole("link", { name: new RegExp(CRISIS_DEFAULT.tel) }),
+    ).toBeNull();
   });
 });
 

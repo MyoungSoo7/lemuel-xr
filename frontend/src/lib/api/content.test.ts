@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { api } from "@/lib/api/client";
+// 번호를 여기 적지 않고 정본에서 가져온다. 픽스처는 백엔드 CrisisTokenResolver 가
+// `{{crisis_resources.default}}` 를 치환해 내려보내는 값을 흉내내는 것이므로,
+// 정본에서 파생시키는 쪽이 실제 동작에 더 가깝기도 하다.
+// (`scripts/check_frontend_hotline.py` — "화면에도 테스트에도 숫자를 다시 적지 않는다")
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 import {
   addBookmark,
   fetchBookmarks,
@@ -261,7 +266,7 @@ describe("실천/성찰 (Theme 6·7)", () => {
     // 위기 자원은 화면이 즉시 띄워야 하는 정보다. 여기서 깎이면 사람이 다친다.
     const resp = {
       practice: { id: 2, topicId: 7 },
-      crisis: { routed: true, resources: [{ tel: "109" }] },
+      crisis: { routed: true, resources: [{ tel: CRISIS_DEFAULT.tel }] },
       safetyFooter: "지금 도움을 받을 수 있습니다",
       aiFooter: "AI 고지",
     };
@@ -273,7 +278,7 @@ describe("실천/성찰 (Theme 6·7)", () => {
     });
 
     expect(out.crisis.routed).toBe(true);
-    expect(out.crisis.resources).toEqual([{ tel: "109" }]);
+    expect(out.crisis.resources).toEqual([{ tel: CRISIS_DEFAULT.tel }]);
   });
 
   it("recordPractice 는 서버 4xx 를 그대로 던진다", async () => {
@@ -445,7 +450,7 @@ describe("일기 조언", () => {
         reflectionQuestions: [],
       },
       catalog: [],
-      crisis: { routed: true, resources: [{ tel: "109" }] },
+      crisis: { routed: true, resources: [{ tel: CRISIS_DEFAULT.tel }] },
       safetyFooter: "도움을 받으세요",
       aiFooter: "AI 고지",
     };

@@ -2,6 +2,10 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다. 픽스처(백엔드가 yml 의
+// `{{crisis_resources.default}}` 를 치환해 내려보내는 값)도 기대값도 정본에서 파생시킨다.
+// (`scripts/check_frontend_hotline.py`)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /*
   욥 미션 화면 테스트.
@@ -27,6 +31,12 @@ import { startMission, decideMission, completeMission } from "@/lib/api/game";
 import JobPage from "./page";
 
 const SESSION = "sess-job";
+
+/**
+ * outro 위기 안내 문구. 픽스처와 기대값이 **같은 상수**를 보게 묶어 둔다 — 둘을 따로
+ * 적으면 화면이 문구를 통째로 떨어뜨려도 한쪽만 고치면 초록이 유지된다.
+ */
+const CRISIS_REMINDER = `지금 이 순간이 무겁다면, ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
 
 function scene(currentScene: number, scenePayload: Record<string, unknown>) {
   return {
@@ -107,7 +117,7 @@ const SCENE5 = scene(5, {
     static_text: "욥은 설명을 듣지 못했습니다. 그러나 만남을 얻었습니다.",
     suffering_footer:
       "이 묵상은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않다면 상담 자원에 연결되세요.",
-    crisis_reminder: "지금 이 순간이 무겁다면, 자살예방 상담전화 109.",
+    crisis_reminder: CRISIS_REMINDER,
     next_scene_suggestion: "엘리야 — 천사가 음식과 잠을 주신 이야기",
   },
 });
@@ -262,11 +272,7 @@ describe("욥 미션 — 씬 상태 기계", () => {
     vi.mocked(startMission).mockResolvedValue(SCENE5);
     renderPage();
 
-    expect(
-      await screen.findByText(
-        /지금 이 순간이 무겁다면, 자살예방 상담전화 109\./,
-      ),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(CRISIS_REMINDER)).toBeInTheDocument();
   });
 });
 

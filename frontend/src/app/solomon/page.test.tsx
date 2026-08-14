@@ -2,6 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다. 이 픽스처들은 백엔드
+// CrisisTokenResolver 가 yml 의 `{{crisis_resources.default}}` 를 치환해 내려보내는
+// 값을 흉내내는 것이라, 정본에서 파생시키는 쪽이 실제 동작에도 더 가깝다.
+// (`scripts/check_frontend_hotline.py`)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 import SolomonPage from "./page";
 import {
@@ -85,6 +90,9 @@ const SCENE2_PAYLOAD = {
   },
 };
 
+/** 동의 카드 마지막 줄의 위기 자원 안내. 픽스처와 기대값이 같은 상수를 본다. */
+const SCENE3_CRISIS_LINE = `지금 힘드시면: ${CRISIS_DEFAULT.tel} (${CRISIS_DEFAULT.label})`;
+
 const SCENE3_CONSENT_KO = [
   "다음 장면은 성경에서 가장 유명한 재판(열왕기상 3:16~28)을 다룹니다.",
   "· 갓난아기를 잃은 어머니의 이야기가 대사로 언급됩니다. (시각적 묘사는 없습니다)",
@@ -92,7 +100,7 @@ const SCENE3_CONSENT_KO = [
   "계속하시겠어요?",
   "[계속한다]  [건너뛰기 — 재판 결과 요약 자막 후 다음 장면으로]",
   "음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]",
-  "지금 힘드시면: 109 (자살예방 상담전화)",
+  SCENE3_CRISIS_LINE,
 ].join("\n");
 
 const SCENE3_PAYLOAD = {
@@ -168,7 +176,8 @@ const SCENE4_PAYLOAD = {
     decision_key: "hevel_label",
     optional_selection: true,
     crisis_reminder:
-      "다 가진 사람에게도 공허는 옵니다. 공허를 느끼는 것은 잘못이 아닙니다. 지금 힘드시면 109",
+      "다 가진 사람에게도 공허는 옵니다. 공허를 느끼는 것은 잘못이 아닙니다. " +
+      `지금 힘드시면 ${CRISIS_DEFAULT.tel}`,
   },
   trigger_warning: {
     level: "low_medium",
@@ -239,7 +248,7 @@ const SCENE5_PAYLOAD = {
       },
       default: REORIENT_DEFAULT,
     },
-    crisis_reminder: "109 (자살예방 상담전화).",
+    crisis_reminder: `${CRISIS_DEFAULT.tel} (${CRISIS_DEFAULT.label}).`,
   },
 };
 
@@ -459,7 +468,9 @@ describe("Solomon Scene 3 — R4 동의 게이트 (두 여인 재판)", () => {
       screen.getByRole("button", { name: "건너뛰기 →" }),
     ).toBeInTheDocument();
     // 위기 자원 줄은 산문에 남아야 한다 (서버가 치환한 정본).
-    expect(screen.getByText(/지금 힘드시면: 109/)).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(`지금 힘드시면: ${CRISIS_DEFAULT.tel}`)),
+    ).toBeInTheDocument();
   });
 
   it("동의하면 본문과 선택지가 열린다", async () => {

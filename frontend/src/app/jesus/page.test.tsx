@@ -28,6 +28,7 @@ import {
   scene5Passion,
   scene6Resurrection,
   scene7Ascension,
+  scene7CrisisReminder,
 } from "@/lib/content/jesus-monologues";
 import JesusPage from "./page";
 
@@ -587,8 +588,11 @@ describe("Jesus 미션 화면", () => {
       ).toBeInTheDocument();
       expect(await findParagraph(scene6Resurrection)).toBeInTheDocument();
       expect(await findParagraph(scene7Ascension)).toBeInTheDocument();
-      // R1 — outro 에는 위기 상담 번호가 반드시 있어야 한다.
-      expect(screen.getByText(/자살예방상담 109/)).toBeInTheDocument();
+      // R1 — outro 에는 위기 상담 번호가 반드시 있어야 한다. 번호를 여기 다시 적는 대신
+      // 화면이 렌더하는 정본 문구(scene7CrisisReminder, 자체가 CRISIS_RESOURCES 파생)를
+      // 그대로 기대한다 — 번호가 개정돼도 이 기대는 따라 움직인다.
+      // (`scripts/check_frontend_hotline.py`)
+      expect(screen.getByText(scene7CrisisReminder)).toBeInTheDocument();
       // R5 — AI 보조 고지.
       expect(
         screen.getAllByText("* AI 보조 — 본문은 성경 참조 *").length,

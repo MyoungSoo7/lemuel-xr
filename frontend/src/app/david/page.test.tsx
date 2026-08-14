@@ -2,6 +2,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+// 번호를 픽스처에 다시 적지 않는다. 이 문자열은 백엔드가 yml 의
+// `{{crisis_resources.default}}` 를 치환해 내려보내는 값을 흉내내는 것이라,
+// 정본에서 파생시키는 쪽이 실제 동작에도 더 가깝다.
+// (`scripts/check_frontend_hotline.py`)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 // 백엔드 왕복만 막는다. 공용 컴포넌트(TriggerWarningGate/SceneBootState/
 // NarrationAudioButton)와 david-monologues 는 **실물** 로 렌더한다 — 배선이 맞는지가
@@ -125,7 +130,7 @@ const PAYLOADS: Record<number, Record<string, unknown>> = {
     next: null,
     extras: {
       anchor: "자기 작음의 평화",
-      crisis_reminder: "지금 이 순간이 무겁다면, 자살예방 상담전화 109.",
+      crisis_reminder: `지금 이 순간이 무겁다면, ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`,
     },
     value_prompt:
       "다윗의 시편은 그의 일기장이었습니다. 오늘 솔직한 한 줄을 적어보세요.",

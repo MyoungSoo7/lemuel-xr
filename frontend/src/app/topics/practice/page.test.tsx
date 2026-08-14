@@ -5,6 +5,9 @@ import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import type { PracticeListResponse, PracticeResponse } from "@/lib/api/content";
 import { fetchPractices, recordPractice } from "@/lib/api/content";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다 —
+// `scripts/check_frontend_hotline.py` 가 화면·테스트·주석 전부를 검사한다.
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 import PracticePage from "./page";
 
 /**
@@ -237,7 +240,7 @@ describe("/topics/practice", () => {
     );
   });
 
-  it("R1 — crisis.routed 응답이면 위기 카드와 24시간 상담 번호(109)를 띄운다", async () => {
+  it("R1 — crisis.routed 응답이면 위기 카드와 24시간 상담 번호를 띄운다", async () => {
     // 이 화면에서 가장 비싼 실패. 위기 신호를 보냈는데 평범한 '기록되었습니다' 만
     // 보이면 사용자는 아무 도움도 받지 못한 채 화면을 닫는다.
     mockRecord.mockResolvedValue(
@@ -253,7 +256,9 @@ describe("/topics/practice", () => {
       await c.findByText("잠시 멈추고, 함께 안전을 살펴봐요."),
     ).toBeInTheDocument();
     // 위기 카드 안의 상담 라인은 번호와 "24시간" 을 함께 준다.
-    expect(c.getByText(/109/)).toHaveTextContent("24시간");
+    expect(
+      c.getByText(new RegExp(CRISIS_DEFAULT.tel)),
+    ).toHaveTextContent("24시간");
     // 위기일 때는 일반 완료 문구로 덮지 않는다.
     expect(c.queryByText("✓ 기록되었습니다.")).not.toBeInTheDocument();
   });
@@ -373,7 +378,9 @@ describe("/topics/practice", () => {
     expect(
       screen.getByRole("heading", { name: "한 번의 거절 / 용기" }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/109/)).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(CRISIS_DEFAULT.tel)),
+    ).toBeInTheDocument();
     expect(screen.getByText(/AI 보조/)).toBeInTheDocument();
   });
 
@@ -383,7 +390,7 @@ describe("/topics/practice", () => {
 
     const footer = screen.getByText(/AI 보조 — storyteller/);
     expect(footer).toHaveTextContent("성경 이외 자료는 사용하지 않습니다.");
-    expect(footer).toHaveTextContent(/109/);
+    expect(footer).toHaveTextContent(new RegExp(CRISIS_DEFAULT.tel));
     expect(screen.getByRole("link", { name: "← 주제" })).toHaveAttribute(
       "href",
       "/topics",
