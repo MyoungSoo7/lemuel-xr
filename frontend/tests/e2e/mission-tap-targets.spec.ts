@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { MIN_TAP_PX, scanTapTargets } from "./tap-target-probe";
 
 /**
  * 44px 터치 타깃 검사 — **인물 미션 씬 안쪽**. 2026-08-12 신설.
@@ -69,7 +70,7 @@ import { test, expect, Page } from "@playwright/test";
  * 절반만 걷고 초록인 상태로 돌아가는 것이 이 파일이 막으려는 바로 그것이다.
  */
 
-const MIN = 44;
+const MIN = MIN_TAP_PX;
 const STEPS = 24;
 
 const CHARACTERS = [
@@ -81,34 +82,6 @@ const CHARACTERS = [
   "/moses",
   "/solomon",
 ];
-
-type Small = { tag: string; text: string; w: number; h: number; cls: string };
-
-async function measure(page: Page) {
-  return page.evaluate((min) => {
-    const small: Small[] = [];
-    let total = 0;
-    const nodes = document.querySelectorAll<HTMLElement>(
-      'a[href], button, [role="button"], input:not([type="hidden"]), select, textarea',
-    );
-    for (const el of Array.from(nodes)) {
-      // 자리지기 사본(CrisisFooter) 은 보이지도 눌리지도 않는다 — 세면 안 된다.
-      if (el.closest('[aria-hidden="true"]')) continue;
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 && r.height === 0) continue;
-      total++;
-      if (r.width >= min && r.height >= min) continue;
-      small.push({
-        tag: el.tagName.toLowerCase(),
-        text: (el.textContent ?? "").trim().slice(0, 30),
-        w: Math.round(r.width),
-        h: Math.round(r.height),
-        cls: el.className.toString().slice(0, 60),
-      });
-    }
-    return { total, small };
-  }, MIN);
-}
 
 /**
  * 헤더("Moses — Scene 3/6 · Mode: VR") 에서 씬 번호만 뽑는다.
@@ -164,13 +137,14 @@ for (const route of CHARACTERS) {
       const scene = (await sceneLabel(page)) ?? `step ${step}`;
       visited.push(scene);
 
-      const { total, small } = await measure(page);
+      const { total, small } = await scanTapTargets(page);
       // 분모도 함께 본다. 위 관문(start 200)이 백엔드 부재를 막고, 이 줄은 그 다음 —
       // 응답은 왔는데 화면이 아무것도 안 그린 경우를 막는다. 아무것도 없으면
       // 「작은 것 0 개」가 참이 되어 검사가 조용히 통과한다.
       if (total > 0) measured++;
+      // 여러 걸음에 걸쳐 모으므로 `tapReport` 대신 씬 이름을 붙인 자체 형식을 쓴다.
       for (const s of small) {
-        violations.add(`  [${scene}] ${s.tag} "${s.text}" ${s.w}×${s.h} — ${s.cls}`);
+        violations.add(`  [${scene}] ${s.tag} "${s.name}" ${s.w}×${s.h} — ${s.cls}`);
       }
 
       const candidates = page.locator(

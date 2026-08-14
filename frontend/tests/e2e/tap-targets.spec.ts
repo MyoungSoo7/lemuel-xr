@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { MIN_TAP_PX, scanTapTargets, tapReport } from "./tap-target-probe";
 
 /**
  * 터치 타깃 최소 크기 검사 — 2026-08-12 신설.
@@ -32,43 +33,20 @@ const ROUTES = [
   "/topics/bookmarks",
 ];
 
-const MIN = 44;
-
-type Small = { tag: string; text: string; w: number; h: number; cls: string };
+const MIN = MIN_TAP_PX;
 
 for (const route of ROUTES) {
   test(`${route} — 모든 터치 타깃이 ${MIN}px 이상이다`, async ({ page }) => {
     await page.goto(route);
     await page.waitForLoadState("networkidle");
 
-    const small: Small[] = await page.evaluate((min) => {
-      const out: Small[] = [];
-      const nodes = document.querySelectorAll<HTMLElement>(
-        'a[href], button, [role="button"], input:not([type="hidden"]), select, textarea',
-      );
-      for (const el of Array.from(nodes)) {
-        // 자리지기 사본(CrisisFooter) 은 보이지도 눌리지도 않는다 — 세면 안 된다.
-        if (el.closest('[aria-hidden="true"]')) continue;
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 && r.height === 0) continue; // 안 그려진 것
-        if (r.width >= min && r.height >= min) continue;
-        out.push({
-          tag: el.tagName.toLowerCase(),
-          text: (el.textContent ?? "").trim().slice(0, 30),
-          w: Math.round(r.width),
-          h: Math.round(r.height),
-          cls: el.className.toString().slice(0, 60),
-        });
-      }
-      return out;
-    }, MIN);
+    const scan = await scanTapTargets(page);
 
-    expect(
-      small,
-      `${MIN}px 미만 타깃:\n` +
-        small
-          .map((s) => `  ${s.tag} "${s.text}" ${s.w}×${s.h} — ${s.cls}`)
-          .join("\n"),
-    ).toEqual([]);
+    // 분모부터 본다. 이 파일은 오래도록 분자만 봤고, 그래서 「잴 것이 0 개라서 초록」을
+    // 구별하지 못했다 — 뒤에 생긴 두 스펙이 각자 고친 것을 여기까지 되돌린다.
+    // 이 7개 화면은 백엔드가 없어도 내비와 위기 푸터를 그리므로 분모는 0 이 될 수 없다.
+    expect(scan.total, `${route} — 잴 타깃이 하나도 없다`).toBeGreaterThan(0);
+
+    expect(scan.small, tapReport(scan, route)).toEqual([]);
   });
 }
