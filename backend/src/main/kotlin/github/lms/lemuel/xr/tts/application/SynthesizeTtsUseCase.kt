@@ -62,8 +62,15 @@ class SynthesizeTtsUseCase(
                     cache.save(hit)
                     return Submission.Ready(hit.audioUrl, hit.durationMs)
                 }
-                e.status == TtsCache.PENDING -> return Submission.Pending(key)
-                // FAILED — 또는 READY 인데 오디오가 비어 있는 모순 상태. 아래로 떨어져 재시도한다.
+                // PENDING 행만 보고 "진행 중" 이라 판단하면 안 된다. 큐와 워커는 JVM 안에
+                // 있어서 배포·OOM·강제종료로 프로세스가 갈리면 행만 PENDING 인 채 아무도
+                // 처리하지 않는 유령이 남는다. 그때 이 분기로 되돌아오면 다시 요청해도
+                // 큐에 안 들어가 그 문장은 영원히 소리가 나지 않는다.
+                // 실제로 들고 있는지까지 확인해야 그 상태에서 스스로 빠져나온다.
+                e.status == TtsCache.PENDING && queue.isInFlight(key) ->
+                    return Submission.Pending(key)
+                // FAILED, 오디오가 빈 READY, 그리고 위에서 걸러진 고아 PENDING —
+                // 전부 아래로 떨어져 다시 큐에 오른다.
             }
         }
 

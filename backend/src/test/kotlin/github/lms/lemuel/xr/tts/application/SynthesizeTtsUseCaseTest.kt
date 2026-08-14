@@ -99,9 +99,10 @@ class SynthesizeTtsUseCaseTest {
     }
 
     @Test
-    fun `이미 PENDING 이면 중복 합성 없이 같은 jobId 를 돌려준다`() {
+    fun `정말 진행 중인 PENDING 이면 중복 합성 없이 같은 jobId 를 돌려준다`() {
         val pending = TtsCache.pendingEntry("key", "v", LocalDateTime.now())
         whenever(cache.findById(any())).thenReturn(Optional.of(pending))
+        whenever(queue.isInFlight(any())).thenReturn(true) // 워커가 실제로 들고 있다
 
         val r = uc.submit("안녕", "v", 1.0)
 
@@ -109,6 +110,50 @@ class SynthesizeTtsUseCaseTest {
         // 핵심: 큐에 또 넣지 않는다. 안 그러면 같은 문장이 워커를 n번 붙잡는다.
         verify(queue, never()).submit(any(), any())
         verify(sidecar, never()).synthesize(any(), anyOrNull(), anyOrNull(), any())
+    }
+
+    /**
+     * 이 버그의 실물이다. 배포·OOM·강제종료로 프로세스가 갈리면 큐(JVM 안)만 사라지고 행은
+     * PENDING 으로 남는다. 예전 코드는 그 행만 보고 "진행 중" 이라며 큐에 안 넣었다 —
+     * 다시 눌러도, 내일 눌러도 같은 jobId 만 돌아오고 소리는 영원히 안 났다.
+     */
+    @Test
+    fun `아무도 안 들고 있는 PENDING 은 고아다 — 다시 큐에 올린다`() {
+        val orphan = TtsCache.pendingEntry("key", "v", LocalDateTime.now())
+        whenever(cache.findById(any())).thenReturn(Optional.of(orphan))
+        whenever(queue.isInFlight(any())).thenReturn(false) // 프로세스가 갈렸다
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(TtsSynthesisPort.SynthesisResult("https://r2/a.wav", 1500, "xtts-v2"))
+        queueRunsInline()
+
+        val r = uc.submit("안녕", "v", 1.0)
+
+        assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Pending::class.java)
+        verify(queue).submit(any(), any())
+        verify(sidecar).synthesize(any(), anyOrNull(), anyOrNull(), any())
+
+        // 그리고 실제로 살아난다 — 폴링이 결국 오디오를 받는다.
+        val saved = argumentCaptor<TtsCache>()
+        verify(cache, times(2)).save(saved.capture())
+        assertThat(saved.lastValue.status).isEqualTo(TtsCache.READY)
+        assertThat(saved.lastValue.audioUrl).isEqualTo("https://r2/a.wav")
+    }
+
+    @Test
+    fun `고아를 되살리려다 큐가 가득 차면 FAILED 로 남긴다`() {
+        // PENDING 인 채로 두면 고아를 고아로 갈아끼우는 셈이라 아무것도 나아지지 않는다.
+        whenever(cache.findById(any()))
+            .thenReturn(Optional.of(TtsCache.pendingEntry("key", "v", LocalDateTime.now())))
+        whenever(queue.isInFlight(any())).thenReturn(false)
+        whenever(queue.submit(any(), any())).thenReturn(false)
+        whenever(queue.queueDepth()).thenReturn(8)
+
+        val r = uc.submit("안녕", "v", 1.0)
+
+        assertThat(r).isEqualTo(SynthesizeTtsUseCase.Submission.Rejected(8))
+        val saved = argumentCaptor<TtsCache>()
+        verify(cache, times(2)).save(saved.capture())
+        assertThat(saved.lastValue.status).isEqualTo(TtsCache.FAILED)
     }
 
     @Test
