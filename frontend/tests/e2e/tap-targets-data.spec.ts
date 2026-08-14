@@ -1,4 +1,5 @@
 import { test, expect, Page } from "@playwright/test";
+import { MIN_TAP_PX, scanTapTargets, tapReport } from "./tap-target-probe";
 
 /**
  * 44px 터치 타깃 검사 — **데이터가 있어야 나타나는 화면**용. 2026-08-12 신설.
@@ -22,7 +23,7 @@ import { test, expect, Page } from "@playwright/test";
  * 이 파일은 「응답이 오면 무엇이 그려지는가」를 재는 것이지 계약을 검증하지 않는다.
  */
 
-const MIN = 44;
+const MIN = MIN_TAP_PX;
 
 // 실제 응답에서 받아 적음(모양 보존, 길이만 줄임).
 const JOURNAL_CATALOG = {
@@ -104,38 +105,11 @@ async function mockBackend(page: Page) {
   await page.route("**/api/values/me", (r) => r.fulfill(json(VALUES_PROFILE)));
 }
 
-type Small = { tag: string; text: string; w: number; h: number; cls: string };
-
 /**
- * 재는 방식은 `tap-targets.spec.ts` 와 같되, **분모(전체 개수)를 같이 돌려준다.**
- * 분모가 없으면 「작은 것 0 개」와 「그려진 것이 0 개」가 구별되지 않는다 — 이 파일이
- * 존재하는 이유가 바로 그 구별이므로, 여기서는 절대 생략하지 않는다.
+ * 재는 자는 `tap-target-probe.ts` 하나다. **분모(전체 개수)를 같이 돌려준다** —
+ * 분모가 없으면 「작은 것 0 개」와 「그려진 것이 0 개」가 구별되지 않고, 이 파일이
+ * 존재하는 이유가 바로 그 구별이다.
  */
-async function measure(page: Page) {
-  return page.evaluate((min) => {
-    const small: Small[] = [];
-    let total = 0;
-    const nodes = document.querySelectorAll<HTMLElement>(
-      'a[href], button, [role="button"], input:not([type="hidden"]), select, textarea',
-    );
-    for (const el of Array.from(nodes)) {
-      // 자리지기 사본(CrisisFooter) 은 보이지도 눌리지도 않는다 — 세면 안 된다.
-      if (el.closest('[aria-hidden="true"]')) continue;
-      const r = el.getBoundingClientRect();
-      if (r.width === 0 && r.height === 0) continue;
-      total++;
-      if (r.width >= min && r.height >= min) continue;
-      small.push({
-        tag: el.tagName.toLowerCase(),
-        text: (el.textContent ?? "").trim().slice(0, 30),
-        w: Math.round(r.width),
-        h: Math.round(r.height),
-        cls: el.className.toString().slice(0, 60),
-      });
-    }
-    return { total, small };
-  }, MIN);
-}
 
 /**
  * `anchor` — 픽스처가 실제로 화면에 닿았는지 보는 못. 이게 없으면 라우트 가로채기가
@@ -164,15 +138,9 @@ for (const { route, anchor } of CASES) {
     ).toBeVisible();
 
     // ② 그제서야 잰다.
-    const { total, small } = await measure(page);
-    expect(total, "잴 타깃이 하나도 없다").toBeGreaterThan(0);
-    expect(
-      small,
-      `${MIN}px 미만 타깃 (전체 ${total} 개 중 ${small.length} 개):\n` +
-        small
-          .map((s) => `  ${s.tag} "${s.text}" ${s.w}×${s.h} — ${s.cls}`)
-          .join("\n"),
-    ).toEqual([]);
+    const scan = await scanTapTargets(page);
+    expect(scan.total, "잴 타깃이 하나도 없다").toBeGreaterThan(0);
+    expect(scan.small, tapReport(scan, `${route} (데이터 있음)`)).toEqual([]);
   });
 }
 
@@ -203,13 +171,10 @@ test(`/topics/bookmarks (빈 목록) — 모든 터치 타깃이 ${MIN}px 이상
       `이 상태의 통과는 무의미하다.`,
   ).toBeVisible();
 
-  const { total, small } = await measure(page);
-  expect(total, "잴 타깃이 하나도 없다").toBeGreaterThan(0);
+  const scan = await scanTapTargets(page);
+  expect(scan.total, "잴 타깃이 하나도 없다").toBeGreaterThan(0);
   expect(
-    small,
-    `${MIN}px 미만 타깃 (전체 ${total} 개 중 ${small.length} 개):\n` +
-      small
-        .map((s) => `  ${s.tag} "${s.text}" ${s.w}×${s.h} — ${s.cls}`)
-        .join("\n"),
+    scan.small,
+    tapReport(scan, "/topics/bookmarks (빈 목록)"),
   ).toEqual([]);
 });
