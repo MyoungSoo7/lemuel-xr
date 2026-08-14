@@ -131,7 +131,17 @@ def _cache_key(text: str, voice_id: str, lang: str) -> str:
     """언어가 다르면 키도 달라야 한다 — 같은 문장·같은 화자라도 오디오가 다르기 때문이다.
 
     ko 만 접두 없이 옛 키를 그대로 쓴다([LEGACY_KEY_LANG] 참조). 전부에 접두를 붙이면
-    이미 구워 둔 캐시(PVC)가 한 번에 통째로 무효가 되고, 다음 요청부터 전부 재합성한다.
+    이미 구워 둔 캐시가 한 번에 통째로 무효가 되고, 다음 요청부터 전부 재합성한다.
+
+    다만 그 이득이 어디서 나오는지는 분명히 해 둔다. **이 서비스의 /data/cache 는
+    emptyDir 이라 파드가 갈리면 어차피 전부 사라진다** — 롤아웃을 건너서 지켜지는 캐시가
+    아니다. 옛 키를 보존해서 실제로 값을 버는 쪽은 영속인 백엔드 캐시(Postgres TtsCache)
+    이고, 여기서 같은 규칙을 지키는 이유는 양쪽 키 공간을 일치시키기 위해서다.
+    백엔드의 대응 규칙은 SynthesizeTtsUseCase.LEGACY_KEY_LANGUAGE 다. 한쪽만 바꾸면
+    두 캐시가 어긋난다.
+
+    (2026-08-15 정정: 이 자리에 "캐시(PVC)" 라고 적혀 있었다. PVC 가 아니다.
+     실제로 이 커밋 직후의 롤아웃에서 구워져 있던 wav 50개·64MB 가 그대로 날아갔다.)
     """
     prefix = "" if lang == LEGACY_KEY_LANG else f"{lang}::"
     return hashlib.sha256(f"{prefix}{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
