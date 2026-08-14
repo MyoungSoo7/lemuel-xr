@@ -49,25 +49,34 @@ describe("readTriggerWarning — payload 모양별 처리", () => {
     expect(readTriggerWarning(payload)).toEqual(JOSEPH_SCENE4);
   });
 
-  it("yml 이 `trigger_warning:` 를 빈 값으로 두면 null — 호출자의 !!warning 에서 게이트가 사라진다", () => {
-    // YAML 에서 키만 적고 값을 비우면 null 이 온다. 저작자는 "경고를 선언했다"고
-    // 믿지만 화면에는 아무것도 안 뜬다. 판정기는 코드가 필드를 *읽는지*만 보므로
-    // 이 경로도 통과시킨다 — 조용히 열린 문이다.
-    const warning = readTriggerWarning({ trigger_warning: null });
-    expect(warning).toBeNull();
-    expect(!!warning).toBe(false);
+  it("명시적으로 끈 선언(false)만 게이트를 닫는다", () => {
+    expect(readTriggerWarning({ trigger_warning: false })).toBeUndefined();
   });
 
-  it("레거시 boolean(true) 도 걸러내지 않는다 — 정보 0 인 카드가 뜬다", () => {
+  it("빈 선언(null)은 게이트를 연다 — 선언한 이상 닫는 쪽으로 넘어가지 않는다", () => {
+    // 주의: 이 경로는 *현재 프로덕션에서는 도달하지 않는다.* yml 에 키만 적고
+    // 값을 비우면 SnakeYAML 이 null 을 싣지만, application.yml 의
+    // `spring.jackson.default-property-inclusion: non_null` 이 그 키를 JSON 에서
+    // 통째로 지워서 프론트에는 "선언 없음"과 똑같이 도착한다. 그래서 그 사고는
+    // yml 을 직접 읽는 scripts/check_frontend_trigger_warning.py 가 잡는다.
+    //
+    // 그럼에도 여기서 undefined 와 뭉뚱그리지 않는 이유는, 직렬화 설정이 바뀌어
+    // null 이 도착하게 되는 날 문이 조용히 *열리는* 쪽이 아니라 닫히는 쪽이어야
+    // 하기 때문이다. 이 단언이 그 방향을 고정한다.
+    expect(readTriggerWarning({ trigger_warning: null })).toEqual({});
+  });
+
+  it("레거시 boolean(true) 은 빈 경고로 정규화되고, 카드는 문과 안내를 갖춘 채 뜬다", () => {
     // david.yml 이 한때 쓰던 `extras.violence_warning` 같은 레거시 boolean 이
-    // trigger_warning 자리에 들어오면, readTriggerWarning 은 캐스팅만 하므로
-    // 그대로 통과하고 호출자의 !!warning 은 참이 된다.
+    // trigger_warning 자리에 들어오는 경우. 예전에는 캐스팅만 해서 통과시켰고,
+    // 카드에는 레벨·트리거 종류·건너뛰기 목적지가 전부 빈 채로 떴다 —
+    // "경고했다"는 흔적만 남고 무엇을 경고하는지는 전달되지 않았다.
     const warning = readTriggerWarning({ trigger_warning: true });
-    expect(!!warning).toBe(true);
+    expect(warning).toEqual({});
 
     render(
       <TriggerWarningGate
-        warning={warning as unknown as TriggerWarning}
+        warning={warning!}
         fallbackProse={기본산문}
         pending={false}
         onContinue={vi.fn()}
@@ -75,45 +84,78 @@ describe("readTriggerWarning — payload 모양별 처리", () => {
       />,
     );
 
-    // 카드는 뜨지만 레벨·트리거 종류·건너뛰기 목적지가 전부 비어 있다.
-    // "경고했다"는 흔적만 남고 무엇을 경고하는지는 사용자에게 전달되지 않는다.
+    // 메타데이터는 없지만 *동의를 구하는 문* 으로서는 온전하다 —
+    // 화면이 소유한 산문 + 두 손잡이 + 건너뛰어도 된다는 사실.
     expect(screen.getByText("잠깐 — 다음 장면 안내")).toBeInTheDocument();
+    expect(
+      screen.getByText("다음 장면은 가족의 배신과 재회를 다룹니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("건너뛰어도 이야기는 이어집니다"),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/정서 강도/)).not.toBeInTheDocument();
-    expect(screen.queryByText(/건너뛰면 Scene/)).not.toBeInTheDocument();
   });
 
-  it("문자열 레벨('high') 도 그대로 통과한다 — 마찬가지로 빈 카드", () => {
-    const warning = readTriggerWarning({ trigger_warning: "high" });
+  it("스칼라 문자열은 동의 카드 본문으로 보여 준다 — 적힌 글자를 삼키지 않는다", () => {
+    // 저작자가 무엇을 의도했는지(레벨? 태그? 문구?) 알 수 없다. 넘겨짚는 대신
+    // 사용자에게 그대로 전달한다. 화면에 뜨면 잘못 적은 것도 눈에 띈다.
+    const warning = readTriggerWarning({
+      trigger_warning: "이 장면에는 폭력 묘사가 있습니다.",
+    });
+    expect(warning).toEqual({
+      consent_card_ko: "이 장면에는 폭력 묘사가 있습니다.",
+    });
+
     render(
       <TriggerWarningGate
-        warning={warning as unknown as TriggerWarning}
+        warning={warning!}
         fallbackProse={기본산문}
         pending={false}
         onContinue={vi.fn()}
         onSkip={vi.fn()}
       />,
     );
-    expect(screen.getByText("잠깐 — 다음 장면 안내")).toBeInTheDocument();
-    expect(screen.queryByText(/정서 강도/)).not.toBeInTheDocument();
+    expect(
+      screen.getByText("이 장면에는 폭력 묘사가 있습니다."),
+    ).toBeInTheDocument();
   });
 
-  it("content 를 배열이 아닌 문자열로 적으면 렌더가 통째로 죽는다", () => {
-    // `(warning.content ?? []).map` — 문자열엔 map 이 없다. yml 에
-    // `content: violence` 처럼 대괄호를 빠뜨리면 경고 카드가 아니라 씬 전체가
-    // 터진다. 시끄럽게 실패한다는 점은 다행이지만, 방어는 없다.
-    const 에러무시 = vi.spyOn(console, "error").mockImplementation(() => {});
-    expect(() =>
-      render(
-        <TriggerWarningGate
-          warning={{ content: "violence" as unknown as string[] }}
-          fallbackProse={기본산문}
-          pending={false}
-          onContinue={vi.fn()}
-          onSkip={vi.fn()}
-        />,
-      ),
-    ).toThrow();
-    에러무시.mockRestore();
+  it("content 를 배열이 아닌 문자열로 적어도 태그 하나로 살아난다", () => {
+    // 예전에는 `(warning.content ?? []).map` 에서 문자열에 map 이 없어
+    // **씬 전체가 터졌다.** yml 에 `content: violence` 처럼 대괄호를 빠뜨린
+    // 대가가 화면 붕괴라면, 저작자는 경고를 안 붙이는 쪽으로 학습한다.
+    const warning = readTriggerWarning({
+      trigger_warning: { content: "violence" },
+    });
+    expect(warning?.content).toEqual(["violence"]);
+
+    render(
+      <TriggerWarningGate
+        warning={warning!}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+    expect(screen.getByText("폭력")).toBeInTheDocument();
+  });
+
+  it("skip 목적지를 문자열로 적어도 숫자로 읽는다", () => {
+    const warning = readTriggerWarning({
+      trigger_warning: { skip_alternative_scene_id: "5" },
+    });
+    expect(warning?.skip_alternative_scene_id).toBe(5);
+  });
+
+  it("모양을 알 수 없는 값도 게이트는 연다", () => {
+    // 배열·숫자 같은 엉뚱한 모양. 무엇을 경고하는지는 못 읽어도 "경고할 씬"
+    // 이라는 선언은 읽었다. 읽지 못한 것을 없는 것으로 취급하지 않는다.
+    expect(readTriggerWarning({ trigger_warning: 3 })).toEqual({});
+    expect(readTriggerWarning({ trigger_warning: ["violence"] })).toEqual({});
   });
 });
 
@@ -147,16 +189,53 @@ describe("경고 카드가 실제로 렌더된다", () => {
     // 보기 나쁜 쪽이 안전한 쪽이다.
     render(
       <TriggerWarningGate
-        warning={{ level: "high", content: ["self_harm", "death"] }}
+        warning={{ level: "high", content: ["public_humiliation", "death"] }}
         fallbackProse={기본산문}
         pending={false}
         onContinue={vi.fn()}
         onSkip={vi.fn()}
       />,
     );
-    expect(screen.getByText("self_harm")).toBeInTheDocument();
+    expect(screen.getByText("public_humiliation")).toBeInTheDocument();
     expect(screen.getByText("죽음")).toBeInTheDocument();
-    expect(screen.getByText("정서 강도: 높음")).toBeInTheDocument();
+    expect(screen.getByText(/정서 강도: 높음/)).toBeInTheDocument();
+  });
+
+  it("배포된 yml 이 쓰는 태그·강도는 전부 한국어 라벨을 갖는다", () => {
+    /*
+      solomon.yml Scene 3·4 의 실제 선언. 이 태그들은 solomon 화면이 로컬
+      TriggerWarning 타입에 `content` 를 두지 않아 **한 번도 뜬 적이 없었고**,
+      뜨게 만들고 보니 사전에도 없어 영문 토큰이 그대로 나왔다.
+      원문 노출은 *모르는* 태그를 위한 안전망이지 배포된 태그의 자리가 아니다.
+    */
+    render(
+      <TriggerWarningGate
+        warning={{
+          level: "low_medium",
+          content: [
+            "infant_loss",
+            "bereavement",
+            "child_endangerment",
+            "emptiness",
+            "existential_despair",
+          ],
+        }}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+    for (const label of [
+      "영아 상실",
+      "사별",
+      "아이가 위험에 놓임",
+      "공허",
+      "삶의 의미를 잃은 절망",
+    ]) {
+      expect(screen.getByText(label)).toBeInTheDocument();
+    }
+    expect(screen.getByText(/정서 강도: 낮음~중간/)).toBeInTheDocument();
   });
 
   it("사전에 없는 level 도 원문 그대로 뜬다", () => {
@@ -169,7 +248,24 @@ describe("경고 카드가 실제로 렌더된다", () => {
         onSkip={vi.fn()}
       />,
     );
-    expect(screen.getByText("정서 강도: extreme")).toBeInTheDocument();
+    expect(screen.getByText(/정서 강도: extreme/)).toBeInTheDocument();
+  });
+
+  it("skip 목적지를 모를 때도 건너뛰어도 된다는 사실은 말해 준다", () => {
+    // 예전에는 skip_alternative_scene_id 가 없으면 이 줄이 통째로 비었다.
+    // 건너뛰면 이야기를 잃는 건지 아닌지 모르는 채로 고르게 하는 게 문제다.
+    render(
+      <TriggerWarningGate
+        warning={{ level: "medium" }}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByText("정서 강도: 중간 · 건너뛰어도 이야기는 이어집니다"),
+    ).toBeInTheDocument();
   });
 
   it("level 이 없고 skip 목적지만 있으면 목적지만 나온다", () => {
@@ -261,10 +357,15 @@ describe("문구 소유권 — consent_card_ko 정본이 화면 문구를 이긴
     ).toBeInTheDocument();
   });
 
-  it("[대괄호]로 시작하는 안전 문구는 UI 지시줄이 아니어도 통째로 사라진다", () => {
-    // 버그 문서화: 필터가 '[' 로 시작하는 *모든* 줄을 버린다. 저작자가
-    // "[주의] 자해 묘사가 있습니다" 처럼 대괄호 머리말을 쓰면 그 경고가
-    // 조용히 증발한다 — 화면은 멀쩡해 보이고 어떤 게이트도 빨개지지 않는다.
+  it("[주의] 같은 대괄호 머리말이 붙은 안전 문구는 살아남는다", () => {
+    /*
+      예전 필터는 '[' 로 시작하는 *모든* 줄을 버렸다. 그래서 저작자가
+      "[주의] 자해 묘사가 있습니다" 처럼 대괄호 머리말을 쓰면 그 경고가 조용히
+      증발했다 — 화면은 멀쩡해 보이고 어떤 게이트도 빨개지지 않는다. 대괄호는
+      한국어 안전 카피의 흔한 머리말이라 특히 밟기 쉬웠다.
+
+      이제 걷어내는 건 *줄 전체가 대괄호 토큰뿐인* UI 지시줄로 한정한다.
+    */
     render(
       <TriggerWarningGate
         warning={{
@@ -280,8 +381,12 @@ describe("문구 소유권 — consent_card_ko 정본이 화면 문구를 이긴
         onSkip={vi.fn()}
       />,
     );
-    expect(screen.getByText(/잠시 숨을 고르세요/)).toBeInTheDocument();
-    expect(screen.queryByText(/자해에 대한 묘사/)).not.toBeInTheDocument();
+    const 산문 = screen.getByText(/잠시 숨을 고르세요/);
+    expect(산문).toHaveTextContent(
+      "[주의] 이 장면에는 자해에 대한 묘사가 있습니다.",
+    );
+    // UI 지시줄은 여전히 버튼으로 대체된다.
+    expect(산문.textContent).not.toContain("[계속한다]");
   });
 
   it("정본이 UI 지시줄뿐이면 남는 산문이 없어 fallbackProse 로 되돌아간다", () => {

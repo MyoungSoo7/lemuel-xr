@@ -19,6 +19,9 @@ import {
   scene5Monologue,
   scene6OutroByScene3,
 } from "@/lib/content/moses-monologues";
+// 위기 문구 픽스처는 정본에서 만든다 — 번호를 여기 적으면 정본이 바뀔 때
+// 테스트만 옛 번호를 지키고 초록이 유지된다.
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * Moses 미션 화면 — 씬 1~6 상태 기계.
@@ -631,6 +634,37 @@ describe("Moses Scene 6 — 회복 (outro)", () => {
       "/joseph",
     );
   });
+
+  /*
+    moses.yml Scene 6 은 `crisis_reminder` 를 선언하고 백엔드
+    `CrisisTokenResolver` 가 `{{crisis_resources.default}}` 를 정본 번호로 치환해
+    내려보낸다. 2026-08-14 까지 이 화면은 그 값을 읽지 않았다 — 치환까지 끝난
+    안내가 payload 안에서 그대로 버려졌다.
+
+    CI 는 이걸 못 잡는다. `check_frontend_hotline.py` 는 "번호를 하드코딩했나" 만
+    보고, 아무것도 안 그리는 화면은 하드코딩이 아니라서 초록이다. 화면에 뜨는지는
+    테스트만 잰다.
+  */
+  it("payload 의 위기 안내를 결말에 낸다", async () => {
+    // 문구는 백엔드가 만든다. 화면은 그대로 실어 나르기만 해야 한다.
+    const reminder = `지금 이 순간이 무겁다면, ${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
+    mockStart.mockResolvedValue({
+      sessionId: SESSION,
+      userId: "guest-1",
+      currentScene: 6,
+      scenePayload: { ...SCENE6_PAYLOAD, crisis_reminder: reminder },
+      responseText: null,
+    });
+    renderPage();
+
+    expect(await screen.findByRole("note")).toHaveTextContent(reminder);
+  });
+
+  it("안내가 없으면 빈 상자를 만들지 않는다", async () => {
+    await bootAt(6, "회복");
+
+    expect(screen.queryByRole("note")).toBeNull();
+  });
 });
 
 describe("Moses — 끝까지 걸어가기", () => {
@@ -702,33 +736,92 @@ describe("Moses — 끝까지 걸어가기", () => {
 });
 
 describe("Moses — R4 동의 게이트 배선", () => {
-  it("[구멍] payload 에 trigger_warning 이 와도 이 화면은 동의 카드를 띄우지 않는다", async () => {
-    // moses.yml 에는 현재 trigger_warning 이 없어서 CI 의
-    // check_frontend_trigger_warning.py 는 moses 를 아예 검사하지 않는다.
-    // 그래서 이 화면에는 R4 배선이 *한 줄도* 없다 — 나중에 yml 에 경고를 넣는
-    // 사람은 "넣으면 화면이 띄운다" 는 규약을 믿을 텐데, 여기서는 조용히 무시된다.
-    // 현재 동작을 고정해 두고 소스는 건드리지 않는다 (보고서에 기재).
+  /*
+    moses.yml 에는 아직 trigger_warning 이 없다. 그래서 CI 의
+    check_frontend_trigger_warning.py 는 moses 를 검사 대상에서 아예 뺐고,
+    이 화면에는 R4 배선이 한 줄도 없었다 — payload 에 경고가 와도 조용히
+    무시하고 본문을 바로 열었다.
+
+    "아직 안 쓰는 기능이니 괜찮다" 가 아니다. 저작자·안전 검토자는 "yml 에
+    경고를 넣으면 화면이 띄운다" 는 규약을 믿고 쓴다. moses 에 넣은 사람은
+    넣었다고 믿는데 화면은 그대로다 — 경고가 아예 없는 것보다 나쁘다.
+    검사가 안 도는 화면이라 CI 도 영원히 초록이다.
+
+    그래서 yml 이 선언하기 *전에* 배선을 깔고, 그 배선을 여기서 고정한다.
+  */
+  const WARNING = {
+    level: "medium",
+    content: ["violence"],
+    consent_card_ko: "다음 장면에는 폭력 묘사가 있습니다. 계속하시겠어요?",
+    skip_alternative_scene_id: 5,
+  };
+
+  function bootWithWarning() {
     mockStart.mockResolvedValue({
       ...sceneResponse(4),
-      scenePayload: {
-        ...SCENE4_PAYLOAD,
-        trigger_warning: {
-          level: "medium",
-          content: ["violence"],
-          consent_card_ko:
-            "다음 장면에는 폭력 묘사가 있습니다. 계속하시겠어요?",
-          skip_alternative_scene_id: 5,
-        },
-      },
+      scenePayload: { ...SCENE4_PAYLOAD, trigger_warning: WARNING },
     });
     renderPage();
+  }
 
-    // 경고 카드도, 건너뛸 길도 없이 본문이 바로 열린다.
-    await screen.findByRole("heading", { name: "파라오 앞에서" });
-    expect(screen.queryByText(/다음 장면에는 폭력 묘사가 있습니다/)).toBeNull();
-    expect(screen.queryByRole("button", { name: /건너뛰기/ })).toBeNull();
+  it("payload 에 trigger_warning 이 오면 동의 전에 본문을 가린다", async () => {
+    bootWithWarning();
+
+    expect(
+      await screen.findByText(/다음 장면에는 폭력 묘사가 있습니다/),
+    ).toBeInTheDocument();
+    // 선택지가 보이면 가린 게 아니다 — 카드만 띄우고 본문을 열어 두면 게이트가 아니다.
+    expect(
+      screen.queryByRole("button", { name: "지팡이를 던진다 (즉시)" }),
+    ).toBeNull();
+  });
+
+  it("동의하면 카드가 사라지고 본문이 열린다", async () => {
+    const user = userEvent.setup();
+    bootWithWarning();
+
+    await user.click(
+      await screen.findByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+    );
+
     expect(
       screen.getByRole("button", { name: "지팡이를 던진다 (즉시)" }),
     ).toBeInTheDocument();
+    expect(screen.queryByText(/폭력 묘사가 있습니다/)).toBeNull();
+  });
+
+  it("건너뛰기는 skip 결정을 백엔드로 보낸다 — 이야기를 잃지 않는 문", async () => {
+    const user = userEvent.setup();
+    advanceEngine();
+    bootWithWarning();
+
+    await user.click(
+      await screen.findByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
+
+    expect(mockDecide).toHaveBeenCalledWith("moses", SESSION, 4, {
+      value: "skip",
+    });
+  });
+
+  it("건너뛰기 목적지와 태그를 화면에 밝힌다", async () => {
+    /*
+      공용 컴포넌트를 쓰는 이유가 여기 있다. 손으로 베낀 카드들은 태그(content)와
+      건너뛰기 목적지를 렌더하지 않아서, 사용자는 "뭐가 나오는지" 도 "건너뛰면
+      어디로 가는지" 도 모르는 채 둘 중 하나를 골라야 했다.
+    */
+    bootWithWarning();
+
+    expect(await screen.findByText("폭력")).toBeInTheDocument();
+    expect(screen.getByText(/건너뛰면 Scene 5 으로 이어집니다/)).toBeVisible();
+  });
+
+  it("경고가 없는 씬은 게이트 없이 바로 본문을 연다", async () => {
+    await bootAt(4, "파라오 앞에서");
+
+    expect(
+      screen.getByRole("button", { name: "지팡이를 던진다 (즉시)" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /건너뛸게요/ })).toBeNull();
   });
 });

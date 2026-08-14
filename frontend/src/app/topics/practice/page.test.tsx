@@ -261,6 +261,13 @@ describe("/topics/practice", () => {
     ).toHaveTextContent("24시간");
     // 위기일 때는 일반 완료 문구로 덮지 않는다.
     expect(c.queryByText("✓ 기록되었습니다.")).not.toBeInTheDocument();
+
+    // 위기 카드의 유일한 CTA. 문구가 「일기(#1)」 라고 말하므로 목적지도 일기여야
+    // 한다 — 여기는 /topics(주제 목록)를 가리키며 사용자를 목록으로 되돌려
+    // 보내고 있었다.
+    expect(
+      c.getByRole("link", { name: /일기\(#1\)로 마음을 먼저 적어보기/ }),
+    ).toHaveAttribute("href", "/topics/journal");
   });
 
   it("저장이 실패하면 실패를 알리고, 사용자가 쓴 글은 지우지 않는다", async () => {

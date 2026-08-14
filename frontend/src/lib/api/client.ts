@@ -68,28 +68,53 @@ async function ensureDisclaimerAccepted(token: string): Promise<void> {
   }
 }
 
+async function issueGuestToken(): Promise<string> {
+  const res = await axios.post<{ userId: string; token: string }>(
+    "/api/auth/guest",
+    { deviceType: "web" },
+    { headers: { "Content-Type": "application/json" } },
+  );
+  storeToken(res.data.token, res.data.userId);
+  // 갓 발급된 게스트는 disclaimer 미동의 상태 — 콘텐츠/게임 endpoint 는
+  // DisclaimerGateFilter 가 451 로 차단한다. 발급 직후 동의를 확정해
+  // 이후 요청이 게이트를 통과하도록 한다.
+  await ensureDisclaimerAccepted(res.data.token);
+  return res.data.token;
+}
+
 async function ensureGuestToken(): Promise<string> {
   const existing = getStoredToken();
   if (existing) return existing;
   if (pendingIssue) return pendingIssue;
-  pendingIssue = (async () => {
-    try {
-      const res = await axios.post<{ userId: string; token: string }>(
-        "/api/auth/guest",
-        { deviceType: "web" },
-        { headers: { "Content-Type": "application/json" } },
-      );
-      storeToken(res.data.token, res.data.userId);
-      // 갓 발급된 게스트는 disclaimer 미동의 상태 — 콘텐츠/게임 endpoint 는
-      // DisclaimerGateFilter 가 451 로 차단한다. 발급 직후 동의를 확정해
-      // 이후 요청이 게이트를 통과하도록 한다.
-      await ensureDisclaimerAccepted(res.data.token);
-      return res.data.token;
-    } finally {
-      pendingIssue = null;
-    }
-  })();
-  return pendingIssue;
+
+  const issue = issueGuestToken();
+  pendingIssue = issue;
+
+  /*
+   * 정리를 발급 본문 *밖* 에 건다. 예전에는 본문이 async IIFE 였고 그 안의
+   * `finally { pendingIssue = null }` 가 이 일을 했는데, 거기엔 구멍이 있었다.
+   *
+   * async 함수의 본문은 첫 await 까지 **동기로** 실행된다. 그래서 `axios.post(...)`
+   * 가 프라미스를 만들기 전에 동기로 던지면 finally 도 같은 틱에 돌아
+   * pendingIssue 를 null 로 만든다 — 그런데 그 시점엔 아직 대입 전이다. 정리가
+   * 끝난 *뒤에* 거부된 프라미스가 pendingIssue 에 꽂히고, 그때부터
+   * `if (pendingIssue) return pendingIssue` 가 영원히 같은 거부를 돌려준다.
+   * 발급 요청은 두 번 다시 나가지 않는다. 게스트 토큰이 이 앱의 유일한 신원이므로
+   * 새로고침 전까지 앱 전체가 잠긴다.
+   *
+   * axios 를 안 거치는 이론적 경로가 아니다 — axios 1.x 의 `Axios#request` 는
+   * config 병합 단계 예외를 스택을 붙이려고 catch 한 뒤 그대로 rethrow 한다.
+   *
+   * 동일성 검사는 그 사이 시작된 새 발급을 뒤늦은 정리가 지우지 않게 한다.
+   * `.finally` 가 아니라 then 의 두 갈래를 쓰는 이유는, finally 가 거부를 그대로
+   * 흘려보내 아무도 안 받는 거부 프라미스를 하나 더 만들기 때문이다.
+   */
+  const clear = () => {
+    if (pendingIssue === issue) pendingIssue = null;
+  };
+  issue.then(clear, clear);
+
+  return issue;
 }
 
 // Request interceptor — /api/auth/* 외 모든 요청에 Bearer 자동 첨부

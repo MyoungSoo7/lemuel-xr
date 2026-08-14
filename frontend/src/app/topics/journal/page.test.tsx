@@ -4,7 +4,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ReactElement } from "react";
 
-import { CRISIS_LINE_FULL, CRISIS_LINE_SHORT } from "@/lib/crisis-resources";
+import {
+  CRISIS_DEFAULT,
+  CRISIS_LINE_FULL,
+  CRISIS_LINE_SHORT,
+  telHref,
+} from "@/lib/crisis-resources";
 import JournalGuidancePage from "./page";
 import {
   fetchJournalGuidance,
@@ -375,9 +380,13 @@ describe("/topics/journal — R1 위기 라우팅", () => {
     expect(screen.queryByText("성찰 질문")).not.toBeInTheDocument();
   });
 
-  it("[버그] 위기 카드의 '일기로 적어보기' 링크가 지금 이 페이지를 가리킨다", async () => {
-    // 소스 현재 동작 고정. /topics/journal 에서 /topics/journal 로 보내므로 사용자는
-    // 눌러도 아무 데도 못 간다 — 위기 순간에 제시되는 유일한 다음 행동이 죽어 있다.
+  it("위기 카드는 자기 자신이 아니라 전화로 연결한다", async () => {
+    // 원래 이 자리는 「일기(#1)로 마음을 먼저 적어보기 →」 링크였고 목적지가
+    // /topics/journal — 즉 **지금 보고 있는 이 페이지** 였다. 눌러도 아무 데도 못
+    // 가므로, 위기 순간에 제시되는 유일한 다음 행동이 죽어 있었다.
+    //
+    // 다른 두 화면(전도서·실천)은 그 링크가 맞다 — 거기서는 실제로 일기로 이동한다.
+    // 여기서만 이동이 아니라 행동(전화)을 준다.
     const user = userEvent.setup();
     mockRequest.mockResolvedValue(
       response({ crisis: { routed: true, resources: [] } }),
@@ -388,9 +397,13 @@ describe("/topics/journal — R1 위기 라우팅", () => {
     await user.click(screen.getByRole("button", { name: "성경 조언 받기" }));
 
     const link = await screen.findByRole("link", {
-      name: /일기\(#1\)로 마음을 먼저 적어보기/,
+      name: new RegExp(`${CRISIS_DEFAULT.tel} 지금 전화하기`),
     });
-    expect(link).toHaveAttribute("href", "/topics/journal");
+    expect(link).toHaveAttribute("href", telHref(CRISIS_DEFAULT));
+    // 자기 자신으로 가는 링크는 이 카드에 남아 있으면 안 된다.
+    expect(
+      screen.queryByRole("link", { name: /마음을 먼저 적어보기/ }),
+    ).toBeNull();
   });
 });
 

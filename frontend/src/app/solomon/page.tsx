@@ -11,6 +11,10 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import {
+  TriggerWarningGate,
+  readTriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 /**
  * Solomon 미션 — 해 아래, 빈 손. 백엔드 runtime 계약(backend/src/main/resources/scenarios/solomon.yml)
@@ -57,11 +61,15 @@ interface ScriptBeat {
   ref?: string;
 }
 
-interface TriggerWarning {
-  level?: string;
-  consent_card_ko?: string;
-  skip_alternative_scene_id?: number;
-}
+/*
+  로컬 TriggerWarning 타입은 걷어냈다 — 공용 정의를 쓴다.
+
+  여기 있던 사본에는 `content` 가 없었다. 그래서 solomon.yml 이 실제로 선언한
+  infant_loss · bereavement · child_endangerment (Scene 3) 와 emptiness ·
+  existential_despair (Scene 4) 태그가 **화면에 한 번도 뜬 적이 없다.** 2026-08-12
+  전수 조사는 solomon 을 "payload 를 읽는다 = 정상" 으로 분류했는데, 읽는 것과
+  읽은 것을 전달하는 것은 다르다. 타입이 필드를 모르면 그 필드는 없는 것이 된다.
+*/
 
 interface LaydownObject {
   id: string;
@@ -181,7 +189,7 @@ export default function SolomonPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
-  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
   const beats = (field<ScriptBeat[]>("script") ?? []).filter((b) => !!b.text);
@@ -255,15 +263,29 @@ export default function SolomonPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-amber-950/80 via-stone-900/85 to-stone-950/90" />
         <div className="relative z-10 p-5">
           {needsConsent ? (
-            <ConsentGate
+            <TriggerWarningGate
               warning={warning!}
-              intensityOptions={field<string[]>("intensity_toggle")}
-              captionsOnly={captionsOnly}
-              onIntensity={(v) => setCaptionsOnly(v === "captions_only")}
+              /*
+                solomon.yml 은 Scene 3·4 에 consent_card_ko 정본을 싣고 있어 이 산문은
+                보통 쓰이지 않는다. 그래도 비워 두지 않는 이유는, 정본이 빠진 씬에서
+                카드가 제목과 버튼만 남는 걸 막기 위해서다.
+              */
+              fallbackProse={
+                <p>
+                  다음 장면에는 지금 버겁게 느껴질 수 있는 내용이 있습니다.
+                  <strong> 건너뛰어도 이야기는 온전히 이어집니다.</strong>
+                </p>
+              }
               pending={decide.isPending}
               onContinue={() => setConsented(true)}
               onSkip={() => skipScene(scene.currentScene)}
-            />
+            >
+              <IntensityToggle
+                options={field<string[]>("intensity_toggle")}
+                captionsOnly={captionsOnly}
+                onIntensity={(v) => setCaptionsOnly(v === "captions_only")}
+              />
+            </TriggerWarningGate>
           ) : (
             <ScriptBeats beats={beats} audio={!captionsOnly} />
           )}
@@ -435,99 +457,59 @@ export default function SolomonPage() {
 }
 
 /**
- * R4 동의 게이트 — 카드 본문은 payload 의 정본(consent_card_ko)을 그대로 쓴다.
- * 원문 안의 `[계속한다] [건너뛰기 …]` · `음성/자막 강도: …` 줄은 *UI 지시* 라 산문에서 걷어내고
- * 실제 버튼으로 렌더한다 (문구를 프론트에 다시 적지 않기 위한 최소 가공).
+ * 음성/자막 강도 조절 — 공용 게이트의 children 슬롯(산문과 버튼 사이)에 들어간다.
+ *
+ * 이 화면 고유의 손잡이라 여기 남는다. 나머지(산문 정제·태그·강도·건너뛰기 목적지·
+ * 버튼)는 전부 공용 게이트가 소유한다.
  */
-function ConsentGate({
-  warning,
-  intensityOptions,
+function IntensityToggle({
+  options,
   captionsOnly,
   onIntensity,
-  pending,
-  onContinue,
-  onSkip,
 }: {
-  warning: TriggerWarning;
-  intensityOptions?: string[];
+  options?: string[];
   captionsOnly: boolean;
   onIntensity: (v: string) => void;
-  pending: boolean;
-  onContinue: () => void;
-  onSkip: () => void;
 }) {
-  const prose = (warning.consent_card_ko ?? "")
-    .split("\n")
-    .filter((l) => l.trim().length > 0)
-    .filter((l) => !l.trim().startsWith("["))
-    .filter((l) => !/^음성\/자막 강도:/.test(l.trim()))
-    .join("\n");
-
   const INTENSITY_LABEL: Record<string, string> = {
     captions_only: "자막만",
     mild: "약",
     default: "기본",
   };
 
+  if (!Array.isArray(options) || options.length === 0) return null;
+
   return (
-    <div className="space-y-4">
-      <p className="text-xs uppercase tracking-wider text-amber-400/80">
-        잠깐 — 다음 장면 안내
-      </p>
-      <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-        {prose}
-      </p>
-
-      {Array.isArray(intensityOptions) && intensityOptions.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs text-[var(--color-warm)]/50">
-            음성/자막 강도
-          </span>
-          {intensityOptions.map((v) => {
-            const active =
-              v === "captions_only"
-                ? captionsOnly
-                : !captionsOnly && v === "default";
-            return (
-              <button
-                key={v}
-                type="button"
-                onClick={() => onIntensity(v)}
-                /*
-                  `min-h-11 min-w-11` — 44px (WCAG 2.5.5 / Apple HIG). 전에는 py-1 뿐이라
-                  320px 에서 「약」이 36×26 이었다(2026-08-12 실측). 이건 장식이 아니라
-                  **자극 강도를 낮추는 손잡이**다. 정서 부담 경고를 읽고 강도를 내리려는
-                  사람이 제일 작은 버튼을 정확히 눌러야 했다.
-                */
-                className={`min-h-11 min-w-11 text-xs px-3 py-1 rounded-full border transition ${
-                  active
-                    ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
-                    : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
-                }`}
-              >
-                {INTENSITY_LABEL[v] ?? v}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          onClick={onContinue}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-        >
-          계속한다
-        </button>
-        <button
-          onClick={onSkip}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90 disabled:opacity-40"
-        >
-          건너뛰기 →
-        </button>
-      </div>
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="text-xs text-[var(--color-warm)]/50">
+        음성/자막 강도
+      </span>
+      {options.map((v) => {
+        const active =
+          v === "captions_only"
+            ? captionsOnly
+            : !captionsOnly && v === "default";
+        return (
+          <button
+            key={v}
+            type="button"
+            onClick={() => onIntensity(v)}
+            /*
+              `min-h-11 min-w-11` — 44px (WCAG 2.5.5 / Apple HIG). 전에는 py-1 뿐이라
+              320px 에서 「약」이 36×26 이었다(2026-08-12 실측). 이건 장식이 아니라
+              **자극 강도를 낮추는 손잡이**다. 정서 부담 경고를 읽고 강도를 내리려는
+              사람이 제일 작은 버튼을 정확히 눌러야 했다.
+            */
+            className={`min-h-11 min-w-11 text-xs px-3 py-1 rounded-full border transition ${
+              active
+                ? "border-[var(--color-primary)] bg-[var(--color-primary)]/15"
+                : "border-[var(--color-primary)]/30 hover:border-[var(--color-primary)]"
+            }`}
+          >
+            {INTENSITY_LABEL[v] ?? v}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -11,6 +11,11 @@ import {
   recordProverbsInteraction,
 } from "@/lib/api/content";
 import ProverbsThemePage from "./page";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다 —
+// `scripts/check_frontend_hotline.py` 가 화면·테스트·주석 전부를 검사한다.
+// (이 자리들은 소프트 패턴이 같은 줄의 문맥 단어를 요구해서 게이트를 통과하고
+//  있었지만, 그건 규칙의 취지가 아니라 정규식의 빈틈이다.)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * /topics/proverbs — 기준2 (잠언과 지혜) 주제별 조회.
@@ -106,7 +111,7 @@ describe("/topics/proverbs", () => {
     ).not.toBeInTheDocument();
     const footer = screen.getByText(/AI 보조/);
     expect(footer).toHaveTextContent("잠언(성경) 외 자료는 사용하지 않습니다.");
-    expect(footer).toHaveTextContent(/109/);
+    expect(footer).toHaveTextContent(new RegExp(CRISIS_DEFAULT.tel));
 
     await act(async () => {
       d.resolve(THEMES);
@@ -135,7 +140,7 @@ describe("/topics/proverbs", () => {
     await waitFor(() => expect(mockThemes).toHaveBeenCalled());
     const footer = screen.getByText(/AI 보조/);
     expect(footer).toHaveTextContent("잠언(성경) 외 자료는 사용하지 않습니다.");
-    expect(footer).toHaveTextContent(/109/);
+    expect(footer).toHaveTextContent(new RegExp(CRISIS_DEFAULT.tel));
     expect(
       screen.getByText("위 주제에서 오늘 마음에 닿는 하나를 골라보세요."),
     ).toBeInTheDocument();

@@ -11,6 +11,11 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import { CrisisReminder } from "@/components/CrisisReminder";
+import {
+  TriggerWarningGate,
+  readTriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 /**
  * Job 미션 — 너의 비탄은 부끄러운 것이 아니다.
@@ -47,11 +52,11 @@ import { SceneBootState } from "@/components/SceneBootState";
  */
 type Scene = JosephStartResponse;
 
-interface TriggerWarning {
-  level?: string;
-  content?: string[];
-  skip_alternative_scene_id?: number;
-}
+/*
+  경고 타입도 공용 정의를 쓴다. 여기 있던 로컬 interface 는 `consent_card_ko` 를
+  아예 몰라서, 안전 검토자가 job.yml 에 정본 동의 문구를 넣어도 이 화면은 그 필드를
+  타입에서부터 못 보고 프론트 문구를 계속 썼다 — 고친 사람은 고쳐진 줄 안다.
+*/
 
 interface JobOption {
   id: string;
@@ -117,7 +122,7 @@ export default function JobPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
-  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
   const anchor = field<string>("anchor");
@@ -141,11 +146,12 @@ export default function JobPage() {
         )}
       </header>
 
-      {crisisReminder && (
-        <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-amber-500/40 bg-amber-500/10 text-sm text-[var(--color-warm)]/90">
-          {crisisReminder}
-        </section>
-      )}
+      {/*
+        원래 여기 있던 블록을 그대로 옮긴 것이다. 손으로 베낀 사본이 화면마다
+        갈라진 것이 이번 결함의 원인이라(7개 시나리오가 선언, 3개 화면만 렌더)
+        렌더를 한 벌로 모았다.
+      */}
+      <CrisisReminder text={crisisReminder} />
 
       {/* Scene 배경 이미지 */}
       <section
@@ -158,8 +164,17 @@ export default function JobPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-950/85 via-stone-950/75 to-slate-900/85" />
         <div className="relative z-10 p-5">
           {needsConsent ? (
-            <ConsentGate
+            <TriggerWarningGate
               warning={warning!}
+              fallbackProse={
+                <p>
+                  다음 장면은 <strong>태어난 날을 저주하는 비탄</strong> 을
+                  다룹니다. 욥이 실제로 그렇게 말했고, 신은 그 외침을{" "}
+                  <strong>책망하지 않으셨습니다</strong>. 직접적인 묘사는 없지만
+                  지금이 버겁다면 <strong>건너뛰어도 괜찮습니다</strong> —
+                  건너뛰어도 이야기는 온전히 이어집니다.
+                </p>
+              }
               pending={decide.isPending}
               onContinue={() => setConsented(true)}
               onSkip={() => advance(scene.currentScene, { value: "skip" })}
@@ -327,58 +342,5 @@ export default function JobPage() {
         </details>
       )}
     </main>
-  );
-}
-
-/**
- * R4 동의 게이트. job.yml Scene 2 의 trigger_warning(level medium,
- * [death_wish, birth_lament]) 을 프론트가 소비하는 지점.
- *
- * consent_card_ko 가 없으므로 문구는 프론트 소유. 건너뛰기는 skip_alternative_scene_id(=3)
- * 이며 이 씬의 next 도 3 이라 결과적으로 같은 자리다 — 즉 건너뛰어도 서사는 잃지 않고
- * 비탄 묘사만 건너뛴다.
- */
-function ConsentGate({
-  warning,
-  pending,
-  onContinue,
-  onSkip,
-}: {
-  warning: TriggerWarning;
-  pending: boolean;
-  onContinue: () => void;
-  onSkip: () => void;
-}) {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-[var(--color-warm)]/90 leading-relaxed">
-        다음 장면은 <strong>태어난 날을 저주하는 비탄</strong> 을 다룹니다. 욥이
-        실제로 그렇게 말했고, 신은 그 외침을{" "}
-        <strong>책망하지 않으셨습니다</strong>. 직접적인 묘사는 없지만 지금이
-        버겁다면 <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 이야기는
-        온전히 이어집니다.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          onClick={onContinue}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-        >
-          계속한다
-        </button>
-        <button
-          onClick={onSkip}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90 disabled:opacity-40"
-        >
-          건너뛰기 →
-        </button>
-      </div>
-      {warning.level && (
-        <p className="text-[10px] text-[var(--color-warm)]/40">
-          정서 강도: {warning.level}
-        </p>
-      )}
-    </div>
   );
 }

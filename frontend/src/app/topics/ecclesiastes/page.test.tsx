@@ -13,6 +13,11 @@ import {
   recordEcclesiastesView,
 } from "@/lib/api/content";
 import EcclesiastesPage from "./page";
+// 번호 리터럴은 `@/lib/crisis-resources` 에만 산다 —
+// `scripts/check_frontend_hotline.py` 가 화면·테스트·주석 전부를 검사한다.
+// (이 자리들은 소프트 패턴이 같은 줄의 문맥 단어를 요구해서 게이트를 통과하고
+//  있었지만, 그건 규칙의 취지가 아니라 정규식의 빈틈이다.)
+import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
 /**
  * /topics/ecclesiastes — 기준4 (전도서와 인생).
@@ -146,7 +151,7 @@ describe("/topics/ecclesiastes", () => {
     expect(footer).toHaveTextContent(
       "전도서와 관련 성구 외 자료는 사용하지 않습니다.",
     );
-    expect(footer).toHaveTextContent(/109/);
+    expect(footer).toHaveTextContent(new RegExp(CRISIS_DEFAULT.tel));
 
     await act(async () => {
       d.resolve(CATEGORIES);
@@ -178,7 +183,7 @@ describe("/topics/ecclesiastes", () => {
     expect(footer).toHaveTextContent(
       "전도서와 관련 성구 외 자료는 사용하지 않습니다.",
     );
-    expect(footer).toHaveTextContent(/109/);
+    expect(footer).toHaveTextContent(new RegExp(CRISIS_DEFAULT.tel));
     expect(
       screen.getByText(
         "위 카테고리에서 오늘 마음에 닿는 진리를 하나 골라보세요.",
@@ -329,10 +334,17 @@ describe("/topics/ecclesiastes", () => {
       screen.getByText(/인생을 포기하라는 말이 아닙니다/),
     ).toBeInTheDocument();
     const crisisLine = screen
-      .getAllByText(/109/)
+      .getAllByText(new RegExp(CRISIS_DEFAULT.tel))
       .find((el) => el.tagName === "P");
     expect(crisisLine).toHaveTextContent("24시간");
     expect(screen.queryByText("✓ 기록되었습니다.")).not.toBeInTheDocument();
+
+    // 위기 카드의 유일한 CTA. 문구가 「일기(#1)」 라고 말하므로 목적지도 일기여야
+    // 한다 — 여기는 /topics/practice(실천 목록)를 가리키고 있었다. 위기 순간에
+    // 제시되는 다음 행동이 엉뚱한 화면으로 가면 사용자는 거기서 길을 잃는다.
+    expect(
+      screen.getByRole("link", { name: /일기\(#1\)로 마음을 먼저 적어보기/ }),
+    ).toHaveAttribute("href", "/topics/journal");
   });
 
   it("저장이 실패하면 실패를 알리고 사용자가 쓴 성찰은 지우지 않는다", async () => {

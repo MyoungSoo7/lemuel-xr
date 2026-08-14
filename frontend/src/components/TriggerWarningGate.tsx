@@ -42,20 +42,110 @@ export interface TriggerWarning {
   skip_alternative_scene_id?: number;
 }
 
-/** payload 에서 trigger_warning 을 꺼낸다. 없으면 undefined — 게이트를 띄우지 않는다. */
+/** content 를 문자열 배열로 맞춘다. 배열이 아니어도 버리지 않는다. */
+function toTags(raw: unknown): string[] | undefined {
+  /*
+    yml 에 `content: violence` 처럼 대괄호를 빠뜨리면 문자열이 온다. 예전엔 그대로
+    렌더러로 흘러가 `"violence".map is not a function` 으로 **씬 전체가 터졌다**.
+    경고를 붙였다는 이유로 화면이 죽는 건 최악의 실패다 — 저작자는 경고를 안 붙이는
+    쪽으로 학습한다. 한 개짜리 목록으로 받아 준다.
+  */
+  if (typeof raw === "string") {
+    const one = raw.trim();
+    return one ? [one] : undefined;
+  }
+  if (!Array.isArray(raw)) return undefined;
+  const tags = raw
+    .filter((v) => v != null)
+    .map((v) => String(v).trim())
+    .filter((v) => v.length > 0);
+  return tags.length > 0 ? tags : undefined;
+}
+
+/** skip 목적지. yml 이 따옴표를 붙여 문자열로 와도 숫자로 읽는다. */
+function toSceneId(raw: unknown): number | undefined {
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string" && /^\d+$/.test(raw.trim())) {
+    return Number(raw.trim());
+  }
+  return undefined;
+}
+
+function toText(raw: unknown): string | undefined {
+  if (typeof raw !== "string") return undefined;
+  return raw.trim() ? raw : undefined;
+}
+
+/**
+ * payload 에서 trigger_warning 을 꺼내 규약 모양으로 맞춘다.
+ *
+ * **판정 기준은 "모양이 맞나" 가 아니라 "저작자가 뭔가 적었나" 다.** 적혀 있는데
+ * 모양이 규약과 다르면 게이트를 *띄운다*. 예전 구현은 `as TriggerWarning` 캐스팅
+ * 하나뿐이어서, 레거시 boolean(`trigger_warning: true`) 이나 문자열이 들어오면
+ * 카드는 뜨는데 레벨·트리거 종류·건너뛰기 목적지가 전부 빈 채로 떴다. 경고했다는
+ * 흔적만 남고 *무엇을* 경고하는지는 전달되지 않는 카드였다.
+ *
+ * 이제 그런 값은 빈 객체(`{}`)로 정규화된다. 카드는 화면이 소유한 fallbackProse 와
+ * 계속·건너뛰기 두 손잡이를 갖춘 채로 뜬다 — 메타데이터는 없어도 *동의를 구하는
+ * 문* 으로서는 온전하다. 그게 경고 없이 씬에 들어가는 것보다 낫다.
+ *
+ * ─────────────── 여기서 못 막는 것 ───────────────
+ *
+ * yml 이 `trigger_warning:` 키만 적고 값을 비우면 SnakeYAML 은 null 을 싣고,
+ * `spring.jackson.default-property-inclusion: non_null` (application.yml) 이
+ * **그 키를 JSON 에서 통째로 지운다.** 즉 프론트에는 "빈 선언" 과 "선언 없음" 이
+ * 똑같이 `undefined` 로 도착한다 — 여기서는 원리적으로 구별할 수 없다.
+ * 그 경우는 yml 을 직접 읽는 `scripts/check_frontend_trigger_warning.py` 가
+ * 빈 선언으로 잡아 CI 를 빨갛게 만든다. 두 곳이 나눠 막는 이유가 이것이다.
+ */
 export function readTriggerWarning(
   payload: Record<string, unknown>,
 ): TriggerWarning | undefined {
-  return payload.trigger_warning as TriggerWarning | undefined;
+  const raw = payload.trigger_warning;
+
+  // 선언이 없거나 명시적으로 끈 경우만 게이트가 없다.
+  // 경고 없는 씬까지 카드를 띄우면 사용자는 카드를 습관적으로 넘기게 되고,
+  // 그때부터 진짜 경고도 안 읽힌다. 없으면 없어야 한다.
+  if (raw === undefined || raw === false) return undefined;
+
+  // null 은 *선언은 했는데 비어 있다* 는 뜻이라 게이트를 연다(fail-closed).
+  // 위에 적었듯 현재 백엔드 설정에서는 이 값이 프론트까지 오지 않는다. 그래도
+  // 여기서 undefined 와 뭉뚱그리지 않는 이유는, 직렬화 설정이 바뀌어 null 이
+  // 도착하게 되는 날 조용히 문이 열리는 쪽이 아니라 닫히는 쪽이어야 해서다.
+  if (raw === null) return {};
+
+  // 레거시 boolean(true) — david.yml 의 violence_warning 이 쓰던 모양이다.
+  // 정보는 0 이지만 "경고할 씬" 이라는 선언이므로 게이트는 연다.
+  if (raw === true) return {};
+
+  // 스칼라 문자열. 저작자가 무엇을 의도했는지(레벨? 태그? 문구?) 알 수 없으므로
+  // 넘겨짚지 않고 동의 카드 본문으로 보여 준다 — 적힌 글자를 사용자에게 전달한다.
+  if (typeof raw === "string") {
+    const text = raw.trim();
+    return text ? { consent_card_ko: text } : {};
+  }
+
+  if (typeof raw !== "object" || Array.isArray(raw)) return {};
+
+  const src = raw as Record<string, unknown>;
+  return {
+    level: toText(src.level),
+    content: toTags(src.content),
+    consent_card_id: toText(src.consent_card_id),
+    consent_card_ko: toText(src.consent_card_ko),
+    skip_alternative_scene_id: toSceneId(src.skip_alternative_scene_id),
+  };
 }
 
 /**
  * content 태그의 한국어 라벨.
  *
  * 모르는 태그는 **원문 그대로 노출한다.** 조용히 버리지 않는 게 핵심이다 —
- * yml 에 새 트리거(예: `self_harm`)가 추가됐는데 라벨이 없어서 화면에서 사라지면,
- * 그건 "경고가 없는 것" 과 구별되지 않는다. 영문 토큰이 그대로 뜨는 건 보기 나쁘지만
- * *보인다*. 보이면 고쳐진다.
+ * yml 에 새 트리거가 추가됐는데 라벨이 없어서 화면에서 사라지면, 그건 "경고가
+ * 없는 것" 과 구별되지 않는다. 영문 토큰이 그대로 뜨는 건 보기 나쁘지만 *보인다*.
+ * 보이면 고쳐진다.
+ *
+ * 다만 그 안전망에 기대 방치하지는 말 것. 배포된 yml 이 쓰는 태그는 여기 등재한다.
  */
 const CONTENT_LABEL: Record<string, string> = {
   violence: "폭력",
@@ -68,13 +158,32 @@ const CONTENT_LABEL: Record<string, string> = {
   infant_loss: "영아 상실",
   despair: "절망",
   isolation: "고립",
+  // solomon.yml 이 실제로 싣고 있는데 라벨이 없어 영문 토큰으로 뜨던 것들.
+  // 원문 노출은 *모르는* 태그를 위한 안전망이지, 이미 배포된 태그의 자리가 아니다.
+  bereavement: "사별",
+  child_endangerment: "아이가 위험에 놓임",
+  emptiness: "공허",
+  existential_despair: "삶의 의미를 잃은 절망",
+  self_harm: "자해",
 };
 
 const LEVEL_LABEL: Record<string, string> = {
   low: "낮음",
+  low_medium: "낮음~중간", // solomon.yml Scene 4 가 쓴다.
   medium: "중간",
   high: "높음",
 };
+
+/*
+  정본에서 걷어낼 *UI 지시줄* — `[계속한다] [건너뛰기 — Scene 5]` 처럼 줄 전체가
+  대괄호 토큰으로만 이뤄진 경우다.
+
+  예전 필터는 `startsWith("[")` 였다. 그래서 "[주의] 이 장면에는 자해 묘사가
+  있습니다" 처럼 대괄호 머리말을 단 **안전 문구가 통째로 증발했다.** 화면은 멀쩡해
+  보이고 어떤 게이트도 빨개지지 않는다 — 검토자는 문구를 넣었다고 믿는다.
+  대괄호는 한국어 안전 카피에서 머리말로 흔히 쓰는 기호라 특히 밟기 쉬웠다.
+*/
+const UI_INSTRUCTION_LINE = /^(?:\[[^\]]*\]\s*)+$/;
 
 export function TriggerWarningGate({
   warning,
@@ -100,11 +209,13 @@ export function TriggerWarningGate({
   /*
     정본(consent_card_ko) 안의 `[계속한다] [건너뛰기 …]` 줄은 *UI 지시* 라 산문에서
     걷어내고 실제 버튼으로 렌더한다. 문구를 프론트에 다시 적지 않기 위한 최소 가공.
+    걷어내는 범위는 좁게 — 판단이 서지 않는 줄은 그대로 보여 준다. 안전 문구를
+    잘못 지우는 쪽의 대가가, 지시줄이 한 줄 남는 쪽의 대가보다 훨씬 크다.
   */
   const canonical = (warning.consent_card_ko ?? "")
     .split("\n")
     .filter((l) => l.trim().length > 0)
-    .filter((l) => !l.trim().startsWith("["))
+    .filter((l) => !UI_INSTRUCTION_LINE.test(l.trim()))
     .filter((l) => !/^음성\/자막 강도:/.test(l.trim()))
     .join("\n");
 
@@ -161,15 +272,24 @@ export function TriggerWarningGate({
         </button>
       </div>
 
+      {/*
+        건너뛰기 안내는 *항상* 적는다.
+
+        예전에는 skip_alternative_scene_id 가 없으면 이 줄이 통째로 비었다.
+        레거시 boolean 처럼 메타데이터가 없는 선언에서는 카드에 산문과 버튼만 남아,
+        건너뛰면 이야기를 잃는 건지 아닌지 모르는 채로 고르게 했다. 목적지를
+        모를 때도 "이어진다" 는 사실만은 말해 줄 수 있고, 그게 이 문의 요지다.
+      */}
       <p className="text-[10px] text-[var(--color-warm)]/40">
         {warning.level && (
-          <>정서 강도: {LEVEL_LABEL[warning.level] ?? warning.level}</>
+          <>정서 강도: {LEVEL_LABEL[warning.level] ?? warning.level} · </>
         )}
-        {warning.level && warning.skip_alternative_scene_id != null && " · "}
-        {warning.skip_alternative_scene_id != null && (
+        {warning.skip_alternative_scene_id != null ? (
           <>
             건너뛰면 Scene {warning.skip_alternative_scene_id} 으로 이어집니다
           </>
+        ) : (
+          <>건너뛰어도 이야기는 이어집니다</>
         )}
       </p>
     </div>

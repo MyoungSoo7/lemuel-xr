@@ -12,6 +12,10 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import {
+  TriggerWarningGate,
+  readTriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 /**
  * Elijah 미션 — 로뎀나무 아래, 먼저 먹고 자도 됩니다.
@@ -51,11 +55,11 @@ import { SceneBootState } from "@/components/SceneBootState";
  */
 type Scene = JosephStartResponse;
 
-interface TriggerWarning {
-  level?: string;
-  content?: string[];
-  skip_alternative_scene_id?: number;
-}
+/*
+  경고 타입도 공용 정의를 쓴다. 여기 있던 로컬 interface 는 `consent_card_ko` 를
+  아예 몰라서, 안전 검토자가 elijah.yml 에 정본 동의 문구를 넣어도 이 화면은 그
+  필드를 타입에서부터 못 보고 프론트 문구를 계속 썼다 — 고친 사람은 고쳐진 줄 안다.
+*/
 
 interface GestureStep {
   id: string;
@@ -120,7 +124,7 @@ export default function ElijahPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
-  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
   const anchor = field<string>("anchor");
@@ -187,8 +191,17 @@ export default function ElijahPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/85 via-stone-900/75 to-emerald-950/85" />
         <div className="relative z-10 p-5">
           {needsConsent ? (
-            <ConsentGate
+            <TriggerWarningGate
               warning={warning!}
+              fallbackProse={
+                <p>
+                  다음 장면은 <strong>죽고 싶다는 마음(죽음 갈구)</strong> 을
+                  다룹니다. 엘리야가 그렇게 기도했고, 신은 그 기도를{" "}
+                  <strong>책망하지 않으셨습니다</strong>. 직접적인 묘사는 없지만
+                  지금이 버겁다면 <strong>건너뛰어도 괜찮습니다</strong> —
+                  건너뛰어도 이야기는 온전히 이어집니다.
+                </p>
+              }
               pending={decide.isPending}
               onContinue={() => setConsented(true)}
               onSkip={() => advance(scene.currentScene, { value: "skip" })}
@@ -366,58 +379,5 @@ export default function ElijahPage() {
         </details>
       )}
     </main>
-  );
-}
-
-/**
- * R4 동의 게이트.
- *
- * solomon 과 달리 elijah.yml 의 trigger_warning 은 `consent_card_ko` 를 주지 않으므로
- * (consent_card_id 만 있고 서버에 본문이 없다) 문구를 프론트가 소유한다 — david/jesus 와 동일.
- * 건너뛰기는 yml 의 skip_alternative_scene_id(=3) 로 가는데, 이 씬의 next 도 3 이라 결과적으로
- * 같은 자리다. 즉 *건너뛰기는 서사를 잃지 않고 죽음 갈구 묘사만 건너뛴다*.
- */
-function ConsentGate({
-  warning,
-  pending,
-  onContinue,
-  onSkip,
-}: {
-  warning: TriggerWarning;
-  pending: boolean;
-  onContinue: () => void;
-  onSkip: () => void;
-}) {
-  return (
-    <div className="space-y-4">
-      <p className="text-sm text-[var(--color-warm)]/90 leading-relaxed">
-        다음 장면은 <strong>죽고 싶다는 마음(죽음 갈구)</strong> 을 다룹니다.
-        엘리야가 그렇게 기도했고, 신은 그 기도를{" "}
-        <strong>책망하지 않으셨습니다</strong>. 직접적인 묘사는 없지만 지금이
-        버겁다면 <strong>건너뛰어도 괜찮습니다</strong> — 건너뛰어도 이야기는
-        온전히 이어집니다.
-      </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          onClick={onContinue}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-        >
-          계속한다
-        </button>
-        <button
-          onClick={onSkip}
-          disabled={pending}
-          className="px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90 disabled:opacity-40"
-        >
-          건너뛰기 →
-        </button>
-      </div>
-      {warning.level && (
-        <p className="text-[10px] text-[var(--color-warm)]/40">
-          정서 강도: {warning.level}
-        </p>
-      )}
-    </div>
   );
 }

@@ -28,7 +28,12 @@ interface ThemeSpec {
   scriptureText: string;
   /** R2 — 피해 상황 사용자 보호 (진입 단계부터). */
   entryNote: string;
-  kinds: { kind: PracticeKind; label: string; placeholder: string; dimension: "spiritual" | "emotional" | "rational" }[];
+  kinds: {
+    kind: PracticeKind;
+    label: string;
+    placeholder: string;
+    dimension: "spiritual" | "emotional" | "rational";
+  }[];
 }
 
 // 성경 이외 자료 배제 — 본문·문구는 성경/예수의 의도만.
@@ -45,13 +50,15 @@ const THEMES: Record<PracticeTopicId, ThemeSpec> = {
       {
         kind: "heart_checkin",
         label: "오늘 내 마음을 흔든 일",
-        placeholder: "오늘 마음을 흔든 사건 한 가지를 적어보세요. 지금 이건 내가 책임지는 영역인가요, 맡기는 영역인가요.",
+        placeholder:
+          "오늘 마음을 흔든 사건 한 가지를 적어보세요. 지금 이건 내가 책임지는 영역인가요, 맡기는 영역인가요.",
         dimension: "emotional",
       },
       {
         kind: "boundary_sentence",
         label: "이번 주 한 사람에게 할 한 문장",
-        placeholder: "‘네 입의 말을 다스리라’ (잠 13:3). 한 사람에게 전할 한 문장을 만들어보세요.",
+        placeholder:
+          "‘네 입의 말을 다스리라’ (잠 13:3). 한 사람에게 전할 한 문장을 만들어보세요.",
         dimension: "rational",
       },
     ],
@@ -68,13 +75,15 @@ const THEMES: Record<PracticeTopicId, ThemeSpec> = {
       {
         kind: "courage_act",
         label: "한 번의 거절 / 용기",
-        placeholder: "오늘 한 사람의 시선을 옆으로 두고 내린 결정, 혹은 해본 거절 하나를 적어보세요.",
+        placeholder:
+          "오늘 한 사람의 시선을 옆으로 두고 내린 결정, 혹은 해본 거절 하나를 적어보세요.",
         dimension: "spiritual",
       },
       {
         kind: "thought_record",
         label: "생각 기록",
-        placeholder: "떠오른 생각 → 이게 사실인가 추측인가 → 균형 잡힌 생각. 순서대로 적어보세요.",
+        placeholder:
+          "떠오른 생각 → 이게 사실인가 추측인가 → 균형 잡힌 생각. 순서대로 적어보세요.",
         dimension: "rational",
       },
     ],
@@ -141,7 +150,8 @@ export default function PracticePage() {
         <p className="text-[10px] text-[var(--color-warm)]/30 mt-8 leading-relaxed">
           {CRISIS_LINE_FULL}
           <br />
-          AI 보조 — storyteller, 본문은 성경 참조. 성경 이외 자료는 사용하지 않습니다.
+          AI 보조 — storyteller, 본문은 성경 참조. 성경 이외 자료는 사용하지
+          않습니다.
         </p>
       </div>
     </main>
@@ -252,13 +262,19 @@ function PracticeCard({
             잠시 멈추고, 함께 안전을 살펴봐요.
           </p>
           <p className="text-xs text-[var(--color-warm)]/70 mt-1 leading-relaxed">
-            지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간 열려 있어요.
+            지금 마음이 많이 힘드시다면 혼자 두지 않겠습니다. 아래 자원은 24시간
+            열려 있어요.
           </p>
           <p className="text-xs text-red-300 mt-2 font-mono">
             {CRISIS_LINE_SHORT}
           </p>
+          {/*
+            문구가 「일기(#1)」 라고 말하므로 목적지도 일기여야 한다. 여기는
+            `/topics`(주제 목록)를 가리키고 있었다 — 위기 순간에 제시되는 유일한
+            다음 행동이 사용자를 목록으로 되돌려 보내고 있었다.
+          */}
           <Link
-            href="/topics"
+            href="/topics/journal"
             className="inline-block mt-2 text-xs text-[var(--color-primary)] hover:underline"
           >
             일기(#1)로 마음을 먼저 적어보기 →
