@@ -562,17 +562,8 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     expect(mockSynthesize).toHaveBeenCalledWith(짧은본문, undefined);
   });
 
-  it("중간 조각이 실패하면 앞부분만 읽어 주지 않고 조용히 unavailable", async () => {
-    // 문맥이 끊긴 채 앞부분만 들리는 것이 아무 소리도 안 나는 것보다 나쁘다.
-    mockSynthesize
-      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
-      .mockResolvedValueOnce({
-        status: "failed",
-        audioUrl: null,
-        durationMs: null,
-        cached: false,
-        jobId: null,
-      });
+  it("첫 조각부터 실패하면 아무 소리도 내지 않고 조용히 unavailable", async () => {
+    mockSynthesize.mockResolvedValueOnce(상태만("failed"));
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
@@ -581,6 +572,63 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
 
     expect(result.current.status).toBe("unavailable");
     expect(만들어진오디오).toHaveLength(0);
+    // 첫 조각이 죽었으면 뒷조각을 물어볼 이유가 없다.
+    expect(mockSynthesize).toHaveBeenCalledTimes(1);
+  });
+
+  it("뒤 조각이 실패해도 들리던 조각은 끝까지 들려주고 버튼은 살려 둔다", async () => {
+    /*
+      먼저 틀고 뒤를 만드는 구조라, 뒷조각이 죽는 순간엔 이미 소리가 나고 있다.
+      그때 unavailable 로 내리면 *들리는 중에* 버튼이 죽고 다시 들을 길도 사라진다.
+      남은 조각만 포기하고 들리던 데까지는 끝맺는다.
+
+      대가는 분명하다 — 낭독이 조각 경계(문단 경계)에서 잘린 채로 끝난다.
+      "전부 아니면 전무" 를 첫 소리까지의 시간과 맞바꾼 것이다.
+    */
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(상태만("failed"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+
+    expect(result.current.status).toBe("playing");
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+    expect(result.current.unavailable).toBe(false);
+
+    // 들리던 조각이 끝나면 조용히 마무리된다 — 오지 않을 조각을 기다리지 않는다.
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("반쪽만 만들어진 낭독은 캐시하지 않는다", async () => {
+    // 캐시해 버리면 다시 들을 때 뒷부분이 영영 안 나온다 — 재합성 기회를 잃는다.
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(상태만("failed"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+
+    // 두 번째 시도에서 두 조각을 다시 물어봤다 (2 + 2).
+    expect(mockSynthesize).toHaveBeenCalledTimes(4);
+    expect(result.current.status).toBe("playing");
   });
 
   it("조각을 기다리는 중 stop() 하면 남은 조각을 더 합성하지 않는다", async () => {
@@ -656,5 +704,203 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
 
     expect(mockSynthesize).toHaveBeenCalledTimes(2); // 재합성 없음
     expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+  });
+});
+
+/**
+ * 첫 조각이 나오면 나머지를 기다리지 않고 바로 튼다.
+ *
+ * 조각을 전부 만든 뒤에 재생하면 캐시가 빈 716자는 첫 소리까지 9분이 걸린다
+ * (조각1 372초 + 조각2 181초, CPU-only XTTS-v2 실측). 먼저 틀고 뒤에서 이어
+ * 만들면 6분으로 줄어든다.
+ *
+ * 대신 재생이 합성을 앞지르는 구간이 생긴다 — 조각1 오디오 85초 < 조각2 합성
+ * 181초라 캐시가 비면 반드시 벌어진다. 그 구간이 "낭독 끝" 으로 보이면 안 된다.
+ */
+describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
+  const 긴본문 = `${"가".repeat(300)}\n\n${"나".repeat(300)}`;
+
+  /** 아직 안 끝난 조각2 합성 — 손으로 풀어 준다. */
+  function 매달린조각() {
+    let 해결: (v: SynthesizeTtsResponse) => void = () => {};
+    const p = new Promise<SynthesizeTtsResponse>((res) => {
+      해결 = res;
+    });
+    return { p, 해결: (v: SynthesizeTtsResponse) => 해결(v) };
+  }
+
+  it("조각2 가 아직 안 끝났어도 조각1 은 이미 흐른다", async () => {
+    const 조각2 = 매달린조각();
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockReturnValueOnce(조각2.p);
+    const { result } = renderHook(() => useTtsNarration());
+
+    let 요청: Promise<void>;
+    act(() => {
+      요청 = result.current.toggle(긴본문);
+    });
+
+    // 여기가 이 변경의 전부다 — 조각2 는 아직 만들어지지도 않았는데 소리가 난다.
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+
+    await act(async () => {
+      조각2.해결(응답("https://cdn/2.mp3"));
+      await 요청!;
+    });
+  });
+
+  it("재생이 조각을 앞지르면 idle 이 아니라 기다렸다가 이어 붙인다", async () => {
+    const 조각2 = 매달린조각();
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockReturnValueOnce(조각2.p);
+    const { result } = renderHook(() => useTtsNarration());
+
+    let 요청: Promise<void>;
+    act(() => {
+      요청 = result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+
+    // 조각1 이 끝났는데 조각2 는 아직이다.
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    // idle 로 떨어지면 사용자는 낭독이 중간에 잘린 줄 안다.
+    expect(result.current.status).toBe("synthesizing");
+
+    await act(async () => {
+      조각2.해결(응답("https://cdn/2.mp3"));
+      await 요청!;
+    });
+
+    // 큐를 거치지 않고 곧장 이어진다.
+    await waitFor(() =>
+      expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/2.mp3"),
+    );
+    expect(result.current.status).toBe("playing");
+
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("기다리던 조각이 끝내 오지 않으면 조용히 idle 로 풀린다", async () => {
+    // 뒷조각이 실패했는데 재생은 그 조각을 기다리며 서 있는 경우.
+    // 풀어 주지 않으면 버튼이 "준비 중…" 인 채로 영원히 잠긴다.
+    const 조각2 = 매달린조각();
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockReturnValueOnce(조각2.p);
+    const { result } = renderHook(() => useTtsNarration());
+
+    let 요청: Promise<void>;
+    act(() => {
+      요청 = result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(result.current.status).toBe("synthesizing");
+
+    await act(async () => {
+      조각2.해결(상태만("failed"));
+      await 요청!;
+    });
+
+    expect(result.current.status).toBe("idle");
+    expect(result.current.unavailable).toBe(false);
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+  });
+
+  it("정지하면 뒤에서 만들던 조각까지 함께 접는다", async () => {
+    const 조각2 = 매달린조각();
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockReturnValueOnce(조각2.p);
+    const { result } = renderHook(() => useTtsNarration());
+
+    let 요청: Promise<void>;
+    act(() => {
+      요청 = result.current.toggle(긴본문);
+    });
+    await waitFor(() => expect(result.current.status).toBe("playing"));
+
+    act(() => {
+      result.current.stop();
+    });
+    expect(result.current.status).toBe("idle");
+
+    // 정지 뒤 늦게 도착한 조각2 가 혼자 울리면 안 된다.
+    await act(async () => {
+      조각2.해결(응답("https://cdn/2.mp3"));
+      await 요청!;
+    });
+    expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("뒤 조각에서 네트워크가 끊겨도 재생 중이면 버튼을 죽이지 않는다", async () => {
+    // 소리가 나고 있다는 건 오디오 경로가 멀쩡하다는 뜻이다. 그때 unavailable 은
+    // 거짓말이고, 버튼이 사라지면(onUnavailable="hide") 다시 들을 수도 없다.
+    mockSynthesize
+      .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+      .mockRejectedValueOnce(new Error("network"));
+    const { result } = renderHook(() => useTtsNarration());
+
+    await act(async () => {
+      await result.current.toggle(긴본문);
+    });
+
+    expect(result.current.unavailable).toBe(false);
+    expect(result.current.status).toBe("playing");
+    act(() => {
+      만들어진오디오[0].dispatchEvent(new Event("ended"));
+    });
+    expect(result.current.status).toBe("idle");
+  });
+
+  it("뒤 조각을 합성하는 동안 재생 상태를 '준비 중' 으로 덮지 않는다", async () => {
+    /*
+      뒷조각이 202 로 떨어져 폴링에 들어가도, 앞조각은 멀쩡히 들리는 중이다.
+      여기서 synthesizing 을 켜면 소리는 나는데 버튼만 잠겨(disabled) 정지도
+      못 하게 된다.
+    */
+    vi.useFakeTimers();
+    try {
+      mockSynthesize
+        .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
+        .mockResolvedValueOnce(대기중("job-2"));
+      mockPoll
+        .mockResolvedValueOnce(상태만("pending"))
+        .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
+      const { result } = renderHook(() => useTtsNarration());
+
+      let 요청: Promise<void>;
+      act(() => {
+        요청 = result.current.toggle(긴본문);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+
+      // 조각2 는 폴링 중, 조각1 은 재생 중.
+      expect(result.current.status).toBe("playing");
+      expect(result.current.synthesizing).toBe(false);
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(4_000);
+      });
+      await act(async () => {
+        await 요청!;
+      });
+      expect(result.current.status).toBe("playing");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
