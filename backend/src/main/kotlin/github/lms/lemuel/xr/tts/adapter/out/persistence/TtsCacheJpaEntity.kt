@@ -38,4 +38,8 @@ class TtsCacheJpaEntity {
 
     @Column(name = "expires_at")
     var expiresAt: LocalDateTime? = null
+
+    /** READY | PENDING | FAILED — 비동기 전환으로 "오디오 없는 정상 행" 이 생겨 필요해졌다. */
+    @Column(name = "status", length = 16, nullable = false)
+    var status: String = "READY"
 }

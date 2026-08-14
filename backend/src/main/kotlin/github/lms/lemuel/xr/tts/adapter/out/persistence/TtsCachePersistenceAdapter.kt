@@ -32,6 +32,7 @@ class TtsCachePersistenceAdapter(
             lastHitAt = e.lastHitAt,
             createdAt = e.createdAt,
             expiresAt = e.expiresAt,
+            status = e.status,
         )
 
     private fun toEntity(d: TtsCache): TtsCacheJpaEntity =
@@ -45,5 +46,6 @@ class TtsCachePersistenceAdapter(
             lastHitAt = d.lastHitAt
             createdAt = d.createdAt
             expiresAt = d.expiresAt
+            status = d.status
         }
 }

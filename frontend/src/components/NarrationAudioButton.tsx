@@ -7,6 +7,11 @@ import { useTtsNarration } from "@/lib/hooks/useTtsNarration";
  *
  * 주어진 텍스트를 TTS 로 합성해 재생한다. 재생 중이면 "⏸ 정지".
  *
+ * ── 합성 대기 ──
+ * 캐시에 없는 문장은 서버가 워커에서 합성하므로 첫 재생까지 수십 초가 걸릴 수 있다.
+ * 그동안 버튼은 "준비 중…" 을 보여주되 **비활성화하지 않는다** — 기다리기 싫은
+ * 사용자가 눌러서 취소할 수 있어야 한다. (한 번 합성된 문장은 이후 즉시 재생된다.)
+ *
  * ── graceful degradation ──
  * TTS 사이드카가 없거나(로컬) 다운되면 합성이 실패한다. 그 경우 버튼은 로딩 후
  * *조용히* 비활성(disabled)되거나 숨겨진다. 에러 UI 는 절대 띄우지 않으며,
@@ -35,7 +40,8 @@ export function NarrationAudioButton({
   className?: string;
   onUnavailable?: "disable" | "hide";
 }) {
-  const { status, unavailable, toggle } = useTtsNarration(voiceId);
+  const { status, unavailable, synthesizing, toggle, stop } =
+    useTtsNarration(voiceId);
 
   const hasText = Boolean(text && text.trim());
   if (!hasText) return null;
@@ -43,20 +49,23 @@ export function NarrationAudioButton({
 
   const isPlaying = status === "playing";
   const isLoading = status === "loading";
+  // 합성 대기는 취소 가능해야 하므로 disabled 에 넣지 않는다.
   const disabled = unavailable || isLoading;
 
   const ariaLabel = unavailable
     ? "음성 안내 사용 불가"
     : isPlaying
       ? `${label} 정지`
-      : isLoading
-        ? "음성 불러오는 중"
-        : `${label} — 음성으로 듣기`;
+      : synthesizing
+        ? "음성 준비 중 — 눌러서 취소"
+        : isLoading
+          ? "음성 불러오는 중"
+          : `${label} — 음성으로 듣기`;
 
   return (
     <button
       type="button"
-      onClick={() => void toggle(text)}
+      onClick={() => (synthesizing ? stop() : void toggle(text))}
       disabled={disabled}
       aria-label={ariaLabel}
       aria-live="polite"
@@ -72,16 +81,24 @@ export function NarrationAudioButton({
       }
     >
       <span aria-hidden="true">
-        {unavailable ? "🔇" : isPlaying ? "⏸" : isLoading ? "⏳" : "🔊"}
+        {unavailable
+          ? "🔇"
+          : isPlaying
+            ? "⏸"
+            : isLoading || synthesizing
+              ? "⏳"
+              : "🔊"}
       </span>
       <span>
         {unavailable
           ? label
           : isPlaying
             ? "정지"
-            : isLoading
-              ? "불러오는 중"
-              : label}
+            : synthesizing
+              ? "준비 중…"
+              : isLoading
+                ? "불러오는 중"
+                : label}
       </span>
     </button>
   );

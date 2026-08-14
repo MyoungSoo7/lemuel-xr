@@ -2,18 +2,42 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NarrationAudioButton } from "./NarrationAudioButton";
-import { synthesizeTts } from "@/lib/api/tts";
+import {
+  pollTtsJob,
+  synthesizeTts,
+  type SynthesizeTtsResponse,
+} from "@/lib/api/tts";
 
 // 훅은 모킹하지 않는다 — 버튼의 상태 표시는 훅의 상태 전이와 한 벌이라
 // 둘을 붙여 놔야 "실패했는데 버튼이 계속 활성" 같은 어긋남을 잡을 수 있다.
 vi.mock("@/lib/api/tts", () => ({
   synthesizeTts: vi.fn(),
+  pollTtsJob: vi.fn(),
 }));
 
 const mockSynthesize = vi.mocked(synthesizeTts);
+const mockPoll = vi.mocked(pollTtsJob);
 
-function 응답(audioUrl = "https://cdn/x.mp3") {
-  return { audioUrl, durationMs: 1000, cached: false };
+/** 캐시 히트 — 누르자마자 재생되는 응답. */
+function 응답(audioUrl = "https://cdn/x.mp3"): SynthesizeTtsResponse {
+  return {
+    status: "ready",
+    audioUrl,
+    durationMs: 1000,
+    cached: false,
+    jobId: null,
+  };
+}
+
+/** 202 — 서버가 합성 중이라 버튼이 "준비 중…" 을 띄워야 하는 응답. */
+function 대기중(jobId = "job-1"): SynthesizeTtsResponse {
+  return {
+    status: "pending",
+    audioUrl: null,
+    durationMs: null,
+    cached: false,
+    jobId,
+  };
 }
 
 /**
@@ -26,6 +50,7 @@ function 응답(audioUrl = "https://cdn/x.mp3") {
 describe("NarrationAudioButton", () => {
   beforeEach(() => {
     mockSynthesize.mockReset();
+    mockPoll.mockReset();
   });
 
   it.each([
@@ -109,6 +134,62 @@ describe("NarrationAudioButton", () => {
     await screen.findByRole("button", { name: "듣기 정지" });
   });
 
+  it("서버가 합성 중이면 '준비 중…' 을 띄우되 버튼을 잠그지 않는다", async () => {
+    // 첫 재생은 수십 초가 걸릴 수 있다. 그동안 잠가 버리면 기다리기 싫은 사용자가
+    // 빠져나올 방법이 없다 — 눌러서 취소할 수 있어야 한다.
+    const user = userEvent.setup();
+    mockSynthesize.mockResolvedValue(대기중());
+    mockPoll.mockResolvedValue({ ...대기중(), status: "pending" });
+    render(<NarrationAudioButton text="본문" />);
+
+    await user.click(screen.getByRole("button"));
+
+    const 준비중 = await screen.findByRole("button", {
+      name: "음성 준비 중 — 눌러서 취소",
+    });
+    expect(준비중).toBeEnabled();
+    expect(준비중).toHaveTextContent("준비 중…");
+  });
+
+  it("합성 대기 중 누르면 취소되고 원래 라벨로 돌아온다", async () => {
+    const user = userEvent.setup();
+    mockSynthesize.mockResolvedValue(대기중());
+    mockPoll.mockResolvedValue({ ...대기중(), status: "pending" });
+    render(<NarrationAudioButton text="본문" />);
+
+    await user.click(screen.getByRole("button"));
+    const 준비중 = await screen.findByRole("button", {
+      name: "음성 준비 중 — 눌러서 취소",
+    });
+
+    await user.click(준비중);
+
+    expect(
+      await screen.findByRole("button", { name: "듣기 — 음성으로 듣기" }),
+    ).toBeEnabled();
+    // 취소는 재요청이 아니다.
+    expect(mockSynthesize).toHaveBeenCalledTimes(1);
+  });
+
+  it("큐가 가득 차도(busy) 버튼은 살아 있어 다시 시도할 수 있다", async () => {
+    const user = userEvent.setup();
+    mockSynthesize.mockResolvedValue({
+      status: "busy",
+      audioUrl: null,
+      durationMs: null,
+      cached: false,
+      jobId: null,
+      retryAfterSeconds: 40,
+    });
+    render(<NarrationAudioButton text="본문" />);
+
+    await user.click(screen.getByRole("button"));
+
+    expect(
+      await screen.findByRole("button", { name: "듣기 — 음성으로 듣기" }),
+    ).toBeEnabled();
+  });
+
   it("TTS 가 죽어 있으면 조용히 비활성되고 에러 문구는 한 글자도 안 뜬다", async () => {
     const user = userEvent.setup();
     mockSynthesize.mockRejectedValue(new Error("502 Bad Gateway"));
@@ -128,11 +209,7 @@ describe("NarrationAudioButton", () => {
 
   it("응답에 audioUrl 이 없어도 같은 방식으로 조용히 비활성된다", async () => {
     const user = userEvent.setup();
-    mockSynthesize.mockResolvedValue({
-      audioUrl: "",
-      durationMs: null,
-      cached: false,
-    });
+    mockSynthesize.mockResolvedValue({ ...응답(), audioUrl: "" });
     render(<NarrationAudioButton text="본문" />);
 
     await user.click(screen.getByRole("button"));
