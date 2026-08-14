@@ -24,6 +24,10 @@ import {
 } from "@/lib/content/moses-monologues";
 import { SceneBootState } from "@/components/SceneBootState";
 import { CrisisReminder } from "@/components/CrisisReminder";
+import {
+  TriggerWarningGate,
+  type TriggerWarning,
+} from "@/components/TriggerWarningGate";
 
 /**
  * Moses 미션 — Phase 2 완전 활성 (요셉과 동급).
@@ -55,6 +59,8 @@ export default function MosesPage() {
   const [scene3Pattern, setScene3Pattern] = useState<Scene3Pattern | null>(
     null,
   );
+  // R4 — trigger_warning 이 있는 씬은 동의 전 본문을 렌더하지 않는다. 씬 전환마다 초기화.
+  const [consented, setConsented] = useState(false);
 
   const start = useMutation({
     mutationFn: () => startMission("moses", "web"),
@@ -75,6 +81,7 @@ export default function MosesPage() {
       const text = d.responseText ?? local?.text ?? null;
       if (text) setEcho({ fromScene: vars.sceneId, text });
       if (local?.scene3Pattern) setScene3Pattern(local.scene3Pattern);
+      setConsented(false);
       setScene(d);
       setHistory((h) => [...h, JSON.stringify(d.scenePayload.title)]);
     },
@@ -116,6 +123,21 @@ export default function MosesPage() {
     (extras[key] as T | undefined) ?? (payload[key] as T | undefined);
 
   const crisisReminder = field<string>("crisis_reminder");
+
+  /*
+    R4 — moses.yml 은 현재 trigger_warning 을 선언하지 않는다. 그래서 CI 의
+    `check_frontend_trigger_warning.py` 는 moses 를 아예 검사 대상에서 뺀다.
+    그 결과 이 화면에는 R4 배선이 **한 줄도** 없었다.
+
+    문제는 규약 쪽이다. 저작자·안전 검토자는 "yml 에 경고를 넣으면 화면이 띄운다"
+    를 믿고 쓰는데, moses 에 넣으면 조용히 무시된다 — 경고를 *추가한* 사람이
+    추가됐다고 믿는 상태가 되고, 그건 경고가 없는 것보다 나쁘다.
+
+    그래서 yml 이 아직 선언하지 않아도 배선을 먼저 깔아 둔다. 지금은 아무 씬도
+    이 경로를 타지 않지만, 넣는 순간 동작한다.
+  */
+  const warning = payload.trigger_warning as TriggerWarning | undefined;
+  const needsConsent = !!warning && !consented;
 
   const advance = (sceneId: number, decision: unknown) => {
     decide.mutate({ sceneId, decision });
@@ -178,112 +200,137 @@ export default function MosesPage() {
       </section>
 
       <section className="max-w-3xl mx-auto w-full space-y-3">
-        {/* Scene 1 — cinematic (광야 40년 내레이션 본문 렌더 후 계속) */}
-        {sceneType === "cinematic" && (
+        {needsConsent ? (
+          <TriggerWarningGate
+            warning={warning!}
+            /*
+              moses.yml 에는 아직 경고가 없어 저작 문구도 없다. 그래서 여기 fallback 은
+              내용을 넘겨짚지 않고 *일반적인* 안내만 한다 — 어떤 씬에 붙을지 모르는데
+              "폭력이 있습니다" 같은 문장을 미리 적어 두면 그게 곧 거짓말이 된다.
+              구체적인 문구는 경고를 붙이는 사람이 yml 의 consent_card_ko 로 준다.
+              그때 이 fallback 은 자동으로 밀려난다(정본 우선).
+            */
+            fallbackProse={
+              <p>
+                다음 장면에는 지금 버겁게 느껴질 수 있는 내용이 있습니다.
+                <strong> 건너뛰어도 이야기는 온전히 이어집니다.</strong>
+              </p>
+            }
+            pending={decide.isPending}
+            onContinue={() => setConsented(true)}
+            onSkip={() => advance(scene.currentScene, { value: "skip" })}
+          />
+        ) : (
           <>
-            {scene.currentScene === 1 && (
-              <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                  {scene1Wilderness}
-                </p>
-                <div className="mt-3">
-                  <NarrationAudioButton
-                    text={scene1Wilderness}
-                    onUnavailable="hide"
-                  />
+            {/* Scene 1 — cinematic (광야 40년 내레이션 본문 렌더 후 계속) */}
+            {sceneType === "cinematic" && (
+              <>
+                {scene.currentScene === 1 && (
+                  <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
+                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
+                      {scene1Wilderness}
+                    </p>
+                    <div className="mt-3">
+                      <NarrationAudioButton
+                        text={scene1Wilderness}
+                        onUnavailable="hide"
+                      />
+                    </div>
+                  </div>
+                )}
+                <button
+                  onClick={() => {
+                    setEcho(null);
+                    advance(scene.currentScene, "next");
+                  }}
+                  className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
+                  disabled={decide.isPending}
+                >
+                  {decide.isPending ? "..." : "계속 →"}
+                </button>
+              </>
+            )}
+
+            {/* Scene 2 — gesture_sequence(경외/거부 분기): 다가가기·신 벗기 뒤,
+            고개를 든다(경외, 출 3:5) 또는 얼굴을 가린다(거부·머뭇거림, 출 3:6)로 갈린다. */}
+            {sceneType === "gesture_sequence" && scene.currentScene === 2 && (
+              <ReverenceGesture
+                steps={field<OptionLike[]>("steps") ?? []}
+                pending={decide.isPending}
+                onComplete={(gesture) =>
+                  advance(scene.currentScene, { value: "completed", gesture })
+                }
+              />
+            )}
+
+            {/* Scene 5 — gesture_sequence(홍해, 단일 행동) */}
+            {sceneType === "gesture_sequence" && scene.currentScene !== 2 && (
+              <GestureSequence
+                steps={field<OptionLike[]>("steps") ?? []}
+                pending={decide.isPending}
+                onComplete={() =>
+                  advance(scene.currentScene, { value: "lift_staff" })
+                }
+              />
+            )}
+
+            {/* Scene 3 — distribute (다섯 변명 카드 → throw/heart) */}
+            {sceneType === "distribute" && (
+              <ExcuseCards
+                cards={
+                  field<Array<OptionLike & { scripture?: string }>>("cards") ??
+                  []
+                }
+                slots={field<string[]>("slots") ?? ["throw", "heart"]}
+                pending={decide.isPending}
+                onSubmit={(assignments) =>
+                  advance(scene.currentScene, {
+                    priority: scene3AssignmentsToPattern(assignments),
+                    assignments,
+                  })
+                }
+              />
+            )}
+
+            {/* Scene 4 — pick_one */}
+            {sceneType === "pick_one" &&
+              Array.isArray(field<OptionLike[]>("options")) && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
+                    <button
+                      key={o.id}
+                      onClick={() => advance(scene.currentScene, o.id)}
+                      disabled={decide.isPending}
+                      className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
+                    >
+                      {o.label}
+                    </button>
+                  ))}
                 </div>
+              )}
+
+            {/* Scene 6 — outro */}
+            {sceneType === "outro" && (
+              <div className="text-center space-y-4">
+                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
+                  {outroText}
+                </p>
+                <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
+                  * AI 보조 — 본문은 성경 참조 *
+                </p>
+                <button
+                  onClick={() =>
+                    completeMission("moses", scene.sessionId, "completed").then(
+                      () => (location.href = "/"),
+                    )
+                  }
+                  className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
+                >
+                  미션 완료
+                </button>
               </div>
             )}
-            <button
-              onClick={() => {
-                setEcho(null);
-                advance(scene.currentScene, "next");
-              }}
-              className="w-full py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold disabled:opacity-40"
-              disabled={decide.isPending}
-            >
-              {decide.isPending ? "..." : "계속 →"}
-            </button>
           </>
-        )}
-
-        {/* Scene 2 — gesture_sequence(경외/거부 분기): 다가가기·신 벗기 뒤,
-            고개를 든다(경외, 출 3:5) 또는 얼굴을 가린다(거부·머뭇거림, 출 3:6)로 갈린다. */}
-        {sceneType === "gesture_sequence" && scene.currentScene === 2 && (
-          <ReverenceGesture
-            steps={field<OptionLike[]>("steps") ?? []}
-            pending={decide.isPending}
-            onComplete={(gesture) =>
-              advance(scene.currentScene, { value: "completed", gesture })
-            }
-          />
-        )}
-
-        {/* Scene 5 — gesture_sequence(홍해, 단일 행동) */}
-        {sceneType === "gesture_sequence" && scene.currentScene !== 2 && (
-          <GestureSequence
-            steps={field<OptionLike[]>("steps") ?? []}
-            pending={decide.isPending}
-            onComplete={() =>
-              advance(scene.currentScene, { value: "lift_staff" })
-            }
-          />
-        )}
-
-        {/* Scene 3 — distribute (다섯 변명 카드 → throw/heart) */}
-        {sceneType === "distribute" && (
-          <ExcuseCards
-            cards={
-              field<Array<OptionLike & { scripture?: string }>>("cards") ?? []
-            }
-            slots={field<string[]>("slots") ?? ["throw", "heart"]}
-            pending={decide.isPending}
-            onSubmit={(assignments) =>
-              advance(scene.currentScene, {
-                priority: scene3AssignmentsToPattern(assignments),
-                assignments,
-              })
-            }
-          />
-        )}
-
-        {/* Scene 4 — pick_one */}
-        {sceneType === "pick_one" &&
-          Array.isArray(field<OptionLike[]>("options")) && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              {(field<OptionLike[]>("options") as OptionLike[]).map((o) => (
-                <button
-                  key={o.id}
-                  onClick={() => advance(scene.currentScene, o.id)}
-                  disabled={decide.isPending}
-                  className="px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 hover:border-[var(--color-primary)] transition disabled:opacity-50"
-                >
-                  {o.label}
-                </button>
-              ))}
-            </div>
-          )}
-
-        {/* Scene 6 — outro */}
-        {sceneType === "outro" && (
-          <div className="text-center space-y-4">
-            <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-              {outroText}
-            </p>
-            <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
-              * AI 보조 — 본문은 성경 참조 *
-            </p>
-            <button
-              onClick={() =>
-                completeMission("moses", scene.sessionId, "completed").then(
-                  () => (location.href = "/"),
-                )
-              }
-              className="px-6 py-3 rounded-lg bg-[var(--color-primary)] text-black font-semibold"
-            >
-              미션 완료
-            </button>
-          </div>
         )}
 
         {decide.isError && (

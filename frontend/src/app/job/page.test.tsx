@@ -163,7 +163,9 @@ describe("욥 미션 — 씬 상태 기계", () => {
     });
 
     // Scene 2 — 경고 씬. 동의해야 본문이 열린다.
-    await user.click(await screen.findByRole("button", { name: "계속한다" }));
+    await user.click(
+      await screen.findByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+    );
     expect(
       await screen.findByText(/태어난 날을 저주합니다/),
     ).toBeInTheDocument();
@@ -284,11 +286,31 @@ describe("욥 미션 — R4 동의 게이트 (job.yml Scene 2)", () => {
     expect(
       await screen.findByText(/태어난 날을 저주하는 비탄/),
     ).toBeInTheDocument();
-    expect(screen.getByText(/정서 강도: medium/)).toBeInTheDocument();
+    // 레벨은 한국어로. 화면 사본이 살아 있던 동안엔 원문 토큰("medium")이 그대로 떴다.
+    expect(screen.getByText(/정서 강도: 중간/)).toBeInTheDocument();
 
     expect(screen.queryByText(/욥은 침묵을 깨고/)).toBeNull();
     expect(screen.queryByText(/한 단어라도 떠올려 보세요/)).toBeNull();
     expect(screen.queryByRole("button", { name: "계속 →" })).toBeNull();
+  });
+
+  it("무엇이 나오는지(태그)와 건너뛰면 어디로 가는지를 밝힌다", async () => {
+    /*
+      이 화면은 2026-08-14 까지 공용 컴포넌트 대신 손으로 베낀 카드를 썼고, 그
+      사본은 job.yml 의 content 태그([death_wish, birth_lament])와
+      skip_alternative_scene_id(=3) 를 **아예 렌더하지 않았다.** 사용자는 뭐가
+      나오는지도, 건너뛰면 이야기를 잃는지도 모르는 채 둘 중 하나를 눌러야 했다.
+      동의를 구한다면서 판단 재료를 안 준 것이다.
+
+      CI 는 통과했다 — check_frontend_trigger_warning.py 는 "화면이 payload 를
+      읽는가" 까지만 보고, 읽고서 무엇을 버리는지는 보지 않는다.
+    */
+    vi.mocked(startMission).mockResolvedValue(SCENE2);
+    renderPage();
+
+    expect(await screen.findByText("죽음을 바라는 마음")).toBeInTheDocument();
+    expect(screen.getByText("출생에 대한 비탄")).toBeInTheDocument();
+    expect(screen.getByText(/건너뛰면 Scene 3 으로 이어집니다/)).toBeVisible();
   });
 
   it("동의하면 본문과 성찰 질문이 열린다", async () => {
@@ -296,11 +318,15 @@ describe("욥 미션 — R4 동의 게이트 (job.yml Scene 2)", () => {
     vi.mocked(startMission).mockResolvedValue(SCENE2);
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "계속한다" }));
+    await user.click(
+      await screen.findByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+    );
 
     expect(await screen.findByText(/욥은 침묵을 깨고/)).toBeInTheDocument();
     expect(screen.getByText(/한 단어라도 떠올려 보세요/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "계속한다" })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+    ).toBeNull();
   });
 
   it("건너뛰기는 skip 결정을 보내고, 서사는 다음 씬으로 이어진다", async () => {
@@ -309,7 +335,9 @@ describe("욥 미션 — R4 동의 게이트 (job.yml Scene 2)", () => {
     vi.mocked(decideMission).mockResolvedValue(SCENE3);
     renderPage();
 
-    await user.click(await screen.findByRole("button", { name: "건너뛰기 →" }));
+    await user.click(
+      await screen.findByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
 
     expect(decideMission).toHaveBeenCalledWith("job", SESSION, 2, {
       value: "skip",
@@ -326,7 +354,9 @@ describe("욥 미션 — R4 동의 게이트 (job.yml Scene 2)", () => {
     expect(
       await screen.findByText(/질문에 답하지 않으셨습니다/),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "계속한다" })).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "준비됐어요 · 들어갈게요" }),
+    ).toBeNull();
   });
 });
 
