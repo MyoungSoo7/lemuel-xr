@@ -150,7 +150,8 @@ class SynthesizeTtsUseCase(
      */
     private fun key(text: String, voiceId: String?, rate: Double?, language: String): String {
         val langPart = if (language == LEGACY_KEY_LANGUAGE) "" else "$language|"
-        val concat = langPart + text + "|" + (voiceId ?: "") +
+        val genPart = AUDIO_GENERATION[language]?.let { "$it|" } ?: ""
+        val concat = genPart + langPart + text + "|" + (voiceId ?: "") +
             "|" + (rate?.toString() ?: "1.0")
         val hash = MessageDigest.getInstance("SHA-256")
             .digest(concat.toByteArray(StandardCharsets.UTF_8))
@@ -185,6 +186,23 @@ class SynthesizeTtsUseCase(
 
         /** 캐시 키의 옛 공간(언어 접두가 없던 시절)을 소유하는 언어. [key] 참조. */
         private const val LEGACY_KEY_LANGUAGE: String = "ko"
+
+        /**
+         * 언어별 **오디오 세대**. 텍스트가 같아도 *나는 소리가 달라지는* 변경을 하면 그 언어의
+         * 값을 올린다(발음 전처리 추가, 엔진 교체, 화자 변경 등).
+         *
+         * 이 표식이 없으면 그런 변경은 **배포는 성공하는데 사용자에게는 아무것도 안 바뀐다.**
+         * 이 캐시는 텍스트 해시로 조회되고 히트하면 사이드카를 아예 부르지 않기 때문이다.
+         * 2026-08-15 시점에 READY 행이 50개(오디오 82MB) 있었다 — 사용자가 실제로 듣는
+         * 문장이 전부 여기 들어 있다. 사이드카(`tts/app.py`)의 키만 고치는 것으로는 부족하다.
+         *
+         * `g2p1` = 한국어를 철자가 아니라 발음대로 XTTS 에 넘기기 시작한 세대. 그 이전에 구워진
+         * 한국어 오디오는 "외국인이 철자대로 읽는" 소리라 재사용하면 안 된다.
+         *
+         * 값을 올리면 그 언어의 캐시가 통째로 무효가 되고 다시 구워진다(한 문장당 CPU 수십 초).
+         * 소리가 안 변하는 변경(로그·리팩터링)에는 올리지 않는다.
+         */
+        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "g2p1")
     }
 
     /** POST /api/tts/synthesize 의 결과. */

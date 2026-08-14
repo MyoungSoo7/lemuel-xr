@@ -26,6 +26,18 @@ assert not missing, (
 extra = [lang for lang in SAMPLES if lang not in app.SUPPORTED_LANGS]
 assert not extra, f"[selftest] 지원 목록에 없는 언어의 검사 문장이 남아 있다: {extra}"
 
+# ko 검사 문장은 발음형 변환이 **실제로 발동하는** 문장이어야 한다. 규칙이 하나도 안 걸리는
+# 문장을 골라 두면, 변환 경로가 통째로 끊겨도 이 self-test 는 그대로 초록불이 된다.
+assert app._spoken(SAMPLES["ko"], "ko") != SAMPLES["ko"], (
+    f"[selftest] ko 검사 문장 {SAMPLES['ko']!r} 은 발음형 변환이 한 글자도 바꾸지 않는다 — "
+    "연음·경음화가 일어나는 문장으로 바꿔라 (그래야 이 self-test 가 변환 경로를 지난다)"
+)
+# 캐시 키가 원문이 아니라 *발음형* 으로 잡혀야 한다. 안 그러면 변환을 켜도 예전에 구워 둔
+# (철자대로 읽은) wav 를 계속 집어 와서, 배포해도 소리가 안 바뀐다.
+assert app._cache_key("걸음도", "narrator-male-low", "ko") == app._cache_key(
+    "거름도", "narrator-male-low", "ko"
+), "[selftest] 캐시 키가 발음형이 아니라 원문으로 잡혀 있다 — 옛 캐시가 무효화되지 않는다"
+
 print(f"[selftest] speakers={len(app._speakers)} default={app.DEFAULT_SPEAKER} "
       f"voice_map={app.VOICE_MAP} langs={list(app.SUPPORTED_LANGS)}", flush=True)
 

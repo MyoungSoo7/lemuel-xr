@@ -346,22 +346,52 @@ class SynthesizeTtsUseCaseTest {
         assertThat(ko.jobId).isNotEqualTo(en.jobId)
     }
 
+    /**
+     * 2026-08-15 이전에는 이 자리에 `ko 키는 언어 접두가 없던 시절과 같다` 가 있었다. 그 테스트는
+     * 옛 ko 캐시가 계속 히트되는 것을 *지키는* 테스트였다. 이제는 정반대를 지켜야 한다 —
+     * 한국어 발음 전처리(g2p)가 붙어서, 그 전에 구워진 ko 오디오는 "외국인이 철자대로 읽는"
+     * 소리이므로 재사용하면 안 된다. 반대 성질로 갈아 끼운다.
+     */
     @Test
-    fun `ko 키는 언어 접두가 없던 시절과 같다`() {
+    fun `발음 전처리 전에 구워진 ko 행은 캐시 히트가 되지 않는다`() {
+        val legacyKey = sha256("안녕|narrator-male-low|1.0")
+        // 옛 세대의 READY 행이 DB 에 그대로 남아 있는 상황(실제로 50행·82MB 있었다).
         whenever(cache.findById(any())).thenReturn(Optional.empty())
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
-            .thenReturn(TtsSynthesisPort.SynthesisResult("u", 1, "e"))
-        queueRunsInline()
+        whenever(cache.findById(legacyKey)).thenReturn(
+            Optional.of(
+                TtsCache.pendingEntry(legacyKey, "narrator-male-low", LocalDateTime.now())
+                    .completed("xtts-v2", "data:audio/wav;base64,AAAA", 1500),
+            ),
+        )
+        whenever(queue.submit(any(), any())).thenReturn(true)
 
         val r = uc.submit("안녕", "narrator-male-low", 1.0, "ko")
 
-        // 옛 규칙: sha256("안녕|narrator-male-low|1.0"). 이게 깨지면 기존 캐시가 통째로 무효가 된다.
-        val legacy = java.util.HexFormat.of().formatHex(
-            java.security.MessageDigest.getInstance("SHA-256")
-                .digest("안녕|narrator-male-low|1.0".toByteArray(Charsets.UTF_8)),
-        )
-        assertThat((r as SynthesizeTtsUseCase.Submission.Pending).jobId).isEqualTo(legacy)
+        // Ready 로 돌아오면 옛 소리가 그대로 나간다 = 배포해도 사용자에겐 아무것도 안 바뀐다.
+        assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Pending::class.java)
+        assertThat((r as SynthesizeTtsUseCase.Submission.Pending).jobId).isNotEqualTo(legacyKey)
     }
+
+    @Test
+    fun `en 캐시는 한국어 발음 전처리에 휘말려 무효화되지 않는다`() {
+        val enKey = sha256("en|David|v|1.0")
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(cache.findById(enKey)).thenReturn(
+            Optional.of(
+                TtsCache.pendingEntry(enKey, "v", LocalDateTime.now())
+                    .completed("xtts-v2", "data:audio/wav;base64,AAAA", 1500),
+            ),
+        )
+
+        val r = uc.submit("David", "v", 1.0, "en")
+
+        // ko 만 바뀌었는데 en 까지 다시 구우면 CPU 를 헛되이 태운다(한 문장당 수십 초).
+        assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Ready::class.java)
+    }
+
+    private fun sha256(s: String): String = java.util.HexFormat.of().formatHex(
+        java.security.MessageDigest.getInstance("SHA-256").digest(s.toByteArray(Charsets.UTF_8)),
+    )
 
     @Test
     fun `사이드카가 다른 언어를 돌려주면 저장하지 않고 실패로 떨어뜨린다`() {
