@@ -24,6 +24,8 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from korean_g2p import to_spoken
+
 CACHE_DIR = Path(os.getenv("CACHE_DIR", "/data/cache"))
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -46,6 +48,22 @@ if DEFAULT_LANG not in SUPPORTED_LANGS:
 # DEFAULT_LANG 이 아니라 "ko" 리터럴에 묶어 둔 이유: 나중에 TTS_LANG 을 en 으로 바꾸면
 # en 이 옛 ko 파일들을 자기 것으로 착각하고 집어 들게 된다.
 LEGACY_KEY_LANG = "ko"
+
+# 발음형 변환을 거치는 언어. XTTS 는 ko 입력을 *철자 그대로* 로마자화해서 모델에 넣기 때문에
+# (`korean_g2p` 모듈 docstring 참조) 철자를 그대로 주면 한국어처럼 들리지 않는다.
+G2P_LANGS = ("ko",)
+
+
+def _spoken(text: str, lang: str) -> str:
+    """모델에 실제로 들어가는 문자열. 합성 경로와 캐시 키가 **둘 다** 이걸 쓴다.
+
+    캐시 키를 원문이 아니라 발음형으로 잡는 이유: 키가 원문 해시면 발음형 변환을 켜도
+    이미 구워 둔 (철자대로 읽은) wav 를 그대로 집어 와서, 배포해도 소리가 안 바뀐다.
+    발음형으로 잡으면 규칙이 발동한 문장만 키가 바뀌어 다시 구워지고, 아무것도 안 바뀐
+    문장은 캐시를 그대로 재사용한다 — 필요한 만큼만 무효화된다.
+    """
+    return to_spoken(text) if lang in G2P_LANGS else text
+
 
 print(f"[lemuel-xr-tts] loading model: {MODEL_NAME}", flush=True)
 from TTS.api import TTS  # noqa: E402
@@ -109,8 +127,13 @@ def synthesize_to_file(
     speaker = VOICE_MAP.get(voice_id) or DEFAULT_SPEAKER
     if not speaker:
         raise RuntimeError("no XTTS speaker available (resolved 0 speakers)")
+    spoken = _spoken(text, lang)
+    if spoken != text:
+        # 캐시 미스일 때만 찍히므로 양이 적다. 이상한 발음이 들릴 때 어떤 변환을 거쳤는지
+        # 파드 로그만으로 되짚기 위한 흔적이다.
+        print(f"[lemuel-xr-tts][g2p] {text!r} -> {spoken!r}", flush=True)
     tts_engine.tts_to_file(
-        text=text,
+        text=spoken,
         file_path=out_path,
         language=lang,
         speaker=speaker,
@@ -134,7 +157,8 @@ def _cache_key(text: str, voice_id: str, lang: str) -> str:
     이미 구워 둔 캐시(PVC)가 한 번에 통째로 무효가 되고, 다음 요청부터 전부 재합성한다.
     """
     prefix = "" if lang == LEGACY_KEY_LANG else f"{lang}::"
-    return hashlib.sha256(f"{prefix}{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
+    key_text = _spoken(text, lang)  # 실제로 합성되는 문자열로 키를 잡는다([_spoken] 참조)
+    return hashlib.sha256(f"{prefix}{voice_id}::{key_text}".encode("utf-8")).hexdigest() + ".wav"
 
 
 def _duration_ms(path: Path) -> int:

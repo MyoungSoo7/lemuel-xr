@@ -14,7 +14,12 @@ FROM ghcr.io/myoungsoo7/lemuel-xr-tts:main-6e83f1397c6250fa505a0e5f9231502c33455
 WORKDIR /app
 
 # app 코드만 갱신 (모델/deps/ENV(COQUI_TOS_AGREED)는 베이스에서 상속)
-COPY app.py selftest.py .
+# korean_g2p.py 를 빠뜨리면 app import 가 ImportError 로 죽는다 — 런타임에야 드러난다.
+COPY app.py korean_g2p.py selftest.py test_korean_g2p.py .
+
+# 발음 규칙표 검사. 표준 라이브러리만 쓰므로 모델 로딩 없이 1초 안에 끝나고, 여기서 먼저
+# 실패시켜 두면 뒤의 (느린) 합성 self-test 까지 가지 않는다.
+RUN python -m unittest test_korean_g2p -v
 
 # 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file, speed 포함) 실행.
 # 실패 시 build 실패 + CI 로그에 traceback → kubectl 없이 원인 파악. 성공 = 런타임 동작 보장에 근접.
