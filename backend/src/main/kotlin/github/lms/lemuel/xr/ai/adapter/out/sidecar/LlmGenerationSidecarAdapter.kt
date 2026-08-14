@@ -27,9 +27,10 @@ class LlmGenerationSidecarAdapter(
     @Value("\${ai.base-url}") baseUrl: String,
     @Value("\${ai.timeout-ms:30000}") timeoutMs: Long,
     @Value("\${ai.internal-token}") private val internalToken: String,
+    @Value("\${ai.max-response-bytes:4194304}") maxResponseBytes: Int = DEFAULT_MAX_RESPONSE_BYTES,
 ) : LlmGenerationPort {
 
-    private val client: WebClient = WebClient.builder().baseUrl(baseUrl).build()
+    private val client: WebClient = SidecarHttp.client(baseUrl, maxResponseBytes)
     private val timeout: Duration = Duration.ofMillis(timeoutMs)
 
     /** /ai/generate — promptKey + variables 로 응답 생성. */
@@ -53,4 +54,13 @@ class LlmGenerationSidecarAdapter(
                 resp["cached"] == true,
             )
         }
+
+    companion object {
+        /**
+         * 4MiB. 긴 생성 응답이 WebClient 기본 한도(256KB)를 넘는 순간
+         * 사이드카는 200 인데 백엔드만 502 가 되는 사고가 난다 — TTS 에서 실제로 겪었다.
+         * [SidecarHttp.client] 참조.
+         */
+        const val DEFAULT_MAX_RESPONSE_BYTES: Int = 4 * 1024 * 1024
+    }
 }

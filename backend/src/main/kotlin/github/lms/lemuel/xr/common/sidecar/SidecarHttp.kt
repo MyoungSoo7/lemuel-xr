@@ -23,6 +23,25 @@ object SidecarHttp {
     private val log = LoggerFactory.getLogger(SidecarHttp::class.java)
 
     /**
+     * 사이드카용 [WebClient] 를 만든다 — **인메모리 버퍼 한도를 반드시 명시해서**.
+     *
+     * `WebClient.builder().build()` 의 기본 한도는 256KB 다. 그런데 TTS 사이드카는 WAV 를
+     * base64 data URL 로 통째로 실어 보낸다: 실측으로 5.7초짜리 한 문장이 WAV 268KB → base64
+     * **357KB** 라, 기본값에서는 사이드카가 200 을 돌려준 *뒤에* 디코더가
+     * `DataBufferLimitException: Exceeded limit on max bytes to buffer : 262144` 로 터졌다.
+     * 호출자에겐 502(E_TTS_UPSTREAM_FAIL)로 보이고, 사이드카 로그엔 성공만 남아
+     * "엔진은 멀쩡한데 소리는 한 번도 안 나는" 상태가 된다.
+     *
+     * 그래서 이 팩토리를 통하지 않고 `WebClient.builder()` 를 직접 쓰지 말 것.
+     */
+    @JvmStatic
+    fun client(baseUrl: String, maxInMemoryBytes: Int): WebClient =
+        WebClient.builder()
+            .baseUrl(baseUrl)
+            .codecs { it.defaultCodecs().maxInMemorySize(maxInMemoryBytes) }
+            .build()
+
+    /**
      * 사이드카에 JSON POST 후 응답 Map 을 `mapper` 로 도메인 타입으로 변환해 반환한다.
      * 빈 본문·타임아웃·업스트림 오류는 `onFail` 코드의 [AppException] 으로 정규화한다.
      *

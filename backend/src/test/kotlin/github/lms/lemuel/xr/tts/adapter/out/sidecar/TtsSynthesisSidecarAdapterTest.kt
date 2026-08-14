@@ -95,6 +95,42 @@ class TtsSynthesisSidecarAdapterTest {
     }
 
     @Test
+    fun `256KB 를 넘는 base64 오디오 응답도 잘린 데 없이 받는다`() {
+        // 회귀 방지 — 2026-08-14 프로덕션 사고.
+        // 사이드카는 WAV 를 base64 data URL 로 인라인해 돌려주는데, 실측으로 5.7초짜리 한 문장이
+        // 이미 357KB 였다. WebClient 기본 인메모리 한도가 256KB(262144) 라 사이드카가 200 을
+        // 돌려준 *뒤에* DataBufferLimitException 이 터졌고, 호출자에겐 502 로 보였다.
+        // 이 테스트 이전의 스텁들은 전부 수백 바이트짜리라 그 한도를 건드린 적이 없었다.
+        val audioBytes = 400 * 1024
+        val payload = "A".repeat(audioBytes)
+        val dataUrl = "data:audio/wav;base64,$payload"
+        val base = startStub(200, """{"audioUrl":"$dataUrl","durationMs":5707,"engine":"xtts-v2"}""")
+        val client = TtsSynthesisSidecarAdapter(base)
+
+        val r = client.synthesize("주는 나의 목자시니 내게 부족함이 없으리로다.", "narrator-male-low", 1.0)
+
+        assertThat(payload.length).isGreaterThan(262144) // 기본 한도를 실제로 넘겼는지부터 확인
+        assertThat(r.audioUrl).hasSize(dataUrl.length)
+        assertThat(r.audioUrl).isEqualTo(dataUrl)
+        assertThat(r.durationMs).isEqualTo(5707)
+    }
+
+    @Test
+    fun `한도를 256KB 로 낮추면 같은 응답이 실제로 실패한다`() {
+        // 위 테스트가 "우연히 통과"한 게 아님을 보이는 대조군 —
+        // 한도만 옛 기본값(262144)으로 되돌리면 동일한 응답이 E_TTS_UPSTREAM_FAIL 로 떨어진다.
+        val dataUrl = "data:audio/wav;base64," + "A".repeat(400 * 1024)
+        val base = startStub(200, """{"audioUrl":"$dataUrl","durationMs":5707,"engine":"xtts-v2"}""")
+        val client = TtsSynthesisSidecarAdapter(base, 262144)
+
+        assertThatThrownBy { client.synthesize("주는 나의 목자시니", "narrator-male-low", 1.0) }
+            .isInstanceOf(AppException::class.java)
+            .satisfies({ e ->
+                assertThat((e as AppException).code).isEqualTo(ErrorCode.E_TTS_UPSTREAM_FAIL)
+            })
+    }
+
+    @Test
     fun `연결 실패 이면 E_TTS_UPSTREAM_FAIL`() {
         // 살아있지 않은 포트 → connection refused → generic Exception catch 분기.
         val client = TtsSynthesisSidecarAdapter("http://127.0.0.1:1")
