@@ -284,6 +284,25 @@ jobs:
         working-directory: frontend
         run: npm run type-check
 
+      # 프론트 유닛 테스트 + 커버리지 하한 (2026-08-14 신설).
+      #
+      # 이 리포는 백엔드만 재고 있었다 — jacoco 가 LINE 98% 를 지키는 동안
+      # 프론트엔드는 유닛 테스트가 **한 줄도 없었고 러너조차 없었다.** 초록한 CI 가
+      # 사실은 절반만 보고 있었던 셈이다. e2e(Playwright)가 있긴 하지만 그건
+      # 백엔드가 붙어야 돌고 행복 경로 위주라, 분기·에러 경로는 아무도 안 봤다.
+      #
+      # 하한은 `vitest.config.mts` 의 thresholds 에 있다 (lines/statements 90,
+      # functions/branches 80). 백엔드 `build.gradle.kts` 의 coverageMinimum 과
+      # 같은 사고방식 — 실측에서 여유를 뺀 값이고 내려가면 깨진다.
+      #
+      # 함정 하나를 명시해 둔다: v8 커버리지는 기본적으로 **테스트가 import 한
+      # 파일만** 집계한다. 손대지 않은 파일은 0% 로 잡히는 게 아니라 분모에서
+      # 통째로 빠져서, 테스트 없는 코드가 늘수록 숫자가 올라간다. 그래서 설정에
+      # `all: true` 를 켜 뒀다. 그거 끄면 이 게이트는 거짓 초록이 된다.
+      - name: Unit tests + coverage
+        working-directory: frontend
+        run: npm run test:coverage
+
       # 위기 상담번호 하드코딩 게이트 (2026-08-11 신설).
       #
       # 백엔드는 2026-08-02 부터 번호를 yml 에 안 적고 토큰만 쓴다
