@@ -19,13 +19,21 @@ class TtsSynthesisSidecarAdapter(
     private val client: WebClient = SidecarHttp.client(baseUrl, maxResponseBytes)
     private val timeout: Duration = Duration.ofSeconds(timeoutSeconds)
 
-    override fun synthesize(text: String, voiceId: String?, speakingRate: Double?): TtsSynthesisPort.SynthesisResult =
+    override fun synthesize(
+        text: String,
+        voiceId: String?,
+        speakingRate: Double?,
+        language: String,
+    ): TtsSynthesisPort.SynthesisResult =
         SidecarHttp.post(
             client, "/synthesize",
             mapOf(
                 "text" to text,
                 "voiceId" to (voiceId ?: "narrator-male-low"),
                 "speakingRate" to (speakingRate ?: 1.0),
+                // 이 키가 없던 동안 사이드카는 자기 기본값(ko)으로만 합성했다. 즉 영어 문장도
+                // 한국어 발음 규칙으로 읽혔고, 응답 어디에도 그 사실이 드러나지 않았다.
+                "language" to language,
             ),
             mapOf(),
             timeout, ErrorCode.E_TTS_UPSTREAM_FAIL,
@@ -34,6 +42,7 @@ class TtsSynthesisSidecarAdapter(
                 resp["audioUrl"] as String?,
                 resp["durationMs"] as Int?,
                 resp["engine"] as String?,
+                resp["language"] as String?,
             )
         }
 

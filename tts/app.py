@@ -3,7 +3,11 @@ Lemuel XR — TTS service (Coqui XTTS-v2).
 
 백엔드 계약(TtsSidecarClient)에 정확히 맞춘 사이드카:
   GET  /healthz
-  POST /synthesize  { text, voiceId, speakingRate } -> { audioUrl, durationMs, engine }
+  POST /synthesize  { text, voiceId, speakingRate, language } -> { audioUrl, durationMs, engine, language }
+
+`language` 는 "ko" 와 "en" 만 받는다([SUPPORTED_LANGS]). 모르는 값은 400 이다 — 조용히
+기본 언어로 떨어뜨리지 않는다. 요청한 언어와 다른 언어가 돌아오는 것이 이 서비스에서
+가장 알아채기 어려운 고장이기 때문이다.
 
 audioUrl 은 `data:audio/wav;base64,...` 인라인 URL (사이드카 ClusterIP → 브라우저 직접 접근
 불가하므로 R2 없이 자족적으로 재생 가능). 모델은 Dockerfile 빌드 단계에서 이미지에 baked-in.
@@ -24,7 +28,24 @@ CACHE_DIR = Path(os.getenv("CACHE_DIR", "/data/cache"))
 CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 MODEL_NAME = os.getenv("MODEL", "tts_models/multilingual/multi-dataset/xtts_v2")
+
+# XTTS-v2 자체는 더 많은 언어를 안다. 그런데 이 서비스가 "지원한다"고 말할 수 있는 범위는
+# **빌드 selftest 가 실제로 합성해 본 언어까지**다(`selftest.py`). 그래서 둘로 못 박는다.
+# 늘리려면 SUPPORTED_LANGS 와 selftest 를 같이 늘려야 한다 — 한쪽만 늘리면 검증 안 된
+# 언어를 지원한다고 주장하게 된다.
+SUPPORTED_LANGS = ("ko", "en")
+
 DEFAULT_LANG = os.getenv("TTS_LANG", "ko")
+if DEFAULT_LANG not in SUPPORTED_LANGS:
+    raise RuntimeError(
+        f"TTS_LANG={DEFAULT_LANG!r} 은 지원 언어가 아니다 (지원: {', '.join(SUPPORTED_LANGS)})"
+    )
+
+# 캐시 키의 옛 공간을 소유하는 언어. 이 서비스는 여태 ko 로만 합성했으므로
+# `옛 키 공간 == ko 키 공간` 이 성립한다 — 그래서 ko 만 접두 없이 옛 키를 그대로 쓴다.
+# DEFAULT_LANG 이 아니라 "ko" 리터럴에 묶어 둔 이유: 나중에 TTS_LANG 을 en 으로 바꾸면
+# en 이 옛 ko 파일들을 자기 것으로 착각하고 집어 들게 된다.
+LEGACY_KEY_LANG = "ko"
 
 print(f"[lemuel-xr-tts] loading model: {MODEL_NAME}", flush=True)
 from TTS.api import TTS  # noqa: E402
@@ -69,21 +90,29 @@ DEFAULT_SPEAKER = _pick("Ana Florence", "Claribel Dervla", "Damien Black")
 print(f"[lemuel-xr-tts] speakers={len(_speakers)} default={DEFAULT_SPEAKER}", flush=True)
 
 
-def synthesize_to_file(text: str, voice_id: str, rate: float, out_path: str) -> None:
+def synthesize_to_file(
+    text: str, voice_id: str, rate: float, out_path: str, lang: str = DEFAULT_LANG
+) -> None:
     """합성 단일 경로. 엔드포인트와 빌드 selftest 가 공유한다.
 
-    XTTS-v2 는 multi-speaker 라 speaker 지정이 필수.
+    XTTS-v2 는 multi-speaker 라 speaker 지정이 필수. speaker 는 언어와 무관하게 고를 수 있다
+    (XTTS 는 다국어 음색이라 같은 화자로 ko 도 en 도 낸다) — 그래서 VOICE_MAP 은 언어별로
+    나누지 않는다.
     NOTE: tts_to_file 에 speed= 를 넘기면 이 XTTS 버전에서 합성이 30s(백엔드 타임아웃)를 넘겨
     502 를 유발한다(2026-07-14 확인). 따라서 speed 는 넘기지 않는다(정상속도). speakingRate 는
     추후 ffmpeg atempo 후처리(빠름)로 별도 구현 예정 — rate 인자는 현재 무시.
     """
+    if lang not in SUPPORTED_LANGS:
+        # 엔드포인트가 먼저 걸러 주지만 여기서도 막는다 — selftest 가 이 함수를 직접 부르므로
+        # 검증되지 않은 언어가 빌드 단계로 새 들어오는 길을 함께 닫는다.
+        raise ValueError(f"unsupported language: {lang!r} (지원: {', '.join(SUPPORTED_LANGS)})")
     speaker = VOICE_MAP.get(voice_id) or DEFAULT_SPEAKER
     if not speaker:
         raise RuntimeError("no XTTS speaker available (resolved 0 speakers)")
     tts_engine.tts_to_file(
         text=text,
         file_path=out_path,
-        language=DEFAULT_LANG,
+        language=lang,
         speaker=speaker,
     )
 
@@ -98,8 +127,14 @@ class SynthesizeRequest(BaseModel):
     language: str = DEFAULT_LANG
 
 
-def _cache_key(text: str, voice_id: str) -> str:
-    return hashlib.sha256(f"{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
+def _cache_key(text: str, voice_id: str, lang: str) -> str:
+    """언어가 다르면 키도 달라야 한다 — 같은 문장·같은 화자라도 오디오가 다르기 때문이다.
+
+    ko 만 접두 없이 옛 키를 그대로 쓴다([LEGACY_KEY_LANG] 참조). 전부에 접두를 붙이면
+    이미 구워 둔 캐시(PVC)가 한 번에 통째로 무효가 되고, 다음 요청부터 전부 재합성한다.
+    """
+    prefix = "" if lang == LEGACY_KEY_LANG else f"{lang}::"
+    return hashlib.sha256(f"{prefix}{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
 
 
 def _duration_ms(path: Path) -> int:
@@ -113,7 +148,13 @@ def _duration_ms(path: Path) -> int:
 
 @app.get("/healthz")
 def healthz():
-    return {"status": "ok", "model": MODEL_NAME, "speakers": len(_speakers)}
+    return {
+        "status": "ok",
+        "model": MODEL_NAME,
+        "speakers": len(_speakers),
+        "languages": list(SUPPORTED_LANGS),
+        "defaultLanguage": DEFAULT_LANG,
+    }
 
 
 @app.post("/synthesize")
@@ -122,13 +163,23 @@ def synthesize(req: SynthesizeRequest):
     if not text:
         raise HTTPException(status_code=400, detail="text is empty")
 
-    fpath = CACHE_DIR / _cache_key(text, req.voiceId)
+    lang = (req.language or DEFAULT_LANG).strip().lower()
+    if lang not in SUPPORTED_LANGS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"unsupported language: {req.language!r} (지원: {', '.join(SUPPORTED_LANGS)})",
+        )
+
+    fpath = CACHE_DIR / _cache_key(text, req.voiceId, lang)
     if not fpath.exists():
-        synthesize_to_file(text, req.voiceId, req.speakingRate or 1.0, str(fpath))
+        synthesize_to_file(text, req.voiceId, req.speakingRate or 1.0, str(fpath), lang)
 
     audio_b64 = base64.b64encode(fpath.read_bytes()).decode("ascii")
     return {
         "audioUrl": f"data:audio/wav;base64,{audio_b64}",
         "durationMs": _duration_ms(fpath),
         "engine": "xtts-v2",
+        # 어떤 언어로 구웠는지 돌려준다. 이게 없으면 호출자는 자기가 보낸 값이 반영됐는지
+        # 오디오를 귀로 듣기 전에는 알 수 없다 — 이 필드가 없던 동안 language 는 계속 무시됐다.
+        "language": lang,
     }

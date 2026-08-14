@@ -7,12 +7,25 @@ package github.lms.lemuel.xr.tts.application.port.out
  */
 interface TtsSynthesisPort {
 
-    /** text+voice+rate → wav URL. 실패 시 `E_TTS_UPSTREAM_FAIL`. */
-    fun synthesize(text: String, voiceId: String?, speakingRate: Double?): SynthesisResult
+    /**
+     * text+voice+rate+language → wav URL. 실패 시 `E_TTS_UPSTREAM_FAIL`.
+     *
+     * [language] 는 `ko`·`en` 만 유효하다. 사이드카는 모르는 값을 조용히 기본 언어로
+     * 떨어뜨리지 않고 400 을 준다 — 그러니 호출 전에 걸러야 한다
+     * ([github.lms.lemuel.xr.tts.application.SynthesizeTtsUseCase.SUPPORTED_LANGUAGES]).
+     */
+    fun synthesize(
+        text: String,
+        voiceId: String?,
+        speakingRate: Double?,
+        language: String,
+    ): SynthesisResult
 
     data class SynthesisResult(
         val audioUrl: String?,
         val durationMs: Int?,
         val engine: String?,
+        /** 사이드카가 실제로 합성한 언어. 요청과 다르면 계약 위반이다. */
+        val language: String? = null,
     )
 }

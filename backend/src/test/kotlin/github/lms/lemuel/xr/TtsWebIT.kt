@@ -87,7 +87,7 @@ class TtsWebIT : IntegrationTestBase() {
 
     @Test
     fun `synthesize 최초는 202 pending 폴링하면 ready 그리고 재요청은 즉시 cached true`() {
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(
                 TtsSynthesisPort.SynthesisResult(
                     "https://r2/audio/mock.wav", 1800, "xtts-v2",
@@ -124,7 +124,7 @@ class TtsWebIT : IntegrationTestBase() {
 
     @Test
     fun `사이드카 오류는 502 가 아니라 폴링에서 failed 로 드러난다`() {
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenThrow(AppException(ErrorCode.E_TTS_UPSTREAM_FAIL, "boom"))
 
         // 비동기로 바뀌면서 제출 자체는 성공한다 — 합성 실패를 HTTP 상태로 알 방법이 없다.
@@ -162,8 +162,47 @@ class TtsWebIT : IntegrationTestBase() {
     }
 
     @Test
+    fun `지원하지 않는 언어는 202 가 아니라 400 이다`() {
+        // 통과시키면 사이드카의 400 이 워커 스레드 안에서 터지고, 사용자에게는 한참 폴링한
+        // 끝의 이유 없는 failed 로만 보인다. 요청 시점에 끊어야 원인이 드러난다.
+        listOf("es", "ja", "korean").forEach { bad ->
+            try {
+                authed().post().uri("/api/tts/synthesize")
+                    .body(mapOf("text" to "hola", "language" to bad))
+                    .retrieve().body(String::class.java)
+                Assertions.fail<Any>("expected 400 for language=$bad")
+            } catch (e: HttpClientErrorException) {
+                assertThat(e.statusCode.value()).isEqualTo(400)
+            }
+        }
+    }
+
+    @Test
+    fun `en 요청은 사이드카까지 en 으로 간다`() {
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(
+                TtsSynthesisPort.SynthesisResult(
+                    "https://r2/audio/en.wav", 1100, "xtts-v2", "en",
+                ),
+            )
+
+        val submitted = authed().post().uri("/api/tts/synthesize")
+            .body(mapOf("text" to "David and Goliath " + System.nanoTime(), "language" to "en"))
+            .retrieve().toEntity(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})
+        assertThat(submitted.statusCode.value()).isEqualTo(202)
+
+        val settled = pollUntilSettled(submitted.body!!["jobId"] as String)
+        assertThat(settled).containsEntry("status", "ready")
+
+        val lang = org.mockito.kotlin.argumentCaptor<String>()
+        org.mockito.kotlin.verify(sidecar)
+            .synthesize(any(), anyOrNull(), anyOrNull(), lang.capture())
+        assertThat(lang.firstValue).isEqualTo("en")
+    }
+
+    @Test
     fun `synthesize voiceId rate 생략도 기본값으로 합성`() {
-        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull()))
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
             .thenReturn(
                 TtsSynthesisPort.SynthesisResult(
                     "https://r2/audio/def.wav", 900, "xtts-v2",
