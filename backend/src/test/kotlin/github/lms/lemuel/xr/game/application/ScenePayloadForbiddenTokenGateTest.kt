@@ -113,8 +113,13 @@ class ScenePayloadForbiddenTokenGateTest {
     }
 
     @Test
-    fun `구조 필드는 그대로 남는다`() {
+    fun `게이트가 발동해도 구조 필드는 대체 문구로 덮이지 않는다`() {
         val payload = build(mapOf("monologues" to mapOf("give_up" to forbidden)))
+
+        // 첫 단언이 "이 payload 에서 게이트가 실제로 발동했다"를 세운다. 이게 없으면
+        // 아래 네 줄은 게이트를 통째로 지워도 통과한다 — 어셈블러가 항상 넣는 값이라서다.
+        @Suppress("UNCHECKED_CAST")
+        assertThat(payload["monologues"] as Map<String, Any?>).containsEntry("give_up", fallbackText)
 
         assertThat(payload).containsEntry("sceneId", 4)
         assertThat(payload).containsEntry("title", "t")
@@ -122,8 +127,18 @@ class ScenePayloadForbiddenTokenGateTest {
         assertThat(payload).containsEntry("next", 5)
     }
 
+    /**
+     * **과차단 가드다 — 게이트가 걸려 있다는 증거가 아니다.**
+     *
+     * 이 테스트는 [ScenePayloadAssembler] 에서 sanitizer 를 통째로 걷어내도 통과한다. 그건 결함이
+     * 아니라 성질이다 — "아무것도 바꾸지 않는다"는 게이트가 없을 때도 참이니까. 이 테스트가 잡는
+     * 것은 반대쪽 실패다: 토큰을 넓게 잡거나 정규화를 잘못 건드려 멀쩡한 저작 문장이 대체 문구로
+     * 날아가는 경우. 그때 사용자는 읽을 것을 잃는다.
+     *
+     * 게이트의 *존재* 는 위의 `scenePayload 로 새어나가는 monologues 원문도 대체된다` 가 증명한다.
+     */
     @Test
-    fun `깨끗한 payload 는 한 글자도 바뀌지 않는다`() {
+    fun `금지 토큰이 없으면 게이트는 아무것도 바꾸지 않는다`() {
         val extras = mapOf("monologues" to mapOf("give_up" to "요셉은 형들 앞에서 울었다"))
 
         assertThat(build(extras)).isEqualTo(
@@ -135,13 +150,29 @@ class ScenePayloadForbiddenTokenGateTest {
     }
 
     @Test
-    fun `위기 토큰 치환 뒤에 금지 토큰을 검사한다`() {
-        // 순서가 뒤바뀌면 치환으로 만들어진 최종 문자열이 검사되지 않는다.
-        // 사용자가 실제로 읽게 될 문자열이 검사 대상이어야 한다.
+    fun `위기 토큰은 실제 번호로 치환된다`() {
         val payload = build(
             mapOf("crisis_reminder" to "도움이 필요하면 ${CrisisTokenResolver.TOKEN} 로 연락하세요"),
         )
 
         assertThat(payload).containsEntry("crisis_reminder", "도움이 필요하면 109 로 연락하세요")
+    }
+
+    @Test
+    fun `치환으로 *생겨난* 금지 토큰도 걸린다 — 검사는 치환 뒤에 온다`() {
+        // 순서를 실제로 가르는 유일한 방법은, 치환 전에는 없고 치환 **후에만** 존재하는
+        // 금지 토큰을 만드는 것이다. 번호가 "109" 인 한 이 순서는 어느 쪽이든 통과한다 —
+        // 그래서 이 테스트만 포트가 금지 토큰 자체를 돌려준다. 현실적인 연락처가 아니라
+        // 순서를 재는 자(尺)다.
+        val assembler = ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "믿음이 부족" }, sanitizer)
+        val extras = mapOf(
+            "crisis_reminder" to "${CrisisTokenResolver.TOKEN}해서 그런 일을 겪은 겁니다.",
+        )
+
+        val payload = assembler.build(Scenario("joseph", "t", listOf(scene(extras))), 4)
+
+        // 검사가 치환보다 앞서면 스캐너는 아직 자리표시자를 보고 있어 아무것도 못 잡고,
+        // 사용자는 "믿음이 부족해서 그런 일을 겪은 겁니다." 를 그대로 읽는다.
+        assertThat(payload).containsEntry("crisis_reminder", fallbackText)
     }
 }
