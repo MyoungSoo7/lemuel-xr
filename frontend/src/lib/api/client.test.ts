@@ -34,10 +34,20 @@ interface Queued {
 }
 
 interface SetupOptions {
-  /** n 번째 게스트 발급 호출의 결과. throw 하면 발급 실패. */
+  /** n 번째 게스트 발급 호출의 결과. throw 하면 발급 실패(비동기 거부). */
   guest?: (attempt: number) => unknown;
   /** n 번째 disclaimer 동의 호출의 결과. throw 하면 동의 실패. */
   disclaimer?: (attempt: number) => unknown;
+  /**
+   * n 번째 게스트 발급 호출이 **동기로** 터질지. 위 `guest` 와 다르다 —
+   * 이쪽은 프라미스가 만들어지기 *전에* 예외가 나간다.
+   *
+   * 실제로 일어나는 경로다. axios 1.x 의 `Axios#request` 는 config 병합 단계의
+   * 예외를 스택을 붙이려고 catch 한 뒤 **그대로 rethrow** 한다. 즉 `axios.post(...)`
+   * 는 거부된 프라미스가 아니라 동기 throw 로 끝날 수 있다. 그 한 줄 차이가
+   * pendingIssue 를 영구히 오염시켰다 (client.ts 의 ensureGuestToken 주석 참고).
+   */
+  guestThrowsSync?: (attempt: number) => boolean;
 }
 
 interface Harness {
@@ -66,7 +76,9 @@ async function setup(options: SetupOptions = {}): Promise<Harness> {
   let guestAttempts = 0;
   let disclaimerAttempts = 0;
 
-  vi.spyOn(axios, "post").mockImplementation((async (
+  // 이 목은 **async 가 아니다.** async 로 감싸면 어떤 예외든 거부 프라미스로 바뀌어
+  // 동기 throw 를 재현할 방법이 사라진다 — 결함 5 가 정확히 그 경계에서 산다.
+  vi.spyOn(axios, "post").mockImplementation(((
     url: string,
     body: unknown,
     config?: { headers?: Record<string, string> },
@@ -74,21 +86,23 @@ async function setup(options: SetupOptions = {}): Promise<Harness> {
     authPosts.push({ url, body, auth: config?.headers?.Authorization });
     if (url === "/api/auth/guest") {
       guestAttempts += 1;
-      if (options.guest) return await options.guest(guestAttempts);
-      return {
+      if (options.guestThrowsSync?.(guestAttempts))
+        throw new Error("axios 가 프라미스를 만들기 전에 터졌다");
+      if (options.guest) return (async () => options.guest!(guestAttempts))();
+      return Promise.resolve({
         data: {
           token: `token-${guestAttempts}`,
           userId: `user-${guestAttempts}`,
         },
-      };
+      });
     }
     if (url === "/api/auth/accept-disclaimer") {
       disclaimerAttempts += 1;
       if (options.disclaimer)
-        return await options.disclaimer(disclaimerAttempts);
-      return { data: {} };
+        return (async () => options.disclaimer!(disclaimerAttempts))();
+      return Promise.resolve({ data: {} });
     }
-    throw new Error(`예상치 못한 axios.post: ${url}`);
+    return Promise.reject(new Error(`예상치 못한 axios.post: ${url}`));
   }) as never);
 
   const mod = await import("./client");
@@ -231,6 +245,46 @@ describe("게스트 세션 부트스트랩", () => {
 
     expect(h.guestPosts()).toHaveLength(2);
     expect(authHeaderOf(h.requests[1])).toBe("Bearer token-2");
+  });
+
+  it("발급이 *동기로* 터져도 세션이 영구히 잠기지 않는다", async () => {
+    // 앞 테스트와 한 글자 차이 같지만 완전히 다른 경로다. 거부 프라미스가 아니라
+    // 동기 throw 면, 예전 코드에서는 정리(pendingIssue = null)가 대입보다 먼저 돌아
+    // **거부된 프라미스가 pendingIssue 에 눌러앉았다.** 그 뒤로는 발급 시도 자체가
+    // 없다 — 게스트 토큰이 이 앱의 유일한 신원이므로 앱 전체가 잠긴다.
+    const h = await setup({ guestThrowsSync: (attempt) => attempt === 1 });
+
+    await h.api.get("/api/content/topics");
+    await h.api.get("/api/content/topics");
+
+    // 두 번째 요청이 발급을 *다시 시도했는가* 가 핵심이다.
+    expect(h.guestPosts()).toHaveLength(2);
+    expect(authHeaderOf(h.requests[0])).toBeUndefined();
+    expect(authHeaderOf(h.requests[1])).toBe("Bearer token-2");
+    expect(localStorage.getItem(TOKEN_KEY)).toBe("token-2");
+  });
+
+  it("동기로 터진 발급을 동시에 기다리던 요청들도 같이 풀려난다", async () => {
+    // 한 번의 동기 실패가 그 순간의 동시 요청 3건만 망치고 끝나야 한다.
+    const h = await setup({ guestThrowsSync: (attempt) => attempt === 1 });
+
+    await Promise.all([
+      h.api.get("/api/content/topics"),
+      h.api.get("/api/values/me"),
+      h.api.get("/api/game/joseph/1"),
+    ]);
+    // 3건이 하나의 실패를 공유했으므로 발급 시도는 1회뿐이다.
+    expect(h.guestPosts()).toHaveLength(1);
+    expect(h.requests.map(authHeaderOf)).toEqual([
+      undefined,
+      undefined,
+      undefined,
+    ]);
+
+    await h.api.get("/api/content/topics");
+
+    expect(h.guestPosts()).toHaveLength(2);
+    expect(authHeaderOf(h.requests[3])).toBe("Bearer token-2");
   });
 });
 
