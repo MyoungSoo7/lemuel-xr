@@ -61,6 +61,10 @@ def _spoken(text: str, lang: str) -> str:
     이미 구워 둔 (철자대로 읽은) wav 를 그대로 집어 와서, 배포해도 소리가 안 바뀐다.
     발음형으로 잡으면 규칙이 발동한 문장만 키가 바뀌어 다시 구워지고, 아무것도 안 바뀐
     문장은 캐시를 그대로 재사용한다 — 필요한 만큼만 무효화된다.
+
+    **여기만 고치면 소리는 안 바뀐다.** 이 서비스 앞에는 백엔드의 영속 캐시(Postgres
+    `tts_cache`)가 있고, 거기서 히트하면 이 서비스는 호출조차 되지 않는다. 그쪽 키에도
+    같은 세대 표식이 있어야 한다 — `SynthesizeTtsUseCase.AUDIO_GENERATION`.
     """
     return to_spoken(text) if lang in G2P_LANGS else text
 
