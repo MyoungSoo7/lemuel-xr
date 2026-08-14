@@ -3,7 +3,7 @@ import {
   splitForTts,
   TTS_BACKEND_MAX_CHARS,
   TTS_MAX_CHARS,
-  TTS_SECONDS_PER_CHAR,
+  TTS_SECONDS_PER_CHAR_WORST,
   TTS_TIMEOUT_SECONDS,
 } from "./splitForTts";
 import {
@@ -118,16 +118,42 @@ describe("splitForTts", () => {
      * 조각이 런타임에 통째로 사라지므로, 시간 예산도 같이 못박는다.
      */
     it("전수 32조합의 모든 조각이 합성 타임아웃 안에 끝난다", () => {
-      const 예산초 = TTS_TIMEOUT_SECONDS * 0.85; // 15% 는 큐·전송·변동 몫으로 남긴다
+      const 예산초 = TTS_TIMEOUT_SECONDS * 0.9; // 10% 는 큐·전송 몫으로 남긴다
       for (const assignments of 조합) {
         const text = buildScene3Echo(
           scene3AssignmentsToPattern(assignments),
           assignments,
         );
         for (const chunk of splitForTts(text)) {
-          expect(chunk.length * TTS_SECONDS_PER_CHAR).toBeLessThan(예산초);
+          expect(chunk.length * TTS_SECONDS_PER_CHAR_WORST).toBeLessThan(
+            예산초,
+          );
         }
       }
+    });
+
+    /**
+     * 상한을 내리는 것도 공짜가 아니다 — 조각 텍스트가 바뀌면 sha256 캐시 키가
+     * 바뀌어 이미 데워 둔 항목이 미스가 된다. 280 을 고른 이유가 바로 "여기까지는
+     * 이탈이 0" 이어서이므로, 그 성질을 테스트로 못박아 둔다. 더 내리고 싶어지면
+     * 이 테스트가 먼저 대가를 보여 준다.
+     */
+    it("300 → 280 으로 내려도 새로 식는 조각이 없다", () => {
+      const 조각들 = (max: number) => {
+        const out = new Set<string>();
+        for (const assignments of 조합) {
+          const text = buildScene3Echo(
+            scene3AssignmentsToPattern(assignments),
+            assignments,
+          );
+          splitForTts(text, max).forEach((c) => out.add(c));
+        }
+        return out;
+      };
+      const 이전 = 조각들(300);
+      const 지금 = 조각들(TTS_MAX_CHARS);
+      const 새로_식는 = [...지금].filter((c) => !이전.has(c));
+      expect(새로_식는).toEqual([]);
     });
 
     it("고치기 전 상한(500자)이었다면 절반 넘는 조합이 타임아웃에 걸렸다", () => {
@@ -141,13 +167,13 @@ describe("splitForTts", () => {
           assignments,
         );
         return splitForTts(text, TTS_BACKEND_MAX_CHARS).some(
-          (c) => c.length * TTS_SECONDS_PER_CHAR >= TTS_TIMEOUT_SECONDS,
+          (c) => c.length * TTS_SECONDS_PER_CHAR_WORST >= TTS_TIMEOUT_SECONDS,
         );
       });
-      // 15 는 *하한* 이다. 실제로 관측된 실패는 400자 조각(합성 298.5초)이었는데,
-      // 순수 합성 시간만 보면 300초 아래라 여기 안 잡힌다 — 큐·전송 몫이 남은
-      // 1.5초를 먹었다. 즉 현실의 피해는 이 수보다 넓었다.
-      expect(못_끝내는).toHaveLength(15);
+      // 최악 속도(0.865초/자) 기준 21개. 평균에 가까운 0.746 으로 재면 15개였다 —
+      // 즉 이 수는 "얼마나 느린 문장이 걸리느냐"에 따라 15~21 사이에서 움직인다.
+      // 어느 쪽이든 절반 안팎이 못 듣고 있었다는 결론은 같다.
+      expect(못_끝내는).toHaveLength(21);
     });
 
     it("전부 내려놓기(716자)는 여러 조각이 되고, 전부 품기는 통짜 그대로다", () => {

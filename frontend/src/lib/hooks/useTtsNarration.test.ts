@@ -6,6 +6,16 @@ import {
   synthesizeTts,
   type SynthesizeTtsResponse,
 } from "@/lib/api/tts";
+import { TTS_MAX_CHARS } from "@/lib/tts/splitForTts";
+
+/**
+ * 상한을 넘되 문단 경계가 하나 있는 본문 — 정확히 두 조각으로 갈린다.
+ *
+ * 길이를 [TTS_MAX_CHARS] 에서 끌어온다. 상수를 조정할 때마다 조각 수가 달라져
+ * 이 파일의 호출 횟수 기대값이 우수수 깨지는 걸 막는다 (2026-08-15, 300 → 280
+ * 으로 내리다 실제로 겪었다).
+ */
+const 두조각본문 = `${"가".repeat(TTS_MAX_CHARS)}\n\n${"나".repeat(TTS_MAX_CHARS)}`;
 
 vi.mock("@/lib/api/tts", () => ({
   synthesizeTts: vi.fn(),
@@ -503,15 +513,13 @@ describe("useTtsNarration — graceful degradation", () => {
 });
 
 /**
- * 긴 본문(500자 초과) 은 조각으로 나뉘어 *차례로* 합성되고 이어서 재생된다.
+ * 긴 본문(상한 초과) 은 조각으로 나뉘어 *차례로* 합성되고 이어서 재생된다.
  *
  * 실물은 모세 3씬 echo 다 — 카드를 내려놓을수록 응답이 붙어 최대 716자가 되고,
- * 그대로 보내면 백엔드 상한(500)에 걸려 400 이 났다. 버튼은 onUnavailable="hide"
+ * 그대로 보내면 백엔드 상한(@Size 500)에 걸려 400 이 났다. 버튼은 onUnavailable="hide"
  * 라 조용히 사라졌으므로, 카드를 많이 내려놓은 사람만 소리를 못 들었다.
  */
 describe("useTtsNarration — 상한을 넘는 본문", () => {
-  /** 상한(500)을 넘되 문단 경계가 있는 본문. 두 조각으로 갈린다. */
-  const 긴본문 = `${"가".repeat(300)}\n\n${"나".repeat(300)}`;
 
   it("조각마다 합성하고 이어 붙여 한 번의 낭독으로 들려준다", async () => {
     mockSynthesize
@@ -520,14 +528,14 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
 
     // 보낸 조각은 둘 다 상한 이하여야 한다 — 이게 400 을 막는 지점이다.
     expect(mockSynthesize).toHaveBeenCalledTimes(2);
     for (const [보낸글] of mockSynthesize.mock.calls) {
-      expect(보낸글.length).toBeLessThanOrEqual(500);
+      expect(보낸글.length).toBeLessThanOrEqual(TTS_MAX_CHARS);
     }
     expect(만들어진오디오[0].getAttribute("src")).toBe("https://cdn/1.mp3");
 
@@ -567,7 +575,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
 
     expect(result.current.status).toBe("unavailable");
@@ -591,7 +599,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
 
     expect(result.current.status).toBe("playing");
@@ -613,7 +621,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
     act(() => {
       만들어진오디오[0].dispatchEvent(new Event("ended"));
@@ -623,7 +631,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
       .mockResolvedValueOnce(응답("https://cdn/1.mp3"))
       .mockResolvedValueOnce(응답("https://cdn/2.mp3"));
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
 
     // 두 번째 시도에서 두 조각을 다시 물어봤다 (2 + 2).
@@ -644,7 +652,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
 
     let 요청: Promise<void>;
     act(() => {
-      요청 = result.current.toggle(긴본문);
+      요청 = result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("synthesizing"));
 
@@ -667,7 +675,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
 
@@ -691,7 +699,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
     act(() => {
@@ -699,7 +707,7 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
     });
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
 
     expect(mockSynthesize).toHaveBeenCalledTimes(2); // 재합성 없음
@@ -718,7 +726,6 @@ describe("useTtsNarration — 상한을 넘는 본문", () => {
  * 181초라 캐시가 비면 반드시 벌어진다. 그 구간이 "낭독 끝" 으로 보이면 안 된다.
  */
 describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
-  const 긴본문 = `${"가".repeat(300)}\n\n${"나".repeat(300)}`;
 
   /** 아직 안 끝난 조각2 합성 — 손으로 풀어 준다. */
   function 매달린조각() {
@@ -738,7 +745,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
 
     let 요청: Promise<void>;
     act(() => {
-      요청 = result.current.toggle(긴본문);
+      요청 = result.current.toggle(두조각본문);
     });
 
     // 여기가 이 변경의 전부다 — 조각2 는 아직 만들어지지도 않았는데 소리가 난다.
@@ -760,7 +767,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
 
     let 요청: Promise<void>;
     act(() => {
-      요청 = result.current.toggle(긴본문);
+      요청 = result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
 
@@ -799,7 +806,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
 
     let 요청: Promise<void>;
     act(() => {
-      요청 = result.current.toggle(긴본문);
+      요청 = result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
     act(() => {
@@ -826,7 +833,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
 
     let 요청: Promise<void>;
     act(() => {
-      요청 = result.current.toggle(긴본문);
+      요청 = result.current.toggle(두조각본문);
     });
     await waitFor(() => expect(result.current.status).toBe("playing"));
 
@@ -853,7 +860,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
     const { result } = renderHook(() => useTtsNarration());
 
     await act(async () => {
-      await result.current.toggle(긴본문);
+      await result.current.toggle(두조각본문);
     });
 
     expect(result.current.unavailable).toBe(false);
@@ -882,7 +889,7 @@ describe("useTtsNarration — 먼저 틀고 뒤를 만든다", () => {
 
       let 요청: Promise<void>;
       act(() => {
-        요청 = result.current.toggle(긴본문);
+        요청 = result.current.toggle(두조각본문);
       });
       await act(async () => {
         await vi.advanceTimersByTimeAsync(0);
