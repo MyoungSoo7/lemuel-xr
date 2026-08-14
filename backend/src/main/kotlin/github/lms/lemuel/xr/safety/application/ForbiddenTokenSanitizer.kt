@@ -23,8 +23,22 @@ import org.springframework.stereotype.Component
 @Component
 class ForbiddenTokenSanitizer(
     private val scanner: ForbiddenTokenScanner,
-    @param:Value("\${safety.forbidden-tokens.fallback-text:}") private val fallbackText: String,
+    // 기본값을 두지 않는다 (2026-08-15). 빈 문자열 기본값이던 동안, 이 프로퍼티가 빠지면
+    // 걸린 문장이 대체 문구가 아니라 `""` 가 됐다 — 설계 의도인 "지금은 어떤 말도 보태지
+    // 않겠습니다" 가 "아무것도 보여주지 않는다" 로 조용히 바뀐다. 절망 상태의 사용자에게
+    // 빈 화면을 내보내는 것은 안전 동작이 아니다. 안전 문구가 없다는 사실은 조용한 성공이
+    // 아니라 시끄러운 실패여야 한다 — 같은 이유로 `ai.generation.enabled` 도 기본값이 없다.
+    @param:Value("\${safety.forbidden-tokens.fallback-text}") private val fallbackText: String,
 ) {
+
+    init {
+        // 키가 있고 값만 빈 경우(`fallback-text: ""`)는 플레이스홀더 해석을 통과한다.
+        // 그 구멍까지 여기서 닫는다 — 기동 시점에 알 수 있는 것을 런타임까지 미루지 않는다.
+        require(fallbackText.isNotBlank()) {
+            "safety.forbidden-tokens.fallback-text 가 비어 있다 — 금지 토큰에 걸린 문장이 " +
+                "빈 문자열로 사용자에게 나간다. 대체 문구를 설정하라."
+        }
+    }
 
     /**
      * 문자열 하나를 검사해 걸리면 대체 문구로 바꾼다.

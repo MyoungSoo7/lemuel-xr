@@ -10,6 +10,12 @@ import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
  * 협력자 조립이 여러 테스트에 반복된다. 대체 문구를 각 테스트가 따로 들고 있으면
  * "두 경로가 같은 문구를 낸다" 는 단언이 사실은 각자 다른 상수를 비교하는 일이 될 수 있다.
  * 하나의 출처를 둔다.
+ *
+ * **이 상수들은 손으로 옮겨 적은 값이라 yml 이 바뀌어도 저절로 따라오지 않는다.** 그런데도
+ * 이 파일을 쓰는 테스트들은 계속 초록이다 — 자기가 만든 sanitizer 를 자기가 만든 상수와
+ * 비교하니 낡은 값끼리도 언제나 일관되기 때문이다. 그래서 실제 설정과의 대조는
+ * `ForbiddenTokenConfigTest.단위 테스트 픽스처가 실제 설정과 어긋나지 않는다` 가 맡는다
+ * (스프링 컨텍스트를 띄우는 쪽). 여기 값을 고칠 일이 생기면 그 테스트가 먼저 깨진다.
  */
 internal object SafetyGateFixtures {
 

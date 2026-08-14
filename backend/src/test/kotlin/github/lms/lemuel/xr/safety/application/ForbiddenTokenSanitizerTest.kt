@@ -1,6 +1,7 @@
 package github.lms.lemuel.xr.safety.application
 
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 /**
@@ -64,5 +65,18 @@ class ForbiddenTokenSanitizerTest {
         val off = ForbiddenTokenSanitizer(ForbiddenTokenScanner(emptyList()), fallback)
 
         assertThat(off.sanitizeText("믿음이 부족해서요", "t")).isEqualTo("믿음이 부족해서요")
+    }
+
+    @Test
+    fun `대체 문구가 비면 생성 자체가 실패한다`() {
+        // 예전에는 `\${...:}` 기본값이 있어서, 설정이 빠지면 걸린 문장이 대체 문구가 아니라
+        // **빈 문자열** 로 사용자에게 나갔다. 게이트는 "차단했다" 는 로그를 남기고, 화면에는
+        // 아무 말도 남지 않는다. 절망 상태의 사용자에게 침묵은 안전 동작이 아니다.
+        // 이 실패는 요청 시점이 아니라 *기동 시점* 에 나야 한다.
+        listOf("", "   ").forEach { blank ->
+            assertThatThrownBy { ForbiddenTokenSanitizer(ForbiddenTokenScanner(listOf("믿음이 부족")), blank) }
+                .isInstanceOf(IllegalArgumentException::class.java)
+                .hasMessageContaining("safety.forbidden-tokens.fallback-text")
+        }
     }
 }

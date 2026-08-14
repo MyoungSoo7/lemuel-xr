@@ -1,9 +1,11 @@
 package github.lms.lemuel.xr.safety.application
 
 import github.lms.lemuel.xr.IntegrationTestBase
+import github.lms.lemuel.xr.game.application.SafetyGateFixtures
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.env.Environment
 
 /**
  * 저작 YAML(`content/{인물}/scene*.yml`)의 `lint_forbidden_tokens` 가 실제로
@@ -45,9 +47,67 @@ class ForbiddenTokenConfigTest : IntegrationTestBase() {
     @Autowired
     private lateinit var scanner: ForbiddenTokenScanner
 
+    @Autowired
+    private lateinit var env: Environment
+
     @Test
     fun `스캐너가 스프링 빈으로 등록돼 있다`() {
         assertThat(scanner).isNotNull()
+    }
+
+    @Test
+    fun `단위 테스트 픽스처가 실제 설정과 어긋나지 않는다`() {
+        // [SafetyGateFixtures] 는 스프링 컨텍스트를 띄우지 않는 게이트 테스트들이 쓰는
+        // 손으로 옮겨 적은 상수 묶음이다. 그 손복사가 조용히 낡는 것을 막는 유일한 지점이 여기다.
+        //
+        // 왜 이게 중요한가: 픽스처가 낡아도 그 테스트들은 *계속 초록* 이다. 자기가 만든
+        // sanitizer 를 자기가 만든 상수와 비교하니 언제나 일관되기 때문이다. 그 초록은
+        // "게이트가 실제 설정으로 동작한다" 를 뜻하지 않는다. yml 의 fallback-text 를 고치면
+        // 그 테스트들은 *이전 문구* 를 기준으로 계속 통과한다.
+        val realFallback = env.getRequiredProperty("safety.forbidden-tokens.fallback-text")
+        assertThat(SafetyGateFixtures.FALLBACK_TEXT)
+            .describedAs(
+                "SafetyGateFixtures.FALLBACK_TEXT 가 application.yml 의 " +
+                    "safety.forbidden-tokens.fallback-text 와 다르다 — 픽스처를 실제 값으로 맞출 것.",
+            )
+            .isEqualTo(realFallback)
+
+        val realTokens = env.getRequiredProperty("safety.forbidden-tokens.list", Array<String>::class.java)
+            .map { it.trim() }
+        assertThat(realTokens)
+            .describedAs("SafetyGateFixtures.TOKENS 에 실제 목록에서 사라진 토큰이 있다")
+            .containsAll(SafetyGateFixtures.TOKENS)
+    }
+
+    @Test
+    fun `모든 금지 토큰은 한글과 공백으로만 이루어진다`() {
+        // [ForbiddenTokenSanitizer.sanitize] 는 payload 의 **모든 문자열 leaf** 를 검사한다 —
+        // `narrationId`·`type`·`interaction` 같은 구조 필드의 *값* 도 문자열이라 예외가 아니다.
+        // 지금 안전한 이유는 오직 하나, 토큰이 전부 한국어 문장이고 그 값들은 ascii
+        // snake_case 라서 서로 겹칠 수 없다는 것이다. 그 사실은 [ForbiddenTokenSanitizer] 의
+        // KDoc 이 설계 근거로 명시하고 있는데, 정작 그것을 지키는 코드가 없었다.
+        //
+        // 만약 ascii 토큰이 하나라도 목록에 들어오면(예: 영문 표현을 막으려고 "give up" 추가)
+        // `narrationId: "job_scene4_give_up"` 같은 값이 대체 문구로 치환된다. 그 결과는
+        // "안전 문구가 보인다" 가 아니라 **오디오 에셋 키 파손** — 클라이언트가 존재하지 않는
+        // 내레이션을 찾게 되고, 게이트는 정상 동작했다고 로그를 남긴다.
+        //
+        // 영문 표현을 막아야 할 날이 오면 토큰을 넣지 말고, 먼저 sanitize 의 순회를
+        // "사용자가 읽는 필드" 로 좁히는 설계 변경을 하라. 그때 이 테스트를 지우는 것이 그 결정의 신호다.
+        val realTokens = env.getRequiredProperty("safety.forbidden-tokens.list", Array<String>::class.java)
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+
+        assertThat(realTokens).isNotEmpty()
+
+        val nonKorean = realTokens.filterNot { KOREAN_ONLY.matches(it) }
+
+        assertThat(nonKorean)
+            .describedAs(
+                "한글·공백 외의 문자가 든 금지 토큰이다. 구조 필드 값(narrationId 등 ascii)과 " +
+                    "충돌해 에셋 키를 대체 문구로 파손할 수 있다.",
+            )
+            .isEmpty()
     }
 
     @Test
@@ -346,5 +406,10 @@ class ForbiddenTokenConfigTest : IntegrationTestBase() {
                     "동시에 그 토큰이 정당한 표현을 과차단하지 않는지 반드시 재검토할 것.",
             )
             .isEmpty()
+    }
+
+    private companion object {
+        /** 한글 음절·자모와 공백만. 숫자·라틴문자·기호가 하나라도 있으면 불합격. */
+        val KOREAN_ONLY = Regex("[가-힣ㄱ-ㅎㅏ-ㅣ\\s]+")
     }
 }
