@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
  */
 class TtsJobQueueAdapterTest {
 
-    private val adapter = TtsJobQueueAdapter(queueCapacity = 4)
+    private val adapter = TtsJobQueueAdapter(queueCapacity = 4, drainSeconds = 5)
 
     /** 지정한 시간 안에 조건이 참이 될 때까지 기다린다 — 워커가 다른 스레드라 즉시 단정할 수 없다. */
     private fun eventually(block: () -> Unit) =
@@ -84,6 +84,58 @@ class TtsJobQueueAdapterTest {
         // 재요청 때 "진행 중" 으로 오인해 되살릴 수 없게 된다.
         assertThat(adapter.isInFlight("거절될것")).isFalse()
 
+        놓아주기.countDown()
+    }
+
+    /**
+     * 배포가 진행 중인 합성을 죽이지 않는지 본다.
+     *
+     * 이 테스트가 없던 동안 [TtsJobQueueAdapter.shutdown] 은 곧장 `shutdownNow()` 였고,
+     * 롤아웃 때마다 그때 굽던 문장이 버려졌다 (2026-08-15 프리웜 57/93 에서 실측).
+     * 사용자에게는 소리 버튼이 이유 없이 사라지는 것으로만 보이는 종류의 고장이라,
+     * 로그도 알림도 이걸 대신 잡아주지 못한다.
+     */
+    @Test
+    fun `종료할 때 진행 중인 합성을 끝까지 기다린다`() {
+        val 어댑터 = TtsJobQueueAdapter(queueCapacity = 4, drainSeconds = 5)
+        val 작업시작 = CountDownLatch(1)
+        val 끝까지갔다 = java.util.concurrent.atomic.AtomicBoolean(false)
+
+        어댑터.submit("굽는중") {
+            작업시작.countDown()
+            Thread.sleep(300) // 합성이 진행 중인 상태를 흉내 낸다
+            끝까지갔다.set(true)
+        }
+        assertThat(작업시작.await(5, TimeUnit.SECONDS)).isTrue()
+
+        어댑터.shutdown()
+
+        // shutdownNow() 였다면 sleep 이 인터럽트돼 여기서 false 였다.
+        assertThat(끝까지갔다.get()).isTrue()
+    }
+
+    /**
+     * 기다림에는 상한이 있어야 한다. 없으면 파드가 유예시간을 넘겨 SIGKILL 로 죽고,
+     * 그때는 배수를 시도했다는 사실만 남고 실제로는 아무것도 못 끝낸 것이 된다.
+     */
+    @Test
+    fun `상한을 넘기면 기다림을 포기한다`() {
+        val 어댑터 = TtsJobQueueAdapter(queueCapacity = 4, drainSeconds = 1)
+        val 놓아주기 = CountDownLatch(1)
+        val 작업시작 = CountDownLatch(1)
+
+        어댑터.submit("영원히안끝남") {
+            작업시작.countDown()
+            놓아주기.await(30, TimeUnit.SECONDS)
+        }
+        assertThat(작업시작.await(5, TimeUnit.SECONDS)).isTrue()
+
+        val 시작 = System.nanoTime()
+        어댑터.shutdown()
+        val 걸린초 = (System.nanoTime() - 시작) / 1_000_000_000.0
+
+        // 상한(1초) 근처에서 돌아와야 한다. 30초를 다 기다렸다면 상한이 안 먹은 것이다.
+        assertThat(걸린초).isLessThan(10.0)
         놓아주기.countDown()
     }
 }

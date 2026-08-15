@@ -21,6 +21,14 @@ import java.util.concurrent.TimeUnit
 @Component
 class TtsJobQueueAdapter(
     @Value("\${tts.queue-capacity:8}") queueCapacity: Int,
+    /**
+     * 종료할 때 **진행 중인 합성 한 건**을 기다려 주는 시간.
+     *
+     * 60초인 근거: 프로덕션 실측에서 한 건이 12~49초 걸린다(280자에 49초). 여유를 두되,
+     * 파드 유예시간(`terminationGracePeriodSeconds: 90`) 안에서 끝나야 한다 — 유예시간을
+     * 넘기면 kubelet 이 SIGKILL 을 보내고 이 대기는 아무 의미가 없어진다.
+     */
+    @Value("\${tts.shutdown-drain-seconds:60}") private val drainSeconds: Long,
 ) : TtsJobQueuePort {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -69,13 +77,33 @@ class TtsJobQueueAdapter(
 
     @PreDestroy
     fun shutdown() {
-        // 진행 중인 합성은 몇 분이 걸릴 수 있다. 종료를 무한정 기다리지 않는다 — 끝난 결과는
-        // 캐시 행에 남아 있고, 못 끝낸 건 PENDING 행으로 남는다. 그 행은 새 프로세스의
-        // [inFlight] 에 없으므로 재요청 때 고아로 판정돼 다시 큐에 오른다 ([isInFlight] 참조).
+        // **진행 중인 합성을 끝까지 기다렸다 죽는다.**
         //
-        // 이 문장은 예전엔 사실이 아니었다. 유스케이스가 PENDING 행만 보고 "진행 중" 이라며
-        // 큐에 안 넣어, 배포에 걸린 문장은 영구히 소리가 나지 않았다. 소유 여부를 함께 보게
-        // 바꾼 지금에야 맞는 말이 됐다.
-        executor.shutdownNow()
+        // 예전에는 여기서 곧장 `shutdownNow()` 를 불렀다. 그러면 워커 스레드가 인터럽트돼
+        // 굽던 문장이 버려지고, 사용자 눈에는 소리 버튼이 아무 설명 없이 사라진다
+        // (`onUnavailable="hide"`). 2026-08-15 프리웜 57/93 에서 실제로 그렇게 한 건을 잃었다 —
+        // 사이드카는 오디오를 다 만들어 200 으로 돌려줬는데 백엔드가 그 순간 교체됐다.
+        //
+        // 배포는 앞으로도 일어난다. 이 리포는 `replicas: 1` 이라 롤아웃 = 파드 교체이고,
+        // 교체가 곧 "그때 듣고 있던 사람의 소리가 사라짐" 이 되지 않게 하려면 여기서
+        // 버티는 수밖에 없다.
+        //
+        // 순서: 새 작업 접수를 닫고(shutdown) → 진행 중 한 건을 기다리고 → 그래도 안 끝나면
+        // 포기(shutdownNow). 큐에 대기만 하던 것들은 어차피 이 대기 안에 다 못 끝내므로
+        // 버려지지만, 그 행들은 PENDING 으로 남아 재요청 때 고아로 판정돼 다시 큐에 오른다
+        // ([isInFlight] 참조).
+        executor.shutdown()
+        try {
+            if (!executor.awaitTermination(drainSeconds, TimeUnit.SECONDS)) {
+                log.warn("TTS 워커가 {}초 안에 안 끝났다 — 남은 작업을 버리고 종료한다", drainSeconds)
+                executor.shutdownNow()
+            } else {
+                log.info("TTS 워커 정상 배수 완료 — 진행 중이던 합성을 끝내고 종료한다")
+            }
+        } catch (_: InterruptedException) {
+            // 우리를 기다리던 쪽이 먼저 포기했다. 더 붙잡을 명분이 없다.
+            executor.shutdownNow()
+            Thread.currentThread().interrupt()
+        }
     }
 }

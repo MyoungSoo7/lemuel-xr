@@ -103,6 +103,20 @@ jobs:
       - name: ${{ matrix.runner }}
         run: python3 scripts/${{ matrix.runner }}.py
 
+  # 어떤 이미지를 다시 빌드할지 고른다.
+  #
+  # **이 잡의 출력은 push 에서도 반드시 지켜져야 한다.** 예전에는 아래 잡들이
+  # `needs.changes.outputs.X == 'true' || github.event_name == 'push'` 조건이었다.
+  # 뒤의 절 때문에 main 푸시에서는 필터가 통째로 무력화됐고, 이미지를 실제로 빌드·푸시하는
+  # 것은 main 푸시뿐이라 필터는 PR 에서만 동작하는 장식이 됐다.
+  #
+  # 결과는 배포 사고로 나타났다 — 프론트엔드 문서 한 줄만 고친 #58 이 백엔드 이미지를
+  # 새로 굽고, ArgoCD image-updater 가 그걸 롤아웃하고, `replicas: 1` 인 백엔드가 교체되며
+  # 그때 합성 중이던 나레이션이 사라졌다(2026-08-15 프리웜 57/93 에서 실측). 사용자에게는
+  # 소리 버튼이 조용히 없어지는 것으로만 보인다.
+  #
+  # paths-filter 는 push 이벤트에서 직전 커밋(`github.event.before`)과 비교하므로,
+  # 우회 절만 걷어내면 push 에서도 의도대로 동작한다.
   changes:
     runs-on: ubuntu-latest
     permissions:
@@ -148,7 +162,7 @@ jobs:
 
   backend:
     needs: changes
-    if: needs.changes.outputs.backend == 'true' || github.event_name == 'push'
+    if: needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -217,7 +231,7 @@ jobs:
 
   tts:
     needs: changes
-    if: needs.changes.outputs.tts == 'true' || github.event_name == 'push'
+    if: needs.changes.outputs.tts == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -264,7 +278,7 @@ jobs:
 
   ai:
     needs: changes
-    if: needs.changes.outputs.ai == 'true' || github.event_name == 'push'
+    if: needs.changes.outputs.ai == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -309,7 +323,7 @@ jobs:
 
   frontend:
     needs: changes
-    if: needs.changes.outputs.frontend == 'true' || github.event_name == 'push'
+    if: needs.changes.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -530,7 +544,7 @@ jobs:
     needs: changes
     # 백엔드(시나리오 yml 포함)든 프론트든 바뀌면 돈다. 씬을 그리는 데 둘 다 필요해서,
     # 한쪽만 트리거로 두면 나머지 한쪽 변경이 이 게이트를 우회한다.
-    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true' || github.event_name == 'push'
+    if: needs.changes.outputs.frontend == 'true' || needs.changes.outputs.backend == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: read
