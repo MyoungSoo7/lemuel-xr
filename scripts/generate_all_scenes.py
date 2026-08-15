@@ -12,7 +12,14 @@
   python3 scripts/generate_all_scenes.py moses      # 특정 인물만
   python3 scripts/generate_all_scenes.py --force    # 이미 있어도 다시 생성
 
-결과: frontend/public/images/scenes/{character}/{scene_id}.jpg
+결과: frontend/public/images/scenes/{character}/{scene_id}.webp
+
+Imagen 은 JPEG 를 돌려준다. 그걸 그대로 두지 않고 **webp 로 바꿔서만 저장한다.**
+프론트가 읽는 확장자가 `.webp` 라서(각 인물 page.tsx 의 backgroundImage) jpg 로
+떨어뜨리면 그 씬만 배경이 통째로 안 나온다 — 404 인데 CSS 배경이라 콘솔에도
+거의 안 남고, 화면은 그냥 검게 보인다. 그래서 변환은 선택이 아니라 필수 단계다.
+크기 차이도 장식이 아니다: 실측 1.26MB → 48KB (39장 합계 49MB → 2MB).
+jpg 원본은 남기지 않는다. 다시 뽑으려면 이 스크립트를 --force 로 돌린다.
 
 프롬프트 규칙 (기존 5장에서 이어받은 것):
   - **인물을 그리지 않는다.** 프롬프트에 인물명을 넣으면 Imagen 이 얼굴 있는
@@ -23,7 +30,10 @@
 import base64
 import json
 import os
+import shutil
+import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from pathlib import Path
@@ -142,10 +152,39 @@ SCENES: dict[str, dict[str, str]] = {
 }
 
 
+# webp 인코딩 설정.
+#
+# q=82 는 39장 실측에서 SSIM 0.967~0.986 (최악이 david/1) 이었다. 전면 배경 위에
+# 텍스트를 얹는 용도라 이 정도 손실은 육안으로 구분되지 않는다 — 풀 텍스처가 아주
+# 약간 뭉개지는 것이 전부고, 구도·광원·피사체 디테일은 그대로다.
+# m=6 은 가장 느린(=가장 잘 줄이는) 탐색이다. 39장에 수십 초라 아낄 이유가 없다.
+WEBP_QUALITY = "82"
+WEBP_METHOD = "6"
+
+
+def to_webp(jpeg_bytes: bytes, out: Path, tag: str) -> str:
+    """Imagen 이 준 JPEG 를 webp 로 인코딩해 out 에 쓴다. jpg 는 남기지 않는다."""
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+        tmp.write(jpeg_bytes)
+        tmp_path = Path(tmp.name)
+    try:
+        proc = subprocess.run(
+            ["cwebp", "-quiet", "-q", WEBP_QUALITY, "-m", WEBP_METHOD,
+             str(tmp_path), "-o", str(out)],
+            capture_output=True, text=True,
+        )
+        if proc.returncode != 0:
+            # 여기서 조용히 넘어가면 씬 배경이 없는 채로 배포된다. 실패는 실패로 남긴다.
+            return f"[{tag}] FAIL cwebp rc={proc.returncode}: {proc.stderr.strip()[:200]}"
+    finally:
+        tmp_path.unlink(missing_ok=True)
+    return f"[{tag}] saved {out.stat().st_size} bytes (jpeg {len(jpeg_bytes)})"
+
+
 def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
     out_dir = OUT_ROOT / character
     out_dir.mkdir(parents=True, exist_ok=True)
-    out = out_dir / f"{scene_id}.jpg"
+    out = out_dir / f"{scene_id}.webp"
     if out.exists() and not force:
         return f"[{character}/{scene_id}] skip (exists)"
 
@@ -184,11 +223,15 @@ def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
         return f"[{character}/{scene_id}] FAIL no bytes: keys={list(preds[0].keys())}"
 
     img = base64.b64decode(b64)
-    out.write_bytes(img)
-    return f"[{character}/{scene_id}] saved {len(img)} bytes"
+    return to_webp(img, out, f"{character}/{scene_id}")
 
 
 if __name__ == "__main__":
+    # 저장 단계가 cwebp 에 의존한다. 39장을 다 뽑고 나서야 인코더가 없다는 걸 알면
+    # Imagen 호출을 통째로 날린다 — 그래서 첫 호출 전에 막는다.
+    if shutil.which("cwebp") is None:
+        sys.exit("ERROR: cwebp 필요 (macOS: brew install webp / Debian: apt install webp)")
+
     argv = [a for a in sys.argv[1:] if a != "--force"]
     force = "--force" in sys.argv
     targets = argv or list(SCENES.keys())
