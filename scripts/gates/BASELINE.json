@@ -251,19 +251,13 @@
     "ac-table:rahab": {
       "rc": 1,
       "tally": [
-        35,
+        41,
         1,
-        7
+        1
       ],
       "items": [
         "t-mut:BLOCKED",
-        "t-thresh:FAIL",
-        "t-tools:BLOCKED",
-        "t-tools:BLOCKED",
-        "t-tools:BLOCKED",
-        "t-tools:BLOCKED",
-        "t-tools:BLOCKED",
-        "t-tools:BLOCKED"
+        "t-thresh:FAIL"
       ]
     },
     "track-b:readiness": {

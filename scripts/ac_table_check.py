@@ -436,6 +436,50 @@ def check(target: Path, git_name: str | None = None) -> int:
         #    값이 낡는 순간 FAIL 이 아니라 BLOCKED(「사람이 볼 것」)로 조용히 빠졌다.
         #    이 seed 에서 가장 많이 인용되는 수치가 정확히 무방비였다. `mutate_ac_table.py`
         #    의 `t-tools` 변이가 그것을 드러냈다(검출 14/15).
+        # ── t-hist 준비 : rev.N 을 선언한 커밋 ──────────────────────────────
+        # 옛 판의 수치는 **오늘 재현될 수 없다** — 그 판의 스크립트와 콘텐츠가
+        # 그때 낸 출력이기 때문이다. 그래서 여기는 오래 「판정하지 않는다(사람이
+        # 볼 것)」로 비워 두었는데, 그러면 이 seed 가 가장 자주 저지르는 결함이
+        # 정확히 그 빈칸에 숨는다: **옛 수치를 옮겨 적다 틀리는 것**(정정 AC —
+        # 「§7-3 합계 줄은 고쳤는데 그 합계를 해설하는 문단 다섯 곳은 옛 값을
+        # 들고 있었다」, 정정 E, 정정 AE 가 전부 같은 형태다).
+        #
+        # 재현은 못 해도 **대조는 된다.** 「rev.10 의 기록」이라고 적은 수치는
+        # rev.10 을 선언한 커밋의 본문에 실제로 있어야 한다. 없으면 그것은 역사가
+        # 아니라 오기이고, 그건 기계가 판정할 수 있다.
+        #
+        # ⚠️ t-baseline 과 같은 이유로 `--all` 이고 얕은 클론이면 판정 불가다.
+        #    못 찾으면 BLOCKED 로 남긴다 — 못 찾은 것을 통과로 바꾸지 않는다.
+        rev_sha: dict[int, str] = {}
+        rev_walked = [False]
+
+        def hist_verify(lineno: int, trio: tuple[int, ...], n: int) -> None:
+            if not rev_walked[0]:
+                rev_walked[0] = True
+                # log 는 최신순 — setdefault 라서 그 판을 선언한 **마지막** 커밋,
+                # 곧 rev.N 의 최종 상태가 남는다(초판이 아니라).
+                for sha in git("log", "--all", "--format=%H",
+                               "--", f"docs/{name}").splitlines():
+                    head = git("show", f"{sha}:docs/{name}").splitlines()
+                    hm = REV.search(head[0]) if head else None
+                    if hm:
+                        rev_sha.setdefault(int(hm.group(1)), sha)
+            label = (f"{name}:{lineno} PASS {trio[0]}·FAIL {trio[1]}"
+                     f"·BLOCKED {trio[2]} — rev.{n} 의 기록")
+            if n not in rev_sha:
+                blk("t-hist", f"{label}인데 rev.{n} 을 선언한 커밋을 git 에서"
+                              f" 못 찾았다 — 대조할 원본이 없다")
+                return
+            body = git("show", f"{rev_sha[n]}:docs/{name}")
+            found = {tuple(int(x) for x in m.groups())
+                     for m in RUNNER.finditer(body)}
+            if trio in found:
+                ok("t-hist", f"{label} — rev.{n} 본문({rev_sha[n][:7]})에 실재한다")
+            else:
+                bad("t-hist", f"{label}으로 적혀 있는데 rev.{n} 본문"
+                              f"({rev_sha[n][:7]})에 그 수치가 없다"
+                              f" — 그 판에 있던 것은 {sorted(found)}")
+
         seen = 0
         for i, raw in enumerate(lines, 1):
             if i not in live or i == tally_lineno:
@@ -456,9 +500,9 @@ def check(target: Path, git_name: str | None = None) -> int:
                         old += [int(x) for x in re.findall(
                             r"(?<!도구 )rev\.(\d+)\s*(?:이|가|까지|최초|시점|에서)", ctx)]
                     if any(n < cur_rev for n in old):
-                        blk("t-tools", f"{name}:{i} PASS {trio[0]}·FAIL {trio[1]}·BLOCKED"
-                                       f" {trio[2]} — rev.{min(old)} 의 기록으로 적혀 있어"
-                                       f" 판정하지 않는다(사람이 볼 것)")
+                        # 오늘 재현되지 않는 옛 판의 수치 — t-tools 로는 잴 수 없다.
+                        # 버리지 않고 t-hist 로 넘겨 **그 판 본문과 대조**한다.
+                        hist_verify(i, trio, min(old))
                         continue
                 seen += 1
                 if trio in tallies:

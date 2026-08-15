@@ -39,16 +39,69 @@ jobs:
       - name: Gate baseline
         run: python3 scripts/ci_gates.py
 
-      # 이 잡이 **덮지 않는 것** — 조용히 빠뜨린 게 아니라 재 보고 뺐다.
-      #
-      # `scripts/mutate_*.py` 4종(판정기를 결함으로 다시 재는 층)은 여기 없다.
-      # `mutate_ac_table.py` 하나가 로컬에서 20분을 넘겨도 끝나지 않아 측정을 중단했다
-      # (2026-08-11, M-series macOS). 중첩이 깊어서 그렇다 — 이 러너는 ac_table_check 를
-      # 15회 이상 돌리고, 그 ac_table_check 는 자기 안에서 다시 mutate_review_log 를 돌린다.
-      #
-      # 그래서 지금 CI 는 **판정기의 결과만 지키고, 판정기가 여전히 무언가를 재고 있는지는
-      # 지키지 못한다.** 아무것도 안 하는 스크립트도 기준선과는 일치한다 —
-      # 이 잡의 초록으로 메울 수 없는 구멍이고, 남은 일이다(별도 스케줄 잡 또는 러너 최적화).
+      # 이 잡이 **덮지 않는 것**: 판정기가 여전히 무언가를 재고 있는지.
+      # 기준선 일치만 보므로 **아무것도 안 하는 스크립트도 여기서는 초록이다.**
+      # 그 층은 아래 `mutation-gate` 잡이 맡는다 (2026-08-15 신설).
+
+  # 판정기를 결함으로 다시 재는 층 — `scripts/mutate_*.py` 4종 (2026-08-15 신설).
+  #
+  # 이 잡이 없는 동안 CI 는 **판정기의 결과만 지키고 판정기가 여전히 무언가를 재는지는
+  # 지키지 못했다.** `gate-baseline` 은 기록된 기준선과의 일치를 보므로, 판정 로직을
+  # 통째로 들어내 `sys.exit(1)` 만 남겨도 기준선과는 일치한다 — 초록인 채로.
+  # 이 러너들은 seed 사본에 결함을 주입하고 판정기가 FAIL/BLOCKED 로 돌아서는지 본다.
+  #
+  # 🔸 **왜 여태 없었는가, 그리고 그 이유는 이제 사실이 아니다.**
+  # 2026-08-11 에 여기 적혀 있던 제외 사유는 "`mutate_ac_table.py` 가 로컬에서 20분을
+  # 넘겨도 안 끝나 측정을 중단했다" 였다. 2026-08-15 에 4종을 실제로 끝까지 돌려
+  # 다시 쟀다 (M-series macOS, 순차):
+  #
+  #     mutate_ac_table        212.4초   rc=0
+  #     mutate_rahab_staging    29.7초   rc=0
+  #     mutate_rahab_captions    2.7초   rc=0
+  #     mutate_review_log        1.9초   rc=0
+  #     ─────────────────────────────────────
+  #     합계 247초 = 4.1분 · 4종 전부 통과
+  #
+  # 20분이 아니라 4분이었다. **측정을 중단한 값이 제외 사유로 굳어 넉 달을 살아남았다** —
+  # 중단한 측정은 측정이 아니다. 아래 matrix 로 4종을 병렬로 돌리므로 벽시계는
+  # `mutate_ac_table` 하나(러너에서 5~8분 예상)가 지배한다.
+  #
+  # `gate-baseline` 과 달리 이것은 **진짜 합격·불합격이다** — 지금 4종 다 rc=0 이라
+  # 조일 수 있고, 빨강이면 판정기가 잡던 결함을 더 이상 안 잡는다는 뜻이다.
+  #
+  # ⚠️ 이 초록이 **주장하지 않는 것**: 변이 목록은 판정기가 **선언한 축의 목록**이지
+  # 결함 공간의 표본이 아니다. 선언하지 않은 축의 결함은 이 잡이 통째로 못 본다
+  # (각 러너가 자기 출력 끝에 같은 취지를 적는다).
+  mutation-gate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      # 한 종이 빨개져도 나머지 셋의 판정을 보고 싶다. fail-fast 면 먼저 죽은 것 하나만
+      # 알게 되고, "판정기 넷 중 몇이 눈이 멀었는가" 라는 이 잡의 질문에 답이 안 나온다.
+      fail-fast: false
+      matrix:
+        runner:
+          - mutate_ac_table
+          - mutate_rahab_staging
+          - mutate_rahab_captions
+          - mutate_review_log
+    # 로컬 최장 212초의 여유 배수. 이 러너들은 실패해도 조용히 오래 도는 성질이 있어
+    # (중첩 subprocess) 상한 없이 두면 6시간짜리 잡이 된다.
+    timeout-minutes: 25
+    steps:
+      # `gate-baseline` 과 같은 이유로 fetch-depth: 0 이다 — `mutate_ac_table` 은
+      # `ac_table_check.py` 를 부르고, 그 `t-baseline` 축이 git log 를 걸어가
+      # 직전 판을 선언한 커밋을 찾는다. 얕은 클론이면 그 축이 조용히 판정 불가가 된다.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install pyyaml
+      - name: ${{ matrix.runner }}
+        run: python3 scripts/${{ matrix.runner }}.py
 
   changes:
     runs-on: ubuntu-latest
