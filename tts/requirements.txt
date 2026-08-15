@@ -1,16 +1,6 @@
+# 2026-08-15: XTTS-v2 를 버리면서 torch·TTS·transformers 가 전부 사라졌다.
+# 합성은 Gemini TTS HTTP 호출이고, 호출에는 표준 라이브러리(urllib)만 쓴다 —
+# google SDK 를 붙이지 않는 이유는 요청 한 종류를 위해 의존성 트리를 늘릴 값어치가 없어서다.
 fastapi==0.115.0
 uvicorn[standard]==0.32.0
-TTS==0.22.0
-# torch 2.6 부터 torch.load 의 weights_only 기본값이 True 로 바뀌어, Coqui TTS 0.22.0 의
-# load_fsspec(weights_only 미지정)가 XTTS 체크포인트(XttsConfig 피클) 로딩에 실패한다:
-#   _pickle.UnpicklingError: Unsupported global: GLOBAL TTS.tts.configs.xtts_config.XttsConfig
-# 이게 파드가 부팅 시 TTS(MODEL) 에서 죽던 CrashLoop 의 진짜 원인. weights_only 가 아직
-# False 이던 마지막 계열 2.5.1 로 고정(+torchaudio 매칭). transformers 4.40.2 핀과 함께 스택 고정.
-torch==2.5.1
-torchaudio==2.5.1
-# Coqui TTS 0.22.0 은 transformers 의 BeamSearchScorer 를 import 하는데, 이는
-# transformers 4.41+ 에서 제거됨 → 미고정 시 최신 transformers 가 깔려
-# "ImportError: cannot import name 'BeamSearchScorer'" 로 모델 로드 실패(무한 크래시).
-# BeamSearchScorer 가 존재하는 마지막 계열로 고정.
-transformers==4.40.2
 pydantic==2.9.2

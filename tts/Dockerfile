@@ -1,32 +1,32 @@
-# Coqui 모델 다운로드 서버가 speakers_xtts.pth 를 HTML 로 반환(_pickle.UnpicklingError:
-# invalid load key, '<')하며 지속 실패한다(2026-07-14). GitHub Actions 는 레이어 캐시가
-# 런간 유지되지 않아 매 빌드가 모델(~1.87GB)을 재다운로드하므로, 다운로드 장애 시 빌드 자체가
-# 막힌다.
+# 2026-08-15: XTTS-v2 를 버리고 Gemini TTS 로 바꾸면서 이 Dockerfile 이 통째로 단순해졌다.
 #
-# 해결: 모델+의존성(torch2.5.1 CPU, TTS, transformers)이 이미 baked-in 된 "마지막 정상 이미지"를
-# 베이스로 삼고 app 레이어만 덮어쓴다. → Coqui 다운로드에 의존하지 않고, app 반복이 빨라지며,
-# 노드도 베이스 레이어를 이미 캐시해 pull 이 가볍다. (아래 base 는 audio 재생 검증된 이미지.)
+# 예전에는 Coqui 모델(~1.87GB)을 이미지에 굽느라, 다운로드 서버가 speakers_xtts.pth 를
+# HTML 로 돌려주는 장애(2026-07-14)에 빌드가 통째로 막혔고, 그걸 우회하려고 "마지막 정상
+# 이미지" 를 base 로 물려 app 레이어만 덮어쓰는 구조를 썼다. 모델이 없어지면서 그 우회도
+# 함께 사라졌다 — 이제 평범한 python:3.11-slim 빌드다.
 #
-# Coqui 다운로드가 복구되면 전체 빌드(python:3.11-slim + 모델 bake)로 되돌릴 수 있다 —
-# git history 의 fe09f84 이전 Dockerfile 참조. 장기적으로는 model+deps 전용 -base 이미지 분리 권장.
-FROM ghcr.io/myoungsoo7/lemuel-xr-tts:main-6e83f1397c6250fa505a0e5f9231502c33455889
+# 부수 효과: 이미지가 ~2GB -> 수십 MB, 파드 메모리 ~2.5GB -> 수백 MB, 기동 시 모델 로딩
+# (수 분) 이 사라져 첫 Ready 까지가 초 단위가 된다.
+FROM python:3.11-slim
 
 WORKDIR /app
 
-# app 코드만 갱신 (모델/deps/ENV(COQUI_TOS_AGREED)는 베이스에서 상속)
-# korean_g2p.py 를 빠뜨리면 app import 가 ImportError 로 죽는다 — 런타임에야 드러난다.
-COPY app.py korean_g2p.py selftest.py test_korean_g2p.py .
+# healthcheck 가 curl 을 쓴다. 이미지가 작아진 만큼 이 한 줄이 눈에 띄므로 남겨 둔다 —
+# 빼려면 HEALTHCHECK 를 python 으로 바꿔야 한다.
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+ && rm -rf /var/lib/apt/lists/*
 
-# 발음 규칙표 검사. 표준 라이브러리만 쓰므로 모델 로딩 없이 1초 안에 끝나고, 여기서 먼저
-# 실패시켜 두면 뒤의 (느린) 합성 self-test 까지 가지 않는다.
-RUN python -m unittest test_korean_g2p -v
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# 빌드 타임 합성 self-test — /synthesize 와 동일 경로(synthesize_to_file, speed 포함) 실행.
-# 실패 시 build 실패 + CI 로그에 traceback → kubectl 없이 원인 파악. 성공 = 런타임 동작 보장에 근접.
+COPY app.py selftest.py .
+
+# 네트워크를 타지 않는 전 구간 검사(WAV 헤더·mime 파싱·캐시 키·목소리 매핑·언어 검증).
+# 실제 합성은 API 키가 필요해 빌드에서 하지 않는다 — 이유는 selftest.py docstring 참조.
 RUN python selftest.py
 
 EXPOSE 5002
-HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=10 \
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD curl -fsS http://localhost:5002/healthz || exit 1
 
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "5002"]
