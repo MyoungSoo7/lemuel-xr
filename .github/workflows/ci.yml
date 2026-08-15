@@ -297,7 +297,7 @@ jobs:
       # ghcr 로 올라가지 않게 하려면 순서가 이래야 한다.
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
 
       - name: Test (ai)
         working-directory: ai
