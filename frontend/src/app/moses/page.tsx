@@ -177,7 +177,7 @@ export default function MosesPage() {
       <section
         className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative aspect-video bg-cover bg-center bg-stone-900"
         style={{
-          backgroundImage: `url(/images/scenes/moses/${scene.currentScene}.jpg)`,
+          backgroundImage: `url(/images/scenes/moses/${scene.currentScene}.webp)`,
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70" />

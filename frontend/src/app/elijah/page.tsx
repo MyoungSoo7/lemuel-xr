@@ -184,7 +184,7 @@ export default function ElijahPage() {
       <section
         className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative bg-cover bg-center bg-stone-900"
         style={{
-          backgroundImage: `url(/images/scenes/elijah/${scene.currentScene}.jpg)`,
+          backgroundImage: `url(/images/scenes/elijah/${scene.currentScene}.webp)`,
         }}
       >
         {/* 요셉 쪽과 달리 본문이 이미지 위에 직접 얹히므로 오버레이를 훨씬 진하게 깐다 */}
