@@ -38,6 +38,7 @@ import json
 import re
 import subprocess
 import sys
+from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -45,7 +46,33 @@ BASELINE = ROOT / "scripts" / "gates" / "BASELINE.json"
 TIMEOUT = 900
 
 TALLY_RE = re.compile(r"---\s*PASS\s+(\d+)\s*/\s*FAIL\s+(\d+)\s*/\s*BLOCKED\s+(\d+)\s*---")
-AXIS_RE = re.compile(r"\[(FAIL|BLOCKED)\s*\]\s+(\S+)")
+AXIS_RE = re.compile(r"\[(FAIL|BLOCKED)\s*\]\s+(\S+)\s*(.*)")
+# 사유에 박힌 **줄 번호**만 지운다 (`SEED-RAHAB.md:3152` → `SEED-RAHAB.md:N`).
+LINENO_RE = re.compile(r"(\.\w{2,4}):\d+")
+ITEM_MSG_CAP = 120                  # 기준선 아이템에 담을 사유 길이 상한
+
+
+def item_key(axis: str, status: str, msg: str) -> str:
+    """기준선 아이템 키. **사유까지 넣는다** (2026-08-15).
+
+    🚨 왜 바꿨나. 예전 키는 `축:상태` 쌍뿐이었다. 같은 쌍이 둘 이상이면 서로 구별이
+    안 되고 tally 도 그대로라, **A 축 BLOCKED 하나가 사라지고 전혀 다른 이유의 A 축
+    BLOCKED 하나가 새로 생겨도 기준선 비교는 아무것도 못 잡았다.** 정렬된 리스트가
+    글자 그대로 동일하기 때문이다. 바로 직전까지 `ac-table:rahab` 의 `t-tools:BLOCKED`
+    6줄이 정확히 그 상태였고, 그 6줄이 해소되면서 **조건이 사라졌을 뿐 구멍은 그대로**
+    였다. 중복이 다시 생기는 순간 되돌아온다.
+
+    사유의 **줄 번호는 지운다.** 문서를 한 줄만 고쳐도 전 항목이 드리프트로 뜨면 이
+    기준선은 며칠 만에 신뢰를 잃고, 그때부터는 `--update` 가 습관이 되어 아무것도
+    못 잡는다. 그 밖의 수치(실측값·집계)는 **남긴다** — 그게 바뀌는 것은 기록할
+    가치가 있는 변화다.
+
+    ⚠️ 이것으로도 못 잡는 것: 사유 문구까지 똑같은 두 항목. 줄 번호를 지운 탓에
+    같아지는 경우가 있어서, 그때는 `observe()` 가 중복을 **경고로 드러낸다** — 조용히
+    구별되는 척하지 않는다.
+    """
+    msg = LINENO_RE.sub(r"\1:N", " ".join(msg.split()))
+    return f"{axis}:{status} {msg[:ITEM_MSG_CAP]}" if msg else f"{axis}:{status}"
 
 
 def runners() -> list[tuple[str, list[str], str]]:
@@ -107,6 +134,9 @@ def observe(name: str, argv: list[str], mode: str) -> tuple[dict, str] | None:
             return None
         summary = data["summary"]
         tally = [summary["pass"], summary["fail"], summary["blocked"]]
+        # 이쪽 `gate` 는 축 이름이 아니라 **항목 식별자**(`G5c` 따위)라 텍스트 모드와
+        # 사정이 다르다 — 2026-08-15 실측으로 12개 게이트 126개 항목에 중복 0 이었다.
+        # 그래도 중복이 생기면 아래 공통 경고가 잡는다.
         items = sorted(
             f"{r['gate']}:{r['status']}" for r in data["results"] if r["status"] != "PASS"
         )
@@ -116,7 +146,16 @@ def observe(name: str, argv: list[str], mode: str) -> tuple[dict, str] | None:
             print(f"  [BLOCKED] {name} — 집계 줄을 찾지 못했다")
             return None
         tally = [int(m.group(1)), int(m.group(2)), int(m.group(3))]
-        items = sorted(f"{axis}:{status}" for status, axis in AXIS_RE.findall(out))
+        items = sorted(item_key(axis, status, msg)
+                       for status, axis, msg in AXIS_RE.findall(out))
+
+    dups = sorted(k for k, n in Counter(items).items() if n > 1)
+    if dups:
+        # 구별이 안 되는 항목이 있다는 사실 자체를 찍는다. 실패로 만들지는 않는다 —
+        # 정당하게 같은 사유가 두 줄 날 수 있고, 그걸 빨강으로 만들면 이 경고가
+        # 곧바로 꺼진다. **못 재는 구간을 못 재는 채로 보이게** 두는 쪽을 택했다.
+        print(f"  ⚠️ {name} — 사유까지 같은 항목이 있어 이만큼은 서로 구별되지 않는다:"
+              f" {dups} (그 사이의 교체는 기준선 비교에 안 잡힌다)")
 
     return {"rc": rc, "tally": tally, "items": items}, out
 

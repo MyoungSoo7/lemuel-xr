@@ -38,6 +38,13 @@ SRC = SEED.read_text(encoding="utf-8")
 
 LINE = re.compile(r"^\s*\[(FAIL|BLOCKED)\s*\]\s*(\S+)")
 
+# 판정기에서 **가져다 쓰는 것은 두 개뿐**이다 — §9 인용을 읽는 정규식과, 판정 대상
+# 줄을 고르는 규약. 돌리는 것이 아니라 읽는 것이라 DP-R18 의 재귀 금지와 무관하다.
+sys.path.insert(0, str(ROOT / "scripts"))
+from ac_table_check import MUT, REV, live_lines      # noqa: E402
+
+SELF_PATH = "scripts/mutate_ac_table.py"
+
 
 def line_with(*needles: str) -> str:
     """모든 조각을 담은 **유일한** 줄. 유일하지 않으면 변이가 겨냥한 축과 실제로
@@ -167,6 +174,52 @@ def run(seed: Path, with_mut: bool) -> tuple[int, set[str], set[str]]:
     return p.returncode, fails, blocked
 
 
+def self_quote_gap(caught: int, rc: int) -> bool:
+    """§9 가 인용한 **이 러너 자신의** 검출 수치를 이번 실행과 대조한다. 어긋나면 True.
+
+    🚨 왜 여기 있나. 판정기의 `t-mut` 은 다른 러너들의 인용 수치를 실제로 대조한다.
+    그런데 **이 러너만은 DP-R18 로 면제**다 — 자기가 자기를 돌리면 얕은 자기검사이기
+    때문이고, 그 면제 자체는 옳다. 문제는 면제가 곧 **아무도 안 본다**로 이어졌다는
+    것이다. §9 가 적어 둔 이 러너의 「검출 N / M · rc=R」은 판정기도 건너뛰고 러너
+    자신도 제 수치를 출력만 할 뿐 대조하지 않았다. `rev.14` 에 적힌 수치가 그때
+    참이 아니었다는 자백이 §9 본문에 남아 있다 — 실제로 한 번 틀렸던 칸이다.
+
+    재귀가 아니다. 판정기를 **부르지 않고** 문서 한 줄을 읽어 비교만 한다.
+    옛 판과 정정 표 행을 빼는 것은 판정기와 같은 규약(`live_lines`)을 쓴다 —
+    정정 표는 틀린 옛 값을 인용해야 하는 자리라 대조 대상이 아니다. 2026-08-15 신설.
+
+    `rc` 는 **변이 검출만으로 정해진 rc** 다. 이 대조의 결과를 다시 넣으면 자기가
+    자기 기대값을 바꾼다.
+    """
+    lines = SRC.splitlines()
+    m = REV.search(lines[0]) if lines else None
+    if not m:
+        print("\n🚨 seed 1행에서 rev 번호를 못 읽었다 — 자기 수치를 대조하지 못한다.")
+        return True
+    live = live_lines(lines, int(m.group(1)))
+    got = (str(caught), str(len(MUTANTS)), str(rc))
+
+    quoted = [(i, q) for i, raw in enumerate(lines, 1) if i in live
+              for q in MUT.findall(raw) if q[0] == SELF_PATH]
+    if not quoted:
+        print(f"\n🚨 §9 의 판정 대상 줄에 `{SELF_PATH}` 의 검출 수치 인용이 없다."
+              f" 판정기는 면제하고 여기는 대조할 대상이 없으니 **아무도 안 보게 된다**."
+              f" 이번 실행값 「검출 {got[0]} / {got[1]} · rc={got[2]}」를 문서에 적을 것.")
+        return True
+
+    gap = False
+    for i, (_, n, tot, r) in quoted:
+        if (n, tot, r) == got:
+            print(f"\n✅ 자기 수치 대조 {SEED.name}:{i} 「검출 {n} / {tot} · rc={r}」"
+                  f" = 이번 실행")
+        else:
+            gap = True
+            print(f"\n🚨 자기 수치 어긋남 {SEED.name}:{i} — 인용 「검출 {n} / {tot} ·"
+                  f" rc={r}」 ≠ 이번 실행 「검출 {got[0]} / {got[1]} · rc={got[2]}」."
+                  f" 변이를 늘렸거나 줄였으면 문서도 같이 고칠 것.")
+    return gap
+
+
 def main() -> int:
     base_rc, base_fail, base_blk = run(SEED, with_mut=False)
     print(f"기준선: rc={base_rc}")
@@ -200,10 +253,15 @@ def main() -> int:
                       f" FAIL={sorted(fails) or '없음'} BLOCKED={sorted(blk) or '없음'}")
 
     print(f"\n--- 검출 {caught} / {len(MUTANTS)} ---")
-    if caught != len(MUTANTS):
+    rc = 0 if caught == len(MUTANTS) else 1
+    if rc:
         print("🚨 못 잡은 축이 있다 — 그 축은 선언만 있고 집행이 없다.")
+    # 검출이 실패했어도 자기 수치 대조는 **한다**. 그래야 두 문제가 한 번에 보인다.
+    if self_quote_gap(caught, rc):
+        rc = 1
+    if rc:
         return 1
-    print("⚠️ 이 초록이 말하지 않는 것 셋.")
+    print("\n⚠️ 이 초록이 말하지 않는 것 셋.")
     print("   ① 「단언」 열이 그 판정기가 재는 것인지 — 판정기 자신이 못 재는 자리다.")
     print("   ② **현재 판 개정 사유 절의 표 행**은 판정 대상 밖이라(정정 표가 옛 값을")
     print("      인용해야 하기 때문) 그 칸에 든 낡은 수치는 이 변이들도 못 잡는다.")
