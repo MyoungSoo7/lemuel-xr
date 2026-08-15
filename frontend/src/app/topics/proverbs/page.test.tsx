@@ -17,6 +17,22 @@ import ProverbsThemePage from "./page";
 //  있었지만, 그건 규칙의 취지가 아니라 정규식의 빈틈이다.)
 import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
 
+/*
+  NarrationAudioButton 의 내부(TTS 훅·사이드카)는 이 화면의 관심사가 아니다. 재고 싶은 건
+  **페이지가 낭독에 무엇을 실어 보내는가** 다. 그래서 받은 text 를 *속성* 으로 드러낸다 —
+  화면 텍스트로 뱉으면 같은 구절이 본문과 두 번 잡혀 아래 getByText 들이 전부 모호해진다.
+*/
+vi.mock("@/components/NarrationAudioButton", () => ({
+  NarrationAudioButton: ({ text, label }: { text: string; label?: string }) => (
+    <button
+      type="button"
+      aria-label={label ?? "듣기"}
+      data-testid="narration-button"
+      data-script={text}
+    />
+  ),
+}));
+
 /**
  * /topics/proverbs — 기준2 (잠언과 지혜) 주제별 조회.
  *
@@ -64,9 +80,18 @@ const THEMES: ProverbsThemeListResponse = {
       summary: "말은 사람을 살리기도 하고 죽이기도 합니다.",
       guidance:
         "이 구절들은 결과를 보장하는 공식이 아니라 오늘 한 걸음의 방향입니다.",
+      // 실제 카탈로그(ProverbsThemeCatalog) 모양 그대로 — `ref` 는 `prov-13:3` 같은
+      // 영문 DB 식별자이고, 사람이 읽는 주소는 `text` 끝에 한글로 붙는다. 픽스처를
+      // "잠 13:3" 으로 두면 낭독이 영문 슬러그를 읽는 버그를 이 테스트가 못 잡는다.
       verses: [
-        { ref: "잠 13:3", text: "입을 지키는 자는 자기의 생명을 보전하나" },
-        { ref: "잠 15:1", text: "유순한 대답은 분노를 쉬게 하여도" },
+        {
+          ref: "prov-13:3",
+          text: "입을 지키는 자는 자기의 생명을 보전하나 (잠 13:3)",
+        },
+        {
+          ref: "prov-15:1",
+          text: "유순한 대답은 분노를 쉬게 하여도 (잠 15:1)",
+        },
       ],
     },
     {
@@ -74,7 +99,9 @@ const THEMES: ProverbsThemeListResponse = {
       title: "부지런함",
       summary: "게으름과 부지런함의 결이 다릅니다.",
       guidance: "부지런함이 곧 부를 보장한다는 뜻이 아닙니다.",
-      verses: [{ ref: "잠 6:6", text: "게으른 자여 개미에게로 가서" }],
+      verses: [
+        { ref: "prov-6:6", text: "게으른 자여 개미에게로 가서 (잠 6:6)" },
+      ],
     },
   ],
   safetyFooter: "답을 다 지키지 않아도 됩니다.",
@@ -85,7 +112,7 @@ function interactionResponse(): ProverbsInteractionResponse {
   return {
     id: 5,
     theme: "tongue",
-    chosenProverbRef: "잠 13:3",
+    chosenProverbRef: "prov-13:3",
     safetyFooter: "답을 다 지키지 않아도 됩니다.",
     aiFooter: "AI 보조 — 본문은 성경 참조.",
   };
@@ -161,13 +188,35 @@ describe("/topics/proverbs", () => {
         "이 구절들은 결과를 보장하는 공식이 아니라 오늘 한 걸음의 방향입니다.",
       ),
     ).toBeInTheDocument();
-    expect(s.getByText("📖 잠 13:3")).toBeInTheDocument();
+    expect(s.getByText("📖 prov-13:3")).toBeInTheDocument();
     expect(
       s.getByText(/입을 지키는 자는 자기의 생명을 보전하나/),
     ).toBeInTheDocument();
-    expect(s.getByText("📖 잠 15:1")).toBeInTheDocument();
+    expect(s.getByText("📖 prov-15:1")).toBeInTheDocument();
     // 나레이션 버튼(고령자 접근성)은 주제를 열면 함께 뜬다.
     expect(s.getByRole("button", { name: /듣기/ })).toBeInTheDocument();
+  });
+
+  it("들려주는 스크립트에 요약·안내·구절이 담기고, DB 식별자(ref)는 빠진다", async () => {
+    // 화면을 눈으로 좇기 어려운 사용자에게는 이 스크립트가 주제의 전부다.
+    // 동시에 `prov-13:3` 같은 식별자가 섞이면 한국어 화자가 영문 슬러그를 그대로
+    // 읽는다 — 발음 전처리(korean_g2p)도 손대지 않고 통과시키고, 같은 주소를
+    // 본문 끝("... (잠 13:3)")에서 한글로 한 번 더 읽는 꼴이 된다.
+    const { user } = renderPage();
+    await user.click(await screen.findByRole("button", { name: /말과 혀/ }));
+
+    const script = screen
+      .getByTestId("narration-button")
+      .getAttribute("data-script")!;
+
+    expect(script).toContain("말은 사람을 살리기도 하고 죽이기도 합니다.");
+    expect(script).toContain("공식이 아니라 오늘 한 걸음의 방향입니다.");
+    expect(script).toContain(
+      "입을 지키는 자는 자기의 생명을 보전하나 (잠 13:3)",
+    );
+    expect(script).toContain("유순한 대답은 분노를 쉬게 하여도 (잠 15:1)");
+    expect(script).not.toContain("prov-13:3");
+    expect(script).not.toContain("prov-15:1");
   });
 
   it("구절을 누르면 그 구절 참조가 그대로 기록되고 압박 없는 확인 문구가 뜬다", async () => {
@@ -179,7 +228,7 @@ describe("/topics/proverbs", () => {
     await waitFor(() =>
       expect(mockRecord).toHaveBeenCalledWith({
         theme: "tongue",
-        chosenProverbRef: "잠 13:3",
+        chosenProverbRef: "prov-13:3",
         dimension: "spiritual",
       }),
     );
@@ -204,7 +253,7 @@ describe("/topics/proverbs", () => {
     await waitFor(() =>
       expect(mockRecord).toHaveBeenLastCalledWith({
         theme: "tongue",
-        chosenProverbRef: "잠 15:1",
+        chosenProverbRef: "prov-15:1",
         dimension: "spiritual",
       }),
     );

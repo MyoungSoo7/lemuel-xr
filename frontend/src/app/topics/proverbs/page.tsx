@@ -43,7 +43,8 @@ export default function ProverbsThemePage() {
           </Link>
         </div>
         <p className="text-xs text-[var(--color-warm)]/40 mt-2">
-          기준2 — 잠언의 지혜를 *주제로 나눠* 보는 자리. 지혜는 공식이 아니라 오늘 한 걸음의 방향입니다.
+          기준2 — 잠언의 지혜를 *주제로 나눠* 보는 자리. 지혜는 공식이 아니라
+          오늘 한 걸음의 방향입니다.
         </p>
       </header>
 
@@ -117,10 +118,12 @@ function ThemeVerses({ theme }: { theme: ProverbsTheme }) {
       </p>
       <div className="mt-2">
         <NarrationAudioButton
+          // `v.ref` 는 `prov-1:7` 같은 DB 내부 식별자라 낭독문에 넣지 않는다 — 한국어
+          // 화자가 영문 슬러그를 그대로 읽고, 구절 주소는 이미 본문 끝에 한글로 있다.
           text={[
             theme.summary,
             theme.guidance,
-            ...theme.verses.map((v) => `${v.ref}. ${v.text}`),
+            ...theme.verses.map((v) => v.text),
           ].join("\n")}
           label="듣기"
           onUnavailable="hide"
@@ -143,7 +146,9 @@ function ThemeVerses({ theme }: { theme: ProverbsTheme }) {
                 : "border-[var(--color-primary)]/15 hover:border-[var(--color-primary)]/50"
             }`}
           >
-            <p className="text-xs text-[var(--color-primary)] font-mono">📖 {v.ref}</p>
+            <p className="text-xs text-[var(--color-primary)] font-mono">
+              📖 {v.ref}
+            </p>
             <blockquote className="text-sm text-[var(--color-warm)]/90 italic leading-relaxed border-l-2 border-[var(--color-primary)]/40 pl-3 mt-1">
               {v.text}
             </blockquote>
@@ -153,7 +158,8 @@ function ThemeVerses({ theme }: { theme: ProverbsTheme }) {
 
       {saved && (
         <p className="mt-4 text-[11px] text-[var(--color-warm)]/40 leading-relaxed">
-          ✓ 오늘 고른 구절로 기록했습니다. 답을 다 지켜야 한다는 압박 없이, 이 한 구절만 붙잡으셔도 충분합니다.
+          ✓ 오늘 고른 구절로 기록했습니다. 답을 다 지켜야 한다는 압박 없이, 이
+          한 구절만 붙잡으셔도 충분합니다.
         </p>
       )}
       {mutation.isError && (

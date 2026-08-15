@@ -193,7 +193,11 @@ export default function JournalGuidancePage() {
 function buildGuidanceNarration(guidance: Guidance): string {
   const parts: string[] = [guidance.validation];
   for (const v of guidance.verses) {
-    parts.push(`${v.ref}. ${v.text}`);
+    // `v.ref` 는 `psalm-34:4` 같은 **DB 내부 식별자**다. 낭독문에 넣으면 한국어 화자가
+    // 영문 슬러그를 그대로 읽는다 — 한글이 아니라 발음 전처리(korean_g2p)도 손대지 않고
+    // 통과시킨다. 게다가 구절 주소는 이미 본문 끝에 한글로 들어 있다("... (시 34:4)").
+    // 즉 앞에 붙이면 같은 주소를 영어로 한 번, 한글로 한 번 두 번 읽는 꼴이다.
+    parts.push(v.text);
   }
   if (guidance.reflectionQuestions.length > 0) {
     parts.push("성찰 질문입니다.");

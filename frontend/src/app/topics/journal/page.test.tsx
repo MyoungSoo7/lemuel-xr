@@ -50,9 +50,13 @@ function guidance(over: Partial<Guidance> = {}): Guidance {
     emotion: "ANXIOUS",
     emotionLabel: "불안",
     validation: "불안한 마음은 성경 안에도 있습니다.",
+    // 실제 카탈로그(JournalGuidanceCatalog)의 모양 그대로다 — `ref` 는 `psalm-55:22`
+    // 같은 **영문 DB 식별자**이고, 사람이 읽는 구절 주소는 `text` 끝에 한글로 붙어 있다.
+    // 예전 픽스처는 ref 를 "시 55:22" 로 두는 바람에 낭독문이 영문 슬러그를 읽는
+    // 버그를 몇 달간 못 잡았다. 픽스처가 실제와 다르면 통과가 아무것도 보증하지 않는다.
     verses: [
-      { ref: "시 55:22", text: "네 짐을 여호와께 맡기라." },
-      { ref: "벧전 5:7", text: "너희 염려를 다 주께 맡기라." },
+      { ref: "psalm-55:22", text: "네 짐을 여호와께 맡기라 (시 55:22)" },
+      { ref: "1pet-5:7", text: "너희 염려를 다 주께 맡기라 (벧전 5:7)" },
     ],
     reflectionQuestions: [
       "오늘 가장 무거웠던 순간은 언제였나요?",
@@ -301,9 +305,11 @@ describe("/topics/journal — 조언 표시", () => {
       await screen.findByText("불안한 마음은 성경 안에도 있습니다."),
     ).toBeInTheDocument();
     expect(screen.getByText("감정 · 불안")).toBeInTheDocument();
-    expect(screen.getByText("📖 시 55:22")).toBeInTheDocument();
-    expect(screen.getByText("네 짐을 여호와께 맡기라.")).toBeInTheDocument();
-    expect(screen.getByText("📖 벧전 5:7")).toBeInTheDocument();
+    expect(screen.getByText("📖 psalm-55:22")).toBeInTheDocument();
+    expect(
+      screen.getByText("네 짐을 여호와께 맡기라 (시 55:22)"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("📖 1pet-5:7")).toBeInTheDocument();
     expect(
       screen.getByText("오늘 가장 무거웠던 순간은 언제였나요?"),
     ).toBeInTheDocument();
@@ -323,9 +329,15 @@ describe("/topics/journal — 조언 표시", () => {
 
     const script = await screen.findByTestId("narration-script");
     expect(script).toHaveTextContent("불안한 마음은 성경 안에도 있습니다.");
-    expect(script).toHaveTextContent("시 55:22. 네 짐을 여호와께 맡기라.");
+    expect(script).toHaveTextContent("네 짐을 여호와께 맡기라 (시 55:22)");
     expect(script).toHaveTextContent("성찰 질문입니다.");
     expect(script).toHaveTextContent("오늘 가장 무거웠던 순간은 언제였나요?");
+
+    // `ref` 는 낭독문에 들어가면 안 된다. 한국어 화자가 `psalm-55:22` 를 그대로
+    // 소리내 읽고(발음 전처리도 손대지 않고 통과시킨다), 같은 주소를 본문 끝에서
+    // 한글로 한 번 더 읽는다. 화면 표시(📖 psalm-55:22)는 그대로 두고 낭독만 뺀다.
+    expect(script).not.toHaveTextContent("psalm-55:22");
+    expect(script).not.toHaveTextContent("1pet-5:7");
   });
 
   it("성찰 질문이 없으면 스크립트에 그 안내를 넣지 않는다", async () => {
