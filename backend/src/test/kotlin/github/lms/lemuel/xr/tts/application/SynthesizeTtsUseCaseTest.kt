@@ -384,7 +384,10 @@ class SynthesizeTtsUseCaseTest {
      */
     @Test
     fun `세대 표식은 언어별로 독립이다 — en 조회는 en 세대 키를 쓴다`() {
-        val enKey = sha256("gem1|en|David|v|1.0")
+        // 세대를 올릴 때 여기도 같이 올려야 한다. 손이 가는 게 의도다 — 이 리터럴이
+        // 빨개지는 것이 "캐시를 통째로 버리는 변경을 하고 있다" 는 마지막 확인이다.
+        // (gem1 -> gem2: 2026-08-15 WAV -> MP3)
+        val enKey = sha256("gem2|en|David|v|1.0")
         whenever(cache.findById(any())).thenReturn(Optional.empty())
         whenever(cache.findById(enKey)).thenReturn(
             Optional.of(

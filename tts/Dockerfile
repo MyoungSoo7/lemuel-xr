@@ -11,9 +11,14 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# healthcheck 가 curl 을 쓴다. 이미지가 작아진 만큼 이 한 줄이 눈에 띄므로 남겨 둔다 —
+# curl 은 healthcheck 가 쓴다. 이미지가 작아진 만큼 이 한 줄이 눈에 띄므로 남겨 둔다 —
 # 빼려면 HEALTHCHECK 를 python 으로 바꿔야 한다.
-RUN apt-get update && apt-get install -y --no-install-recommends curl \
+#
+# lame 은 나레이션을 MP3 로 굽는 데 쓴다(app._encode_mp3). ffmpeg 이 아니라 lame 인 것은
+# 필요한 게 mp3 인코딩 하나뿐이기 때문이다 — ffmpeg 은 의존 트리까지 수백 MB 인데,
+# 이 이미지는 XTTS 를 버리면서 겨우 수십 MB 로 줄인 참이다. 되돌릴 이유가 없다.
+# 속도 조절(atempo) 같은 게 정말로 필요해지면 그때 ffmpeg 을 다시 논의한다.
+RUN apt-get update && apt-get install -y --no-install-recommends curl lame \
  && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
