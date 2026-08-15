@@ -1,0 +1,290 @@
+# Ouroboros Seed — 신학 게이트 v1 (역방향 브라운필드)
+#
+# 이 파일은 사람이 손으로 쓴 것이 아니라, 이 리포를 역방향으로 읽어 만든
+# PRD(.ouroboros/pm.md)에서 개발 인터뷰 4라운드를 거쳐 생성된 실행 가능한 Seed 다.
+#
+#   seed_id:      seed_ed857e2429f0
+#   interview_id: interview_20260815_171502
+#   ambiguity:    0.089
+#   created_at:   2026-08-15T18:12:41Z (KST 2026-08-16 03:12)
+#
+# 생성 시 클라이언트 게이트 2개(seed_ready_acceptance_guard, restate_goal_approved)가
+# ack 되지 않은 상태였다. 실행(execute) 전에 그 두 게이트를 사람이 통과시킬 것.
+
+goal: Implement theology gate v1 for lemuel-xr — add 8 empirically validated L2 forbidden
+  tokens achieving 7/7 heterodox recall and 100% precision on the 13-fixture golden
+  set, with Micrometer counter observability (content.gate.block{axis,layer}), user-invisible
+  blocking via existing fallback cascade, and T1_-prefixed axis enforcement infrastructure
+  across all 12 gate-configured characters, on the existing hexagonal Spring Boot
+  (Kotlin) + Python AI sidecar brownfield codebase.
+task_type: code
+brownfield_context:
+  project_type: brownfield
+  context_references:
+  - path: /Users/lms/lemuel-xr
+    role: primary
+    summary: Spring Boot (Kotlin, hexagonal) backend + Next.js/R3F frontend + Python
+      AI sidecar (ai/) + TTS sidecar + Unity stub; detached HEAD 9f250dd, working
+      tree clean except .ouroboros/ untracked
+  - path: backend/src/main/resources/application.yml
+    role: reference
+    summary: Safety config — safety.forbidden-tokens.list (680 mental-health tokens
+      folded scalar), token design principles (:165-167), R2 gaslighting tokens (:219-220),
+      fallback string (:347), actuator/prometheus config (:382)
+  - path: ai/app.py
+    role: reference
+    summary: Python AI sidecar — _SYSTEM_PREFIX (:155-166) for L1 prompt guard injection;
+      no enforcement test exists for this layer
+  - path: eval/grounding/v1/fixtures/
+    role: reference
+    summary: Golden set 13 fixtures (7 heterodox + 4 orthodox + 2 structural) with
+      manifest.json; build.gradle.kts references as task inputs
+  - path: backend/src/.../ContentSafetyGateEnforcementTest.kt
+    role: reference
+    summary: Authoring-runtime sync enforcement; isConstraintAxis (:256-260) and AXIS
+      regex (:356) hardcoded to R2/R3 — T-prefix invisible; vacuous gate ratchet;
+      structural enforcement verified_by gap
+  - path: backend/src/.../ForbiddenTokenScanner.kt
+    role: reference
+    summary: Token scanner with PRECEDING_EXEMPTIONS lookbehind and lookahead (:64-86);
+      text-position-first ordering (:44-52); not pure context-free
+  - path: backend/src/.../GenerateLlmResponseUseCase.kt
+    role: reference
+    summary: LLM response generation — directly injects scanner+fallback (:38-39),
+      bypasses ForbiddenTokenSanitizer; regenerate-then-hard-fallback cascade (:71-89);
+      sole theology-heterodoxy emission path
+  - path: scripts/gates/
+    role: reference
+    summary: Gate configurations for 12 characters (including rahab with 0 scenes);
+      source of truth for roster completeness; no fixed-roster validation test exists
+  - path: scripts/newchar_gates.py
+    role: reference
+    summary: New character gate validation — AXIS_RE (:1075) and g5d (:1133-1163)
+      hardcoded to R2/R3; lint_forbidden_tokens placement rules
+  existing_patterns:
+  - Hexagonal architecture with ports and adapters (SafetyMetricsPort / MicrometerSafetyMetricsAdapter
+    seam already exists)
+  - ContentSafetyGateEnforcementTest ratchet pattern — baseline files freeze known
+    state, tests detect drift not absolute pass
+  - ForbiddenTokenScanner with per-token PRECEDING_EXEMPTIONS regex map for context-sensitive
+    matching
+  - GenerateLlmResponseUseCase regenerate-then-hard-fallback cascade for token violations
+  - Scene YAML safety_gates with id-prefix-based axis routing (R1-R5 mental health,
+    T1 theology)
+  - GoldenSet fixture-driven testing with filename==id invariant and class-based expected-status
+    lookup
+  - Vacuous gate baseline ratchet (vacuous-safety-gates-baseline.txt) to prevent enforcement
+    gaps from growing
+  existing_dependencies:
+  - Spring Boot (Kotlin)
+  - Micrometer (actuator + prometheus, build.gradle.kts:31,56)
+  - Gradle (backend module)
+  - Python 3 (AI sidecar)
+  - JUnit 5 with @EnabledIfEnvironmentVariable conditional execution
+  - ForbiddenTokenScanner/ForbiddenTokenSanitizer (token matching subsystem)
+  - SafetyMetricsPort/MicrometerSafetyMetricsAdapter (metrics seam)
+constraints:
+- Theology blocking invisible to users — same fallback string (application.yml:347)
+  and status code as mental-health axis; no crisis_resources, no shown_resources,
+  no operator telegram page; no axis-specific response fields; crisis fields only
+  on mental-health path as explicit contract
+- Tokens narrow — only empirically validated surface-form phrases of heterodox speech;
+  dead tokens (9 candidates with no golden-set match) excluded; 'wide tokens are loss
+  not safety' (application.yml:165-167)
+- Mental health axis 680 tokens frozen — this change adds theology-axis tokens only
+- Authoring lint and runtime token lists must stay synchronized — ContentSafetyGateEnforcementTest.kt:38-56
+  enforces authoring-subset-of-runtime; lint_forbidden_tokens in scene/scenario yml
+  must mirror runtime additions in same commit
+- No new blocking path — reuse GenerateLlmResponseUseCase.kt:71-89 regenerate then
+  hard-fallback cascade and shared fallback string
+- Direction-of-utterance criterion — God-directed statements pass, user-blaming/promising/minimizing
+  statements blocked; encode via token surface-form specificity not semantic analysis
+- New theology tokens must have zero string overlap with existing R2 gaslighting tokens
+  (application.yml:219-220); overlapping surface forms stay R2-owned, not duplicated
+  to theology axis
+- Fixture IDs in eval/grounding/v1/fixtures/ unchanged — different namespace from
+  scene gate IDs; GoldenSetIntegrityTest.kt:22-31 enforces filename==id and global
+  uniqueness only
+- Token literals must not appear in Prometheus tags or theology-axis WARN logs — /actuator/prometheus
+  is unauthenticated (SecurityConfig.kt:55); use opaque rule_id only
+- L1 system prompt guard (ai/app.py:155-166 _SYSTEM_PREFIX) is preventive only — no
+  AC attached, no enforcement test; enforcement is L2 only
+- No grounding_ref field until ScriptureGroundingValidationTest runs in default CI;
+  no review_policy field — unverifiable claims must not be fixed in schema
+- Single ForbiddenTokenSanitizer bean — no port split, no second bean; axis awareness
+  via nullable axis field on ScanResult; existing consumers source-compatible
+- Four axis predicates (isConstraintAxis, AXIS regex :356, newchar_gates.py AXIS_RE
+  :1075, g5d :1133-1163) must all be widened to T-prefix atomically in same commit
+  as gate authoring — widening one alone leaves silent bypass in the others
+- Existing 6 structural enforcement gates frozen in new baseline — no retroactive
+  verified_by requirement; ratchet not wall per existing convention
+- YAML token list format (folded scalar comma-separated) unchanged — ForbiddenTokenConfigTest.kt:75,83,97
+  asserts Array<String> binding and Korean+space-only content; theology tokens added
+  to same list or separate key preserving these assertions
+- v1 scope only — L3 LLM classifier, golden set expansion beyond 13, multi-stage gate,
+  GROUNDING_EVAL shadow-to-enforce promotion are v2
+- GenerateLlmResponseUseCase bypasses ForbiddenTokenSanitizer (injects scanner+fallback
+  directly :38-39,:69-89) — LLM path is sole theology-heterodoxy source; observability
+  must cover both paths before or alongside counter addition
+- AC limitation explicit — enumerated recall on frozen 13-fixture golden set; synonym
+  rewriting 8/8 undetected per application.yml:181-187; generalization closure is
+  v2 L3 classifier
+acceptance_criteria:
+- description: 'Golden set theology detection — 7/7 heterodox recall and 100% precision
+    (0 false positives on 4 orthodox + 2 structural fixtures) on current 13-fixture
+    golden set with 8 validated L2 tokens; limitation: enumerated recall on frozen
+    fixtures, generalization unverified'
+  semantic_ac_key: ac_3888439e65864862
+  verify_command: cd /Users/lms/lemuel-xr && ./gradlew :backend:test --tests '*GoldenSetTokenLintCrossCheckTest*'
+    --tests '*GoldenSetIntegrityTest*' -q
+  expected_artifacts:
+  - eval/grounding/v1/fixtures/manifest.json
+- description: Theology blocking user-indistinguishable from mental-health blocking
+    — response bytes identical (same fallback string, status code, headers); theology
+    path carries no crisis_resources or shown_resources fields; regression test enforces
+    this invariant
+  semantic_ac_key: ac_c8a12a5a60d97d82
+  verify_command: cd /Users/lms/lemuel-xr && ./gradlew :backend:test --tests '*ContentSafetyGateEnforcementTest*'
+    --tests '*ForbiddenTokenConfigTest*' -q
+- description: Theology gate observable via Micrometer counter content.gate.block
+    with axis and layer dimensions — counter registered at boot (value 0 distinguishable
+    from absent), both LLM generation path (GenerateLlmResponseUseCase) and content
+    sanitization path counted, tags use opaque rule_id only (no token literals)
+  semantic_ac_key: ac_84f89ff3b6e3e602
+  verify_command: cd /Users/lms/lemuel-xr && ./gradlew :backend:test --tests '*SafetyMetrics*'
+    -q
+- description: Theology axis enforcement complete across all 12 gate-configured characters
+    — each declares T1_-prefixed gates or carries explicit exemption with reason string;
+    silence cannot equal pass; structural enforcement gates carry verified_by field
+    pointing to existing test method; meta-test validates reference resolves to real
+    source
+  semantic_ac_key: ac_4f32bdd90c9f9432
+  verify_command: cd /Users/lms/lemuel-xr && ./gradlew :backend:test --tests '*ContentSafetyGateEnforcementTest*'
+    -q
+- description: Theology L2 tests execute unconditionally in default CI — no @EnabledIfEnvironmentVariable
+    gate, no GEMINI_API_KEY or external API key required; distinct from ScriptureGroundingValidationTest
+    which remains gated
+  semantic_ac_key: ac_dd945104dc2b800b
+  verify_command: cd /Users/lms/lemuel-xr && unset GEMINI_API_KEY && ./gradlew :backend:test
+    --tests '*GoldenSet*' --tests '*ForbiddenToken*' -q
+ontology_schema:
+  name: TheologyContentSafetyGate
+  description: Domain model for theology gate v1 enforcement — gate declarations with
+    T1_ axis prefix, L2 forbidden token matching, golden set fixture validation, Micrometer
+    counter observability, and character roster coverage across the existing content
+    safety framework
+  fields:
+  - name: gate_id
+    type: string
+    description: T1_-prefixed gate identifier in scene YAML safety_gates (e.g. T1_no_gnostic_dualism);
+      distinct from R1-R5 mental-health namespace
+    required: true
+  - name: axis
+    type: string
+    description: Safety axis label — theology or mental_health; determines enforcement
+      path, counter tags, and ChatOps routing
+    required: true
+  - name: enforcement_type
+    type: string
+    description: Gate enforcement mode — structural (prose check backed by verified_by)
+      or token_lint (ForbiddenTokenScanner match)
+    required: true
+  - name: verified_by
+    type: string
+    description: Test method identifier backing a structural enforcement gate; meta-test
+      validates this reference resolves to existing source
+    required: true
+  - name: forbidden_token
+    type: string
+    description: Narrow Korean surface-form phrase for L2 substring matching (e.g.
+      갇혀 있는 감옥); must have empirical golden-set evidence
+    required: true
+  - name: fixture_id
+    type: string
+    description: Golden set fixture identifier matching filename in eval/grounding/v1/fixtures/;
+      globally unique per GoldenSetIntegrityTest
+    required: true
+  - name: fixture_class
+    type: string
+    description: Golden set classification — heterodox (should be caught), orthodox
+      (must not be caught), or structural (must not be caught)
+    required: true
+  - name: detection_status
+    type: string
+    description: Token lint cross-check result — CAUGHT_BY_TOKEN_LINT or MISSED_BY_TOKEN_LINT;
+      determined by ForbiddenTokenScanner.scan against fixture meditationText
+    required: true
+  - name: rule_id
+    type: string
+    description: Opaque identifier for Micrometer counter tags and log correlation;
+      never contains token literals due to unauthenticated actuator endpoint
+    required: true
+  - name: exemption_reason
+    type: string
+    description: Stated reason why a character is exempt from T-axis gate declaration;
+      required when T-axis gates are absent — empty string is not valid exemption
+    required: true
+  - name: counter_layer
+    type: string
+    description: Gate layer dimension for content.gate.block counter — L1 (prompt
+      guard) or L2 (token match); enables future L1 contribution measurement
+    required: true
+  - name: character_name
+    type: string
+    description: One of 12 gate-configured characters from scripts/gates/; roster
+      completeness test enumerates this fixed set
+    required: true
+evaluation_principles:
+- name: heterodox_recall
+  description: All 7 heterodox fixtures in the 13-fixture golden set must be detected
+    by L2 token matching; 7/7 is the v1 floor, measured against frozen fixture text
+    only
+  weight: 0.3
+- name: orthodox_precision
+  description: Zero false positives on 4 orthodox and 2 structural fixtures; a false
+    positive blocks legitimate theological content and is as severe as a miss
+  weight: 0.3
+- name: user_indistinguishability
+  description: Theology and mental-health blocking produce byte-identical user-facing
+    responses; any observable difference enables user reverse-engineering of block
+    reason
+  weight: 0.2
+- name: observability_from_zero
+  description: Gate events measurable from registered-at-boot zero baseline on both
+    code paths; counter absence and counter value 0 must be distinguishable
+  weight: 0.1
+- name: enforcement_integrity
+  description: No silent pass-through — new characters cannot skip theology enforcement
+    without explicit exemption; structural declarations must be machine-verifiable
+    via verified_by links
+  weight: 0.1
+exit_conditions:
+- name: golden_set_green
+  description: Golden set token lint cross-check test passes with 7/7 heterodox recall
+    and 0/6 false positives
+  criteria: GoldenSetTokenLintCrossCheckTest and GoldenSetIntegrityTest pass; all
+    heterodox fixtures show CAUGHT_BY_TOKEN_LINT status
+- name: ci_unconditional
+  description: All theology L2 tests execute in default CI without external API keys
+  criteria: Tests pass with GEMINI_API_KEY unset; no @EnabledIfEnvironmentVariable
+    annotation on theology test classes
+- name: enforcement_complete
+  description: All 12 gate-configured characters covered by T-axis declaration or
+    explicit exemption; four axis predicates recognize T-prefix
+  criteria: Roster completeness test passes; isConstraintAxis, AXIS regex, AXIS_RE,
+    and g5d all match T1_ identifiers
+- name: counter_registered
+  description: content.gate.block counter queryable at boot with axis and layer dimensions
+  criteria: Counter with axis=theology appears in actuator/prometheus output at application
+    startup with value 0
+metadata:
+  seed_id: seed_ed857e2429f0
+  version: 1.0.0
+  created_at: '2026-08-15T18:12:41.482645Z'
+  ambiguity_score: 0.089
+  interview_id: interview_20260815_171502
+  parent_seed_id: null
+  generation_mode: normal
+  degraded: false
+  unresolved_slots: []
+  recovery_reason: null
