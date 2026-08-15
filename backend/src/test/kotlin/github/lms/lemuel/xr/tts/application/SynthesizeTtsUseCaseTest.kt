@@ -372,21 +372,39 @@ class SynthesizeTtsUseCaseTest {
         assertThat((r as SynthesizeTtsUseCase.Submission.Pending).jobId).isNotEqualTo(legacyKey)
     }
 
+    /**
+     * 이 테스트는 원래 `en 캐시는 한국어 발음 전처리에 휘말려 무효화되지 않는다` 였다.
+     * 그때는 세대 표식이 ko 에만 있었고(`{ko: g2p2}`), en 키에는 접두가 아예 없었다.
+     *
+     * 2026-08-15 엔진을 XTTS-v2 에서 Gemini 로 바꾸면서 `en` 에도 세대를 붙였다 — 발음
+     * 전처리가 아니라 **엔진**이 바뀌었으니 XTTS 가 구운 영어 오디오도 전부 옛 소리다.
+     * 그래서 옛 단언(en 은 Ready)은 더 이상 맞지 않는다. 다만 그때 지키려던 성질 자체는
+     * 그대로 살아 있어야 한다 — **세대는 언어별로 독립이다.** 한 언어를 올렸다고 다른
+     * 언어까지 휩쓸리면 안 구워도 될 오디오를 다시 굽는다. 그걸 여기서 계속 지킨다.
+     */
     @Test
-    fun `en 캐시는 한국어 발음 전처리에 휘말려 무효화되지 않는다`() {
-        val enKey = sha256("en|David|v|1.0")
+    fun `세대 표식은 언어별로 독립이다 — en 조회는 en 세대 키를 쓴다`() {
+        val enKey = sha256("gem1|en|David|v|1.0")
         whenever(cache.findById(any())).thenReturn(Optional.empty())
         whenever(cache.findById(enKey)).thenReturn(
             Optional.of(
                 TtsCache.pendingEntry(enKey, "v", LocalDateTime.now())
-                    .completed("xtts-v2", "data:audio/wav;base64,AAAA", 1500),
+                    .completed("gemini-3.1-flash-tts-preview", "data:audio/wav;base64,AAAA", 1500),
             ),
         )
 
         val r = uc.submit("David", "v", 1.0, "en")
 
-        // ko 만 바뀌었는데 en 까지 다시 구우면 CPU 를 헛되이 태운다(한 문장당 수십 초).
+        // en 세대 키로 구워 둔 행이 히트해야 한다. 여기서 Pending 이 나오면 en 조회가
+        // 제 언어의 세대가 아닌 다른 값(ko 세대·빈 접두)을 쓰고 있다는 뜻이다.
         assertThat(r).isInstanceOf(SynthesizeTtsUseCase.Submission.Ready::class.java)
+
+        // 같은 문장·같은 화자라도 언어가 다르면 키가 달라야 한다. 이게 깨지면 en 요청이
+        // ko 오디오를 캐시 히트로 받아간다 — 소리로만 드러나는 고장이다.
+        whenever(cache.findById(any())).thenReturn(Optional.empty())
+        whenever(queue.submit(any(), any())).thenReturn(true)
+        val ko = uc.submit("David", "v", 1.0, "ko")
+        assertThat((ko as SynthesizeTtsUseCase.Submission.Pending).jobId).isNotEqualTo(enKey)
     }
 
     private fun sha256(s: String): String = java.util.HexFormat.of().formatHex(

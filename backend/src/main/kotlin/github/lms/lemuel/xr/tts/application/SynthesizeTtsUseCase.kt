@@ -204,10 +204,20 @@ class SynthesizeTtsUseCase(
          * 덩어리가 된다(코퍼스 실측 8 회 → 200 회). 사용자가 `/moses` 에서 "알 수 없는 소리에
          * 잡음"이라고 들은 자리가 그 덩어리들이다. 자세한 근거는 `tts/korean_g2p.py` docstring.
          *
-         * 값을 올리면 그 언어의 캐시가 통째로 무효가 되고 다시 구워진다(한 문장당 CPU 수십 초).
+         * `gem1` = **엔진을 XTTS-v2 에서 Gemini TTS 로 바꾼** 세대(2026-08-15). 위 g2p1·g2p2 는
+         * 둘 다 오진이었다 — 전처리를 아예 하지 않은 원문도 똑같이 잡음이 났다. 154 자 문장이
+         * 정상 낭독이면 ~28 초인데 XTTS 는 입력을 어떻게 바꾸든 47~51 초를 뱉었다. 글에 없는
+         * 소리를 계속 만드는 runaway 였고, 전처리로 고칠 수 있는 종류가 아니었다.
+         * 그래서 `ko` 뿐 아니라 **`en` 도 같이 올린다** — 엔진이 바뀌었으니 XTTS 가 구운 영어
+         * 오디오도 전부 옛 소리다. 앞선 두 세대가 ko 만 건드린 것과 다른 점이다.
+         * (`korean_g2p.py` 는 이 커밋 계열에서 삭제됐다. 발음 전처리 자체가 없다.)
+         *
+         * 값을 올리면 그 언어의 캐시가 통째로 무효가 되고 다시 구워진다. 재생성 비용은 엔진
+         * 교체로 크게 줄었다 — XTTS 는 오디오 1 초당 CPU 4 초 남짓이었고, Gemini 는 80 자
+         * 문장이 왕복 14 초다(2026-08-15 파드 실측).
          * 소리가 안 변하는 변경(로그·리팩터링)에는 올리지 않는다.
          */
-        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "g2p2")
+        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "gem1", "en" to "gem1")
     }
 
     /** POST /api/tts/synthesize 의 결과. */
