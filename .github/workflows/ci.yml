@@ -227,11 +227,17 @@ jobs:
 
       # 이 잡의 나머지 스텝은 전부 `github.ref == main` 조건이 붙어 있다. 즉 PR 에서
       # tts/ 를 고치면 잡은 초록불로 끝나지만 **실행된 검사는 0건**이다(빌드 타임 self-test 는
-      # 이미지 빌드 안에 있고, 그 빌드는 main 에서만 돈다). 발음 규칙표는 표준 라이브러리만
-      # 쓰므로 PR 에서도 몇 초면 돌릴 수 있다 — 여기 하나는 조건 없이 둔다.
-      - name: Unit tests (no model, runs on PRs too)
+      # 이미지 빌드 안에 있고, 그 빌드는 main 에서만 돈다). 그래서 여기 하나는 조건 없이 둔다.
+      #
+      # 2026-08-15: 여기가 `unittest discover -p 'test_*.py'` 였다. 엔진을 바꾸며 발음 규칙표
+      # 테스트가 사라지자 **매칭되는 파일이 하나도 없어 0건을 실행하고 초록불**이 됐다 —
+      # 위 주석이 경고한 상태가 조용히 되살아난 것이다. discover 대신 파일을 직접 지목한다.
+      # selftest.py 는 --live 없이는 네트워크를 타지 않으므로 PR 에서 몇 초면 끝난다.
+      - name: Self-test (no network, runs on PRs too)
         working-directory: tts
-        run: python -m unittest discover -p 'test_*.py' -v
+        run: |
+          pip install --quiet -r requirements.txt
+          python selftest.py
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
