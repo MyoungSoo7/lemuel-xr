@@ -537,7 +537,7 @@ def check(target: Path, git_name: str | None = None) -> int:
                 if Path(__file__).name in mp.read_text(encoding="utf-8"):
                     blk("t-mut", f"{name}:{i} {path} 는 이 도구 자신의 돌연변이"
                                  f" 러너다 — 자기가 자기를 돌리지 않는다(DP-R18)."
-                                 f" 사람이 따로 돌려 이 칸과 맞출 것")
+                                 f" 이 칸과의 대조는 러너 자신이 한다(CI mutation-gate)")
                     continue
                 rc, out = run(f"python3 {path}")
                 om = MUT_OUT.search(out)
