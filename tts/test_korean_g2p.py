@@ -17,7 +17,6 @@ CASES = [
     ("웃음", "우슴", "연음"),
     ("닭이", "달기", "겹받침 연음"),
     ("젊음", "절믐", "겹받침 연음"),
-    ("값이", "갑씨", "겹받침 연음 + 경음화"),
     # ㅎ (12항)
     ("않은", "아는", "ㅎ 탈락 + 연음"),
     ("싫어", "시러", "ㅎ 탈락 + 연음"),
@@ -51,16 +50,26 @@ CASES = [
     ("신라", "실라", "유음화"),
     ("실내", "실래", "유음화"),
     ("칼날", "칼랄", "유음화"),
-    # 경음화(23항)
-    ("먹다", "먹따", "경음화"),
-    ("학교", "학꾜", "경음화"),
-    ("십분", "십뿐", "경음화"),
-    ("있습니다", "읻씀니다", "대표음 + 경음화 + 비음화"),
-    ("밟다", "밥따", "자음군 예외(밟-) + 경음화"),
+    ("있습니다", "읻슴니다", "대표음 + 비음화"),
+    ("밟다", "밥다", "자음군 예외(밟-)"),
     # 문장 — 실제 내레이션 형태
     ("걸음도 멈추지 않은 것이", "거름도 멈추지 아는 거시", "문장"),
-    ("홍해가 갈라졌다", "홍해가 갈라젿따", "문장"),
+    ("홍해가 갈라졌다", "홍해가 갈라젿다", "문장"),
     ("사랑과 소망과 믿음", "사랑과 소망과 미듬", "문장"),
+]
+
+# 경음화(23항)는 **일부러** 적용하지 않는다. 이유는 korean_g2p 모듈 docstring 참조 —
+# 정서법이 절대 적지 않는 규칙이라, 발음형으로 적으면 XTTS 학습 분포 밖의 자음 덩어리
+# (jinadtta·gadkko 류)가 생긴다. 실측 8 회 → 200 회.
+#
+# 이 표가 있는 이유: 규칙표만 보면 "경음화가 빠졌네" 하고 되돌리기 쉽다. 되돌리면
+# 여기가 깨져서, 그게 실수가 아니라 결정이었다는 걸 알린다.
+NOT_APPLIED = [
+    ("먹다", "먹다", "경음화 — [먹따] 로 적지 않는다"),
+    ("학교", "학교", "경음화 — [학꾜] 로 적지 않는다"),
+    ("십분", "십분", "경음화 — [십뿐] 로 적지 않는다"),
+    ("값이", "갑시", "겹받침 연음은 하되 뒤따르는 경음화는 하지 않는다([갑씨] 아님)"),
+    ("시작된다", "시작된다", "경음화 — [시작뙨다] 로 적지 않는다"),
 ]
 
 # 바뀌면 안 되는 것들. 여기 있는 문자열이 바뀌면 규칙이 자기 영역 밖으로 샌 것이다.
@@ -73,11 +82,48 @@ UNCHANGED = [
 ]
 
 
+def _tense_after_plosive(text: str):
+    """평파열음 받침(ㄱㄷㅂ) 바로 뒤에 된소리(ㄲㄸㅃㅆㅉ)가 오는 자리를 모두 찾는다.
+
+    로마자화하면 dtt·dkk·dpp·dss 같은 덩어리가 되는 조합이다. 철자를 로마자화해서는
+    나올 수 없는 문자열이라, 여기 걸리는 게 있으면 XTTS 입장에서 학습 분포 밖이다.
+    """
+    from korean_g2p import _decompose
+
+    found = []
+    syls = [_decompose(ch) for ch in text]
+    for left, right in zip(syls, syls[1:]):
+        if left is None or right is None:
+            continue
+        if left.jong in ("ㄱ", "ㄷ", "ㅂ") and right.cho in ("ㄲ", "ㄸ", "ㅃ", "ㅆ", "ㅉ"):
+            found.append(left.compose() + right.compose())
+    return found
+
+
 class KoreanG2PTest(unittest.TestCase):
     def test_발음_규칙표(self):
         for text, expected, rule in CASES:
             with self.subTest(rule=rule, text=text):
                 self.assertEqual(to_spoken(text), expected)
+
+    def test_경음화는_적용하지_않는다(self):
+        for text, expected, why in NOT_APPLIED:
+            with self.subTest(why=why, text=text):
+                self.assertEqual(to_spoken(text), expected)
+
+    def test_출력에_된소리_자음_덩어리가_생기지_않는다(self):
+        """XTTS 가 실제로 받는 문자열의 성질을 직접 잰다.
+
+        위 표는 낱말 단위라 "규칙이 맞나"만 본다. 여기서 재는 것은 **분포 안에 있나** 다 —
+        평파열음 받침 뒤에 된소리가 오는 조합은 로마자화되면 dtt/dkk/dpp/dss 가 되고,
+        그건 철자를 로마자화해서는 나올 수 없는 문자열이다(모듈 docstring 실측표).
+        """
+        sample = (
+            "미디안 광야. 해가 진다. 애굽에서 도망친 지 40년이 지났다. "
+            "왕자였던 기억도, 시간이 덮었다. 오늘도 어제와 같고, 내일도 어제와 같을 것이다."
+        )
+        out = to_spoken(sample)
+        self.assertEqual(_tense_after_plosive(out), [], f"입력: {sample!r} / 출력: {out!r}")
 
     def test_건드리면_안_되는_입력은_한_글자도_안_바뀐다(self):
         for text, why in UNCHANGED:

@@ -199,10 +199,15 @@ class SynthesizeTtsUseCase(
          * `g2p1` = 한국어를 철자가 아니라 발음대로 XTTS 에 넘기기 시작한 세대. 그 이전에 구워진
          * 한국어 오디오는 "외국인이 철자대로 읽는" 소리라 재사용하면 안 된다.
          *
+         * `g2p2` = 그 발음형에서 **경음화를 뺀** 세대(2026-08-15). g2p1 은 `지났다`를 `지낟따`로
+         * 적어 넘겼는데, 로마자화하면 `jinadtta` 처럼 철자를 로마자화해서는 나올 수 없는 자음
+         * 덩어리가 된다(코퍼스 실측 8 회 → 200 회). 사용자가 `/moses` 에서 "알 수 없는 소리에
+         * 잡음"이라고 들은 자리가 그 덩어리들이다. 자세한 근거는 `tts/korean_g2p.py` docstring.
+         *
          * 값을 올리면 그 언어의 캐시가 통째로 무효가 되고 다시 구워진다(한 문장당 CPU 수십 초).
          * 소리가 안 변하는 변경(로그·리팩터링)에는 올리지 않는다.
          */
-        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "g2p1")
+        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "g2p2")
     }
 
     /** POST /api/tts/synthesize 의 결과. */
