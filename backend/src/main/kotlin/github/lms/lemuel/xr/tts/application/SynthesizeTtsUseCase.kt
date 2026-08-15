@@ -212,12 +212,20 @@ class SynthesizeTtsUseCase(
          * 오디오도 전부 옛 소리다. 앞선 두 세대가 ko 만 건드린 것과 다른 점이다.
          * (`korean_g2p.py` 는 이 커밋 계열에서 삭제됐다. 발음 전처리 자체가 없다.)
          *
+         * `gem2` = **오디오를 무압축 WAV 가 아니라 48kbps MP3 로 굽는** 세대(2026-08-15).
+         * 소리 자체는 같은 엔진·같은 목소리라 바뀌지 않는다 — 그런데도 세대를 올리는 이유는
+         * 이 값이 *들리는 소리* 가 아니라 **캐시 행에 든 바이트** 를 가르는 표지이기 때문이다.
+         * `audio_url` 에는 오디오가 base64 로 통째로 들어 있고(TtsCacheJpaEntity), 옛 행은
+         * `data:audio/wav` 다. 올리지 않으면 전부 히트해서 사용자는 영원히 옛 WAV 를 받는다 —
+         * 즉 이 변경이 배포돼도 아무 효과가 없다. 실측 비교: 51.5 초짜리 한 문장이
+         * base64 3.30MB(WAV) 대 0.41MB(MP3), 8 배다.
+         *
          * 값을 올리면 그 언어의 캐시가 통째로 무효가 되고 다시 구워진다. 재생성 비용은 엔진
          * 교체로 크게 줄었다 — XTTS 는 오디오 1 초당 CPU 4 초 남짓이었고, Gemini 는 80 자
-         * 문장이 왕복 14 초다(2026-08-15 파드 실측).
+         * 문장이 왕복 14 초다(2026-08-15 파드 실측). 전 문장 프리웜은 93 건에 36 분이었다.
          * 소리가 안 변하는 변경(로그·리팩터링)에는 올리지 않는다.
          */
-        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "gem1", "en" to "gem1")
+        private val AUDIO_GENERATION: Map<String, String> = mapOf("ko" to "gem2", "en" to "gem2")
     }
 
     /** POST /api/tts/synthesize 의 결과. */

@@ -5,8 +5,12 @@ Lemuel XR — TTS service (Gemini TTS).
   GET  /healthz
   POST /synthesize  { text, voiceId, speakingRate, language } -> { audioUrl, durationMs, engine, language }
 
-audioUrl 은 `data:audio/wav;base64,...` 인라인 URL (사이드카 ClusterIP → 브라우저 직접 접근
+audioUrl 은 `data:audio/mpeg;base64,...` 인라인 URL (사이드카 ClusterIP → 브라우저 직접 접근
 불가하므로 R2 없이 자족적으로 재생 가능).
+
+**인라인이라 오디오 크기가 곧 전송량이다.** base64 가 33% 를 더 붙이므로 무압축 WAV 를
+그대로 실으면 51.5초짜리가 3.30MB 다(프로덕션 최장 행 실측). 그래서 48kbps CBR MP3 로
+구워서 싣는다 — 같은 오디오가 0.41MB, 8배 차이다. 자세한 근거는 [_encode_mp3].
 
 ## 왜 XTTS-v2 를 버렸는가 (2026-08-15)
 
@@ -40,11 +44,12 @@ import base64
 import hashlib
 import json
 import os
+import shutil
 import struct
+import subprocess
 import time
 import urllib.error
 import urllib.request
-import wave
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -101,6 +106,15 @@ TIMEOUT_S = float(os.getenv("GEMINI_TIMEOUT_SECONDS", "180"))
 
 MAX_ATTEMPTS = int(os.getenv("GEMINI_MAX_ATTEMPTS", "3"))
 
+# MP3 인코딩 — 근거는 [_encode_mp3] docstring 참조.
+LAME_BIN = os.getenv("LAME_BIN", "lame")
+MP3_BITRATE_KBPS = int(os.getenv("MP3_BITRATE_KBPS", "48"))
+
+if shutil.which(LAME_BIN) is None:
+    # API 키와 같은 이유로 기동 시 죽인다. 인코더가 없으면 /healthz 는 초록불인데
+    # 합성 요청만 전부 502 가 되는, 가장 알아채기 어려운 상태가 된다.
+    raise RuntimeError(f"{LAME_BIN!r} 을 찾을 수 없다 — 이 사이드카는 mp3 인코더 없이는 못 굽는다")
+
 
 def _rate_from_mime(mime: str) -> int:
     """`audio/L16;codec=pcm;rate=24000` / `audio/l16; rate=24000; channels=1` 둘 다 받는다."""
@@ -113,12 +127,44 @@ def _rate_from_mime(mime: str) -> int:
 
 
 def _pcm_to_wav(pcm: bytes, rate: int, path: str) -> None:
-    """16-bit mono PCM 에 WAV 헤더를 붙인다. 백엔드·브라우저 모두 RIFF 를 기대한다."""
+    """16-bit mono PCM 에 WAV 헤더를 붙인다. lame 에 먹이는 중간 산물이다."""
     with open(path, "wb") as f:
         f.write(b"RIFF" + struct.pack("<I", 36 + len(pcm)) + b"WAVEfmt ")
         f.write(struct.pack("<IHHIIHH", 16, 1, 1, rate, rate * 2, 2, 16))
         f.write(b"data" + struct.pack("<I", len(pcm)))
         f.write(pcm)
+
+
+def _encode_mp3(pcm: bytes, rate: int, path: str) -> None:
+    """PCM 을 MP3(CBR mono)로 인코딩한다.
+
+    나레이션은 `data:` URL 로 **본문에 통째로 실려** 브라우저까지 간다. base64 가 33% 를
+    더 붙이므로 무압축 WAV 는 그대로 전송량이 된다 — 프로덕션 최장 행 실측으로
+    51.5초짜리가 base64 3.30MB 였다. 같은 오디오가 48kbps MP3 로는 0.41MB 다(8배).
+
+    비트레이트를 48k 로 둔 이유: 32k 면 11배까지 줄지만 24kHz 사람 목소리에서 아티팩트가
+    들리기 시작하는 지점이다. 이 프로젝트는 XTTS 를 *소리 품질 때문에* 버렸다 — 여기서
+    다시 소리를 깎아 되돌아갈 이유가 없다. 8배면 충분하다.
+
+    `-t` 는 LAME/Xing 태그 프레임을 안 쓰게 한다. 그 프레임이 있으면 [_duration_ms] 가
+    파일 크기로 재는 길이가 한 프레임(24ms) 만큼 더 길게 나온다.
+    """
+    tmp_wav = f"{path}.tmp.wav"
+    try:
+        _pcm_to_wav(pcm, rate, tmp_wav)
+        proc = subprocess.run(
+            [LAME_BIN, "--quiet", "-t", "--cbr", "-m", "m", "-b", str(MP3_BITRATE_KBPS),
+             tmp_wav, path],
+            capture_output=True, text=True,
+        )
+        if proc.returncode != 0:
+            # 여기서 조용히 넘어가면 0바이트 파일이 캐시에 남고, 다음 요청이 그걸 히트해
+            # "재생은 되는데 소리가 없는" 상태가 된다. 실패는 실패로 올린다.
+            raise RuntimeError(
+                f"mp3 인코딩 실패 (lame rc={proc.returncode}): {proc.stderr.strip()[:300]}"
+            )
+    finally:
+        Path(tmp_wav).unlink(missing_ok=True)
 
 
 def _call_gemini(text: str, voice: str) -> tuple[bytes, int]:
@@ -193,10 +239,11 @@ def synthesize_to_file(
         raise ValueError(f"unsupported language: {lang!r} (지원: {', '.join(SUPPORTED_LANGS)})")
     voice = VOICE_MAP.get(voice_id) or DEFAULT_VOICE
     pcm, sample_rate = _call_gemini(text, voice)
-    _pcm_to_wav(pcm, sample_rate, out_path)
+    _encode_mp3(pcm, sample_rate, out_path)
     print(
         f"[lemuel-xr-tts] synthesized model={MODEL} voice={voice} lang={lang} "
-        f"chars={len(text)} pcm={len(pcm)}B rate={sample_rate}",
+        f"chars={len(text)} pcm={len(pcm)}B rate={sample_rate} "
+        f"mp3={Path(out_path).stat().st_size}B",
         flush=True,
     )
 
@@ -224,17 +271,33 @@ def _cache_key(text: str, voice_id: str, lang: str) -> str:
     2026-08-15: 키 재료에서 발음형 변환이 빠졌다(엔진 교체로 전처리 자체가 사라졌다).
     그래서 **같은 문장의 키가 예전과 달라진다** — 옛 wav 는 자연히 미아가 되고 다시 구워진다.
     백엔드 캐시도 같이 무효화해야 소리가 실제로 바뀐다: SynthesizeTtsUseCase.AUDIO_GENERATION.
+
+    확장자만 `.mp3` 로 바뀌었고 해시 재료는 그대로다. 여기 캐시는 emptyDir 이라 확장자
+    변경으로 옛 파일이 미아가 되는 것은 실질적 손해가 없다 — 영속 캐시는 백엔드 쪽이다.
     """
     prefix = "" if lang == LEGACY_KEY_LANG else f"{lang}::"
-    return hashlib.sha256(f"{prefix}{voice_id}::{text}".encode("utf-8")).hexdigest() + ".wav"
+    return hashlib.sha256(f"{prefix}{voice_id}::{text}".encode("utf-8")).hexdigest() + ".mp3"
 
 
-def _duration_ms(path: Path) -> int:
+def _duration_ms(path: Path | str) -> int:
+    """CBR MP3 의 길이를 파일 크기로 잰다.
+
+    프레임 헤더를 걷지 않는 이유는, [_encode_mp3] 가 CBR 로 굽고 `-t` 로 Xing 태그
+    프레임까지 없앴기 때문이다 — 그러면 파일은 같은 크기의 프레임만 늘어선 것이라
+    `bytes * 8 / bitrate` 가 곧 길이다.
+
+    **약 +56ms 만큼 길게 나온다** (실측: 1000ms 입력 -> 1056ms, 51520ms -> 51576ms).
+    입력 길이와 무관한 고정 편차이고, 정체는 lame 의 인코더 지연(1152 샘플 = 48ms)이
+    프레임 경계(24ms)로 올림된 것이다. 빼서 보정하지 않는 이유는, 그 값이 인코더 구현
+    세부라 lame 판이 바뀌면 보정식이 조용히 틀려지기 때문이다 — 재지 않은 상수를 빼는
+    것보다 잰 편차를 적어 두는 편이 정직하다.
+
+    애초에 이 값은 계약상 돌려주는 메타데이터일 뿐 재생 동작에 쓰이지 않는다(프론트는
+    `durationMs` 를 타입으로만 들고 다닌다). 56ms 를 위해 프레임 파서를 들일 값어치가 없다.
+    """
     try:
-        with wave.open(str(path), "rb") as w:
-            rate = w.getframerate() or 1
-            return int(w.getnframes() * 1000 / rate)
-    except Exception:  # noqa: BLE001
+        return int(os.path.getsize(path) * 8 * 1000 / (MP3_BITRATE_KBPS * 1000))
+    except OSError:
         return 0
 
 
@@ -273,7 +336,7 @@ def synthesize(req: SynthesizeRequest):
 
     audio_b64 = base64.b64encode(fpath.read_bytes()).decode("ascii")
     return {
-        "audioUrl": f"data:audio/wav;base64,{audio_b64}",
+        "audioUrl": f"data:audio/mpeg;base64,{audio_b64}",
         "durationMs": _duration_ms(fpath),
         "engine": MODEL,
         # 어떤 언어로 구웠는지 돌려준다. 다만 Gemini 는 언어를 본문에서 스스로 판단하므로

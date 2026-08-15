@@ -247,9 +247,13 @@ jobs:
       # 테스트가 사라지자 **매칭되는 파일이 하나도 없어 0건을 실행하고 초록불**이 됐다 —
       # 위 주석이 경고한 상태가 조용히 되살아난 것이다. discover 대신 파일을 직접 지목한다.
       # selftest.py 는 --live 없이는 네트워크를 타지 않으므로 PR 에서 몇 초면 끝난다.
+      # lame 은 이미지에는 Dockerfile 이 넣지만, 이 스텝은 러너에서 맨몸으로 돈다.
+      # app.py 가 import 시점에 lame 존재를 확인하고 없으면 죽으므로(의도된 fail-fast),
+      # 여기서도 깔아 주지 않으면 selftest 가 단 한 줄도 못 돌고 import 에서 끝난다.
       - name: Self-test (no network, runs on PRs too)
         working-directory: tts
         run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends lame
           pip install --quiet -r requirements.txt
           python selftest.py
 
@@ -264,12 +268,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build + push tts image
-        if: github.ref == 'refs/heads/main'
+      # PR 에서도 **빌드는 한다**(푸시만 main 전용). 위 러너 self-test 는 lame 을 러너에
+      # 따로 깔고 도는 것이라, Dockerfile 에서 lame 이 빠져도 초록불이다. 그 경우 파드는
+      # 뜨고 /healthz 도 초록불인데 합성 요청만 전부 실패한다 — 이미지를 실제로 빌드해야만
+      # (Dockerfile 의 `RUN python selftest.py` 가) 그걸 잡는다.
+      - name: Build tts image (push only on main)
         uses: docker/build-push-action@v6
         with:
           context: tts
-          push: true
+          push: ${{ github.ref == 'refs/heads/main' }}
           tags: |
             ghcr.io/myoungsoo7/lemuel-xr-tts:main-${{ github.sha }}
             ghcr.io/myoungsoo7/lemuel-xr-tts:latest

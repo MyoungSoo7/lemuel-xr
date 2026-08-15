@@ -29,30 +29,62 @@ import app  # noqa: E402
 
 LIVE = "--live" in sys.argv
 
-# ── 1. PCM -> WAV 헤더 ────────────────────────────────────────────────────────
-# Gemini 는 헤더 없는 raw PCM 을 준다. 헤더를 잘못 붙이면 "요청은 200 인데 브라우저에서
-# 재생이 안 되는" 상태가 되고, 그건 로그에 아무 흔적도 남기지 않는다.
+# ── 1a. PCM -> WAV 헤더 ───────────────────────────────────────────────────────
+# Gemini 는 헤더 없는 raw PCM 을 준다. WAV 는 이제 브라우저까지 가지 않고 lame 에 먹이는
+# 중간 산물이지만, 헤더가 틀리면 lame 이 거부하거나 엉뚱한 레이트로 굽는다.
 pcm = b"\x00\x01" * 24000  # 1초치 16-bit mono
-out = os.path.join(tempfile.gettempdir(), "selftest.wav")
-app._pcm_to_wav(pcm, 24000, out)
+wav_out = os.path.join(tempfile.gettempdir(), "selftest.wav")
+app._pcm_to_wav(pcm, 24000, wav_out)
 
-with open(out, "rb") as f:
+with open(wav_out, "rb") as f:
     head = f.read(12)
 assert head[:4] == b"RIFF" and head[8:12] == b"WAVE", f"[selftest] not a WAV: {head!r}"
 
-with wave.open(out, "rb") as w:
+with wave.open(wav_out, "rb") as w:
     assert w.getnchannels() == 1, f"[selftest] channels={w.getnchannels()} (mono 여야 한다)"
     assert w.getsampwidth() == 2, f"[selftest] sampwidth={w.getsampwidth()} (16-bit 여야 한다)"
     assert w.getframerate() == 24000, f"[selftest] rate={w.getframerate()}"
     assert w.getnframes() == 24000, f"[selftest] frames={w.getnframes()}"
 
-# 헤더에 적은 길이와 실제 파일 크기가 어긋나면 일부 플레이어가 뒤를 잘라 먹는다.
-size = os.path.getsize(out)
-with open(out, "rb") as f:
+# 헤더에 적은 길이와 실제 파일 크기가 어긋나면 lame 이 뒤를 잘라 먹는다.
+wav_size = os.path.getsize(wav_out)
+with open(wav_out, "rb") as f:
     riff = struct.unpack("<I", f.read(8)[4:])[0]
-assert riff == size - 8, f"[selftest] RIFF 길이 {riff} != 파일 {size}-8"
-assert app._duration_ms(out) == 1000, f"[selftest] duration={app._duration_ms(out)}ms (1000 이어야)"
-print(f"[selftest] wav header OK — {size} bytes, 1000ms", flush=True)
+assert riff == wav_size - 8, f"[selftest] RIFF 길이 {riff} != 파일 {wav_size}-8"
+print(f"[selftest] wav header OK — {wav_size} bytes", flush=True)
+
+# ── 1b. PCM -> MP3 ────────────────────────────────────────────────────────────
+# 여기가 이 selftest 의 값어치가 가장 큰 자리다. **lame 이 이미지에 실제로 들어 있는지를
+# 빌드에서 증명한다.** 없으면 파드는 뜨고 /healthz 도 초록불인데 합성 요청만 전부
+# 실패한다 — app 이 기동 시 죽도록 해 뒀지만, 그건 배포까지 가서야 드러난다.
+mp3_out = os.path.join(tempfile.gettempdir(), "selftest.mp3")
+app._encode_mp3(pcm, 24000, mp3_out)
+
+mp3_size = os.path.getsize(mp3_out)
+assert mp3_size > 0, "[selftest] mp3 가 비었다"
+
+with open(mp3_out, "rb") as f:
+    sync = f.read(2)
+# ID3 태그가 붙으면 `bytes*8/bitrate` 길이 계산이 그만큼 어긋난다. `-t` 가 먹었는지 본다.
+assert sync[0] == 0xFF and (sync[1] & 0xE0) == 0xE0, (
+    f"[selftest] mp3 첫 바이트가 프레임 sync 가 아니다: {sync!r} (ID3 태그가 붙었나?)"
+)
+
+# 1초를 넣었으니 1초 근처가 나와야 한다. 정확히 1000 은 아니다 — lame 의 인코더 지연
+# 1152 샘플이 프레임 경계로 올림돼 약 +56ms 가 붙는다([app._duration_ms] 참조).
+# 범위를 넓게 잡은 것은 lame 판이 바뀌어도 이 검사가 깨지지 않게 하려는 것이고,
+# 진짜로 잡으려는 것은 "레이트를 잘못 줘서 길이가 2배/절반이 되는" 종류의 고장이다.
+ms = app._duration_ms(mp3_out)
+assert 950 <= ms <= 1150, f"[selftest] mp3 duration={ms}ms (1초 입력인데 범위를 벗어났다)"
+
+# 줄이려고 하는 일이므로, 실제로 줄었는지도 잰다. 8배는 프로덕션 실측 비율이다.
+assert mp3_size * 5 < wav_size, (
+    f"[selftest] mp3 {mp3_size}B 가 wav {wav_size}B 대비 충분히 줄지 않았다 — CBR 설정 확인"
+)
+
+# 중간 산물을 남기면 emptyDir 이 두 배로 찬다.
+assert not os.path.exists(f"{mp3_out}.tmp.wav"), "[selftest] 중간 wav 가 지워지지 않았다"
+print(f"[selftest] mp3 OK — {wav_size} -> {mp3_size} bytes, {ms}ms", flush=True)
 
 # ── 2. mimeType 파싱 ──────────────────────────────────────────────────────────
 # 모델마다 꼬리가 다르다. 실제로 2.5 는 `rate=24000`, 3.1 은 `rate=24000; channels=1` 을 준다
@@ -97,7 +129,7 @@ print(f"[selftest] voice_map={app.VOICE_MAP} model={app.MODEL} OK", flush=True)
 
 # ── 5. 지원하지 않는 언어는 합성 경로에 들어가지 못한다 ───────────────────────
 try:
-    app.synthesize_to_file("hola", "narrator-male-low", 1.0, "/tmp/x.wav", "es")
+    app.synthesize_to_file("hola", "narrator-male-low", 1.0, "/tmp/x.mp3", "es")
 except ValueError:
     pass
 else:  # pragma: no cover
@@ -117,7 +149,7 @@ missing = [l for l in app.SUPPORTED_LANGS if l not in SAMPLES]
 assert not missing, f"[selftest] 검사 문장이 없는 언어: {missing}"
 
 for lang in app.SUPPORTED_LANGS:
-    path = os.path.join(tempfile.gettempdir(), f"selftest-{lang}.wav")
+    path = os.path.join(tempfile.gettempdir(), f"selftest-{lang}.mp3")
     app.synthesize_to_file(SAMPLES[lang], "narrator-male-low", 1.0, path, lang)
     ms = app._duration_ms(path)
     assert ms > 500, f"[selftest][{lang}] 너무 짧다: {ms}ms"
