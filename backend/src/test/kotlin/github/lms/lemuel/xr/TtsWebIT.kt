@@ -85,6 +85,39 @@ class TtsWebIT : IntegrationTestBase() {
         return Assertions.fail("job $jobId 가 ${POLL_TIMEOUT_MS}ms 안에 안 끝남 — 마지막 응답: $last")
     }
 
+    /**
+     * 2026-08-15 프로덕션 사고의 회귀 테스트.
+     *
+     * 엔진을 Gemini 로 바꾸자 사이드카가 돌려주는 engine 값이 `xtts-v2`(7자)에서
+     * `gemini-3.1-flash-tts-preview`(28자)가 됐는데, `tts_cache.engine` 이
+     * `VARCHAR(20)` 이라 **저장이 통째로 터졌다**(`value too long for type character
+     * varying(20)`). 사이드카는 200 으로 오디오를 잘 만들어 돌려주는데 백엔드가 그걸
+     * 못 써서 매번 FAILED — 사용자에게는 "나레이션이 그냥 안 나온다"로만 보였다.
+     *
+     * 기존 테스트가 이걸 놓친 이유는 하나다. **목이 짧은 이름을 돌려주고 있었다.**
+     * 컬럼 폭은 진짜 DB 에 써봐야만 드러나므로(Flyway + Postgres 컨테이너가 도는
+     * 이 IT 가 그 자리다), 여기서는 실제 모델 이름을 그대로 쓴다.
+     */
+    @Test
+    fun `벤더 모델 이름처럼 긴 engine 값도 저장된다`() {
+        val longEngine = "gemini-3.1-flash-tts-preview" // 28자 — 옛 VARCHAR(20) 을 넘긴다
+        whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))
+            .thenReturn(
+                TtsSynthesisPort.SynthesisResult("https://r2/audio/gem.wav", 17000, longEngine),
+            )
+
+        val text = "긴 엔진 이름 " + System.nanoTime()
+        val res = authed().post().uri("/api/tts/synthesize")
+            .body(mapOf("text" to text, "voiceId" to "narrator-male-low", "speakingRate" to 1.0))
+            .retrieve().toEntity(object : org.springframework.core.ParameterizedTypeReference<Map<String, Any?>>() {})
+        assertThat(res.statusCode.value()).isEqualTo(202)
+
+        // 저장이 터지면 여기서 ready 가 아니라 failed 가 온다.
+        val settled = pollUntilSettled(res.body!!["jobId"] as String)
+        assertThat(settled).containsEntry("status", "ready")
+            .containsEntry("audioUrl", "https://r2/audio/gem.wav")
+    }
+
     @Test
     fun `synthesize 최초는 202 pending 폴링하면 ready 그리고 재요청은 즉시 cached true`() {
         whenever(sidecar.synthesize(any(), anyOrNull(), anyOrNull(), any()))

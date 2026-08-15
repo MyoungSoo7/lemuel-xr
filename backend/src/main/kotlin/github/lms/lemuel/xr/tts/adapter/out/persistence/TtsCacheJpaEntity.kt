@@ -28,7 +28,9 @@ class TtsCacheJpaEntity {
     @Column(name = "voice_id", length = 50)
     var voiceId: String? = null
 
-    @Column(name = "engine", length = 20)
+    // 20 이었다가 64 로 넓혔다(V20260815073000). 엔진 이름은 벤더가 정하는 문자열이고
+    // `gemini-3.1-flash-tts-preview` 는 28자다 — 20 에서는 저장 자체가 터졌다.
+    @Column(name = "engine", length = 64)
     var engine: String? = null
 
     @Column(name = "audio_url", columnDefinition = "TEXT")
