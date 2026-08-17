@@ -1,0 +1,8 @@
+gate: G5t
+expect: FAIL
+reason_contains: "설정이 콘텐츠보다 늦었다"
+planted: "T1 축은 실재하는데 설정은 exempt 라고 적힌 상태 — 면제가 실재 축을 덮어 쓰지 못하게 한다"
+config_patch:
+  theology_axis:
+    status: exempt
+    reason: "이 사유는 실재하는 T1 축과 모순된다 — 게이트가 이 모순을 잡아야 한다."

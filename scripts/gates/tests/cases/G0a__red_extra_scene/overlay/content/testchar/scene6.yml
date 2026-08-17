@@ -3,6 +3,8 @@
 #    ↑ 이 주석은 **금지 토큰을 인용**한다. 파서가 값으로 보지 않으므로 G6 는 여기 걸리면 안 된다.
 scene_id: testchar_scene6
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 narration_blocks:
   - id: nb_s5_close
     speaker: the_voice

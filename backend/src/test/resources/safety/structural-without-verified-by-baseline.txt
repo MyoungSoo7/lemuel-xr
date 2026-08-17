@@ -1,0 +1,17 @@
+# `enforcement: structural` 을 적고 `verified_by`(기계 검사 지목)가 없는 게이트의 기준선.
+#
+# 이 파일에 있다는 것은 "괜찮다"가 아니라 **"아직 산문뿐이다" 를 등재해 둔 것**이다.
+# 2026-08-18 실측 — 저작 YAML 의 structural 게이트 6건 중 기계 검사를 가진 것은 1건
+# (content/elijah/scene4.yml:R3_all_laments_valid)뿐이었다. 나머지 5건은 아무 테스트도
+# 그 산문을 확인하지 않는다. 래칫이지 벽이 아니다 — 기존은 동결하고 **신규만 차단**한다.
+#
+# 줄을 지우려면 그 게이트에 `verified_by: "<테스트 이름>"` 을 달고, 그 이름의 테스트가
+# 실제로 존재해야 한다(매달린 참조는 별도 테스트가 차단한다).
+#
+# T1(신학) 축은 이 기준선에 등재할 수 없다 — 새 축이라 물려받은 부채가 없고,
+# 등재를 허용하면 첫 T1 게이트부터 산문으로 통과한다. 테스트가 그걸 강제한다.
+content/abraham/scene3.yml:R3_all_waits_valid
+content/daniel/scene2.yml:R3_all_request_styles_valid
+content/esther/scene3.yml:R3_silence_is_also_deliverance
+content/jacob/scene3.yml:R3_no_ranking_of_return_choices
+content/jacob/scene5.yml:R3_no_reconciliation_pressure

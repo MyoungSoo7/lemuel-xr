@@ -361,3 +361,11 @@ release_blockers:
       consent 는 0회다. 저작 트리는 동의를 선언하고 런타임은 읽지 않는다 —
       사용자 노출 층위의 R4 보호는 현재 0이다.
     resolved: false
+
+# ── T1 신학 축 (2026-08-18) ────────────────────────────────────────────────────
+# G5t 는 `safety_gates[].id: T1_*` 를 요구하거나, 없으면 **여기에 부채를 등재**하게 한다.
+# 등재는 PASS 가 아니라 BLOCKED(판정 유보)다 — 침묵과 구별하려고 적는 것이다.
+theology_axis:
+  status: exempt
+  reason: >-
+    신학 게이트 v1 미도입. 이 인물은 content/rahab/scene*.yml 자체가 아직 main 에 없어서 T1_ 축을 둘 자리도 없다 — 콘텐츠 머지가 선행 조건이다.

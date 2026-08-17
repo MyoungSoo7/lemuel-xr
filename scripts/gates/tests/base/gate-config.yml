@@ -64,6 +64,13 @@ polite_evasive:
 trigger_scenes: [2, 4]
 crisis_reminder_scenes: [3]
 
+# G2v — 래치 **키의 값**이 계약이다. 이 선언이 없으면 G2v 는 BLOCKED(판정 유보)이고,
+# base 가 초록이 아니면 이 하네스는 base 검사에서 멈춰 케이스를 한 건도 못 돌린다.
+# 2026-08-18 실측으로 정확히 그 상태였다 — `latch_contract` 미선언으로 G2v BLOCKED.
+latch_contract:
+  scene_keys:
+    post_crisis_latch_scope: mission
+
 test_identifier: "테스트인물"
 application_yml: backend/src/main/resources/application.yml
 forbidden_token_test: backend/src/test/kotlin/github/lms/lemuel/xr/safety/application/ForbiddenTokenConfigTest.kt

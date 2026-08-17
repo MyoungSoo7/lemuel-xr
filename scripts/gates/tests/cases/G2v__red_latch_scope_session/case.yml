@@ -1,0 +1,4 @@
+gate: G2v
+expect: FAIL
+reason_contains: "불일치"
+planted: "scene3 의 `post_crisis_latch_scope` 값만 mission → session — 키는 그대로다. 키 존재만 보는 검사는 여기서 초록이라, 이 케이스가 G2v 가 *값*을 재는지에 대한 유일한 대조군이다"

@@ -1,0 +1,24 @@
+# base/scene2 에서 T1 축만 뺀 픽스처 — '선언조차 안 하면 안 걸린다' 를 재현한다.
+# Scene 2 — R4 동의 게이트가 붙는 Scene (픽스처)
+scene_id: testchar_scene2
+mission_id: testchar
+# 위기 래치는 미션 범위다 — 세션 범위로 바뀌면 다음 미션에서 래치가 풀린다(G2v 계약).
+post_crisis_latch_scope: mission
+consent_card_id: card_testchar_s2_consent
+skip_alternative_scene_id: testchar_scene3
+narration_blocks:
+  - id: nb_s2_body
+    speaker: scripture_caption
+    text_ko: "천사가 그를 어루만지며 이르되 일어나서 먹으라 (테스트 본문 2)"
+safety_gates:
+  - id: R2_no_blame_only_witness
+    enforced_at: always
+    description: "책망 어휘 0건 — 아래 목록이 집행 수단이다."
+    lint_forbidden_tokens: ["너 때문", "믿음이 부족", "왜 도망", "정신 차려"]
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"

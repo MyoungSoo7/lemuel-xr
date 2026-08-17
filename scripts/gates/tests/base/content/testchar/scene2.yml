@@ -1,6 +1,8 @@
 # Scene 2 — R4 동의 게이트가 붙는 Scene (픽스처)
 scene_id: testchar_scene2
 mission_id: testchar
+# 위기 래치는 미션 범위다 — 세션 범위로 바뀌면 다음 미션에서 래치가 풀린다(G2v 계약).
+post_crisis_latch_scope: mission
 consent_card_id: card_testchar_s2_consent
 skip_alternative_scene_id: testchar_scene3
 narration_blocks:
@@ -12,6 +14,14 @@ safety_gates:
     enforced_at: always
     description: "책망 어휘 0건 — 아래 목록이 집행 수단이다."
     lint_forbidden_tokens: ["너 때문", "믿음이 부족", "왜 도망", "정신 차려"]
+  # T1 = 신학 정통성 축. `enforcement: structural` 로 갈 때는 `verified_by` 까지
+  # 요구된다 — structural_check 산문만으로는 빈 게이트라는 것이 실측이었다
+  # (구조 선언 6건 중 기계 검사 보유 1건, 2026-08-18).
+  - id: T1_no_gnostic_inner_divinity
+    enforced_at: always
+    enforcement: structural
+    structural_check: "묵상 분기 어디에도 '내 안의 신성' 계열 귀결이 없다 — 구조 검사."
+    verified_by: "structural 선언은 실제 분기 구조로 뒷받침된다 — elijah scene4 세 토로 동등성"
   - id: R1_voice_self_harm_listener
     enforced_at: always
     action: pause_fade_black_show_crisis_card

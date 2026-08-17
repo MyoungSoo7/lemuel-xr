@@ -7,12 +7,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -22,12 +23,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -37,7 +39,7 @@
       "tally": [
         3,
         1,
-        24
+        25
       ],
       "items": [
         "G0a:BLOCKED",
@@ -59,6 +61,7 @@
         "G5c:BLOCKED",
         "G5d:BLOCKED",
         "G5e:BLOCKED",
+        "G5t:BLOCKED",
         "G6:BLOCKED",
         "G6d:BLOCKED",
         "G7:BLOCKED",
@@ -72,12 +75,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -87,12 +91,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -102,12 +107,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -117,7 +123,7 @@
       "tally": [
         3,
         1,
-        24
+        25
       ],
       "items": [
         "G0a:BLOCKED",
@@ -139,6 +145,7 @@
         "G5c:BLOCKED",
         "G5d:BLOCKED",
         "G5e:BLOCKED",
+        "G5t:BLOCKED",
         "G6:BLOCKED",
         "G6d:BLOCKED",
         "G7:BLOCKED",
@@ -152,7 +159,7 @@
       "tally": [
         3,
         1,
-        24
+        25
       ],
       "items": [
         "G0a:BLOCKED",
@@ -174,6 +181,7 @@
         "G5c:BLOCKED",
         "G5d:BLOCKED",
         "G5e:BLOCKED",
+        "G5t:BLOCKED",
         "G6:BLOCKED",
         "G6d:BLOCKED",
         "G7:BLOCKED",
@@ -187,11 +195,12 @@
       "tally": [
         26,
         1,
-        1
+        2
       ],
       "items": [
         "G0e:FAIL",
-        "G2v:BLOCKED"
+        "G2v:BLOCKED",
+        "G5t:BLOCKED"
       ]
     },
     "gates:rahab": {
@@ -199,7 +208,7 @@
       "tally": [
         10,
         0,
-        18
+        19
       ],
       "items": [
         "G0a:BLOCKED",
@@ -216,6 +225,7 @@
         "G5a-ii:BLOCKED",
         "G5d:BLOCKED",
         "G5e:BLOCKED",
+        "G5t:BLOCKED",
         "G6:BLOCKED",
         "G7:BLOCKED",
         "G8:BLOCKED",
@@ -227,10 +237,11 @@
       "tally": [
         27,
         1,
-        0
+        1
       ],
       "items": [
-        "G0e:FAIL"
+        "G0e:FAIL",
+        "G5t:BLOCKED"
       ]
     },
     "gates:solomon": {
@@ -238,12 +249,13 @@
       "tally": [
         23,
         0,
-        5
+        6
       ],
       "items": [
         "G0b:BLOCKED",
         "G0e:BLOCKED",
         "G2v:BLOCKED",
+        "G5t:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]

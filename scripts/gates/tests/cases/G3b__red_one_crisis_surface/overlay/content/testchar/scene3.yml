@@ -1,6 +1,8 @@
 # Scene 3 — 쉼 (픽스처). 위기 리마인더 리터럴 키가 여기 있다.
 scene_id: testchar_scene3
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 narration_blocks:
   - id: nb_s3_rest
     speaker: system

@@ -12,3 +12,11 @@ docs:
 doc_min_lines:
   mvp: 450
   content: 550
+
+# ── T1 신학 축 (2026-08-18) ────────────────────────────────────────────────────
+# G5t 는 `safety_gates[].id: T1_*` 를 요구하거나, 없으면 **여기에 부채를 등재**하게 한다.
+# 등재는 PASS 가 아니라 BLOCKED(판정 유보)다 — 침묵과 구별하려고 적는 것이다.
+theology_axis:
+  status: exempt
+  reason: >-
+    신학 게이트 v1 미도입. 이 인물만 theology_ 접두 게이트 3건(scene2 1건·scene3 2건)을 이미 갖고 있으나 description 뿐이고 집행 수단이 없다 — T1_ 로 개칭하고 토큰을 채우는 것이 이 면제의 해소 조건이다.

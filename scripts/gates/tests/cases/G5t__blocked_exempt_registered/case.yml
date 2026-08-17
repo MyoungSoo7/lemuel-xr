@@ -1,0 +1,8 @@
+gate: G5t
+expect: BLOCKED
+reason_contains: "면제 등재됨(판정 유보)"
+planted: "T1 축 0건 + 사유를 갖춘 면제 — 이건 PASS 가 아니라 BLOCKED 여야 한다(⑳)"
+config_patch:
+  theology_axis:
+    status: exempt
+    reason: "신학 게이트 v1 이 이 픽스처 인물에는 아직 안 내려왔다 — T1_ 축이 들어오면 걷는다."

@@ -3,6 +3,8 @@
 #    ↑ 이 주석은 **금지 토큰을 인용**한다. 파서가 값으로 보지 않으므로 G6 는 여기 걸리면 안 된다.
 scene_id: testchar_scene5
 mission_id: testchar
+# 위기 래치는 미션 범위다 — 세션 범위로 바뀌면 다음 미션에서 래치가 풀린다(G2v 계약).
+post_crisis_latch_scope: mission
 narration_blocks:
   - id: nb_s5_close
     speaker: the_voice
@@ -21,7 +23,16 @@ safety_gates:
   - id: R3_no_recovery_pressure
     enforced_at: always
     description: "'다시 이겨라/빨리 회복/사역으로 돌아가' 어휘 0건. ← 게이트 자신을 서술하는 노드다."
-    lint_forbidden_tokens: ["빨리 회복", "다시 이겨", "사역으로 돌아가", "이제 다시 싸워"]
+    lint_forbidden_tokens:
+      ["빨리 회복", "다시 이겨", "사역으로 돌아가", "이제 다시 싸워"]
+  # T1 축은 scene2 와 여기, **두 Scene 에** 둔다. 케이스 overlay 는 Scene 하나를
+  # 통째로 갈아치우므로, 한 곳에만 있으면 무관한 케이스가 T1 축을 0건으로 만들어
+  # G5t 가 부수 피해로 빨개진다 — 그러면 그 케이스는 자기 게이트를 검증했다고 말할 수 없다.
+  - id: T1_no_works_righteousness
+    enforced_at: always
+    enforcement: structural
+    structural_check: "회복 분기 어디에도 '더 해내면 받아들여진다' 계열 귀결이 없다 — 구조 검사."
+    verified_by: "structural 선언은 실제 분기 구조로 뒷받침된다 — br_s5_recovery 두 route 등가"
   - id: R1_voice_self_harm_listener
     enforced_at: always
     action: pause_fade_black_show_crisis_card

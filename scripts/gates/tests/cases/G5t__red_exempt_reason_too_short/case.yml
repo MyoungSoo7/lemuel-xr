@@ -1,0 +1,8 @@
+gate: G5t
+expect: FAIL
+reason_contains: "theology_axis.reason"
+planted: "T1 축 0건 + 면제 사유를 한 낱말로 적은 상태 — 면제가 초록으로 가는 싼 길이 되지 않게 하한을 둔다"
+config_patch:
+  theology_axis:
+    status: exempt
+    reason: "미도입"
