@@ -86,7 +86,7 @@ G10 = line_with("| `G10`", "955줄")
 #    BLOCKED 로 두는 칸이라 변이시켜도 빨강이 안 난다」고 적혀 있었다. 그 칸은 이제
 #    `t-hist` 가 **그 판 본문과 대조해서** 판정한다(아래 HIST 변이). 옛 판 수치도
 #    더는 무판정 지대가 아니다.
-TOOLS = line_with("**합계 PASS 10 / FAIL 0 / BLOCKED 18")
+TOOLS = line_with("**합계 PASS 10 / FAIL 0 / BLOCKED 19")
 MUT14 = "검출 14 / 14"
 # rev.10 의 기록으로 적힌 수치. 오늘 재현될 수 없으니 `t-tools` 는 못 재고,
 # rev.10 커밋 본문에 실재하는지는 `t-hist` 가 잰다.
@@ -138,7 +138,7 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      AC2, re.sub(r"--baseline [0-9a-f]{7,40}", "--baseline e39368c", AC2)),
     ("t-tools", "t-tools", "FAIL",
      "본문이 인용한 러너 합계를 rev.11 의 옛 값으로 — 정정 AC 가 잡은 형태다",
-     TOOLS, TOOLS.replace("PASS 10 / FAIL 0 / BLOCKED 18",
+     TOOLS, TOOLS.replace("PASS 10 / FAIL 0 / BLOCKED 19",
                           "PASS 7 / FAIL 0 / BLOCKED 20")),
     ("t-hist", "t-hist", "FAIL",
      "rev.10 의 기록을 5/2/20 → 5/3/20 으로 — 옛 수치 옮겨 적기 오기(정정 AC 형태)",
