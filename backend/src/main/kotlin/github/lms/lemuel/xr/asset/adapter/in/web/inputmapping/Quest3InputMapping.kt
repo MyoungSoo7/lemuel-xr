@@ -17,4 +17,16 @@ class Quest3InputMapping : InputMappingProvider {
             "POINT_AT" to mapOf("source" to "controller", "binding" to "raycast"),
             "GAZE_DURATION" to mapOf("source" to "head", "binding" to "head_direction_dwell"),
         )
+
+    /** Quest 3 는 컬러 패스스루 + 씬 메시가 있어 평면 히트테스트로 배치한다. */
+    override fun arOverlay(): Map<String, Any> =
+        mapOf(
+            "PLACE_ON_SURFACE" to mapOf(
+                "source" to "controller",
+                "binding" to "raycast_plane_hittest",
+                "fallback" to mapOf("source" to "hand", "binding" to "pinch_plane_hittest"),
+            ),
+            "RECENTER_ANCHOR" to mapOf("source" to "controller", "binding" to "menu_long_press"),
+            "LOCOMOTION" to mapOf("source" to "room_scale", "binding" to "physical_walk"),
+        )
 }

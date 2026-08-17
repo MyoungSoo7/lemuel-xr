@@ -29,14 +29,16 @@ namespace Lemuel
         public IEnumerator LoadMission(string mission, string device, int sceneNumber,
                                          Action<float> onProgress,
                                          Action<AssetManifest, string> onComplete,
-                                         Action<string> onError)
+                                         Action<string> onError,
+                                         string mode = null)
         {
             AssetManifest manifest = null;
             string apiError = null;
 
             yield return _api.GetAssetManifest(mission, device, sceneNumber,
                 ok => manifest = ok,
-                err => apiError = err);
+                err => apiError = err,
+                mode);
 
             if (apiError != null || manifest == null)
             {

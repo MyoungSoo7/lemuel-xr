@@ -2,6 +2,7 @@ package github.lms.lemuel.xr.asset.adapter.out.persistence
 
 import github.lms.lemuel.xr.asset.application.port.out.AssetManifestPort
 import github.lms.lemuel.xr.asset.domain.AssetManifest
+import github.lms.lemuel.xr.asset.domain.XrMode
 import org.springframework.data.domain.Limit
 import org.springframework.stereotype.Component
 import java.util.Optional
@@ -18,16 +19,24 @@ class AssetManifestPersistenceAdapter(
     private val jpa: AssetManifestJpaRepository,
 ) : AssetManifestPort {
 
-    override fun findLatest(missionId: String, sceneNumber: Short?, deviceType: String): Optional<AssetManifest> =
-        jpa.findLatest(missionId, sceneNumber, deviceType, Limit.of(1)).map(::toDomain)
+    override fun findLatest(
+        missionId: String,
+        sceneNumber: Short?,
+        deviceType: String,
+        xrMode: XrMode,
+    ): Optional<AssetManifest> =
+        jpa.findLatest(missionId, sceneNumber, deviceType, xrMode.wire, Limit.of(1)).map(::toDomain)
 
     override fun existsByCoordinates(
         missionId: String,
         sceneNumber: Short?,
         deviceType: String,
+        xrMode: XrMode,
         version: String,
     ): Boolean =
-        jpa.existsByMissionIdAndSceneNumberAndDeviceTypeAndVersion(missionId, sceneNumber, deviceType, version)
+        jpa.existsByMissionIdAndSceneNumberAndDeviceTypeAndXrModeAndVersion(
+            missionId, sceneNumber, deviceType, xrMode.wire, version,
+        )
 
     override fun save(manifest: AssetManifest): AssetManifest =
         toDomain(jpa.save(toEntity(manifest)))
@@ -38,6 +47,7 @@ class AssetManifestPersistenceAdapter(
             missionId = e.missionId!!,
             sceneNumber = e.sceneNumber,
             deviceType = e.deviceType!!,
+            xrMode = XrMode.from(e.xrMode) ?: XrMode.VR,
             capabilitiesMin = e.capabilitiesMin,
             version = e.version!!,
             manifest = e.manifest ?: mutableMapOf(),
@@ -55,6 +65,7 @@ class AssetManifestPersistenceAdapter(
             missionId = d.missionId
             sceneNumber = d.sceneNumber
             deviceType = d.deviceType
+            xrMode = d.xrMode.wire
             capabilitiesMin = d.capabilitiesMin?.toNonNullMutableMap()
             version = d.version
             manifest = d.manifest.toNonNullMutableMap()

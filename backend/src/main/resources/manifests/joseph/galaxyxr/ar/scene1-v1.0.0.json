@@ -1,0 +1,116 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 1,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_pharaoh",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/models/pharaoh.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_courtier",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/models/courtier.glb",
+        "size_bytes": 1280000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_dream_book",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/models/dream_book.glb",
+        "size_bytes": 720000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_torch_4x",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/models/torch.glb",
+        "size_bytes": 320000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_pharaoh_call_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/s1_pharaoh_call_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "pharaoh_v1",
+        "duration_ms": 18000
+      },
+      {
+        "id": "aud_s1_joseph_inner_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/s1_joseph_inner_ko.wav",
+        "size_bytes": 760000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s1_prompt_open_book",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/s1_prompt_open_book.wav",
+        "size_bytes": 224000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 2500
+      },
+      {
+        "id": "amb_nile_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/amb_nile_distant.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 30000
+      },
+      {
+        "id": "amb_torch_crackle",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/amb_torch_crackle.ogg",
+        "size_bytes": 480000,
+        "voice_id": null,
+        "duration_ms": 20000
+      },
+      {
+        "id": "amb_low_organ_drone",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/audio/amb_low_organ_drone.ogg",
+        "size_bytes": 640000,
+        "voice_id": null,
+        "duration_ms": 60000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_dream_book_pages",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/textures/dream_book_pages_512.ktx2",
+        "size_bytes": 480000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_book_interaction",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/scripts/Scene1BookInteraction.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "Scene1BookInteraction"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 9261200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

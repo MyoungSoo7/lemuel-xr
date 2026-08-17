@@ -2,6 +2,7 @@ package github.lms.lemuel.xr.asset.application
 
 import github.lms.lemuel.xr.asset.application.port.out.AssetManifestPort
 import github.lms.lemuel.xr.asset.domain.AssetManifest
+import github.lms.lemuel.xr.asset.domain.XrMode
 import github.lms.lemuel.xr.common.AppException
 import github.lms.lemuel.xr.common.ErrorCode
 import org.springframework.stereotype.Service
@@ -19,13 +20,20 @@ class GetAssetManifestUseCase(
 
     /**
      * 최신 active manifest 를 도메인으로 반환. 매칭이 없으면 [AppException] 로 거부.
+     *
+     * 모드를 생략하면 [XrMode.VR] — 모드를 모르는 기존 클라이언트의 동작은 그대로다.
      */
-    fun getLatest(missionId: String, sceneNumber: Short?, deviceType: String): AssetManifest =
-        manifests.findLatest(missionId, sceneNumber, deviceType)
+    fun getLatest(
+        missionId: String,
+        sceneNumber: Short?,
+        deviceType: String,
+        xrMode: XrMode = XrMode.VR,
+    ): AssetManifest =
+        manifests.findLatest(missionId, sceneNumber, deviceType, xrMode)
             .orElseThrow {
                 AppException(
                     ErrorCode.E_VALIDATION,
-                    "No active manifest for mission=$missionId device=$deviceType",
+                    "No active manifest for mission=$missionId device=$deviceType mode=${xrMode.wire}",
                 )
             }
 }

@@ -15,6 +15,8 @@ data class AssetManifest(
     val missionId: String,
     val sceneNumber: Short?,
     val deviceType: String,
+    /** 몰입 모드. 모드를 명시하지 않은 기존 manifest 는 [XrMode.VR]. */
+    val xrMode: XrMode = XrMode.VR,
     val capabilitiesMin: Map<String, Any?>?,
     val version: String,
     val manifest: Map<String, Any?>,

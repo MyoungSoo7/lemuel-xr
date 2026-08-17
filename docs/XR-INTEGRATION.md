@@ -502,6 +502,41 @@ def get_assets_for(scope, capabilities):
 
 → 이건 *content delivery 만의 분기*. 게임 로직 자체는 *동일*.
 
+### 10.3 몰입 모드(`xr_mode`) — 디바이스와 *직교* 하는 두 번째 축
+
+디바이스가 "무엇으로 보느냐" 라면, 모드는 "무엇을 내려받느냐" 다. 같은 quest3 라도
+VR 은 방 전체 환경 모델을 받고, AR 은 *실제 방* 을 배경으로 쓰므로 환경을 빼고
+앵커에 붙일 소품만 받는다. 그래서 모드는 디바이스의 하위 분류가 아니라 별도 축이다.
+
+```
+GET /api/config/asset-manifest?mission=joseph&device=quest3&scene=1&mode=ar
+GET /api/config/input-mapping?device=quest3&mode=ar
+GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes":["vr","ar"]}
+```
+
+- `mode` 생략 = `vr`. 모드를 모르는 기존 클라이언트의 동작은 *바뀌지 않는다*.
+- **모드는 폴백하지 않는다.** AR 요청에 VR 매니페스트를 대신 주면 패스스루 위에
+  가짜 벽이 겹쳐 그려진다. 없으면 없다고 답한다(400).
+- 어느 미션이 AR 을 여는지는 코드가 아니라 설정이 정한다 —
+  `lemuel.xr.ar-enabled-missions` (기본 `joseph`). 도메인은 여전히 모드를 모른다.
+
+| 미션 | vr | ar | 근거 |
+|---|---|---|---|
+| joseph | ✅ | ✅ | `manifests/joseph/{device}/ar/` 시드 15개 (3기기 × 5씬) |
+| moses · david | ✅ | ❌ | AR 씬·에셋 없음. 열면 클라이언트가 빈 씬을 띄운다 |
+
+AR 매니페스트는 VR 에서 두 부류를 덜어낸다 — `env_*`(방 전체 환경)와
+`*_far`(원경 임포스터). 룸스케일에는 지평선이 없다. 대신 평면 히트테스트로 소품을
+놓는 `script_ar_anchor_placement` 를 더한다. 결과적으로 요셉 AR 총량은
+VR 376MB → AR 224MB (3기기 × 5씬 합계).
+
+scene5(어둠 속 묵상)만 예외다. 환경을 지우면 남는 게 없어서, 환경 모델 대신
+패스스루를 어둡게 덮는 `shader_ar_passthrough_dim` 으로 바꿨다. 헤드셋은 현실을
+완전히 가릴 수 없으므로 *가림* 이 아니라 *감광* 이다.
+
+생성은 손이 아니라 스크립트로 한다(멱등):
+`python3 scripts/gen_joseph_ar_manifests.py`
+
 ---
 
 ## 11. 5개 도큐 보완 정리
@@ -538,11 +573,20 @@ def get_assets_for(scope, capabilities):
 | 항목 | 보류 이유 | 언제 |
 |---|---|---|
 | WebSocket 실시간 멀티 사용자 | 단일 사용자 게임 우선 | Phase 3 (소셜) |
-| AR 공간 anchor 영구화 | 실내 좌표 영속 — 복잡 | Phase 3 |
+| AR 공간 anchor *영구화* | 세션 간 실내 좌표 영속 — 복잡 | Phase 3 |
 | Hand co-presence (다른 사람 손) | 소셜 영역 | Phase 3 |
-| Pass-through 카메라 사용 | 사생활 부담 | Phase 4 (선택) |
+| Pass-through 카메라 *프레임 접근* | 사생활 부담 | Phase 4 (선택) |
 | 외부 게임 컨트롤러 | 추상화 이미 OpenXR 처리 | — |
 | 8K texture | 자산 크기 폭증 | V2 (Vision Pro 만) |
+
+> **AR 은 더 이상 전부 보류가 아니다.** 요셉 한 미션에 한해 `xr_mode=ar` 계약과
+> 매니페스트가 들어왔다(§10.3). 여전히 보류인 건 위 표의 두 가지 — 세션을 넘어
+> 살아남는 *영구 앵커* 와 패스스루 *카메라 프레임 자체* 에 대한 접근이다. 지금
+> AR 은 세션 안에서만 유효한 앵커와, OS 가 합성해 주는 패스스루 배경만 쓴다.
+>
+> 그리고 백엔드 계약이 있다는 것과 씬이 있다는 것은 다르다. Unity 쪽은
+> `unity/` 가 아직 비어 있고 `unity-stub/` 의 요셉 Scene 1 스텁뿐이다 —
+> 실제 AR 씬은 그 프로젝트가 생긴 뒤의 일이다.
 
 ---
 
