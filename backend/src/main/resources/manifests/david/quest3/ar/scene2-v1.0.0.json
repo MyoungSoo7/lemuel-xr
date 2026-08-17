@@ -1,0 +1,157 @@
+{
+  "mission_id": "david",
+  "scene_number": 2,
+  "device_type": "quest3",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_eliab",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/eliab.glb",
+        "size_bytes": 2200000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_brothers_silent_2",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/brothers_silent_2.glb",
+        "size_bytes": 3000000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_soldiers_18_pack",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/soldiers_18_pack.glb",
+        "size_bytes": 4800000,
+        "lod": "lod3_pbr_with_imposter"
+      },
+      {
+        "id": "model_provisions_bread_cheese",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/provisions_bread_cheese.glb",
+        "size_bytes": 480000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_choice_cards_3",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/choice_cards_3_floating.glb",
+        "size_bytes": 240000,
+        "lod": "lod2_ui"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_arrival_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s2_arrival_ko.wav",
+        "size_bytes": 1400000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 14000
+      },
+      {
+        "id": "aud_s2_eliab_rebuke_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s2_eliab_rebuke_ko.wav",
+        "size_bytes": 1600000,
+        "voice_id": "eliab_v1",
+        "duration_ms": 16000
+      },
+      {
+        "id": "aud_s2_post_A_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s2_post_A_rebuttal_ko.wav",
+        "size_bytes": 1000000,
+        "voice_id": "david_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s2_post_B_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s2_post_B_silence_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "david_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s2_post_C_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s2_post_C_walk_away_ko.wav",
+        "size_bytes": 900000,
+        "voice_id": "david_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "amb_low_camp_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_camp_murmur.ogg",
+        "size_bytes": 1100000,
+        "voice_id": "crowd_silent",
+        "duration_ms": 45000
+      },
+      {
+        "id": "amb_weapon_maintenance",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_weapon_maintenance.ogg",
+        "size_bytes": 540000,
+        "voice_id": null,
+        "duration_ms": 30000
+      },
+      {
+        "id": "amb_goliath_faint_shout_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_goliath_faint_distant.ogg",
+        "size_bytes": 380000,
+        "voice_id": "goliath_v1_distant",
+        "duration_ms": 18000
+      },
+      {
+        "id": "amb_philistine_distant_layer",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_philistine_distant.ogg",
+        "size_bytes": 420000,
+        "voice_id": null,
+        "duration_ms": 40000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_brothers_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/textures/brothers_atlas_2k.ktx2",
+        "size_bytes": 2200000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_soldiers_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/textures/soldiers_atlas_2k.ktx2",
+        "size_bytes": 2800000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_provisions_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/textures/provisions_pbr_1k.ktx2",
+        "size_bytes": 380000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_choose_reaction",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/scripts/Scene2ChooseReaction.cs.bundle",
+        "size_bytes": 32000,
+        "entry_class": "Scene2ChooseReaction"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 24290000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

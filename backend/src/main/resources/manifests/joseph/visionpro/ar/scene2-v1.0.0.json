@@ -85,13 +85,6 @@
     ],
     "textures": [
       {
-        "id": "tex_granary_pbr",
-        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/textures/granary_pbr_4k.ktx2",
-        "size_bytes": 2160000,
-        "format": "ktx2",
-        "resolution": "4096x4096"
-      },
-      {
         "id": "tex_grain_bag_pbr",
         "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/textures/grain_bag_pbr_2k.ktx2",
         "size_bytes": 600000,
@@ -127,6 +120,6 @@
     ]
   },
   "audio_locale": "ko-KR",
-  "total_size_bytes": 12190800,
+  "total_size_bytes": 10030800,
   "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
 }

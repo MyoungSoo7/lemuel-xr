@@ -10,17 +10,20 @@ import org.springframework.stereotype.Component
 /**
  * "어떤 미션이 어떤 몰입 모드를 노출하는가" 정책.
  *
- * 현재는 요셉만 AR 을 연다. AR 은 패스스루·평면 인식·앵커가 필요해 씬을 따로 만들어야
- * 하고(XR-INTEGRATION §13 Phase 3/4), 요셉 외 미션엔 그 에셋이 없다. 없는 걸 열어두면
- * 클라이언트는 "지원한다" 고 믿고 빈 씬을 띄운다 — 그래서 조회 전에 막는다.
+ * 현재 AR 이 열린 미션은 요셉·모세·다윗 — AR manifest 가 실제로 있는 미션들이다.
+ * 예수는 VR manifest 조차 없어 닫혀 있다. 없는 걸 열어두면 클라이언트는 "지원한다" 고
+ * 믿고 빈 씬을 띄운다 — 그래서 조회 전에 막는다.
+ *
+ * 목록은 `scripts/gen_ar_manifests.py` 의 `AR_MISSIONS` 와 같아야 한다. 한쪽만 늘리면
+ * 게이트는 열렸는데 에셋이 없거나(404), 에셋은 있는데 게이트가 닫힌(400) 상태가 된다.
  *
  * 미션 목록을 코드가 아니라 설정(`lemuel.xr.ar-enabled-missions`)에 두는 이유:
- * 다윗·모세에 AR 씬이 생기면 배포 없이 열 수 있어야 하고, 무엇보다 이 분기가
+ * 새 미션에 AR 씬이 생기면 배포 없이 열 수 있어야 하고, 무엇보다 이 분기가
  * 도메인 안으로 새어 들어가지 않게 한 곳에 묶어두기 위해서다.
  */
 @Component
 class XrModePolicy(
-    @Value("\${lemuel.xr.ar-enabled-missions:joseph}") arEnabledMissions: String,
+    @Value("\${lemuel.xr.ar-enabled-missions:joseph,moses,david}") arEnabledMissions: String,
 ) {
 
     private val arMissions: Set<String> =

@@ -1,0 +1,166 @@
+{
+  "mission_id": "david",
+  "scene_number": 1,
+  "device_type": "quest3",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_lyre",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/lyre.glb",
+        "size_bytes": 850000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_sheep_pack_12",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/sheep_pack_12.glb",
+        "size_bytes": 3200000,
+        "lod": "lod3_pbr_with_imposter"
+      },
+      {
+        "id": "model_seating_stone",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/models/seating_stone.glb",
+        "size_bytes": 320000,
+        "lod": "lod3_pbr"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_opening_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_opening_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s1_david_inner_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_david_inner_ko.wav",
+        "size_bytes": 900000,
+        "voice_id": "david_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s1_psalm_1_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_psalm_1_ko_soft.wav",
+        "size_bytes": 620000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s1_psalm_2_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_psalm_2_ko_soft.wav",
+        "size_bytes": 620000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s1_psalm_3_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_psalm_3_ko_soft.wav",
+        "size_bytes": 620000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s1_psalm_4_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_psalm_4_ko_soft.wav",
+        "size_bytes": 820000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s1_psalm_5_ko_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_psalm_5_ko_soft.wav",
+        "size_bytes": 620000,
+        "voice_id": "david_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s1_extend_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_extend_prompt_ko.wav",
+        "size_bytes": 420000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 4000
+      },
+      {
+        "id": "aud_s1_lyre_string_samples",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/s1_lyre_5_pentatonic_samples.ogg",
+        "size_bytes": 380000,
+        "voice_id": null,
+        "duration_ms": 2500,
+        "note": "5 pentatonic plucks"
+      },
+      {
+        "id": "amb_sheep_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_sheep_distant.ogg",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 30000
+      },
+      {
+        "id": "amb_wind_through_grass",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_wind_grass_loop.ogg",
+        "size_bytes": 880000,
+        "voice_id": null,
+        "duration_ms": 40000
+      },
+      {
+        "id": "amb_field_insects_dusk",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/audio/amb_field_insects.ogg",
+        "size_bytes": 460000,
+        "voice_id": null,
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_lyre_wood_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/textures/lyre_wood_1k.ktx2",
+        "size_bytes": 480000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_sheep_wool_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/textures/sheep_wool_1k.ktx2",
+        "size_bytes": 620000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_lyre_strings",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/scripts/Scene1LyreStrings.cs.bundle",
+        "size_bytes": 26000,
+        "entry_class": "Scene1LyreStrings"
+      },
+      {
+        "id": "shader_grass_gpu_instanced",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/scripts/GrassGPUInstanced.shadergraph.bundle",
+        "size_bytes": 18000,
+        "entry_class": "GrassGPUInstanced"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/david/quest3/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13792000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

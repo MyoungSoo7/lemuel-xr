@@ -83,13 +83,6 @@
     ],
     "textures": [
       {
-        "id": "tex_granary_pbr",
-        "url": "https://cdn.r2.dev/lemuel-xr/joseph/quest3/ar/v1.0.0/textures/granary_pbr_2k.ktx2",
-        "size_bytes": 1800000,
-        "format": "ktx2",
-        "resolution": "2048x2048"
-      },
-      {
         "id": "tex_grain_bag_pbr",
         "url": "https://cdn.r2.dev/lemuel-xr/joseph/quest3/ar/v1.0.0/textures/grain_bag_pbr_1k.ktx2",
         "size_bytes": 500000,
@@ -119,6 +112,6 @@
     ]
   },
   "audio_locale": "ko-KR",
-  "total_size_bytes": 10152000,
+  "total_size_bytes": 8352000,
   "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
 }

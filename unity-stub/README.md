@@ -33,8 +33,8 @@ unity-stub/
    - `xrMode` — `vr` (기본) 또는 `ar`
 5. Play 누르면 Game View 좌상단에 status / progress 표시
 
-> AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은 요셉만 열려 있고,
-> `mission` 을 moses/david 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
+> AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은 요셉·모세·다윗이
+> 열려 있고, `mission` 을 `jesus` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
 > 던져서 400 을 받는 대신, 먼저 `/api/config/xr-modes` 로 물어보기 때문이다.
 
 ---
@@ -48,7 +48,7 @@ unity-stub/
 | 3. "지금 시작" 클릭 | `manifest+에셋 로드 완료 — 5 models, 6 audio, ~12MB` | manifest 만 받고 다운로드 0% — 정상 (R2 빔) |
 | 4. progress 바 | 0% → 일부 % 로 진행 후 stuck (R2 빔) | 0% 도 못 가면 manifest 파싱 실패 |
 | 5. AR 토글 (요셉) | 토글 켜면 `[ar]`, 로드 후 models 4개·환경 모델 없음 | 토글이 안 보이면 xr-modes 실패 |
-| 6. AR 토글 (모세) | 토글이 아예 안 보임 — 요셉만 AR | 보이면 게이트가 뚫린 것 |
+| 6. AR 토글 (예수) | 토글이 아예 안 보임 — 에셋 없는 미션 | 보이면 게이트가 뚫린 것 |
 
 ---
 
@@ -67,7 +67,7 @@ unity-stub/
 ```json
 { "missionId": "joseph", "modes": ["vr", "ar"] }
 ```
-모세·다윗은 `["vr"]` 만 돌아온다.
+예수·룻 등 에셋 없는 미션은 `["vr"]` 만 돌아온다.
 
 ### `GET /api/config/input-mapping?device=quest3&mode=ar`
 ```json
@@ -103,7 +103,7 @@ VR 매핑 위에 AR 오버레이가 얹힌 형태다.
 
 `&mode=ar` 를 붙이면 같은 씬의 AR manifest 가 온다 — 환경 모델(`env_*`)과 원경
 임포스터(`*_far`)가 빠지고 `script_ar_anchor_placement` 가 붙어, scene 1 기준
-24.8MB → 11.6MB 다. 요셉이 아닌 미션에 `mode=ar` 를 던지면 400 이다.
+24.8MB → 11.6MB 다. AR 이 열리지 않은 미션에 `mode=ar` 를 던지면 400 이다.
 
 ---
 
