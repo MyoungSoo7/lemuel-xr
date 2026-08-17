@@ -1,6 +1,8 @@
 # Scene 1 — 도입 (픽스처)
 scene_id: testchar_scene1
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 narration_blocks:
   - id: nb_s1_open
     speaker: scripture_caption

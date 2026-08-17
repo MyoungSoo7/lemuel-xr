@@ -359,3 +359,11 @@ release_blockers:
       양방향으로 못박는다 — 일상어가 안 걸리는 것과 위험 형태가 여전히 걸리는 것 둘 다.
       medium 의 영향 범위는 그대로 safety_alerts 잡음 + 하단 카드로 한정된다
       (lockout 도 chatops 알림도 medium 에는 걸리지 않는다).
+
+# ── T1 신학 축 (2026-08-18) ────────────────────────────────────────────────────
+# G5t 는 `safety_gates[].id: T1_*` 를 요구하거나, 없으면 **여기에 부채를 등재**하게 한다.
+# 등재는 PASS 가 아니라 BLOCKED(판정 유보)다 — 침묵과 구별하려고 적는 것이다.
+theology_axis:
+  status: exempt
+  reason: >-
+    신학 게이트 v1(.ouroboros/seed.yml AC1·AC4)이 아직 콘텐츠에 안 내려왔다 — L2 금칙 토큰 8종과 T1_ 축 선언이 들어오면 이 면제를 걷는다.

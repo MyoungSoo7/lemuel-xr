@@ -4,6 +4,8 @@
 # '부정' 이 아니라 '부정 + 양보 어미 -도' 인 이유가 이 케이스다.
 scene_id: testchar_scene5
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 narration_blocks:
   - id: nb_s5_close
     speaker: the_voice

@@ -2,6 +2,8 @@
 # 이 픽스처의 요점: 마커를 값 안에 박아도 면제되지 않는다.
 scene_id: testchar_scene2
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 consent_card_id: card_testchar_s2_consent
 skip_alternative_scene_id: testchar_scene3
 narration_blocks:

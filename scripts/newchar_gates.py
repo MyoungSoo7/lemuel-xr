@@ -139,6 +139,11 @@ NEWCHAR_ONLY_GATES = frozenset(
      "G5e", "G6d", "G9d", "G7", "G8", "G10"}
 )
 
+# ⚠️ `G5t`(T1 신학 축) 는 여기 **일부러 넣지 않았다.** 신학 정통성은 토큰 규약보다
+#    앞서는 요건이고, legacy 3인물이야말로 `theology_` 게이트 3건을 산문으로만 갖고
+#    있는 당사자다(전부 moses). 면제를 원하면 설정에 사유를 적으면 되고 — 그건
+#    BLOCKED(판정 유보)로 남는다 — 침묵으로 빠져나가지는 못한다.
+
 
 # ──────────────────────────────────────────────────────────────────────────────
 # 결과 표현
@@ -1072,18 +1077,41 @@ def g4(c: Ctx) -> Result:
 
 
 LINT_KEY = "lint_forbidden_tokens"
-AXIS_RE = re.compile(r"^R[23](_|$)")  # ⑰ — `^R[23]_` 로 쓰면 id 가 정확히 R2/R3 인 축을 건너뛴다
+
+# 제약 축 술어 — **여기 하나가 정본이다.**
+#
+# ⑰ — `^R[23]_` 로 쓰면 id 가 정확히 R2/R3 인 축을 건너뛴다. 그래서 `(_|$)`.
+#
+# 2026-08-18: T1(신학 정통성) 을 넣었다. 넣기 전 실측 — 이 술어와 코틀린
+# `ContentSafetyGateEnforcementTest.isConstraintAxis` 는 **이미 어긋나 있었다.**
+# 코틀린은 `contains("instrumental")`·`contains("gaslight")` 까지 축으로 보고,
+# 여기는 접두 앵커만 봤다. 그 결과 `no_user_instrumentalization` 3건
+# (david/joseph/moses)은 코틀린만 축으로 세고 G5a-ii·G5d 는 아예 안 봤다.
+# 축을 넓힐 때 한쪽만 넓히면 나머지가 조용히 통과시킨다 — 그래서 이 커밋에서
+# **양쪽을 같은 정의로** 맞춘다: 접두 R2/R3/T1 **또는** 이름에 instrumental/gaslight.
+THEOLOGY_AXIS = "T1"
+AXIS_PREFIX_RE = re.compile(r"^(R[23]|T1)(_|$)")
+# 접두 없이 축을 표방하는 이름. 코틀린 쪽 술어와 **낱말까지 같아야** 한다.
+AXIS_SUBSTRINGS = ("instrumental", "gaslight")
+
+
+def is_axis(gid: str) -> bool:
+    """제약 축인가. 코틀린 `isConstraintAxis` 와 같은 판정을 내려야 한다."""
+    return bool(AXIS_PREFIX_RE.match(gid)) or any(s in gid for s in AXIS_SUBSTRINGS)
+
+# 면제 사유의 하한. 한 낱말("미도입")로는 무엇이 왜 빠졌는지 다음 사람이 못 읽는다.
+MIN_EXEMPTION_REASON = 20
 
 
 def _axes(c: Ctx) -> list[tuple[str, str, dict]]:
-    """(파일, gate id, gate dict) — R2/R3 축만."""
+    """(파일, gate id, gate dict) — R2/R3/T1 축만."""
     out = []
     for f in c.require_scenes():
         for g in c.yml(f).get("safety_gates") or []:
             if not isinstance(g, dict):
                 continue
             gid = str(g.get("id", ""))
-            if AXIS_RE.match(gid):
+            if is_axis(gid):
                 out.append((f, gid, g))
     return out
 
@@ -1107,11 +1135,20 @@ def g5a_i(c: Ctx) -> Result:
 
 
 def g5a_ii(c: Ctx) -> Result:
-    """§5(ii)+⑳ — 선언된 R2/R3 축마다 집행 수단. **축 0개면 BLOCKED**(공회전)."""
+    """§5(ii)+⑳ — 선언된 R2/R3/T1 축마다 집행 수단. **축 0개면 BLOCKED**(공회전).
+
+    T1 축의 `enforcement: structural` 에는 `verified_by` 를 더 요구한다.
+    실측(2026-08-18): `structural` 선언 6건 전부 `structural_check` 산문은 있고
+    그 선언을 기계로 확인하는 테스트가 있는 건 1건(elijah scene4)뿐이었다.
+    산문 한 문장이면 래칫 둘 다 초록이 된다 — 그래서 T1 부터는 **그 선언을 검사하는
+    테스트 이름** 을 적게 하고, 그 이름이 실재하는지는 코틀린 메타 테스트
+    (`ContentSafetyGateEnforcementTest`)가 소스에서 확인한다.
+    기존 R2/R3 6건은 소급 요구하지 않는다 — 새 기준선으로 동결한다.
+    """
     axes = _axes(c)
     if not axes:
         raise GateBlocked(
-            "R2/R3 축 0개 — 공집합에 대한 전칭명제는 항상 참이다. 이걸 충족으로 인쇄하지 않는다(⑳)"
+            "R2/R3/T1 축 0개 — 공집합에 대한 전칭명제는 항상 참이다. 이걸 충족으로 인쇄하지 않는다(⑳)"
         )
     bad = []
     for f, gid, g in axes:
@@ -1122,9 +1159,14 @@ def g5a_ii(c: Ctx) -> Result:
                 bad.append(
                     f"{c.rel(f)} :: {gid} — enforcement: structural 인데 structural_check 가 비었다"
                 )
+            elif gid.startswith(THEOLOGY_AXIS) and not str(g.get("verified_by") or "").strip():
+                bad.append(
+                    f"{c.rel(f)} :: {gid} — T1 축 + enforcement: structural 인데 verified_by 가 없다. "
+                    f"그 선언을 기계로 확인하는 테스트 이름을 적어라(산문만으로는 빈 게이트다)"
+                )
         elif n == 0:
             bad.append(
-                f"{c.rel(f)} :: {gid} — R2/R3 축 선언 + 토큰 0종(④). "
+                f"{c.rel(f)} :: {gid} — R2/R3/T1 축 선언 + 토큰 0종(④). "
                 f"토큰을 넣거나 enforcement: structural + structural_check 를 적어라"
             )
     if bad:
@@ -1133,7 +1175,7 @@ def g5a_ii(c: Ctx) -> Result:
 
 
 def g5d(c: Ctx) -> Result:
-    """㉗ — `lint_forbidden_tokens` 는 `safety_gates[].id: R2_*/R3_*` **아래**에만.
+    """㉗ — `lint_forbidden_tokens` 는 `safety_gates[].id: R2_*/R3_*/T1_*` **아래**에만.
 
     최상위에 두면 G5a-i(재귀라 어디 있든 센다)는 통과하고 G5a-ii 는 축 0개로 공회전한다.
     두 게이트가 서로를 가려 준다. 위치를 강제해 그 조합을 불가능하게 만든다.
@@ -1148,19 +1190,70 @@ def g5d(c: Ctx) -> Result:
             continue
         legit = 0
         for g in d.get("safety_gates") or []:
-            if isinstance(g, dict) and AXIS_RE.match(str(g.get("id", ""))) and LINT_KEY in g:
+            if isinstance(g, dict) and is_axis(str(g.get("id", ""))) and LINT_KEY in g:
                 legit += 1
         placed += legit
         if legit < total:
             bad.append(
                 f"{c.rel(f)}: {LINT_KEY} {total}곳 중 {total - legit}곳이 "
-                f"safety_gates[].id R2_*/R3_* 밖에 있다"
+                f"safety_gates[].id R2_*/R3_*/T1_* 밖에 있다"
             )
     if bad:
         return fail("G5d", "토큰 목록 위치 위반", bad)
     if placed == 0:
         raise GateBlocked(f"{LINT_KEY} 선언이 0곳 — 위치 판정 대상 없음")
-    return ok("G5d", f"{placed}곳 전부 R2/R3 축 아래")
+    return ok("G5d", f"{placed}곳 전부 R2/R3/T1 축 아래")
+
+
+def g5t(c: Ctx) -> Result:
+    """T1 신학 축 — **선언하거나 명시로 면제**한다. 침묵은 통과가 아니다.
+
+    왜 필요한가: 축 술어를 T1 까지 넓혀도 `safety_gates` 에 T1 을 *안 적으면* G5a-ii·G5d
+    의 시야 밖이다. 선언하고 안 지키면 걸리는데 안 하면 안 걸리는, 이 리포가 이미 두 번
+    당한 형태다(job.yml 의 R3 산문 선언 · jesus.yml 의 '부활' 토큰 0종).
+    실측(2026-08-18): `theology_` 로 시작하는 게이트는 3건뿐이고 전부 moses 이며
+    `description` 만 있다. 그 3건은 legacy 면제 대상이라 이중으로 안 걸렸다.
+
+    그래서 12인물 전원에게 둘 중 하나를 요구한다 —
+      ① `safety_gates[].id: T1_*` 를 실제로 두거나,
+      ② 설정에 `theology_axis: {status: exempt, reason: "..."}` 로 **부채를 등재**한다.
+    ②는 PASS 가 아니라 **BLOCKED(판정 유보)** 다. 면제는 "괜찮다"가 아니라
+    "아직 없다를 적어 둔 것"이다(⑳ — 공집합 전칭명제를 충족으로 인쇄하지 않는다).
+    """
+    axes = [(f, gid, g) for f, gid, g in _axes(c) if gid.startswith(THEOLOGY_AXIS)]
+    decl = c.cfg.get("theology_axis")
+    decl = decl if isinstance(decl, dict) else None
+    status = str((decl or {}).get("status") or "")
+    reason = str((decl or {}).get("reason") or "").strip()
+
+    if axes:
+        if status == "exempt":
+            return fail(
+                "G5t",
+                f"T1 축 {len(axes)}건이 실재하는데 설정은 `theology_axis.status: exempt` 라고 적혀 있다 — "
+                f"설정이 콘텐츠보다 늦었다. 면제를 걷어라",
+                [f"{c.rel(f)} :: {gid}" for f, gid, _ in axes],
+            )
+        return ok("G5t", f"T1 축 {len(axes)}건 선언 (집행 수단은 G5a-ii 가 본다)")
+
+    if decl is None:
+        return fail(
+            "G5t",
+            "T1 신학 축 0건 + `theology_axis` 선언도 없음 — 침묵을 통과로 세지 않는다. "
+            "축을 두거나 `theology_axis: {status: exempt, reason: ...}` 로 부채를 등재하라",
+        )
+    if status != "exempt":
+        return fail(
+            "G5t",
+            f"T1 축 0건인데 `theology_axis.status` 가 {status!r} — 축이 없으면 `exempt` 여야 한다",
+        )
+    if len(reason) < MIN_EXEMPTION_REASON:
+        return fail(
+            "G5t",
+            f"`theology_axis.reason` 이 {len(reason)}자 (<{MIN_EXEMPTION_REASON}) — "
+            f"무엇이 왜 미도입인지 다음 사람이 읽을 수 있게 적어라",
+        )
+    raise GateBlocked(f"T1 축 0건 — 면제 등재됨(판정 유보): {reason}")
 
 
 def _appyml_tokens(c: Ctx) -> list[str]:
@@ -1571,8 +1664,9 @@ GATES: list[tuple[str, Callable[[Ctx], Result], str, str]] = [
     ("G3d", g3d, "위기 리마인더 리터럴 키", AUTHOR),
     ("G4", g4, "YAML 파싱", AUTHOR),
     ("G5a-i", g5a_i, "토큰 합집합 하한", AUTHOR),
-    ("G5a-ii", g5a_ii, "R2/R3 축마다 집행 수단", AUTHOR),
+    ("G5a-ii", g5a_ii, "R2/R3/T1 축마다 집행 수단", AUTHOR),
     ("G5d", g5d, "토큰 목록 위치 강제", AUTHOR),
+    ("G5t", g5t, "T1 신학 축 선언 또는 명시 면제", AUTHOR),
     ("G5b", g5b, "application.yml 반영", BRIDGE),
     ("G5e", g5e, "저작 토큰 합집합 ⊆ 런타임 토큰", BRIDGE),
     ("G5c", g5c, "ForbiddenTokenConfigTest 인물 문장", RUNTIME),

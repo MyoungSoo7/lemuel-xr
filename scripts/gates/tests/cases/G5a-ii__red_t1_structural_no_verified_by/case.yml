@@ -1,0 +1,4 @@
+gate: G5a-ii
+expect: FAIL
+reason_contains: "verified_by 가 없다"
+planted: "T1 축 + enforcement: structural 인데 verified_by 없음 — 산문 한 문장으로 래칫 둘을 초록으로 만들던 경로"

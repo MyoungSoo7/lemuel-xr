@@ -1,6 +1,8 @@
 # Scene 4 — 탄식 라벨링 + R4 동의 (픽스처)
 scene_id: testchar_scene4
 mission_id: testchar
+# 위기 래치 값은 Scene 전건의 계약이다 — overlay 가 Scene 을 통째로 갈아도 이 키는 남아야 한다(G2v).
+post_crisis_latch_scope: mission
 consent_card_id: card_testchar_s4_consent
 skip_alternative_scene_id: testchar_scene5
 narration_blocks:
