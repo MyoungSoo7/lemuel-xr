@@ -1,5 +1,6 @@
 package github.lms.lemuel.xr.safety.application
 
+import github.lms.lemuel.xr.safety.application.port.out.SafetyMetricsPort
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component
 @Component
 class ForbiddenTokenSanitizer(
     private val scanner: ForbiddenTokenScanner,
+    private val metrics: SafetyMetricsPort,
     // 기본값을 두지 않는다 (2026-08-15). 빈 문자열 기본값이던 동안, 이 프로퍼티가 빠지면
     // 걸린 문장이 대체 문구가 아니라 `""` 가 됐다 — 설계 의도인 "지금은 어떤 말도 보태지
     // 않겠습니다" 가 "아무것도 보여주지 않는다" 로 조용히 바뀐다. 절망 상태의 사용자에게
@@ -52,6 +54,12 @@ class ForbiddenTokenSanitizer(
             return text
         }
         log.warn("금지 토큰 — 대체 문구로 교체. at={} token={}", where, scan.matchedToken)
+        // 로그는 자구를 남기고(저작자가 고칠 곳을 찾아야 한다), 메트릭은 축·층·불투명 id 만 남긴다.
+        metrics.recordGateBlock(
+            axis = scan.axis ?: ForbiddenTokenScanner.DEFAULT_AXIS,
+            layer = SafetyMetricsPort.LAYER_CONTENT,
+            ruleId = scan.ruleId ?: SafetyMetricsPort.RULE_ID_NONE,
+        )
         return fallbackText
     }
 

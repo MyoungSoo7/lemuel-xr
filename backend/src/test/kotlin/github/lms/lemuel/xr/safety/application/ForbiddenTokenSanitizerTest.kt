@@ -1,5 +1,6 @@
 package github.lms.lemuel.xr.safety.application
 
+import github.lms.lemuel.xr.game.application.SafetyGateFixtures
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
@@ -13,7 +14,7 @@ import org.junit.jupiter.api.Test
 class ForbiddenTokenSanitizerTest {
 
     private val fallback = "대체 문구"
-    private val sanitizer = ForbiddenTokenSanitizer(ForbiddenTokenScanner(listOf("믿음이 부족")), fallback)
+    private val sanitizer = ForbiddenTokenSanitizer(ForbiddenTokenScanner(listOf("믿음이 부족")), SafetyGateFixtures.metrics(), fallback)
 
     @Test
     fun `걸리면 대체 문구, 아니면 원문`() {
@@ -62,7 +63,7 @@ class ForbiddenTokenSanitizerTest {
 
     @Test
     fun `토큰 목록이 비면 아무것도 바꾸지 않는다`() {
-        val off = ForbiddenTokenSanitizer(ForbiddenTokenScanner(emptyList()), fallback)
+        val off = ForbiddenTokenSanitizer(ForbiddenTokenScanner(emptyList()), SafetyGateFixtures.metrics(), fallback)
 
         assertThat(off.sanitizeText("믿음이 부족해서요", "t")).isEqualTo("믿음이 부족해서요")
     }
@@ -74,7 +75,7 @@ class ForbiddenTokenSanitizerTest {
         // 아무 말도 남지 않는다. 절망 상태의 사용자에게 침묵은 안전 동작이 아니다.
         // 이 실패는 요청 시점이 아니라 *기동 시점* 에 나야 한다.
         listOf("", "   ").forEach { blank ->
-            assertThatThrownBy { ForbiddenTokenSanitizer(ForbiddenTokenScanner(listOf("믿음이 부족")), blank) }
+            assertThatThrownBy { ForbiddenTokenSanitizer(ForbiddenTokenScanner(listOf("믿음이 부족")), SafetyGateFixtures.metrics(), blank) }
                 .isInstanceOf(IllegalArgumentException::class.java)
                 .hasMessageContaining("safety.forbidden-tokens.fallback-text")
         }

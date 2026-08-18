@@ -4,6 +4,7 @@ import github.lms.lemuel.xr.ai.application.port.out.LlmCachePort
 import github.lms.lemuel.xr.ai.application.port.out.LlmGenerationPort
 import github.lms.lemuel.xr.ai.application.port.out.LlmMetricsPort
 import github.lms.lemuel.xr.ai.domain.LlmCache
+import github.lms.lemuel.xr.game.application.SafetyGateFixtures
 import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -60,6 +61,7 @@ class GenerateLlmResponseUseCaseSafetyGateTest {
             disabledFallback = "",
             forbiddenTokenScanner = scanner,
             forbiddenTokenFallback = safeFallback,
+            safetyMetrics = SafetyGateFixtures.metrics(),
         )
 
     // ── 테스트 ────────────────────────────────────────────────────────────

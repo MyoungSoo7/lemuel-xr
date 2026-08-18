@@ -1,7 +1,10 @@
 package github.lms.lemuel.xr.game.application
 
+import github.lms.lemuel.xr.safety.adapter.out.metrics.MicrometerSafetyMetricsAdapter
 import github.lms.lemuel.xr.safety.application.ForbiddenTokenSanitizer
 import github.lms.lemuel.xr.safety.application.ForbiddenTokenScanner
+import github.lms.lemuel.xr.safety.application.port.out.SafetyMetricsPort
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 
 /**
  * 금지 토큰 게이트 테스트 픽스처.
@@ -25,6 +28,12 @@ internal object SafetyGateFixtures {
     /** `application.yml` 의 `safety.forbidden-tokens.fallback-text` 실값. */
     const val FALLBACK_TEXT = "지금은 어떤 말도 보태지 않겠습니다. 여기 이대로 머물러도 괜찮습니다."
 
-    fun sanitizer(): ForbiddenTokenSanitizer =
-        ForbiddenTokenSanitizer(ForbiddenTokenScanner(TOKENS), FALLBACK_TEXT)
+    /**
+     * 목이 아니라 *진짜 어댑터* 를 준다 — 레지스트리만 인메모리다.
+     * 목을 쓰면 "포트를 불렀다" 까지만 재고, 태그 이름·값이 틀려도 초록이다.
+     */
+    fun metrics(): SafetyMetricsPort = MicrometerSafetyMetricsAdapter(SimpleMeterRegistry())
+
+    fun sanitizer(metrics: SafetyMetricsPort = metrics()): ForbiddenTokenSanitizer =
+        ForbiddenTokenSanitizer(ForbiddenTokenScanner(TOKENS), metrics, FALLBACK_TEXT)
 }

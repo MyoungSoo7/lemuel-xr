@@ -1,5 +1,7 @@
 package github.lms.lemuel.xr.safety.application
 
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
@@ -28,12 +30,25 @@ import org.springframework.stereotype.Component
 @Component
 class ForbiddenTokenScanner(
     @param:Value("\${safety.forbidden-tokens.list:}") tokens: List<String>,
+    // 축 예외 목록 — 여기 적히지 않은 토큰의 축은 [DEFAULT_AXIS] 다. 목록 전체를 축별로
+    // 쪼개지 않는 이유: `list` 는 G5b·G5e·`newchar_gates.py` 가 파싱하는 단일 출처이고,
+    // 축은 저작 yml 의 *게이트 id* 에 산다(런타임 토큰에 축을 새기지 않는다는 결정).
+    // 그래서 축은 목록의 구조가 아니라 그 위에 얹는 **소수의 예외**로 표현한다.
+    // 이 예외가 저작과 어긋나면 `SafetyMetricsGateBlockTest` 가 빨강을 낸다.
+    // 기본값 `emptyList()` 는 *테스트 편의* 지 운영 여지가 아니다 — 이 목록이 통째로 비면
+    // 모든 차단이 [DEFAULT_AXIS] 로 보고되는데, 그 조용한 축 붕괴는
+    // `SafetyMetricsGateBlockTest` 가 실제 스프링 컨텍스트의 프로퍼티로 잡는다.
+    @param:Value("\${safety.forbidden-tokens.theology-list:}") theologyTokens: List<String> = emptyList(),
 ) {
 
     /** 생성 시점에 한 번만 정규화 — 요청마다 반복하지 않는다. */
     private val normalizedTokens: List<Pair<String, String>> =
         tokens.filter { it.isNotBlank() }
             .map { it to normalize(it) }
+
+    /** 정규화 형태로 담는다 — `scan` 이 비교하는 것도 정규화 형태다. */
+    private val theologyAxisTokens: Set<String> =
+        theologyTokens.filter { it.isNotBlank() }.map { normalize(it) }.toSet()
 
     fun scan(text: String?): ScanResult {
         if (text.isNullOrBlank() || normalizedTokens.isEmpty()) {
@@ -42,16 +57,24 @@ class ForbiddenTokenScanner(
         val haystack = normalize(text)
 
         var hitToken: String? = null
+        var hitNormalized: String? = null
         var hitAt = Int.MAX_VALUE
         for ((original, normalized) in normalizedTokens) {
             val at = firstNonExemptIndex(haystack, normalized)
             if (at in 0 until hitAt) {
                 hitAt = at
                 hitToken = original
+                hitNormalized = normalized
             }
         }
 
-        return if (hitToken == null) ScanResult(false, null) else ScanResult(true, hitToken)
+        if (hitToken == null) return ScanResult(false, null)
+        return ScanResult(
+            matched = true,
+            matchedToken = hitToken,
+            axis = if (hitNormalized in theologyAxisTokens) THEOLOGY_AXIS else DEFAULT_AXIS,
+            ruleId = ruleIdOf(hitToken),
+        )
     }
 
     /**
@@ -89,13 +112,35 @@ class ForbiddenTokenScanner(
 
     private fun normalize(s: String): String = s.trim().replace(WHITESPACE, " ")
 
+    /**
+     * @param axis 걸린 토큰이 속한 안전 축. 메트릭 차원으로 나간다 — 운영자는 신학 차단과
+     *   정신건강 차단을 구분해야 하고, **사용자는 구분하지 못해야 한다**(seed AC2).
+     * @param ruleId 토큰의 **불투명 식별자**. 메트릭 태그에 자구를 실으면 금칙 문구가
+     *   대시보드·시계열 저장소로 새어 나간다 — 그 문구들은 가스라이팅 표현 그 자체다.
+     *   자구는 로그(`ForbiddenTokenSanitizer`)에만 남고 메트릭에는 이 값만 나간다.
+     */
     data class ScanResult(
         val matched: Boolean,
         val matchedToken: String?,
+        val axis: String? = null,
+        val ruleId: String? = null,
     )
 
-    private companion object {
-        val WHITESPACE = Regex("\\s+")
+    companion object {
+        /** 신학 정통성 축. 저작 yml 의 `T1_` 접두 게이트와 같은 이름이어야 한다. */
+        const val THEOLOGY_AXIS = "T1"
+
+        /** 축 예외에 없는 토큰의 축. 목록의 절대다수가 여기 속한다. */
+        const val DEFAULT_AXIS = "R2_R3"
+
+        /** 메트릭에 실을 불투명 규칙 id. 토큰마다 안정적이고 자구를 복원할 수 없다. */
+        fun ruleIdOf(token: String): String =
+            MessageDigest.getInstance("SHA-256")
+                .digest(token.toByteArray(StandardCharsets.UTF_8))
+                .take(6)
+                .joinToString("") { "%02x".format(it) }
+
+        private val WHITESPACE = Regex("\\s+")
 
         /**
          * 어간 뒤 **양보 부정** — `<어간 완성 0~3자><지> <않|못><0~3자><도>`.
@@ -118,8 +163,8 @@ class ForbiddenTokenScanner(
          * 창을 12자로 자르는 이유: 부정이 어간에 *직접* 붙어야 한다. 문장이 넘어간 뒤의 부정
          * ("빨리 회복하세요. 참지 않아도 됩니다.")까지 면제하면 앞 문장의 압박이 풀린다.
          */
-        val CONCESSIVE_NEGATION = Regex("^[가-힣]{0,3}지\\s?(?:않|못)[가-힣]{0,3}도")
-        const val LOOKAHEAD = 12
+        private val CONCESSIVE_NEGATION = Regex("^[가-힣]{0,3}지\\s?(?:않|못)[가-힣]{0,3}도")
+        private const val LOOKAHEAD = 12
 
         /**
          * **토큰별 선행 문맥 면제** — 토큰 바로 *앞* 이 정규식과 맞으면 그 출현은 위반이 아니다.
@@ -142,11 +187,11 @@ class ForbiddenTokenScanner(
          * `그분` 은 넣지 않는다 — 사별 미션에서 "그분 덕분에" 는 고인을 가리킬 확률이 높다.
          * 신을 가리킨다는 것이 문자열만으로 확실한 호칭만 면제한다.
          */
-        val PRECEDING_EXEMPTIONS: Map<String, Regex> = mapOf(
+        private val PRECEDING_EXEMPTIONS: Map<String, Regex> = mapOf(
             "덕분에" to Regex("(?:하나님|하느님|여호와|주님|성령|예수님|그리스도)(?:의)?\\s?(?:은혜\\s?)?$"),
         )
 
         /** 선행 문맥을 몇 자까지 거슬러 보는가. "하나님의 은혜 덕분에"(8자) 가 들어가는 최소치. */
-        const val LOOKBEHIND = 14
+        private const val LOOKBEHIND = 14
     }
 }
