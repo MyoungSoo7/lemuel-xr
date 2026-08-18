@@ -33,8 +33,8 @@ unity-stub/
    - `xrMode` — `vr` (기본) 또는 `ar`
 5. Play 누르면 Game View 좌상단에 status / progress 표시
 
-> AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은 요셉·모세·다윗이
-> 열려 있고, `mission` 을 `jesus` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
+> AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은 요셉·모세·다윗·예수가
+> 열려 있고, `mission` 을 `elijah` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
 > 던져서 400 을 받는 대신, 먼저 `/api/config/xr-modes` 로 물어보기 때문이다.
 
 ---

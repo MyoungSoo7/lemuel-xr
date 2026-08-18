@@ -1,0 +1,123 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 3,
+  "device_type": "quest3",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "haptic_intensity_max": 0.35,
+    "haptic_pattern": "PULSE_SOFT",
+    "haptic_channel": "BOTH"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_capernaum_street_dusk",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/models/env_capernaum_street.glb",
+        "size_bytes": 8400000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_jesus_reaching_hand",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/models/jesus_reaching_hand.glb",
+        "size_bytes": 2600000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_leper_seated",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/models/leper_seated.glb",
+        "size_bytes": 2200000,
+        "lod": "lod3_pbr_with_imposter"
+      },
+      {
+        "id": "model_npc_bystander_pack_12",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/models/npc_bystander_pack_12.glb",
+        "size_bytes": 4200000,
+        "lod": "lod3_pbr_with_imposter"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_approach_cue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/audio/s3_approach_cue_ko.wav",
+        "size_bytes": 520000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 5000
+      },
+      {
+        "id": "aud_s3_reach_out_cue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/audio/s3_reach_out_cue_ko.wav",
+        "size_bytes": 540000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 5000
+      },
+      {
+        "id": "aud_s3_i_will_be_clean_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/audio/s3_i_will_be_clean_ko.wav",
+        "size_bytes": 700000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 7000
+      },
+      {
+        "id": "sfx_touch_warm_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/audio/sfx_touch_warm.ogg",
+        "size_bytes": 180000,
+        "voice_id": null,
+        "duration_ms": 1500,
+        "note": "hapticHint.fallback.audioCueId=touch-warm — 햅틱 없는 기기의 대체 큐"
+      },
+      {
+        "id": "amb_street_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/audio/amb_street_murmur.ogg",
+        "size_bytes": 1000000,
+        "voice_id": null,
+        "duration_ms": 40000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_jesus_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/textures/jesus_garment_2k.ktx2",
+        "size_bytes": 2000000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_leper_skin_dignity",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/textures/leper_skin_dignity_2k.ktx2",
+        "size_bytes": 1900000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_npc_bystander_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/textures/npc_bystander_atlas_2k.ktx2",
+        "size_bytes": 2600000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_touch_sequence",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/scripts/Scene3TouchSequence.cs.bundle",
+        "size_bytes": 52000,
+        "entry_class": "Scene3TouchSequence"
+      },
+      {
+        "id": "script_haptic_pulse_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/quest3/v1.0.0/scripts/HapticPulseSoft.cs.bundle",
+        "size_bytes": 20000,
+        "entry_class": "HapticPulseSoft"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 26912000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,136 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 3,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "haptic_intensity_max": 0.35,
+    "haptic_pattern": "PULSE_SOFT",
+    "haptic_channel": "BOTH",
+    "spatial_audio_mode": "personal",
+    "haptic_fallback_audio_cue": "touch-warm",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_jesus_reaching_hand",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/models/jesus_reaching_hand.glb",
+        "size_bytes": 3120000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_leper_seated",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/models/leper_seated.glb",
+        "size_bytes": 2640000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_npc_bystander_pack_12",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/models/npc_bystander_pack_12.glb",
+        "size_bytes": 5040000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_approach_cue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s3_approach_cue_ko.wav",
+        "size_bytes": 624000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 5000
+      },
+      {
+        "id": "aud_s3_reach_out_cue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s3_reach_out_cue_ko.wav",
+        "size_bytes": 648000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 5000
+      },
+      {
+        "id": "aud_s3_i_will_be_clean_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s3_i_will_be_clean_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 7000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "sfx_touch_warm_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/sfx_touch_warm.ogg",
+        "size_bytes": 216000,
+        "voice_id": null,
+        "duration_ms": 1500,
+        "note": "hapticHint.fallback.audioCueId=touch-warm — 햅틱 없는 기기의 대체 큐"
+      },
+      {
+        "id": "amb_street_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/amb_street_murmur.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 40000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_jesus_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/textures/jesus_garment_4k.ktx2",
+        "size_bytes": 2400000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_leper_skin_dignity",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/textures/leper_skin_dignity_4k.ktx2",
+        "size_bytes": 2280000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_npc_bystander_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/textures/npc_bystander_atlas_4k.ktx2",
+        "size_bytes": 3120000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_touch_sequence",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/Scene3TouchSequencePolySpatial.cs.bundle",
+        "size_bytes": 62400,
+        "entry_class": "Scene3TouchSequencePolySpatial"
+      },
+      {
+        "id": "script_haptic_pulse_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/HapticPulseSoft.cs.bundle",
+        "size_bytes": 24000,
+        "entry_class": "HapticPulseSoft"
+      },
+      {
+        "id": "script_touch_audio_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/TouchAudioFallback.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "TouchAudioFallback"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 22250400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

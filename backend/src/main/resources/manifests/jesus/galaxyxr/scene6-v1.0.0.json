@@ -1,0 +1,112 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 6,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_garden_tomb_dawn",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/env_garden_tomb_dawn.glb",
+        "size_bytes": 6400000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_jesus_gardener_appearance",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/jesus_gardener_appearance.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_mary_magdalene",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/mary_magdalene.glb",
+        "size_bytes": 1760000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_stone_rolled_away",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/stone_rolled_away.glb",
+        "size_bytes": 1280000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s6_jn20_15_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s6_jn20_15_ko.wav",
+        "size_bytes": 656000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s6_jn20_16_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s6_jn20_16_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s6_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s6_reflection_prompt_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "amb_dawn_birds_garden",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/amb_dawn_birds_garden.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_jesus_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/jesus_garment_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_mary_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/mary_garment_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_stone_surface",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/stone_surface_1k.ktx2",
+        "size_bytes": 1200000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene6_empty_tomb_reading",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/Scene6EmptyTombReading.cs.bundle",
+        "size_bytes": 36800,
+        "entry_class": "Scene6EmptyTombReading"
+      },
+      {
+        "id": "script_name_call_moment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/NameCallMoment.cs.bundle",
+        "size_bytes": 17600,
+        "entry_class": "NameCallMoment"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 18950400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

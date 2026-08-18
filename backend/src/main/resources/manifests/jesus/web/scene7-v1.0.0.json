@@ -1,0 +1,109 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 7,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "passive_only": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ascension_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/360/env_meditation_ascension_river.jpg",
+        "size_bytes": 5600000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_river_of_life_flow_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/river_of_life_flow_lite.glb",
+        "size_bytes": 216000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_disciples_looking_up_pack_11_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/billboards/disciples_looking_up_pack_11_sheet.webp",
+        "size_bytes": 1600000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s7_ascension_monologue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s7_ascension_monologue_ko.mp3",
+        "size_bytes": 800000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 16000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s7_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s7_value_prompt_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s7_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s7_recovery_pack_15entries_ko.tar",
+        "size_bytes": 1800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s7_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s7_crisis_reminder_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps",
+        "note": "R1 — {{crisis_resources.default}} 낭독. 위기 감지 시 1번 정적 콘텐츠로 라우팅"
+      },
+      {
+        "id": "amb_flowing_water_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_flowing_water_soft.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_river_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/textures/river_overlay_2k.webp",
+        "size_bytes": 440000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene7_outro_recovery_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/Scene7OutroRecoveryWeb.js",
+        "size_bytes": 37400,
+        "entry_class": "Scene7OutroRecoveryWeb"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/RecoveryKeyRouter.js",
+        "size_bytes": 20400,
+        "entry_class": "RecoveryKeyRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 11813800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,108 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 5,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "contemplation_sec": 15,
+    "consent_card_required": true,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_olive_tree_cluster",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/models/olive_tree_cluster.glb",
+        "size_bytes": 3360000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_cup_still",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/models/cup_still.glb",
+        "size_bytes": 480000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_lk22_42_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s5_lk22_42_ko.wav",
+        "size_bytes": 1320000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 11000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s5_cross_line_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s5_cross_line_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 6000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s5_suffering_footer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/s5_suffering_footer_ko.wav",
+        "size_bytes": 1680000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 14000,
+        "note": "R2 필수 footer — 고난 강요 아님을 명시하는 낭독"
+      },
+      {
+        "id": "amb_deep_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/audio/amb_deep_drone_60hz.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_olive_bark",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/textures/olive_bark_4k.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/Scene5ConsentGatePolySpatial.cs.bundle",
+        "size_bytes": 31200,
+        "entry_class": "Scene5ConsentGatePolySpatial"
+      },
+      {
+        "id": "script_contemplation_timer",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/ContemplationTimer.cs.bundle",
+        "size_bytes": 21600,
+        "entry_class": "ContemplationTimer"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10522800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -42,7 +42,7 @@ MANIFESTS = ROOT / "backend/src/main/resources/manifests"
 # AR 을 여는 미션. backend application.yml 의 `lemuel.xr.ar-enabled-missions`
 # 기본값과 같아야 한다 — 한쪽만 늘리면 게이트는 열렸는데 에셋이 없거나(404),
 # 에셋은 있는데 게이트가 닫힌(400) 상태가 된다.
-AR_MISSIONS = ("joseph", "moses", "david")
+AR_MISSIONS = ("joseph", "moses", "david", "jesus")
 
 # AR 을 지원하는 디바이스만. web 은 패스스루가 없어 대상이 아니다.
 AR_DEVICES = ("quest3", "visionpro", "galaxyxr")

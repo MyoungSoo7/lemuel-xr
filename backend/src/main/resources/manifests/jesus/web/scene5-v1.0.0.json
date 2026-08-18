@@ -1,0 +1,101 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 5,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "contemplation_sec": 15,
+    "consent_card_required": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_gethsemane_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/360/env_meditation_gethsemane.jpg",
+        "size_bytes": 5400000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_olive_tree_cluster_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/olive_tree_cluster_lite.glb",
+        "size_bytes": 252000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_cup_still_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/cup_still_lite.glb",
+        "size_bytes": 36000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_lk22_42_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s5_lk22_42_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_cross_line_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s5_cross_line_ko.mp3",
+        "size_bytes": 300000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 6000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_suffering_footer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s5_suffering_footer_ko.mp3",
+        "size_bytes": 700000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 14000,
+        "format": "mp3_192kbps",
+        "note": "R2 필수 footer — 고난 강요 아님을 명시하는 낭독"
+      },
+      {
+        "id": "amb_deep_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_deep_drone_60hz.mp3",
+        "size_bytes": 400000,
+        "voice_id": null,
+        "duration_ms": 30000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_fog_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/textures/fog_overlay_2k.webp",
+        "size_bytes": 420000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_consent_gate_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/Scene5ConsentGateWeb.js",
+        "size_bytes": 22100,
+        "entry_class": "Scene5ConsentGateWeb"
+      },
+      {
+        "id": "script_contemplation_timer",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/ContemplationTimer.js",
+        "size_bytes": 15300,
+        "entry_class": "ContemplationTimer"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 8095400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

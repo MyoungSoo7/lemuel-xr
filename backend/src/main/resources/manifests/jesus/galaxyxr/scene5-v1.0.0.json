@@ -1,0 +1,102 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 5,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "contemplation_sec": 15,
+    "consent_card_required": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_meditation_gethsemane_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/env_meditation_gethsemane.glb",
+        "size_bytes": 2720000,
+        "lod": "lod2_volumetric"
+      },
+      {
+        "id": "model_olive_tree_cluster",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/olive_tree_cluster.glb",
+        "size_bytes": 2240000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_cup_still",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/cup_still.glb",
+        "size_bytes": 320000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_lk22_42_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s5_lk22_42_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s5_cross_line_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s5_cross_line_ko.wav",
+        "size_bytes": 480000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 6000
+      },
+      {
+        "id": "aud_s5_suffering_footer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s5_suffering_footer_ko.wav",
+        "size_bytes": 1120000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 14000,
+        "note": "R2 필수 footer — 고난 강요 아님을 명시하는 낭독"
+      },
+      {
+        "id": "amb_deep_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/amb_deep_drone_60hz.ogg",
+        "size_bytes": 640000,
+        "voice_id": null,
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_olive_bark",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/olive_bark_1k.ktx2",
+        "size_bytes": 1280000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_fog_volumetric_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/fog_volumetric_atlas_512.ktx2",
+        "size_bytes": 720000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/Scene5ConsentGate.cs.bundle",
+        "size_bytes": 20800,
+        "entry_class": "Scene5ConsentGate"
+      },
+      {
+        "id": "script_contemplation_timer",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/ContemplationTimer.cs.bundle",
+        "size_bytes": 14400,
+        "entry_class": "ContemplationTimer"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10435200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

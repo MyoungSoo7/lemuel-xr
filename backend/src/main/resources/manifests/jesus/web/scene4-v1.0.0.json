@@ -1,0 +1,106 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 4,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "pick_one_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_crossroad_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/360/env_crossroad_lamps.jpg",
+        "size_bytes": 7000000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_jesus_standing_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/jesus_standing_lite.glb",
+        "size_bytes": 234000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_thomas_questioning_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/billboards/thomas_questioning_sheet.webp",
+        "size_bytes": 880000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_signpost_three_ways_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/signpost_three_ways_lite.glb",
+        "size_bytes": 126000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_context_thomas_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s4_context_thomas_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s4_prompt_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_iam_cache_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s4_iam_pack_9entries_ko.tar",
+        "size_bytes": 2300000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 240000,
+        "note": "9 = 3 options x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "amb_lamp_flicker_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_lamp_flicker_night.mp3",
+        "size_bytes": 400000,
+        "voice_id": null,
+        "duration_ms": 40000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_signpost_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/textures/signpost_overlay_2k.webp",
+        "size_bytes": 460000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_pick_one_iam_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/Scene4PickOneIAmWeb.js",
+        "size_bytes": 42500,
+        "entry_class": "Scene4PickOneIAmWeb"
+      },
+      {
+        "id": "script_monologue_cache_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/MonologueCacheRouter.js",
+        "size_bytes": 20400,
+        "entry_class": "MonologueCacheRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12262900,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

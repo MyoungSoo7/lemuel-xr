@@ -393,7 +393,7 @@ lemuel:
     # AR(패스스루) 을 노출할 미션. 여기 없는 미션에 mode=ar 로 오면 400.
     # 요셉만 AR 씬·에셋이 있어서 요셉만 열어둔다 — 늘리려면 그 미션의
     # manifests/{mission}/{device}/ar/ 시드를 먼저 채울 것.
-    ar-enabled-missions: ${XR_AR_MISSIONS:joseph,moses,david}
+    ar-enabled-missions: ${XR_AR_MISSIONS:joseph,moses,david,jesus}
 
 # === Actuator (운영 모니터링) ===
 management:

@@ -526,7 +526,7 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
 - **모드는 폴백하지 않는다.** AR 요청에 VR 매니페스트를 대신 주면 패스스루 위에
   가짜 벽이 겹쳐 그려진다. 없으면 없다고 답한다(400).
 - 어느 미션이 AR 을 여는지는 코드가 아니라 설정이 정한다 —
-  `lemuel.xr.ar-enabled-missions` (기본 `joseph,moses,david`). 도메인은 여전히 모드를 모른다.
+  `lemuel.xr.ar-enabled-missions` (기본 `joseph,moses,david,jesus`). 도메인은 여전히 모드를 모른다.
 - **용어 주의** — 여기서의 `ar` 은 _인물 미션을 패스스루로 보는 것_ 이다.
   [CROSS-MAPPING-VR-AR.md](./CROSS-MAPPING-VR-AR.md) 의 "AR 1~7 가치(일상 습관)" 와는
   다른 축이고, 그쪽은 `ar_topic_*` 테이블이 담당한다.
@@ -536,10 +536,13 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
 | joseph                                | ✅   | ✅  | `manifests/joseph/{device}/ar/` 시드 15개 (3기기 × 5씬)                           |
 | moses                                 | ✅   | ✅  | 시드 18개 (3기기 × 6씬)                                                           |
 | david                                 | ✅   | ✅  | 시드 18개 (3기기 × 6씬)                                                           |
-| jesus · ruth · solomon · elijah · job | ✅\* | ❌  | 시나리오(yml)만 있고 **VR manifest 자체가 없다**. 덜어낼 원본이 없으니 AR 도 없다 |
+| jesus                                 | ✅   | ✅  | 시드 21개 (3기기 × 7씬)                                                           |
+| ruth · solomon · elijah · job         | ✅\* | ❌  | 시나리오(yml)만 있고 **VR manifest 자체가 없다**. 덜어낼 원본이 없으니 AR 도 없다 |
 
 \* 이 미션들은 `scenarios/*.yml` 은 있으나 `manifests/` 항목이 없다. AR 을 열려면
-VR manifest 를 먼저 써야 한다 — 그건 파생이 아니라 씬별 자산 설계다.
+VR manifest 를 먼저 써야 한다 — 그건 파생이 아니라 씬별 자산 설계다. 예수는
+2026-08-19 에 그 순서를 밟아 열렸다 — 7씬 × 4기기 VR manifest 를 먼저 쓰고,
+`gen_ar_manifests.py` 로 AR 을 파생한 뒤 게이트 목록을 늘렸다.
 
 AR 매니페스트는 VR 에서 세 부류를 덜어낸다 — `env_*`(방 전체 환경), `*_far`(원경
 임포스터), 그리고 _남은 모델 어디에도 안 붙는 텍스처_(환경 아틀라스 등). 룸스케일에는
@@ -599,7 +602,7 @@ AR 매니페스트는 VR 에서 세 부류를 덜어낸다 — `env_*`(방 전�
 | 외부 게임 컨트롤러                | 추상화 이미 OpenXR 처리       | —                  |
 | 8K texture                        | 자산 크기 폭증                | V2 (Vision Pro 만) |
 
-> **AR 은 더 이상 전부 보류가 아니다.** 에셋이 있는 세 미션(요셉·모세·다윗)에
+> **AR 은 더 이상 전부 보류가 아니다.** 에셋이 있는 네 미션(요셉·모세·다윗·예수)에
 > `xr_mode=ar` 계약과 매니페스트가 들어왔다(§10.3). 여전히 보류인 건 위 표의 두 가지 — 세션을 넘어
 > 살아남는 _영구 앵커_ 와 패스스루 _카메라 프레임 자체_ 에 대한 접근이다. 지금
 > AR 은 세션 안에서만 유효한 앵커와, OS 가 합성해 주는 패스스루 배경만 쓴다.
