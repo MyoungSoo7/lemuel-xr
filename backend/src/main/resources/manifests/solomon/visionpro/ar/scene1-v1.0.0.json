@@ -1,0 +1,141 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 1,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "skippable_after_sec": 3,
+    "offering_auto_proceed_sec": 25,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_solomon_young_kneeling",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/solomon_young_kneeling.glb",
+        "size_bytes": 3120000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_offering_bundle",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/offering_bundle.glb",
+        "size_bytes": 1440000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_altar_gibeon",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/altar_gibeon.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_crown",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/crown.glb",
+        "size_bytes": 840000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_gibeon_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s1_narration_gibeon_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s1_inner_voice_crown_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s1_inner_voice_crown_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 9000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s1_inner_voice_little_child_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s1_inner_voice_little_child_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s1_petition_hearing_heart_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s1_petition_hearing_heart_ko.wav",
+        "size_bytes": 1320000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 11000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_hilltop_fire_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/amb_hilltop_fire_night.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 60000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/solomon_robe_4k.ktx2",
+        "size_bytes": 2400000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_crown_gold",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/crown_gold_4k.ktx2",
+        "size_bytes": 1680000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_altar_stone",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/altar_stone_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_thousand_offerings",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/Scene1ThousandOfferingsPolySpatial.cs.bundle",
+        "size_bytes": 57600,
+        "entry_class": "Scene1ThousandOfferingsPolySpatial"
+      },
+      {
+        "id": "script_grab_place_offering",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/GrabPlaceOffering.cs.bundle",
+        "size_bytes": 28800,
+        "entry_class": "GrabPlaceOffering"
+      },
+      {
+        "id": "script_eye_gaze_dwell",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/EyeGazeDwell.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "EyeGazeDwell"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 20642400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

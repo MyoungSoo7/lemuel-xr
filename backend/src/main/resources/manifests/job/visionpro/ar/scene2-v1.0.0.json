@@ -1,0 +1,129 @@
+{
+  "mission_id": "job",
+  "scene_number": 2,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "consent_card_required": true,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_job_crying_out",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/models/job_crying_out.glb",
+        "size_bytes": 3120000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_three_friends_watching",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/models/three_friends_watching.glb",
+        "size_bytes": 4320000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_job3_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s2_job3_3_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "job_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s2_additional_refs_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s2_additional_refs_ko.wav",
+        "size_bytes": 1680000,
+        "voice_id": "job_v1",
+        "duration_ms": 14000,
+        "note": "job-3:11 · job-6:8 추가 참조 낭독",
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s2_not_rebuked_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s2_not_rebuked_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s2_reflection_prompt_ko.wav",
+        "size_bytes": 1560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000
+      },
+      {
+        "id": "aud_s2_language_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s2_language_note_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "note": "R 가드 — 비탄의 언어를 허락하되 낭만화하지 않는다. 죽음 생각이 크면 본문보다 {{crisis_resources.default}} 연결이 우선"
+      },
+      {
+        "id": "amb_night_desolate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/amb_night_desolate.ogg",
+        "size_bytes": 1080000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_job_garment_torn",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/textures/job_garment_torn_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_friends_garment_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/textures/friends_garment_atlas_4k.ktx2",
+        "size_bytes": 2880000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/Scene2ConsentGatePolySpatial.cs.bundle",
+        "size_bytes": 31200,
+        "entry_class": "Scene2ConsentGatePolySpatial"
+      },
+      {
+        "id": "script_lament_reading_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/LamentReadingSync.cs.bundle",
+        "size_bytes": 26400,
+        "entry_class": "LamentReadingSync"
+      },
+      {
+        "id": "script_line_gaze_advance",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/LineGazeAdvance.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "LineGazeAdvance"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 20733600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

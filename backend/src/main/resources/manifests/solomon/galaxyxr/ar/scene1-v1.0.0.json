@@ -1,0 +1,131 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 1,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "skippable_after_sec": 3,
+    "offering_auto_proceed_sec": 25,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_solomon_young_kneeling",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/solomon_young_kneeling.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_offering_bundle",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/offering_bundle.glb",
+        "size_bytes": 960000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_altar_gibeon",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/altar_gibeon.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_crown",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/crown.glb",
+        "size_bytes": 560000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_gibeon_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s1_narration_gibeon_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s1_inner_voice_crown_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s1_inner_voice_crown_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s1_inner_voice_little_child_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s1_inner_voice_little_child_ko.wav",
+        "size_bytes": 640000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s1_petition_hearing_heart_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s1_petition_hearing_heart_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "amb_hilltop_fire_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/amb_hilltop_fire_night.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 60000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/textures/solomon_robe_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_crown_gold",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/textures/crown_gold_1k.ktx2",
+        "size_bytes": 1120000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_altar_stone",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/textures/altar_stone_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_thousand_offerings",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/Scene1ThousandOfferings.cs.bundle",
+        "size_bytes": 38400,
+        "entry_class": "Scene1ThousandOfferings"
+      },
+      {
+        "id": "script_grab_place_offering",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/GrabPlaceOffering.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "GrabPlaceOffering"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13755600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

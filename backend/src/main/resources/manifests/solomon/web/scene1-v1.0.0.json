@@ -1,0 +1,121 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "skippable_after_sec": 3,
+    "grab_place_via_click_drag": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_gibeon_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/360/env_gibeon_high_place.jpg",
+        "size_bytes": 7200000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_solomon_young_kneeling_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/billboards/solomon_young_kneeling_sheet.webp",
+        "size_bytes": 1040000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_offering_bundle_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/models/offering_bundle_lite.glb",
+        "size_bytes": 108000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_altar_gibeon_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/models/altar_gibeon_lite.glb",
+        "size_bytes": 216000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_crown_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/models/crown_lite.glb",
+        "size_bytes": 63000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_gibeon_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s1_narration_gibeon_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s1_inner_voice_crown_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s1_inner_voice_crown_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s1_inner_voice_little_child_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s1_inner_voice_little_child_ko.mp3",
+        "size_bytes": 400000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s1_petition_hearing_heart_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s1_petition_hearing_heart_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_hilltop_fire_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/amb_hilltop_fire_night.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_offering_zone_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/textures/offering_zone_overlay_2k.webp",
+        "size_bytes": 500000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_thousand_offerings_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/scripts/Scene1ThousandOfferingsWeb.js",
+        "size_bytes": 40800,
+        "entry_class": "Scene1ThousandOfferingsWeb"
+      },
+      {
+        "id": "script_grab_place_offering",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/scripts/GrabPlaceOffering.js",
+        "size_bytes": 20400,
+        "entry_class": "GrabPlaceOffering"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 11688200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

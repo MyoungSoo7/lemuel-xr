@@ -1,0 +1,110 @@
+{
+  "mission_id": "job",
+  "scene_number": 1,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "skippable_after_sec": 5,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_job_seated_ashes",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/models/job_seated_ashes.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_three_friends_seated_silent",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/models/three_friends_seated_silent.glb",
+        "size_bytes": 4320000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_potsherd",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/models/potsherd.glb",
+        "size_bytes": 480000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_seven_days_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/s1_seven_days_narration_ko.wav",
+        "size_bytes": 2640000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 22000
+      },
+      {
+        "id": "amb_wind_low_desolate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/amb_wind_low_desolate.ogg",
+        "size_bytes": 1080000,
+        "voice_id": null,
+        "duration_ms": 60000
+      },
+      {
+        "id": "amb_silence_room_tone",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/audio/amb_silence_room_tone.ogg",
+        "size_bytes": 840000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_job_garment_torn",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/textures/job_garment_torn_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_friends_garment_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/textures/friends_garment_atlas_4k.ktx2",
+        "size_bytes": 2880000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_seven_days_silence",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/Scene1SevenDaysSilencePolySpatial.cs.bundle",
+        "size_bytes": 50400,
+        "entry_class": "Scene1SevenDaysSilencePolySpatial"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/SkipGateIntro.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "SkipGateIntro"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 17379600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

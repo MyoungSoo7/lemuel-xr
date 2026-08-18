@@ -1,0 +1,98 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "skippable_after_sec": 3
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_carmel_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/360/env_carmel_aftermath.jpg",
+        "size_bytes": 7000000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_elijah_fleeing_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/billboards/elijah_fleeing_sheet.webp",
+        "size_bytes": 1040000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_altar_smoldering_stones_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/altar_smoldering_stones_lite.glb",
+        "size_bytes": 180000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_jezreel_walls_far_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/jezreel_walls_far_lite.glb",
+        "size_bytes": 108000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s1_narration_ko.mp3",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 24000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_ridge_wind_dusk",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/amb_ridge_wind_dusk.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_embers_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/amb_embers_low.mp3",
+        "size_bytes": 400000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_ember_glow_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/textures/ember_glow_overlay_2k.webp",
+        "size_bytes": 500000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_carmel_flight_cinematic_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/Scene1CarmelFlightCinematicWeb.js",
+        "size_bytes": 37400,
+        "entry_class": "Scene1CarmelFlightCinematicWeb"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/SkipGateIntro.js",
+        "size_bytes": 13600,
+        "entry_class": "SkipGateIntro"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10979000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

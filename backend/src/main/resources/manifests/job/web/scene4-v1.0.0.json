@@ -1,0 +1,109 @@
+{
+  "mission_id": "job",
+  "scene_number": 4,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "line_advance_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_whirlwind_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/360/env_meditation_whirlwind_cosmos.jpg",
+        "size_bytes": 5600000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_job_looking_up_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/job_looking_up_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_cosmos_scale_fx_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/models/cosmos_scale_fx_lite.glb",
+        "size_bytes": 234000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_out_of_whirlwind_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s4_out_of_whirlwind_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "whirlwind_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_where_were_you_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s4_where_were_you_ko.mp3",
+        "size_bytes": 800000,
+        "voice_id": "whirlwind_v1",
+        "duration_ms": 16000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_answer_is_presence_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s4_answer_is_presence_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps",
+        "note": "신학 가드 — 하나님의 응답은 설명이 아니라 임재(욥 38~42). 질문에 답을 주신 것으로 서술하지 않는다"
+      },
+      {
+        "id": "aud_s4_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s4_reflection_prompt_ko.mp3",
+        "size_bytes": 650000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_whirlwind_deep",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_whirlwind_deep.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_cosmos_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/textures/cosmos_overlay_2k.webp",
+        "size_bytes": 450000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_whirlwind_answer_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/Scene4WhirlwindAnswerWeb.js",
+        "size_bytes": 39100,
+        "entry_class": "Scene4WhirlwindAnswerWeb"
+      },
+      {
+        "id": "script_line_highlight_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/LineHighlightSync.js",
+        "size_bytes": 17000,
+        "entry_class": "LineHighlightSync"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10350100,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

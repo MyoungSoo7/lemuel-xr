@@ -1,0 +1,123 @@
+{
+  "mission_id": "job",
+  "scene_number": 2,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "consent_card_required": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ash_heap_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/env_ash_heap_night.glb",
+        "size_bytes": 6400000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_job_crying_out",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/job_crying_out.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_three_friends_watching",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/three_friends_watching.glb",
+        "size_bytes": 2880000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_job3_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s2_job3_3_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "job_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s2_additional_refs_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s2_additional_refs_ko.wav",
+        "size_bytes": 1120000,
+        "voice_id": "job_v1",
+        "duration_ms": 14000,
+        "note": "job-3:11 · job-6:8 추가 참조 낭독"
+      },
+      {
+        "id": "aud_s2_not_rebuked_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s2_not_rebuked_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s2_reflection_prompt_ko.wav",
+        "size_bytes": 1040000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000
+      },
+      {
+        "id": "aud_s2_language_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s2_language_note_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "note": "R 가드 — 비탄의 언어를 허락하되 낭만화하지 않는다. 죽음 생각이 크면 본문보다 {{crisis_resources.default}} 연결이 우선"
+      },
+      {
+        "id": "amb_night_desolate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/amb_night_desolate.ogg",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_job_garment_torn",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/job_garment_torn_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_friends_garment_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/friends_garment_atlas_1k.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_night_sand_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/night_sand_atlas_512.ktx2",
+        "size_bytes": 640000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/scripts/Scene2ConsentGate.cs.bundle",
+        "size_bytes": 20800,
+        "entry_class": "Scene2ConsentGate"
+      },
+      {
+        "id": "script_lament_reading_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/scripts/LamentReadingSync.cs.bundle",
+        "size_bytes": 17600,
+        "entry_class": "LamentReadingSync"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 20838400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

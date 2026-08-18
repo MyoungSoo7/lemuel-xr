@@ -1,0 +1,160 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 4,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "consent_card_required": true,
+    "no_selection_after_sec": 30,
+    "dwell_limit_sec": 90,
+    "crisis_overlay_persistent": true,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_solomon_elder_seated",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/solomon_elder_seated.glb",
+        "size_bytes": 3360000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_vineyard_pool_miniature",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/vineyard_pool_miniature.glb",
+        "size_bytes": 2400000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_hevel_label_cards_3",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/models/hevel_label_cards_3.glb",
+        "size_bytes": 840000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_wealth_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_wealth_narration_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s4_i_made_great_works_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_i_made_great_works_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "solomon_elder_v1",
+        "duration_ms": 12000,
+        "note": "왕상 10:27; 전 2:4~6, 요약",
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_nothing_withheld_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_nothing_withheld_ko.wav",
+        "size_bytes": 1440000,
+        "voice_id": "solomon_elder_v1",
+        "duration_ms": 12000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_all_vanity_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_all_vanity_ko.wav",
+        "size_bytes": 1680000,
+        "voice_id": "solomon_elder_v1",
+        "duration_ms": 14000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_empathy_block_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_empathy_block_ko.wav",
+        "size_bytes": 1560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000,
+        "note": "R2 — 공감 먼저·교정 없음. '허무는 믿음/감사 부족' 류 표현 금지"
+      },
+      {
+        "id": "aud_s4_crisis_overlay_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/s4_crisis_overlay_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "note": "R2 영구 오버레이 — outro 를 기다리지 않고 이 씬에서 {{crisis_resources.default}} 노출"
+      },
+      {
+        "id": "amb_terrace_wind_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/audio/amb_terrace_wind_low.ogg",
+        "size_bytes": 1080000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_elder_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/solomon_elder_robe_4k.ktx2",
+        "size_bytes": 2400000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_hevel_cards_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/hevel_cards_atlas_2k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_vineyard_leaf",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/textures/vineyard_leaf_4k.ktx2",
+        "size_bytes": 1800000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_hevel_labeling",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/Scene4HevelLabelingPolySpatial.cs.bundle",
+        "size_bytes": 60000,
+        "entry_class": "Scene4HevelLabelingPolySpatial"
+      },
+      {
+        "id": "script_dwell_limit_guard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/DwellLimitGuard.cs.bundle",
+        "size_bytes": 26400,
+        "entry_class": "DwellLimitGuard"
+      },
+      {
+        "id": "script_choice_via_gaze_dwell_10s",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/ChoiceViaGazeDwell10s.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ChoiceViaGazeDwell10s"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/visionpro/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 21254400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

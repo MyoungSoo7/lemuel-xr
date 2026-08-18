@@ -1,0 +1,185 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 3,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "consent_card_required": true,
+    "dead_infant_visualized": false,
+    "sword_touches_child": false,
+    "default_choice_after_sec": 40,
+    "intensity_toggle": [
+      "captions_only",
+      "mild",
+      "default"
+    ]
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_throne_hall_judgment",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/env_throne_hall_judgment.glb",
+        "size_bytes": 7200000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_solomon_enthroned",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/solomon_enthroned.glb",
+        "size_bytes": 2240000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_woman_a_pleading",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/woman_a_pleading.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_woman_b_standing",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/woman_b_standing.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_sword_ceremonial",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/sword_ceremonial.glb",
+        "size_bytes": 720000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_two_women_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_two_women_narration_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "note": "요약 — '창기' 생략은 여인 비낙인화 목적의 의도적 각색(왕상 3:16)"
+      },
+      {
+        "id": "aud_s3_woman_a_claim_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_woman_a_claim_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "woman_a_v1",
+        "duration_ms": 15000
+      },
+      {
+        "id": "aud_s3_woman_b_claim_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_woman_b_claim_ko.wav",
+        "size_bytes": 640000,
+        "voice_id": "woman_b_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s3_judgment_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_judgment_prompt_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s3_sword_command_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_sword_command_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 10000,
+        "note": "칼은 들어올려질 뿐 아기에게 닿지 않는다 — 마음을 드러내는 시험의 말"
+      },
+      {
+        "id": "aud_s3_true_mother_plea_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_true_mother_plea_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "woman_a_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s3_verdict_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_verdict_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s3_skip_summary_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s3_skip_summary_caption_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "note": "R4 스킵 대체 — 비묘사 요약 자막 1장 낭독 후 Scene 4 로"
+      },
+      {
+        "id": "amb_hall_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/amb_hall_murmur.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/solomon_robe_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_woman_a_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/woman_a_garment_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_woman_b_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/woman_b_garment_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_sword_blade_dull",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/sword_blade_dull_512.ktx2",
+        "size_bytes": 640000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      },
+      {
+        "id": "tex_hall_marble_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/hall_marble_atlas_1k.ktx2",
+        "size_bytes": 2080000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_judgment_pick_one",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/scripts/Scene3JudgmentPickOne.cs.bundle",
+        "size_bytes": 43200,
+        "entry_class": "Scene3JudgmentPickOne"
+      },
+      {
+        "id": "script_consent_gate_infant_loss",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/scripts/ConsentGateInfantLoss.cs.bundle",
+        "size_bytes": 20800,
+        "entry_class": "ConsentGateInfantLoss"
+      },
+      {
+        "id": "script_intensity_toggle",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/scripts/IntensityToggle.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "IntensityToggle"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 28640000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,144 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 3,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "haptic_intensity_max": 0.3,
+    "haptic_pattern": "TAP_SOFT",
+    "haptic_channel": "BOTH"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_broom_tree_dawn",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/models/env_broom_tree_dawn.glb",
+        "size_bytes": 6560000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_angel_touch_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/models/angel_touch_light.glb",
+        "size_bytes": 1120000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_bread_cake_on_coals",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/models/bread_cake_on_coals.glb",
+        "size_bytes": 720000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_water_jar",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/models/water_jar.glb",
+        "size_bytes": 640000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_elijah_asleep",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/models/elijah_asleep.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_arise_and_eat_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/s3_arise_and_eat_ko.wav",
+        "size_bytes": 560000,
+        "voice_id": "angel_v1",
+        "duration_ms": 7000
+      },
+      {
+        "id": "aud_s3_step_receive_food_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/s3_step_receive_food_ko.wav",
+        "size_bytes": 640000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s3_step_lie_down_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/s3_step_lie_down_ko.wav",
+        "size_bytes": 640000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s3_practical_reminders_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/s3_practical_reminders_ko.wav",
+        "size_bytes": 1040000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000,
+        "note": "한 끼·30분 일찍 눕기·산책 10분 — 신체 회복 우선(왕상 19:5~6)"
+      },
+      {
+        "id": "sfx_touch_gentle_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/sfx_touch_gentle.ogg",
+        "size_bytes": 144000,
+        "voice_id": null,
+        "duration_ms": 1500,
+        "note": "hapticHint.fallback.audioCueId=touch-gentle — 햅틱 없는 기기의 대체 큐"
+      },
+      {
+        "id": "amb_dawn_desert_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/audio/amb_dawn_desert_soft.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_bread_crust",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/textures/bread_crust_1k.ktx2",
+        "size_bytes": 880000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_water_jar_clay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/textures/water_jar_clay_1k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/textures/elijah_mantle_1k.ktx2",
+        "size_bytes": 1520000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_dawn_sand_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/textures/dawn_sand_atlas_512.ktx2",
+        "size_bytes": 640000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_body_first_gestures",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/scripts/Scene3BodyFirstGestures.cs.bundle",
+        "size_bytes": 41600,
+        "entry_class": "Scene3BodyFirstGestures"
+      },
+      {
+        "id": "script_haptic_tap_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/v1.0.0/scripts/HapticTapSoft.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "HapticTapSoft"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 18841600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

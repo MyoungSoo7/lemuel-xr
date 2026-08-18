@@ -1,0 +1,121 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 5,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "passive_only": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_seven_thousand_lights",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/models/seven_thousand_lights.glb",
+        "size_bytes": 1760000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_elijah_standing_wrapped",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/models/elijah_standing_wrapped.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_seven_thousand_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s5_seven_thousand_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s5_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s5_value_prompt_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s5_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s5_recovery_pack_15entries_ko.tar",
+        "size_bytes": 2880000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s5_timeline_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s5_timeline_note_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "note": "R3 — 회복 시간표 강요 금지. 먹고 잔 뒤에도 엘리야는 두 번 더 '나만 남았다' 고 말한다(왕상 19:10·14)"
+      },
+      {
+        "id": "aud_s5_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s5_crisis_reminder_ko.wav",
+        "size_bytes": 560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "note": "R1 — {{crisis_resources.default}} 낭독. 위기 감지 시 1번 정적 콘텐츠로 라우팅"
+      },
+      {
+        "id": "amb_dawn_ridge_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/amb_dawn_ridge_soft.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/textures/elijah_mantle_1k.ktx2",
+        "size_bytes": 1520000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_lights_motes_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/textures/lights_motes_atlas_512.ktx2",
+        "size_bytes": 640000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_outro_recovery",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/Scene5OutroRecovery.cs.bundle",
+        "size_bytes": 35200,
+        "entry_class": "Scene5OutroRecovery"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/RecoveryKeyRouter.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "RecoveryKeyRouter"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12472400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

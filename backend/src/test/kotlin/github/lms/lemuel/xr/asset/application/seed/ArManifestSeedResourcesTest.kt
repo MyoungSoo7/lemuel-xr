@@ -19,7 +19,8 @@ class ArManifestSeedResourcesTest {
     private val resolver = PathMatchingResourcePatternResolver()
 
     /** AR 을 여는 미션 — application.yml `lemuel.xr.ar-enabled-missions` 기본값과 같다. */
-    private val arMissions = setOf("joseph", "moses", "david", "jesus")
+    private val arMissions =
+        setOf("joseph", "moses", "david", "jesus", "elijah", "solomon", "job")
 
     /** 패스스루가 있는 기기만. web 은 대상이 아니다. */
     private val arDevices = setOf("quest3", "visionpro", "galaxyxr")
@@ -60,7 +61,8 @@ class ArManifestSeedResourcesTest {
             .map { it.coords }.toSet()
 
         assertThat(ar.map { it.coords }.toSet()).isEqualTo(vrCoords)
-        assertThat(ar).hasSize(72) // (요셉 5 + 모세 6 + 다윗 6 + 예수 7) x 3 기기
+        // (요셉 5 + 모세 6 + 다윗 6 + 예수 7 + 엘리야 5 + 솔로몬 5 + 욥 5) x 3 기기
+        assertThat(ar).hasSize(117)
     }
 
     @Test

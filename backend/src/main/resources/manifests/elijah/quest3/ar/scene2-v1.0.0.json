@@ -1,0 +1,119 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 2,
+  "device_type": "quest3",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "consent_card_required": true,
+    "crisis_check_required": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_broom_tree",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/models/broom_tree.glb",
+        "size_bytes": 2200000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_elijah_lying_exhausted",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/models/elijah_lying_exhausted.glb",
+        "size_bytes": 2400000,
+        "lod": "lod3_pbr_with_imposter"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_1kgs19_4_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/audio/s2_1kgs19_4_ko.wav",
+        "size_bytes": 1000000,
+        "voice_id": "elijah_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s2_not_rebuked_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/audio/s2_not_rebuked_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/audio/s2_reflection_prompt_ko.wav",
+        "size_bytes": 1100000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s2_crisis_check_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/audio/s2_crisis_check_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000,
+        "note": "R1 crisis_check 게이트 낭독 — 동의 못 하면 즉시 {{crisis_resources.default}}"
+      },
+      {
+        "id": "amb_desert_night_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/audio/amb_desert_night_low.ogg",
+        "size_bytes": 900000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/textures/elijah_mantle_2k.ktx2",
+        "size_bytes": 1900000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_broom_branch_dry",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/textures/broom_branch_dry_2k.ktx2",
+        "size_bytes": 1500000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/scripts/Scene2ConsentGate.cs.bundle",
+        "size_bytes": 26000,
+        "entry_class": "Scene2ConsentGate"
+      },
+      {
+        "id": "script_crisis_check_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/scripts/CrisisCheckGate.cs.bundle",
+        "size_bytes": 22000,
+        "entry_class": "CrisisCheckGate"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13078000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,115 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 4,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "line_advance_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_horeb_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/360/env_meditation_horeb_cave.jpg",
+        "size_bytes": 5600000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_cave_mouth_frame_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/cave_mouth_frame_lite.glb",
+        "size_bytes": 180000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_theophany_fx_wind_quake_fire_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/theophany_fx_wind_quake_fire_lite.glb",
+        "size_bytes": 234000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_elijah_wrapped_mantle_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/billboards/elijah_wrapped_mantle_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_wind_quake_fire_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s4_wind_quake_fire_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_still_small_voice_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s4_still_small_voice_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "still_small_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_examples_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s4_examples_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_framing_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s4_framing_note_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "신학 가드 — '세미한 소리'(왕상 19:12~13)는 내면 신비 체험이 아니라 말씀으로 찾아오시는 임재"
+      },
+      {
+        "id": "amb_cave_silence_tone",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/amb_cave_silence_tone.mp3",
+        "size_bytes": 350000,
+        "voice_id": null,
+        "duration_ms": 40000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_cave_dim_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/textures/cave_dim_overlay_2k.webp",
+        "size_bytes": 440000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_still_small_voice_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/Scene4StillSmallVoiceWeb.js",
+        "size_bytes": 39100,
+        "entry_class": "Scene4StillSmallVoiceWeb"
+      },
+      {
+        "id": "script_line_highlight_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/LineHighlightSync.js",
+        "size_bytes": 17000,
+        "entry_class": "LineHighlightSync"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 9920100,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

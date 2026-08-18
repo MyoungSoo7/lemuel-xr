@@ -1,0 +1,99 @@
+{
+  "mission_id": "job",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "skippable_after_sec": 5
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ash_heap_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/360/env_meditation_ash_heap.jpg",
+        "size_bytes": 5400000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_job_seated_ashes_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/job_seated_ashes_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_three_friends_seated_silent_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/three_friends_seated_silent_sheet.webp",
+        "size_bytes": 1440000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_potsherd_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/models/potsherd_lite.glb",
+        "size_bytes": 36000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_seven_days_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s1_seven_days_narration_ko.mp3",
+        "size_bytes": 1100000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 22000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_wind_low_desolate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_wind_low_desolate.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_silence_room_tone",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_silence_room_tone.mp3",
+        "size_bytes": 350000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_ash_dim_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/textures/ash_dim_overlay_2k.webp",
+        "size_bytes": 430000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_seven_days_silence_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/Scene1SevenDaysSilenceWeb.js",
+        "size_bytes": 35700,
+        "entry_class": "Scene1SevenDaysSilenceWeb"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/SkipGateIntro.js",
+        "size_bytes": 13600,
+        "entry_class": "SkipGateIntro"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10215300,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,153 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 3,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "haptic_intensity_max": 0.3,
+    "haptic_pattern": "TAP_SOFT",
+    "haptic_channel": "BOTH",
+    "spatial_audio_mode": "personal",
+    "haptic_fallback_audio_cue": "touch-gentle"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_broom_tree_dawn",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/models/env_broom_tree_dawn.glb",
+        "size_bytes": 9840000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_angel_touch_light",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/models/angel_touch_light.glb",
+        "size_bytes": 1680000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_bread_cake_on_coals",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/models/bread_cake_on_coals.glb",
+        "size_bytes": 1080000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_water_jar",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/models/water_jar.glb",
+        "size_bytes": 960000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_elijah_asleep",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/models/elijah_asleep.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_arise_and_eat_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/s3_arise_and_eat_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "angel_v1",
+        "duration_ms": 7000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s3_step_receive_food_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/s3_step_receive_food_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s3_step_lie_down_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/s3_step_lie_down_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s3_practical_reminders_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/s3_practical_reminders_ko.wav",
+        "size_bytes": 1560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000,
+        "note": "한 끼·30분 일찍 눕기·산책 10분 — 신체 회복 우선(왕상 19:5~6)"
+      },
+      {
+        "id": "sfx_touch_gentle_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/sfx_touch_gentle.ogg",
+        "size_bytes": 216000,
+        "voice_id": null,
+        "duration_ms": 1500,
+        "note": "hapticHint.fallback.audioCueId=touch-gentle — 햅틱 없는 기기의 대체 큐"
+      },
+      {
+        "id": "amb_dawn_desert_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/audio/amb_dawn_desert_soft.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_bread_crust",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/textures/bread_crust_4k.ktx2",
+        "size_bytes": 1320000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_water_jar_clay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/textures/water_jar_clay_4k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/textures/elijah_mantle_4k.ktx2",
+        "size_bytes": 2280000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_dawn_sand_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/textures/dawn_sand_atlas_2k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_body_first_gestures",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/scripts/Scene3BodyFirstGesturesPolySpatial.cs.bundle",
+        "size_bytes": 62400,
+        "entry_class": "Scene3BodyFirstGesturesPolySpatial"
+      },
+      {
+        "id": "script_haptic_tap_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/scripts/HapticTapSoft.cs.bundle",
+        "size_bytes": 24000,
+        "entry_class": "HapticTapSoft"
+      },
+      {
+        "id": "script_touch_audio_fallback",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/visionpro/v1.0.0/scripts/TouchAudioFallback.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "TouchAudioFallback"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 28280400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
