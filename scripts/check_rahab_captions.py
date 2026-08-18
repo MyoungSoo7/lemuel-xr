@@ -575,6 +575,9 @@ def check_yml(lines: list[str], slines: list[str], content: str) -> list[st.Resu
 
     res: list[st.Result] = []
     cap_bad, foot_bad = [], []
+    # cid → 본문이 실린 Scene 번호 집합 / 본문 없이 그 카드를 가리키기만 한 자리
+    card_bodies_seen: dict[str, set[int]] = {}
+    card_refs: list[tuple[int, str, object]] = []
     for path in files:
         n = int(re.search(r"scene(\d+)", os.path.basename(path)).group(1))
         doc = st.load_yaml(path)
@@ -589,17 +592,43 @@ def check_yml(lines: list[str], slines: list[str], content: str) -> list[st.Resu
             want_attr = "" if ea in ("—", "-") else ea
             if gr == er and ga != want_attr:
                 cap_bad.append(f"scene{n}.yml {gr}: attribution {ga!r} ≠ {want_attr!r}")
+        # 🚨 카드 **본문**만 잰다. Scene 최상위에도 `consent_card_id` 가 있는데(G7 이
+        #    요구하는 Scene 층위 포인터다 — 룻도 같은 모양이다) 거기엔 본문이 없다.
+        #    그 dict 까지 세면 「footer 가 없다」가 6건 뜨고, 고칠 방법이 **LOCKED 문자열
+        #    사본을 한 벌 더 두는 것**뿐이 된다. 이 파일이 처음부터 피하려던 것이 그거다.
+        #    대신 **본문이 통째로 없는 카드**를 여기서 FAIL 로 잡는다 — 그러지 않으면
+        #    본문을 지우는 것이 초록으로 가는 길이 된다(⑳ 공집합 전칭명제).
         for d in st.walk_dicts(doc):
             cid = d.get("consent_card_id")
             if not cid or cid not in assign:
                 continue
-            ko = norm(str(d.get("consent_card_ko", "")))
-            if not ko.endswith(assign[cid]):
-                foot_bad.append(f"scene{n}.yml {cid}: F-6.5 footer 가 카드 끝에 없다")
+            if "consent_card_ko" in d:
+                ko = norm(str(d.get("consent_card_ko") or ""))
+                card_bodies_seen.setdefault(cid, set()).add(n)
+                if not ko.endswith(assign[cid]):
+                    foot_bad.append(f"scene{n}.yml {cid}: F-6.5 footer 가 카드 끝에 없다")
+            elif d is doc:
+                # Scene 최상위의 포인터. 본문을 담는 자리가 아니다(G7 이 요구하는 키다).
+                continue
+            else:
+                card_refs.append((n, cid, d.get("asked_at_scene")))
         for d in st.walk_dicts(doc):
             if "speaker" in d and "verse_ref" in d and d.get("speaker") != "scripture_caption":
                 cap_bad.append(f"scene{n}.yml {d.get('verse_ref')}: "
                                f"speaker={d['speaker']!r} ≠ scripture_caption")
+
+    # 본문 없이 카드를 가리킨 자리 — 「이미 물은 카드가 이 Scene 도 덮는다」는 선언이다.
+    # 그 선언이 참이려면 **가리킨 Scene 에 본문이 실제로 있어야** 한다. 그러지 않으면
+    # 모든 자리에 `asked_at_scene` 만 적고 본문을 통째로 지우는 것이 초록이 된다(⑳).
+    for n, cid, asked in card_refs:
+        where = card_bodies_seen.get(cid) or set()
+        if asked is None:
+            foot_bad.append(f"scene{n}.yml {cid}: 본문도 `asked_at_scene` 도 없다 — "
+                            f"footer 가 어디에 붙는지 말하지 않는 카드다")
+        elif int(asked) not in where:
+            foot_bad.append(f"scene{n}.yml {cid}: `asked_at_scene: {asked}` 라고 적었는데 "
+                            f"scene{asked}.yml 에 그 카드 본문이 없다 "
+                            f"(본문이 있는 Scene: {sorted(where) or '없음'})")
 
     res.append(bad("a-yml", f"(자막) yml 불일치 {len(cap_bad)}건", cap_bad) if cap_bad
                else ok("a-yml", f"{len(files)}개 Scene yml 의 자막 배열이 §5-1-a 와 일치"))

@@ -1,0 +1,223 @@
+# content/rahab/scene4.yml — Theme 20 라합 · Scene 4 「창문과 붉은 줄」
+# 정본 출처는 scene1.yml 머리말과 같다.
+# 이 Scene 은 4행 중 3행(수 2:15 · 2:18 · 2:19)이 자를 근거 없이 「중」으로 잠겨 있다.
+#
+# 🚨 카드 2장이 한 Scene 을 덮는 최초의 자리다. 엔진의 거절 조건은
+#    `consent_declined_or_skipped` 하나이고 Scene 범위 이진이라 **어느 한 장만 거절해도
+#    두 장의 델타가 함께 적용된다.** 과차단이지만 정직한 대가이고, 카드 문안 둘 다
+#    합집합을 적어 그 사실을 미리 말한다.
+
+character: rahab
+theme_id: 20
+scene_id: 4
+scene_name_ko: "창문과 붉은 줄"
+mission_minutes: "7 (전 5 Scene 자막 합계 420초)"
+duration_seconds_target: 80
+
+exposure_grade: C
+trigger_categories:
+  - blood_guilt_attribution
+  - height_suspension
+  - family_annihilation_risk
+# ── §5-1 긍정 선언. 금지 목록(`staging_constraints`)만 두면 「아무 데도 안 적혀
+#    있으니 괜찮다」가 성립한다 — seed §5-1 이 그래서 이 키를 따로 요구한다.
+#    자구는 §5-1 표의 `user_presence` 칸 그대로다. 코퍼스 첫 사용례다.
+user_presence: "창문 안쪽, 줄에 손이 닿지 않는 곳"
+
+staging_constraints:
+  - "불변식 1 — 사용자를 라합의 몸 안에 두지 않는다."
+  - "불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다."
+  - "불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다."
+  - "창문 안쪽 · 줄에 손이 닿지 않는 곳."
+  - "성벽 바깥 조망 금지 — 높이를 시각적 위협으로 쓰지 않는다."
+  - "붉은 줄은 타인의 손이 맨다 — 라합의 손을 사용자 손으로 대체하지 않는다."
+  - "하강 묘사 없음 — 내려가는 동작은 어느 경로에서도 화면에 나오지 않는다."
+  - "클로즈업 없음."
+
+consent_card_id: rahab_blood_guilt
+consent_card_intensity: mid
+consent_covers_scenes: [4]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: null
+skip_alternative_note: >-
+  거절해도 Scene 은 이어진다 — 계약 문구 두 줄(2:18·2:19)이 빠지고 창문·줄 에셋이
+  화면에서 내려간다. 대체 Scene 이 없으므로 null 이다.
+skip_bridge_narration_ko: null
+consent_cards:
+  - consent_card_id: rahab_blood_guilt
+    consent_card_intensity: mid
+    consent_covers_scenes: [4]
+    consent_declined_route: s4_declined
+    voice_intensity_options: [subtitle_only, low, default]
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-4"
+    consent_card_ko: |
+      다음 장면에는 고대의 계약 문구가 나옵니다. 집 밖으로 나가면 그 피가 그의 머리로
+      돌아간다는 말입니다.
+      · 누구에게 책임이 있는지를 정하던 옛 표현이며, 이 미션은 그 말을 오늘의 당신에게
+        적용하지 않습니다.
+      · 건너뛰시면 그 두 줄이 나오지 않습니다. 같은 장면의 창문과 줄도 화면에 띄우지
+        않습니다.
+      · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      계속하시겠어요?
+      [계속한다]  [계약 문구 두 줄은 건너뛴다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      이 장면의 자막은 고대의 계약 문구입니다. 누가 다치든 그것이 당신 책임이라는 뜻이
+      아닙니다. 지금 안전하지 않은 곳에 있다면 {{crisis_resources.default}}
+  - consent_card_id: rahab_height_rope
+    consent_card_intensity: mid
+    consent_covers_scenes: [4]
+    consent_declined_route: s4_declined
+    voice_intensity_options: [subtitle_only, low, default]
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-5"
+    consent_card_ko: |
+      다음 장면에는 사람이 창문에서 줄에 매달려 성벽 아래로 내려가는 대목이 나옵니다.
+      · 내려가는 동작은 어느 쪽을 고르셔도 화면에 나오지 않습니다.
+      · 건너뛰시면 창문과 줄이 화면에 나오지 않습니다. 같은 장면의 계약 문구 두 줄도
+        함께 빠집니다.
+      · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      계속하시겠어요?
+      [계속한다]  [창문과 줄은 화면에 띄우지 않는다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      이 장면에는 줄을 타고 성벽을 내려가는 대목이 나옵니다. 자막은 성경 본문 그대로지만,
+      창문과 줄은 화면에 띄우지 않도록 고르실 수 있습니다. 지금 힘들다면
+      {{crisis_resources.default}}
+
+consent_overblock_note: >-
+  두 카드의 `consent_declined_route` 가 같은 `s4_declined` 인 것은 축약이 아니라
+  엔진의 한계다. 어느 카드를 거절했는지 기록되지 않으므로 최악을 가정한 경로 하나만
+  실행된다. 카드가 자기 델타만 적으면 거짓 약속이 되므로 두 장 다 합집합을 적었다.
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    axis: "R2 고난 귀속 금지 · R3 회복 압박 금지"
+    note: >-
+      「그의 피가 그의 머리로 돌아갈 것이요」는 책임 귀속 문장이다. 이 Scene 에서 R2 의
+      표층형이 붙으면 그 귀속이 오늘의 사용자에게 옮겨 붙는다. 상단 고지가 그것을 막는
+      1차 수단이고 토큰은 2차다.
+    lint_forbidden_tokens:
+      - "다 뜻이 있어"
+      - "하시려고 그 일을 허락"
+      - "연단하시려고"
+      - "그만큼 헌신했으니"
+      - "충성했으니"
+      - "믿음이 좋아서"
+      - "용기를 냈기 때문에"
+
+environment:
+  location_ko: "창문 안쪽. 성벽 위의 집."
+  time_of_day: 밤
+  lighting: "등불. 조도 하한 유지."
+  ambient_audio: ["밤바람"]
+  assets_shared: [interior_room_generic, oil_lamp, figure_silhouette_x3]
+  assets_dedicated: [window_frame, scarlet_cord]
+  assets_hidden_on_route:
+    route: s4_declined
+    hidden: [window_frame, scarlet_cord]
+  camera_rig: inside_window_out_of_reach
+  ui_overlays:
+    - id: rahab_s4_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: rahab_s4_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: rahab
+    display_ko: "라합"
+    framing: full_body_far
+    staging_note: "줄을 매는 손은 이 인물의 손이다. 사용자에게 넘기지 않는다."
+  - id: two_men
+    display_ko: "두 사람"
+    framing: full_body_far
+
+captions:
+  - id: rahab_s4_jos_2_15
+    verse_ref: "수 2:15 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "라합이 그들을 창문에서 줄로 달아 내리니 그의 집이 성벽 위에 있으므로 그가 성벽 위에 거주하였음이라"
+    cut_basis: null
+  - id: rahab_s4_jos_2_18
+    verse_ref: "수 2:18 중"
+    speaker: scripture_caption
+    attribution_display_ko: "정탐꾼"
+    omitted_on_route: s4_declined
+    text_ko: "우리가 이 땅에 들어올 때에 우리를 달아 내린 창문에 이 붉은 줄을 매고 네 부모와 형제와 네 아버지의 가족을 다 네 집에 모으라"
+    cut_basis: null
+    attribution_note: >-
+      화자 표기가 배제 절에 기대고 있다 — 이 말을 여는 도입절은 배제된 앞 절에 있었다.
+      배제 절의 **내용을 되살리지 않고** 표기 필드로만 푼다(§2-3). 절 번호도 적지 않는다:
+      G9 는 배제 절의 참조 문자열이 렌더 leaf 에 나오는 것 자체를 잡는다 —
+      초안이 설계 주석에 그 번호를 적었다가 걸렸고, 마커로 면제시키지 않고 참조를 뺐다.
+  - id: rahab_s4_jos_2_19
+    verse_ref: "수 2:19 중"
+    speaker: scripture_caption
+    attribution_display_ko: "정탐꾼"
+    omitted_on_route: s4_declined
+    text_ko: "누구든지 네 집 문을 나가서 거리로 가면 그의 피가 그의 머리로 돌아갈 것이요 우리는 허물이 없으리라 그러나 누구든지 너와 함께 집에 있는 자에게 손을 대면 그의 피는 우리의 머리로 돌아오려니와"
+    cut_basis: null
+    attribution_note: "같은 사유 — 도입절이 배제된 앞 절에 있다."
+  - id: rahab_s4_jos_2_21
+    verse_ref: "수 2:21 중"
+    speaker: scripture_caption
+    attribution_display_ko: "라합"
+    text_ko: "너희의 말대로 할 것이라 하고 그들을 보내어 가게 하고 붉은 줄을 창문에 매니라"
+    cut_basis: "화자 도입구 — 「라합이 이르되」를 attribution_display_ko 로 옮겼다."
+
+partial_marker_unbased:
+  - id: rahab_s4_jos_2_15
+    note: "덜어낼 화자 도입구가 없고 배제된 구도 없다. 절 전문인데 표기는 「중」이다."
+  - id: rahab_s4_jos_2_18
+    note: >-
+      절 안에는 자를 자리가 없다. 도입절은 애초에 배제된 다른 절이고, 그 배제는 배제
+      목록이 처리한 것이지 이 절을 부분 인용으로 만드는 근거가 아니다.
+  - id: rahab_s4_jos_2_19
+    note: "같은 사유."
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: false
+
+interactions: []
+interaction_note: >-
+  인터랙션 0종. 창문에 줄을 매는 것은 수 2:21 이 라합에게 돌린 행위다 —
+  사용자에게 넘기면 그 행위를 가로챈다.
+
+branches: []
+branches_note: "사건 분기 0건. 거절 경로 `s4_declined` 는 자막 제외와 에셋 비표시로만 표현된다."
+
+next_scene_id: 5
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["증표가 걸리는 자리를 본다"]
+  emotional: ["높이와 매달림을 손이 닿지 않는 거리에서 겪는다"]
+  rational: ["책임의 경계를 정하던 옛 문구를 옛 문구로 읽는다"]

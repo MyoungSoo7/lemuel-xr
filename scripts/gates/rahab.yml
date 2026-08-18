@@ -363,9 +363,15 @@ release_blockers:
     resolved: false
 
 # ── T1 신학 축 (2026-08-18) ────────────────────────────────────────────────────
-# G5t 는 `safety_gates[].id: T1_*` 를 요구하거나, 없으면 **여기에 부채를 등재**하게 한다.
-# 등재는 PASS 가 아니라 BLOCKED(판정 유보)다 — 침묵과 구별하려고 적는 것이다.
-theology_axis:
-  status: exempt
-  reason: >-
-    신학 게이트 v1 미도입. 이 인물은 content/rahab/scene*.yml 자체가 아직 main 에 없어서 T1_ 축을 둘 자리도 없다 — 콘텐츠 머지가 선행 조건이다.
+# G5t 는 `safety_gates[].id: T1_*` 를 요구하거나, 없으면 여기에 부채를 등재하게 한다.
+#
+# 라합은 **등재가 아니라 선언**으로 간다. Scene 이 생기면서 축을 둘 자리가 생겼고,
+# `theology_axis: {status: exempt}` 를 그대로 두면 G5t 가 FAIL 한다(축이 실재하는데
+# 설정만 면제라고 적힌 상태 — 설정이 콘텐츠보다 늦은 것). 그래서 면제를 걷었다.
+#
+# 축은 `content/rahab/scene{1,2,5}.yml` 의 `T1_no_repentance_narrative_lint` 다.
+# 토큰은 계열 7·8·9(낙인 소거 · 본문 밖 서사 · 공로화 인과) 7종으로, R2_R3 축에서
+# **옮긴** 것이다 — 아래 `forbidden` 31종 합집합은 변하지 않는다. 옮긴 근거는
+# `docs/THEOLOGY-REFERENCES.md` §라합: 여호수아 본문은 라합의 회개를 말하지 않으며
+# 회개 서사는 4세기의 구성물이다. 그건 고난 귀속(R2)도 회복 압박(R3)도 아니라
+# **본문 충실성** 문제다.

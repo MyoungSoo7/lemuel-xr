@@ -1,0 +1,212 @@
+# content/rahab/scene3.yml — Theme 20 라합 · Scene 3 「지붕에서 한 말」
+# 정본 출처는 scene1.yml 머리말과 같다.
+# 이 Scene 은 4행 중 2행(수 2:12 · 수 2:13)이 자를 근거 없이 「중」으로 잠겨 있다.
+
+character: rahab
+theme_id: 20
+scene_id: 3
+scene_name_ko: "지붕에서 한 말"
+mission_minutes: "7 (전 5 Scene 자막 합계 420초)"
+duration_seconds_target: 95
+
+exposure_grade: C
+trigger_categories:
+  - family_annihilation_risk
+  - conditional_survival_pact
+# ── §5-1 긍정 선언. 금지 목록(`staging_constraints`)만 두면 「아무 데도 안 적혀
+#    있으니 괜찮다」가 성립한다 — seed §5-1 이 그래서 이 키를 따로 요구한다.
+#    자구는 §5-1 표의 `user_presence` 칸 그대로다. 코퍼스 첫 사용례다.
+user_presence: "지붕, 선 채로, 대화 바깥 거리"
+
+staging_constraints:
+  - "불변식 1 — 사용자를 라합의 몸 안에 두지 않는다."
+  - "불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다."
+  - "불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다."
+  - "지붕 · 선 채로 · 대화 바깥 거리."
+  - "눕힘 금지 — 사용자 자세를 눕는 자세로 바꾸지 않는다."
+  - "올려다보는 각도 금지."
+  - "삼대와 정탐꾼을 프레임 밖에 둔다."
+  - "라합의 손 대체 금지 — 본문이 라합에게 돌린 행위를 사용자에게 넘기지 않는다."
+
+consent_card_id: rahab_family_risk
+consent_card_intensity: low_mid
+consent_covers_scenes: [3]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: null
+skip_alternative_note: >-
+  거절해도 Scene 은 이어진다 — 수 2:13 과 수 2:14 두 자막만 빠진다. 대체 Scene 이 없으므로
+  null 이다. G7 은 키의 존재만 보므로 통과하지만, 통과시키려고 없는 경로를 적지 않는다.
+skip_bridge_narration_ko: null
+consent_cards:
+  - consent_card_id: rahab_family_risk
+    consent_card_intensity: low_mid
+    consent_covers_scenes: [3]
+    consent_declined_route: s3_omit_2_13_2_14
+    voice_intensity_options: [subtitle_only, low, default]
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-3"
+    consent_card_ko: |
+      다음 장면에는 한 사람이 자기 부모와 형제를 살려 달라고 청하는 대목이 나옵니다.
+      상대는 자기들의 목숨으로 대신하겠다고 답합니다.
+      · 누가 죽는 장면은 없습니다. 말로 오가는 약속입니다.
+      · 건너뛰시면 청하는 줄과 답하는 줄이 나오지 않습니다. 장면은 이어집니다.
+      · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      계속하시겠어요?
+      [계속한다]  [약속하는 두 줄은 건너뛴다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      이 장면에는 목숨을 걸고 맺는 약속이 나옵니다. 침묵을 조건으로 안전을 얻어 본 적이
+      있다면 건너뛰셔도 됩니다. {{crisis_resources.default}}
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    axis: "R2 고난 귀속 금지 · R3 회복 압박 금지"
+    note: >-
+      침묵을 조건으로 안전을 얻는 계약이 자막에 그대로 나온다. 이 자리에서 R3(회복 압박)의
+      표층형이 가장 잘 붙는다 — 「이제 그만 일어나」 류가 계약 문장 뒤에 오면 조건부 생존을
+      회복 서사로 덮는다.
+    lint_forbidden_tokens:
+      - "이제 그만 일어나"
+      - "감사하면 회복"
+      - "믿음으로 이겨내"
+      - "빨리 잊고"
+      - "결국 보상받았"
+      - "참으니 복이"
+      - "연단하시려고"
+
+environment:
+  location_ko: "집 지붕. 밤. 삼대는 프레임 밖에 있다."
+  time_of_day: 밤
+  lighting: "밤하늘 미광. 조도 하한 유지."
+  ambient_audio: ["밤바람"]
+  assets_shared: [rooftop_generic, night_sky, figure_silhouette_x3]
+  assets_dedicated: []
+  camera_rig: standing_outside_conversation_radius
+  ui_overlays:
+    - id: rahab_s3_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: rahab_s3_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: rahab
+    display_ko: "라합"
+    framing: full_body_far
+  - id: two_men
+    display_ko: "두 사람"
+    framing: full_body_far
+    staging_note: "대화 바깥 거리에 둔다. 사용자를 이 자리에 세우지 않는다."
+
+# ── `s2_skip` 착지 블록. scene2.yml 의 `skip_alternative_scene_id: "s2_skip"` 이
+#    가리키는 정의가 여기 있다 — 그 경로는 Scene 2 를 통째로 건너뛰므로 정의를 scene2.yml 에
+#    두면 정의를 담은 파일이 재생되지 않는다. 바로 아래 브리지 문장이 뜨는 자리도 여기다
+#    (`docs/RAHAB-LOCKED-STRINGS.md` §3 — 「Scene 3 첫 자막(수 2:8) 앞」).
+#    ⚠️ 이 블록은 이 Scene 자신의 카드(`rahab_family_risk`)와 무관하다. Scene 3 의 거절
+#    경로는 `s3_omit_2_13_2_14` 이고, 그것은 자막 두 줄의 `omitted_on_route` 로 표현된다.
+#    두 거절이 겹치면 두 경로가 함께 적용된다 — 이 블록은 Scene 3 자막을 한 줄도 빼지 않는다.
+conditional_blocks:
+  - id: s2_skip
+    condition: scene2_consent_declined
+    description: "Scene 2(수 2:2-7) 전체 미재생. 이 Scene 은 그대로 재생되고, 첫 자막 앞에 비성경 내레이션 한 줄이 붙는다."
+    omits_scene: 2
+    prepends_narration: rahab_nar_s3_bridge
+    keeps_captions:
+      [
+        rahab_s3_jos_2_8,
+        rahab_s3_jos_2_12,
+        rahab_s3_jos_2_13,
+        rahab_s3_jos_2_14,
+      ]
+
+non_scripture_narration:
+  - id: rahab_nar_s3_bridge
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §3"
+    shown_on_route: s2_skip
+    position: "Scene 3 첫 자막(수 2:8) 앞"
+    marker_ko: "본문이 아닙니다"
+    text_ko: "한 장면을 건너뛰었습니다. 라합이 여기서 말을 건네는 상대는 성 밖에서 온 두 사람입니다."
+    note: >-
+      상한은 **지시 대상까지**다. 건너뛴 절의 사건(숨김·수색·성문)을 되살리지 않는다.
+      route 이름은 Scene 2 거절인데 문장이 뜨는 자리는 Scene 3 첫 행이다 — 건너뛴 Scene 에
+      두면 화면에 나오지 않는다.
+
+captions:
+  - id: rahab_s3_jos_2_8
+    verse_ref: "수 2:8 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "또 그들이 눕기 전에 라합이 지붕에 올라가서"
+    cut_basis: "화자 도입구 — 뒤이어 오는 말을 여는 「그들에게 이르러」를 뺐다."
+  - id: rahab_s3_jos_2_12
+    verse_ref: "수 2:12 중"
+    speaker: scripture_caption
+    attribution_display_ko: "라합"
+    text_ko: "그러므로 이제 청하노니 내가 너희를 선대하였은즉 너희도 내 아버지의 집을 선대하도록 여호와로 내게 맹세하고 내게 증표를 내라"
+    cut_basis: null
+  - id: rahab_s3_jos_2_13
+    verse_ref: "수 2:13 중"
+    speaker: scripture_caption
+    attribution_display_ko: "라합"
+    omitted_on_route: s3_omit_2_13_2_14
+    text_ko: "그리고 나의 부모와 나의 남녀 형제와 그들에게 속한 모든 사람을 살려 주어 우리 목숨을 죽음에서 건져내라"
+    cut_basis: null
+  - id: rahab_s3_jos_2_14
+    verse_ref: "수 2:14 중"
+    speaker: scripture_caption
+    attribution_display_ko: "정탐꾼"
+    omitted_on_route: s3_omit_2_13_2_14
+    text_ko: "네가 우리의 이 일을 누설하지 아니하면 우리의 목숨으로 너희를 대신할 것이요 여호와께서 우리에게 이 땅을 주실 때에는 인자하고 진실하게 너를 대우하리라"
+    cut_basis: "화자 도입구 — 「그 사람들이 그에게 이르되」를 attribution_display_ko 로 옮겼다."
+
+partial_marker_unbased:
+  - id: rahab_s3_jos_2_12
+    note: "덜어낼 화자 도입구가 없고 배제된 구도 없다. 절 전문인데 표기는 「중」이다."
+  - id: rahab_s3_jos_2_13
+    note: "같은 사유."
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: false
+
+interactions: []
+interaction_note: >-
+  인터랙션 0종. rev.2 가 여기 수 2:13 위에 1종을 얹으려다 철회한 자리다 —
+  동기가 설계가 아니라 G8 판정 대상 만들기였다(§3-1).
+
+branches: []
+branches_note: "사건 분기 0건. 거절 경로 `s3_omit_2_13_2_14` 는 자막 제외로만 표현된다."
+
+next_scene_id: 4
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["맹세를 요청하는 자리에 선다"]
+  emotional: ["가족을 지키려는 요구를 요구인 채로 둔다"]
+  rational: ["조건과 약속의 구조를 본다"]

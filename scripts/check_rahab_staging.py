@@ -397,11 +397,18 @@ def check(seed_path: str, content_dir: str) -> list[Result]:
             ))
 
         # ── (b3) 철자 — '기존' 은 코퍼스에 실재하고 '신규' 는 없어야 한다 ──
+        #    🚨 **검사 대상 인물 자신은 코퍼스가 아니다.** '신규' 는 「이 어휘를 라합이
+        #    처음 들여온다」는 주장이고, 라합 Scene 이 `content/` 에 들어오는 순간
+        #    자기 자신을 근거로 그 주장이 거짓이 된다 — 콘텐츠를 머지하는 것만으로
+        #    7건이 빨개졌다(2026-08-18 실측). 자기 자신을 빼고 센다.
         corpus_dir = os.path.join(ROOT, "content")
+        self_char = os.path.basename(os.path.normpath(content_dir))
         corpus_vals: set[str] = set()
         corpus_files = []
         if os.path.isdir(corpus_dir):
             for ch in sorted(os.listdir(corpus_dir)):
+                if ch == self_char:
+                    continue
                 for p in scene_files(os.path.join(corpus_dir, ch)):
                     corpus_files.append(p)
                     data = load_yaml(p)
@@ -671,17 +678,32 @@ def check(seed_path: str, content_dir: str) -> list[Result]:
         res.append(blocked("f-corpus", "코퍼스를 읽지 못했다 (PyYAML 부재 또는 파일 없음)"))
     else:
         mx = max((len(v) for v in cover.values()), default=0)
-        over = [f"{c} Scene {n} → {sorted(v)}" for (c, n), v in sorted(cover.items()) if len(v) > 1]
-        if over:
+        over = {(c, n) for (c, n), v in cover.items() if len(v) > 1}
+        # §7-2 가 **선언한** 예외. 「라합은 Scene 4·5 에 카드를 둘씩 두는 첫 사례이고,
+        # 그 순간 엔진의 이진 플래그가 표현력을 잃는다」— 그 부채는 §10 에 등재돼 있다
+        # (`rahab_consent_delta_no_runtime`). 그러니 이 둘이 2장인 것은 **드리프트가
+        # 아니라 선언**이다. 대신 양방향으로 잠근다 — 선언 밖의 인물이 2장을 두면
+        # 빨강이고, 라합 4·5 가 1장으로 줄어도 빨강이다(§7-2 서술이 죽은 것이므로).
+        DECLARED_MULTI = {("rahab", 4), ("rahab", 5)}
+        unexpected = sorted(over - DECLARED_MULTI)
+        vanished = sorted(DECLARED_MULTI - over)
+        if unexpected or vanished:
             res.append(bad(
-                "f-corpus", f"§7-2 의 '최대 1' 이 깨졌다 — 최대 {mx}",
-                over + ["§7-2 의 '라합이 첫 사례' 서술과 그 위에 세운 판정을 다시 봐야 한다"],
+                "f-corpus",
+                f"§7-2 의 커버 카드 선언과 코퍼스가 어긋난다 (최대 {mx})",
+                [f"선언 밖: {c} Scene {n} → {sorted(cover[(c, n)])}" for c, n in unexpected]
+                + [f"선언했는데 없다: {c} Scene {n} → {sorted(cover.get((c, n)) or [])}"
+                   for c, n in vanished]
+                + ["§7-2 의 '라합이 첫 사례' 서술과 그 위에 세운 판정을 다시 봐야 한다"],
             ))
         else:
             res.append(ok(
-                "f-corpus", f"코퍼스에서 한 Scene 을 덮는 카드 최대 {mx} — §7-2 실측 유지",
-                [f"Scene yml {n_files}개 · 카드 보유 (인물,Scene) {len(cover)}쌍",
-                 "라합은 Scene 4·5 에 둘씩 두는 첫 사례가 된다(§7-2)"],
+                "f-corpus",
+                f"커버 카드 2장인 자리가 §7-2 선언({len(DECLARED_MULTI)}쌍)과 정확히 일치",
+                [f"Scene yml {n_files}개 · 카드 보유 (인물,Scene) {len(cover)}쌍 · 최대 {mx}",
+                 "라합 Scene 4·5 가 그 첫 사례다 — 엔진 이진 플래그의 표현력 한계는 "
+                 "§10 `rahab_consent_delta_no_runtime` 로 등재된 미해소 부채다",
+                 "⚠️ 이 초록은 '2장이어도 괜찮다'가 아니다. '선언한 자리에서만 2장이다' 까지다"],
             ))
 
     # ── yml 쪽 — 대조 대상이 있어야 잴 수 있다 ────────────────────────────
