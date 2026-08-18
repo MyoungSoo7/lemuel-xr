@@ -74,32 +74,39 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
 
     private companion object {
         /**
-         * 두 방어선이 겹치는 지점 — 고난정당화(`suffering-justification`) 층뿐이다.
-         * 이 층은 애초에 *정신건강* 축의 위반이라 토큰 게이트의 사정거리 안에 있다.
+         * 두 방어선이 겹치는 지점.
          *
-         * `suffering-prosperity-inverse` 는 2026-08-04 사인오프 시점에는 543종 중 하나도
-         * 걸리지 않았다. 그 사각지대가 job.yml R3 게이트 신설(2026-08-05)로 닫혔다.
+         * 2026-08-18 v1: 신학 게이트 T1_no_heterodox_theology (scenarios/job.yml) 가 영지주의·
+         * 뉴에이지·번영신학 고난귀책 표층형 8종을 추가함으로써 REJECTED 표본 7/7 이 모두 잡힌다.
+         *
+         * 잡히는 토큰 요약:
+         *  - gnostic-body-prison         : 갇혀 있는 감옥 / 창조는 실패
+         *  - gnostic-inner-divinity      : 나의 신성
+         *  - gnostic-secret-knowledge    : 감춰진 비밀 지식 / 영혼의 무덤
+         *  - newage-universal-energy     : 우주의 에너지 / 긍정의 파동
+         *  - suffering-faith-deficiency  : 믿음이 부족 (기존 R2_R3 토큰)
+         *  - suffering-justification     : 당사자의 실패를 증명
+         *  - suffering-prosperity-inverse: 회복의 크기는 (기존 R2_R3 토큰)
+         *
+         * ⚠️ 한계 — 동의어 재작성(synonym rewriting)은 8/8 미포착(application.yml:181-187).
+         * 부분문자열 lint 의 구조적 한계이며 v2 L3 분류기가 맡는다.
          */
-        val CAUGHT_BY_TOKEN_LINT = listOf("suffering-faith-deficiency", "suffering-prosperity-inverse")
-
-        /**
-         * 토큰 게이트의 사정거리 밖 — 영지주의·뉴에이지는 *신학* 축이라 여기서 안 잡히는 게 맞다.
-         * 이들의 방어선은 근거성 게이트와 사람 신학 검토다.
-         *
-         * ⚠️ 단 `gnostic-inner-divinity` 는 예외다. 이 표본은 근거성 게이트에서도 ACCEPTED 로
-         * 통과한다(ScriptureGroundingValidationTest.KNOWN_MISMATCHES). **두 게이트를 모두
-         * 통과하는 유일한 이단 표본** 이고, 현재 이것을 막는 것은 사람 검토뿐이다.
-         * 이 사실을 목록 주석이 아니라 실행되는 검사로 남겨 둔 이유가 그것이다.
-         *
-         * `suffering-justification` 이 여기 있는 것도 뜻이 있다 — 같은 층인데 표층형이 달라
-         * 토큰을 비껴간다. 부분문자열 lint 는 층이 아니라 표현을 막는다는 증거다.
-         */
-        val MISSED_BY_TOKEN_LINT = listOf(
+        val CAUGHT_BY_TOKEN_LINT = listOf(
             "gnostic-body-prison",
             "gnostic-inner-divinity",
             "gnostic-secret-knowledge",
             "newage-universal-energy",
+            "suffering-faith-deficiency",
             "suffering-justification",
+            "suffering-prosperity-inverse",
         )
+
+        /**
+         * 토큰 게이트가 놓치는 표본 — 현재 0건.
+         *
+         * v1 토큰 8종으로 13건 골든셋의 REJECTED 7건이 전부 잡혔다.
+         * 이 목록이 비어 있는 것이 AC1 의 완료 조건이다.
+         */
+        val MISSED_BY_TOKEN_LINT = emptyList<String>()
     }
 }
