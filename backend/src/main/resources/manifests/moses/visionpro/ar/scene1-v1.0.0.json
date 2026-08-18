@@ -1,0 +1,105 @@
+{
+  "mission_id": "moses",
+  "scene_number": 1,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "passive_only": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_moses_self_shepherd",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/models/moses_self_shepherd.glb",
+        "size_bytes": 2640000,
+        "lod": "lod3_pbr_upscale_4k",
+        "eye_tracking_enhanced": true
+      },
+      {
+        "id": "model_long_round_staff",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/models/long_round_staff.glb",
+        "size_bytes": 480000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_rock_seat",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/models/rock_seat.glb",
+        "size_bytes": 600000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_distant_sheep_pack_6x",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/models/distant_sheep_pack_6x.glb",
+        "size_bytes": 720000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "amb_low_freq_wilderness_wind",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/audio/amb_low_freq_wilderness_wind.wav",
+        "size_bytes": 1440000,
+        "voice_id": null,
+        "duration_ms": 90000
+      },
+      {
+        "id": "amb_distant_sheep_low_bleat",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/audio/amb_distant_sheep_low_bleat.wav",
+        "size_bytes": 480000,
+        "voice_id": null,
+        "duration_ms": 5000
+      },
+      {
+        "id": "amb_silence_layer_pad",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/audio/amb_silence_layer_pad.wav",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 90000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_shepherd_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/textures/shepherd_garment_2k.ktx2",
+        "size_bytes": 720000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_rock_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/textures/rock_pbr_2k.ktx2",
+        "size_bytes": 600000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_wilderness_idle",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/scripts/Scene1WildernessIdlePolySpatial.cs.bundle",
+        "size_bytes": 22000,
+        "entry_class": "Scene1WildernessIdlePolySpatial"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 8440000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

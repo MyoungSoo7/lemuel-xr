@@ -1,0 +1,71 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 5,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [],
+    "audio": [
+      {
+        "id": "aud_s5_gen45_5_ko_softvoice",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s5_gen45_5_ko_soft.wav",
+        "size_bytes": 1320000,
+        "voice_id": "joseph_v1_soft",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_deep_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/amb_deep_drone_60hz.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 30000
+      },
+      {
+        "id": "aud_s5_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s5_recovery_pack_30entries_ko.tar",
+        "size_bytes": 8160000,
+        "voice_id": "joseph_v1_soft",
+        "duration_ms": 360000,
+        "note": "30 = 10 emotions x 3 faith_tones"
+      }
+    ],
+    "textures": [],
+    "scripts": [
+      {
+        "id": "script_scene5_recovery_match",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/Scene5RecoveryMatchPolySpatial.cs.bundle",
+        "size_bytes": 24000,
+        "entry_class": "Scene5RecoveryMatchPolySpatial"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10494000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

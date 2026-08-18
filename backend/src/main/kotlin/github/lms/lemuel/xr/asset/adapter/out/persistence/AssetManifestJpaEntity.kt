@@ -9,7 +9,7 @@ import org.hibernate.type.SqlTypes
 import java.time.LocalDateTime
 import java.util.UUID
 
-/** asset_manifests (V10) — 미션·씬·디바이스별 자산 묶음. */
+/** asset_manifests (V10 + xr_mode) — 미션·씬·디바이스·모드별 자산 묶음. */
 @Entity
 @Table(name = "asset_manifests")
 class AssetManifestJpaEntity {
@@ -25,6 +25,10 @@ class AssetManifestJpaEntity {
 
     @Column(name = "device_type", nullable = false, length = 30)
     var deviceType: String? = null
+
+    /** 'vr' | 'ar' — 도메인 enum 은 어댑터 경계에서만 문자열로 환원한다. */
+    @Column(name = "xr_mode", nullable = false, length = 10)
+    var xrMode: String? = null
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "capabilities_min", columnDefinition = "jsonb")

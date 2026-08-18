@@ -6,6 +6,7 @@ import github.lms.lemuel.xr.asset.application.seed.ManifestParser
 import github.lms.lemuel.xr.asset.application.seed.ManifestScanner
 import github.lms.lemuel.xr.asset.application.seed.ManifestValidator
 import github.lms.lemuel.xr.asset.domain.AssetManifest
+import github.lms.lemuel.xr.asset.domain.XrMode
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
@@ -32,9 +33,14 @@ class AssetManifestSeederTest {
     // real validator — 검증 분기까지 실제로 태운다.
     private val validator = ManifestValidator()
 
-    private fun doc(mission: String?, device: String?, version: String?): ManifestDocument =
+    private fun doc(
+        mission: String?,
+        device: String?,
+        version: String?,
+        xrMode: String? = null,
+    ): ManifestDocument =
         ManifestDocument(
-            mission, 1.toShort(), device, version,
+            mission, 1.toShort(), device, xrMode, version,
             mapOf("webgl" to 2), mapOf("bundle" to "s.glb"), "ko", 2048L, "https://cdn",
         )
 
@@ -46,7 +52,8 @@ class AssetManifestSeederTest {
         val r: Resource = ClassPathResource("test-manifests/valid/scene1-v1.0.0.json")
         whenever(scanner.scan()).thenReturn(arrayOf(r))
         whenever(parser.parse(r)).thenReturn(doc("joseph", "web", "1.0.0"))
-        whenever(manifests.existsByCoordinates("joseph", 1.toShort(), "web", "1.0.0")).thenReturn(false)
+        whenever(manifests.existsByCoordinates("joseph", 1.toShort(), "web", XrMode.VR, "1.0.0"))
+            .thenReturn(false)
 
         seeder().seed()
 
@@ -57,6 +64,7 @@ class AssetManifestSeederTest {
         assertThat(m.missionId).isEqualTo("joseph")
         assertThat(m.deviceType).isEqualTo("web")
         assertThat(m.version).isEqualTo("1.0.0")
+        assertThat(m.xrMode).isEqualTo(XrMode.VR) // xr_mode 없는 기존 시드는 VR
         assertThat(m.active).isTrue()
         assertThat(m.createdAt).isNotNull()
         assertThat(m.supersededAt).isNull()
@@ -71,7 +79,7 @@ class AssetManifestSeederTest {
         seeder().seed()
 
         verify(manifests, never()).save(any())
-        verify(manifests, never()).existsByCoordinates(any(), anyOrNull(), any(), any())
+        verify(manifests, never()).existsByCoordinates(any(), anyOrNull(), any(), any(), any())
     }
 
     @Test
@@ -79,7 +87,8 @@ class AssetManifestSeederTest {
         val r: Resource = ClassPathResource("test-manifests/valid/scene1-v1.0.0.json")
         whenever(scanner.scan()).thenReturn(arrayOf(r))
         whenever(parser.parse(r)).thenReturn(doc("joseph", "web", "1.0.0"))
-        whenever(manifests.existsByCoordinates("joseph", 1.toShort(), "web", "1.0.0")).thenReturn(true)
+        whenever(manifests.existsByCoordinates("joseph", 1.toShort(), "web", XrMode.VR, "1.0.0"))
+            .thenReturn(true)
 
         seeder().seed()
 
@@ -95,5 +104,32 @@ class AssetManifestSeederTest {
         seeder().seed() // 예외를 삼키고 완료해야 함
 
         verify(manifests, never()).save(any())
+    }
+
+    @Test
+    fun `xr_mode ar 이면 AR 좌표로 저장`() {
+        val r: Resource = ClassPathResource("test-manifests/valid/scene1-v1.0.0.json")
+        whenever(scanner.scan()).thenReturn(arrayOf(r))
+        whenever(parser.parse(r)).thenReturn(doc("joseph", "quest3", "1.0.0", xrMode = "ar"))
+        whenever(manifests.existsByCoordinates("joseph", 1.toShort(), "quest3", XrMode.AR, "1.0.0"))
+            .thenReturn(false)
+
+        seeder().seed()
+
+        val saved = argumentCaptor<AssetManifest>()
+        verify(manifests).save(saved.capture())
+        assertThat(saved.firstValue.xrMode).isEqualTo(XrMode.AR)
+    }
+
+    @Test
+    fun `xr_mode 오타면 스킵 — VR 로 흘려보내지 않는다`() {
+        val r: Resource = ClassPathResource("test-manifests/valid/scene1-v1.0.0.json")
+        whenever(scanner.scan()).thenReturn(arrayOf(r))
+        whenever(parser.parse(r)).thenReturn(doc("joseph", "quest3", "1.0.0", xrMode = "AR모드"))
+
+        seeder().seed()
+
+        verify(manifests, never()).save(any())
+        verify(manifests, never()).existsByCoordinates(any(), anyOrNull(), any(), any(), any())
     }
 }

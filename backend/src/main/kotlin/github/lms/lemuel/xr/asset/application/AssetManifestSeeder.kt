@@ -6,6 +6,7 @@ import github.lms.lemuel.xr.asset.application.seed.ManifestParser
 import github.lms.lemuel.xr.asset.application.seed.ManifestScanner
 import github.lms.lemuel.xr.asset.application.seed.ManifestValidator
 import github.lms.lemuel.xr.asset.domain.AssetManifest
+import github.lms.lemuel.xr.asset.domain.XrMode
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -14,10 +15,13 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 /**
- * classpath:manifests/{mission}/{device}/scene{N}-v{version}.json 을 스캔해
+ * classpath:manifests/{mission}/{device}[/{mode}]/scene{N}-v{version}.json 을 스캔해
  * asset_manifests 테이블에 upsert. 부팅 1회.
  *
- * (mission_id, scene_number, device_type, version) 이미 있으면 스킵 — 재배포 안전.
+ * 좌표는 디렉터리가 아니라 파일 안의 필드가 정한다 — 스캐너는 manifests 아래를 통으로
+ * 훑는다. 디렉터리는 사람이 읽기 위한 것이고, `xr_mode` 가 없으면 VR 이다.
+ *
+ * (mission_id, scene_number, device_type, xr_mode, version) 이미 있으면 스킵 — 재배포 안전.
  * 새 버전이면 신규 row INSERT (V10 의 superseded_by 흐름은 운영 도구에서 처리).
  *
  * SRP — 스캔([ManifestScanner])·파싱([ManifestParser])·검증
@@ -50,7 +54,11 @@ class AssetManifestSeeder(
                 }
 
                 if (manifests.existsByCoordinates(
-                        doc.missionId!!, doc.sceneNumber, doc.deviceType!!, doc.version!!,
+                        doc.missionId!!,
+                        doc.sceneNumber,
+                        doc.deviceType!!,
+                        XrMode.fromOrDefault(doc.xrMode)!!,
+                        doc.version!!,
                     )
                 ) {
                     skipped++
@@ -76,6 +84,7 @@ class AssetManifestSeeder(
             missionId = doc.missionId!!,
             sceneNumber = doc.sceneNumber,
             deviceType = doc.deviceType!!,
+            xrMode = XrMode.fromOrDefault(doc.xrMode)!!,
             capabilitiesMin = doc.capabilitiesMin,
             version = doc.version!!,
             manifest = doc.manifest ?: emptyMap(),

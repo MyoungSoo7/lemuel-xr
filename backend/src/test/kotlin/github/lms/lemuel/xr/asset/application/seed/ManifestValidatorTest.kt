@@ -10,9 +10,14 @@ class ManifestValidatorTest {
 
     private val validator = ManifestValidator()
 
-    private fun doc(missionId: String?, deviceType: String?, version: String?): ManifestDocument =
+    private fun doc(
+        missionId: String?,
+        deviceType: String?,
+        version: String?,
+        xrMode: String? = null,
+    ): ManifestDocument =
         ManifestDocument(
-            missionId, 1.toShort(), deviceType, version,
+            missionId, 1.toShort(), deviceType, xrMode, version,
             emptyMap(), emptyMap(), "ko", 1024L, "https://cdn",
         )
 
@@ -39,5 +44,21 @@ class ManifestValidatorTest {
     @Test
     fun `version 없으면 무효`() {
         assertThat(validator.isValid(doc("joseph", "web", null))).isFalse()
+    }
+
+    @Test
+    fun `xr_mode 없으면 유효 — 모드 도입 전 시드가 그대로 산다`() {
+        assertThat(validator.isValid(doc("joseph", "web", "1.0.0", xrMode = null))).isTrue()
+    }
+
+    @Test
+    fun `xr_mode vr ar 은 유효 (대소문자 무시)`() {
+        assertThat(validator.isValid(doc("joseph", "quest3", "1.0.0", "vr"))).isTrue()
+        assertThat(validator.isValid(doc("joseph", "quest3", "1.0.0", "AR"))).isTrue()
+    }
+
+    @Test
+    fun `모르는 xr_mode 는 무효`() {
+        assertThat(validator.isValid(doc("joseph", "quest3", "1.0.0", "mr"))).isFalse()
     }
 }

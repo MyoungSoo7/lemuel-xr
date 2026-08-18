@@ -25,19 +25,32 @@ namespace Lemuel
             _timeoutSeconds = timeoutSeconds;
         }
 
+        /// <param name="mode">"vr" | "ar". 비우면 서버가 vr 로 본다.
+        /// 그 미션이 열지 않은 모드면 400 — 폴백하지 않는다.</param>
         public IEnumerator GetAssetManifest(string mission, string device, int? sceneNumber,
-                                              Action<AssetManifest> onOk, Action<string> onErr)
+                                              Action<AssetManifest> onOk, Action<string> onErr,
+                                              string mode = null)
         {
             string url = $"{_baseUrl}/api/config/asset-manifest?mission={mission}&device={device}";
             if (sceneNumber.HasValue) url += $"&scene={sceneNumber.Value}";
+            if (!string.IsNullOrEmpty(mode)) url += $"&mode={mode}";
             yield return GetJson<AssetManifest>(url, onOk, onErr);
         }
 
         public IEnumerator GetInputMapping(string device,
-                                             Action<InputMapping> onOk, Action<string> onErr)
+                                             Action<InputMapping> onOk, Action<string> onErr,
+                                             string mode = null)
         {
             string url = $"{_baseUrl}/api/config/input-mapping?device={device}";
+            if (!string.IsNullOrEmpty(mode)) url += $"&mode={mode}";
             yield return GetJson<InputMapping>(url, onOk, onErr);
+        }
+
+        /// 이 미션이 노출하는 몰입 모드 목록. AR 토글을 그릴지 여기서 정한다.
+        public IEnumerator GetXrModes(string mission,
+                                        Action<XrModes> onOk, Action<string> onErr)
+        {
+            yield return GetJson<XrModes>($"{_baseUrl}/api/config/xr-modes?mission={mission}", onOk, onErr);
         }
 
         public IEnumerator StartGameSession(string mission, string userId,

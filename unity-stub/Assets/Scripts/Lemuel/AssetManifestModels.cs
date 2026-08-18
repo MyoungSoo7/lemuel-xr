@@ -15,6 +15,7 @@ namespace Lemuel
         public string missionId;
         public int sceneNumber;
         public string deviceType;
+        public string xrMode;       // "vr" | "ar" — 요청한 모드가 그대로 돌아온다
         public string version;
         public string cdnBaseUrl;
         public long totalSizeBytes;

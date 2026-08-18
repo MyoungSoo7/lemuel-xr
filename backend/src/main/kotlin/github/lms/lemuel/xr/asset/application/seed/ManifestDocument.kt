@@ -12,6 +12,8 @@ data class ManifestDocument(
     @param:JsonProperty("mission_id") val missionId: String?,
     @param:JsonProperty("scene_number") val sceneNumber: Short?,
     @param:JsonProperty("device_type") val deviceType: String?,
+    /** 'vr' | 'ar'. 없으면 VR — 모드 도입 전 시드 파일이 그대로 유효하다. */
+    @param:JsonProperty("xr_mode") val xrMode: String? = null,
     @param:JsonProperty("version") val version: String?,
     @param:JsonProperty("capabilities_min") val capabilitiesMin: Map<String, Any?>?,
     @param:JsonProperty("manifest") val manifest: Map<String, Any?>?,

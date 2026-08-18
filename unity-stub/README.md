@@ -30,7 +30,12 @@ unity-stub/
    - `device` — `quest3`
    - `mission` — `joseph`
    - `sceneNumber` — `1`
+   - `xrMode` — `vr` (기본) 또는 `ar`
 5. Play 누르면 Game View 좌상단에 status / progress 표시
+
+> AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은 요셉·모세·다윗이
+> 열려 있고, `mission` 을 `jesus` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
+> 던져서 400 을 받는 대신, 먼저 `/api/config/xr-modes` 로 물어보기 때문이다.
 
 ---
 
@@ -42,6 +47,8 @@ unity-stub/
 | 2. R4 동의 카드 | OnGUI 에 "건너뛰기" + "지금 시작" 버튼 | 카드가 안 보이면 OnGUI 잘못 attach |
 | 3. "지금 시작" 클릭 | `manifest+에셋 로드 완료 — 5 models, 6 audio, ~12MB` | manifest 만 받고 다운로드 0% — 정상 (R2 빔) |
 | 4. progress 바 | 0% → 일부 % 로 진행 후 stuck (R2 빔) | 0% 도 못 가면 manifest 파싱 실패 |
+| 5. AR 토글 (요셉) | 토글 켜면 `[ar]`, 로드 후 models 4개·환경 모델 없음 | 토글이 안 보이면 xr-modes 실패 |
+| 6. AR 토글 (예수) | 토글이 아예 안 보임 — 에셋 없는 미션 | 보이면 게이트가 뚫린 것 |
 
 ---
 
@@ -56,6 +63,25 @@ unity-stub/
 }
 ```
 
+### `GET /api/config/xr-modes?mission=joseph`
+```json
+{ "missionId": "joseph", "modes": ["vr", "ar"] }
+```
+예수·룻 등 에셋 없는 미션은 `["vr"]` 만 돌아온다.
+
+### `GET /api/config/input-mapping?device=quest3&mode=ar`
+```json
+{
+  "GRAB": {"source":"controller","binding":"grip","fallback":{"source":"hand","binding":"pinch"}},
+  "POINT_AT": {"source":"controller","binding":"raycast"},
+  "GAZE_DURATION": {"source":"head","binding":"head_direction_dwell"},
+  "PLACE_ON_SURFACE": {"source":"controller","binding":"raycast_plane_hittest","fallback":{"source":"hand","binding":"pinch_plane_hittest"}},
+  "RECENTER_ANCHOR": {"source":"controller","binding":"menu_long_press"},
+  "LOCOMOTION": {"source":"room_scale","binding":"physical_walk"}
+}
+```
+VR 매핑 위에 AR 오버레이가 얹힌 형태다.
+
 ### `GET /api/config/asset-manifest?mission=joseph&device=quest3&scene=1`
 ```json
 {
@@ -63,6 +89,7 @@ unity-stub/
   "missionId": "joseph",
   "sceneNumber": 1,
   "deviceType": "quest3",
+  "xrMode": "vr",
   "version": "1.0.0",
   "cdnBaseUrl": "https://cdn.r2.dev/lemuel-xr/",
   "totalSizeBytes": 12345678,
@@ -73,6 +100,10 @@ unity-stub/
   }
 }
 ```
+
+`&mode=ar` 를 붙이면 같은 씬의 AR manifest 가 온다 — 환경 모델(`env_*`)과 원경
+임포스터(`*_far`)가 빠지고 `script_ar_anchor_placement` 가 붙어, scene 1 기준
+24.8MB → 11.6MB 다. AR 이 열리지 않은 미션에 `mode=ar` 를 던지면 400 이다.
 
 ---
 

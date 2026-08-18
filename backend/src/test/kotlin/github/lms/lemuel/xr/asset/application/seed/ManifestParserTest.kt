@@ -22,6 +22,7 @@ class ManifestParserTest {
         assertThat(doc.missionId).isEqualTo("joseph")
         assertThat(doc.sceneNumber).isEqualTo(1.toShort())
         assertThat(doc.deviceType).isEqualTo("web")
+        assertThat(doc.xrMode).isNull() // 파일에 xr_mode 가 없으면 null → 시더가 VR 로 해석
         assertThat(doc.version).isEqualTo("1.0.0")
         assertThat(doc.audioLocale).isEqualTo("ko")
         assertThat(doc.totalSizeBytes).isEqualTo(2048L)

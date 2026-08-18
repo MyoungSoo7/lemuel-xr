@@ -1,0 +1,131 @@
+{
+  "mission_id": "joseph",
+  "scene_number": 4,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_joseph_self_outfit",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/models/joseph_egyptian_outfit.glb",
+        "size_bytes": 3120000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_brothers_11",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/models/brothers_11_pack.glb",
+        "size_bytes": 5760000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_first_farmer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s4_first_farmer_ko.wav",
+        "size_bytes": 1488000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 12000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_first_immigrant_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s4_first_immigrant_ko.wav",
+        "size_bytes": 1584000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 13000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_first_merchant_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s4_first_merchant_ko.wav",
+        "size_bytes": 1704000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 14000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_first_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s4_first_balanced_ko.wav",
+        "size_bytes": 1224000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s4_common_gen45_5_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/s4_common_gen45_5_ko.wav",
+        "size_bytes": 1296000,
+        "voice_id": "joseph_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_benjamin_sob_loop",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/amb_benjamin_sob_loop.ogg",
+        "size_bytes": 648000,
+        "voice_id": "benjamin_silent_v1",
+        "duration_ms": 18000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "amb_low_breath_layer",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/audio/amb_low_breath.ogg",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_joseph_outfit_pbr",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/textures/joseph_outfit_4k.ktx2",
+        "size_bytes": 2280000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_brothers_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/textures/brothers_atlas_4k.ktx2",
+        "size_bytes": 3840000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_choice",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/Scene4ChoicePolySpatial.cs.bundle",
+        "size_bytes": 36000,
+        "entry_class": "Scene4ChoicePolySpatial"
+      },
+      {
+        "id": "script_silence_via_gaze_dwell_10s",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/SilenceViaGazeDwell10s.cs.bundle",
+        "size_bytes": 14000,
+        "entry_class": "SilenceViaGazeDwell10s"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/joseph/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 23732000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

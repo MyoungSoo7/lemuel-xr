@@ -10,13 +10,14 @@ import java.util.UUID
 interface AssetManifestJpaRepository : JpaRepository<AssetManifestJpaEntity, UUID> {
 
     /**
-     * 미션·씬·디바이스 조합으로 최신 active manifest. version 내림차순.
+     * 미션·씬·디바이스·모드 조합으로 최신 active manifest. version 내림차순.
      * scene 이 null 이거나 여러 씬 manifest 가 매칭될 수 있으므로 [Limit] 로 1행만
      * 취해 NonUniqueResultException 을 방지한다(호출부는 Limit.of(1)).
      */
     @Query(
         "SELECT a FROM AssetManifestJpaEntity a " +
             "WHERE a.missionId = :mission AND a.deviceType IN (:device, '*') " +
+            "AND a.xrMode = :mode " +
             "AND (:scene IS NULL OR a.sceneNumber = :scene OR a.sceneNumber IS NULL) " +
             "AND a.isActive = true ORDER BY a.version DESC",
     )
@@ -24,13 +25,15 @@ interface AssetManifestJpaRepository : JpaRepository<AssetManifestJpaEntity, UUI
         @Param("mission") missionId: String,
         @Param("scene") sceneNumber: Short?,
         @Param("device") deviceType: String,
+        @Param("mode") xrMode: String,
         limit: Limit,
     ): Optional<AssetManifestJpaEntity>
 
-    fun existsByMissionIdAndSceneNumberAndDeviceTypeAndVersion(
+    fun existsByMissionIdAndSceneNumberAndDeviceTypeAndXrModeAndVersion(
         missionId: String,
         sceneNumber: Short?,
         deviceType: String,
+        xrMode: String,
         version: String,
     ): Boolean
 }

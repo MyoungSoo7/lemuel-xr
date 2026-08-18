@@ -1,0 +1,90 @@
+{
+  "mission_id": "moses",
+  "scene_number": 6,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": true,
+    "passive_only": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [],
+    "audio": [
+      {
+        "id": "aud_s6_ex3_12_ko_softvoice",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/s6_ex3_12_ko_softvoice.wav",
+        "size_bytes": 576000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000
+      },
+      {
+        "id": "aud_s6_recovery_unworthy_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/s6_recovery_unworthy_balanced_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s6_recovery_afraid_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/s6_recovery_afraid_balanced_ko.wav",
+        "size_bytes": 784000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s6_recovery_lonely_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/s6_recovery_lonely_balanced_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "aud_s6_recovery_anxious_balanced_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/s6_recovery_anxious_balanced_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000
+      },
+      {
+        "id": "amb_deep_ambient_drone_60hz",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/audio/amb_deep_ambient_drone_60hz.wav",
+        "size_bytes": 368000,
+        "voice_id": null,
+        "duration_ms": 30000
+      }
+    ],
+    "textures": [],
+    "scripts": [
+      {
+        "id": "script_scene6_recovery_match",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/scripts/Scene6RecoveryMatch.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "Scene6RecoveryMatch"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/moses/galaxyxr/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 4336000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
