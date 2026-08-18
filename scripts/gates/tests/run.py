@@ -17,7 +17,7 @@ RED 가 vacuous 해지는 두 경로를 둘 다 막는다
 --------------------------------------------
 1. **다른 이유로 실패한 RED.** 케이스마다 `gate` 를 명시하고, 그 게이트가 FAIL 인지
    확인한 뒤 `reason_contains` 로 실패 사유까지 대조한다. 사유가 안 맞으면 실패다.
-2. **부수 피해로 실패한 RED.** base 는 27/27 PASS 여야 한다(러너가 먼저 검사한다).
+2. **부수 피해로 실패한 RED.** base 는 **전 게이트 PASS** 여야 한다(러너가 먼저 검사한다).
    그러면 RED 케이스에서 비-PASS 인 게이트 집합은 정확히 `{gate} ∪ also_nonpass`
    여야 한다. 하나라도 더 있으면 그 픽스처는 "의도한 게이트를 검증했다"고 말할 수 없다.
    불가피한 경우(YAML 파싱 불가 등)만 `delta_check: false` + `delta_note` 로 명시 면제한다.
@@ -104,6 +104,15 @@ def build_case(case_dir: str, case: dict) -> str:
     return root
 
 
+# 하한(래칫). **이 러너 자신이 vacuous 해지는 경로를 막는다.**
+# 케이스 트리가 통째로 비면 `no_red` 가 전 게이트를 잡아 주지만, base 설정이
+# 망가져 게이트 목록 자체가 쪼그라들면 "적은 게이트를 전부 통과" 로 초록이 난다 —
+# 검사 대상이 사라진 것이 통과로 인쇄되는 형태다(⑳). 그래서 **줄어들면 빨강**이다.
+# 게이트를 늘릴 때 이 수를 같이 올린다. 내리려면 왜 내리는지 커밋에 적어라.
+MIN_GATES = 29
+MIN_CASES = 59
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--filter", default=None, help="케이스 이름 부분문자열")
@@ -125,6 +134,10 @@ def main() -> int:
         return 1
     if base["_exit"] != 0:
         print(f"{RED}[FAIL]{OFF} base 종료코드 {base['_exit']} (0 이어야 한다)")
+        return 1
+    if len(all_gates) < MIN_GATES:
+        print(f"{RED}[FAIL]{OFF} base 가 돌린 게이트 {len(all_gates)}개 < 하한 {MIN_GATES}개 — "
+              "검사 대상이 줄어든 것을 통과로 인쇄하지 않는다")
         return 1
     print(f"{GREEN}[OK]{OFF}   GREEN 기준선 base/ — {len(all_gates)}개 게이트 전부 PASS, 종료코드 0")
     print(f"{DIM}       (이 한 줄이 모든 게이트의 GREEN 픽스처다 — 규약을 지킨 입력에서 초록){OFF}")
@@ -213,8 +226,11 @@ def main() -> int:
     if no_red:
         print(f"{RED}  RED 픽스처 없는 게이트: {no_red}{OFF}")
         print("  RED 대조군이 없는 게이트는 '막고 있다'는 증거가 없다.")
+    if len(names) < MIN_CASES:
+        print(f"{RED}  케이스 {len(names)}개 < 하한 {MIN_CASES}개{OFF} — "
+              "픽스처가 사라진 것은 초록이 아니다.")
     print(f"\n--- 케이스 {ok_n}/{len(names)} 통과 ---")
-    if bad or no_red:
+    if bad or no_red or len(names) < MIN_CASES:
         return 1
     return 0
 
