@@ -135,7 +135,7 @@ acceptance_criteria:
     golden set with 8 validated L2 tokens; limitation: enumerated recall on frozen
     fixtures, generalization unverified'
   semantic_ac_key: ac_3888439e65864862
-  verify_command: cd /Users/lms/lemuel-xr/backend && gradle test --tests '*GoldenSetTokenLintCrossCheckTest*'
+  verify_command: cd "$(git rev-parse --show-toplevel)/backend" && gradle test --tests '*GoldenSetTokenLintCrossCheckTest*'
     --tests '*GoldenSetIntegrityTest*' -q
   expected_artifacts:
   - eval/grounding/v1/manifest.json
@@ -144,14 +144,14 @@ acceptance_criteria:
     path carries no crisis_resources or shown_resources fields; regression test enforces
     this invariant
   semantic_ac_key: ac_c8a12a5a60d97d82
-  verify_command: cd /Users/lms/lemuel-xr/backend && gradle test --tests '*ContentSafetyGateEnforcementTest*'
+  verify_command: cd "$(git rev-parse --show-toplevel)/backend" && gradle test --tests '*ContentSafetyGateEnforcementTest*'
     --tests '*ForbiddenTokenConfigTest*' -q
 - description: Theology gate observable via Micrometer counter content.gate.block
     with axis and layer dimensions — counter registered at boot (value 0 distinguishable
     from absent), both LLM generation path (GenerateLlmResponseUseCase) and content
     sanitization path counted, tags use opaque rule_id only (no token literals)
   semantic_ac_key: ac_84f89ff3b6e3e602
-  verify_command: cd /Users/lms/lemuel-xr/backend && gradle test --tests '*SafetyMetrics*'
+  verify_command: cd "$(git rev-parse --show-toplevel)/backend" && gradle test --tests '*SafetyMetrics*'
     -q
 - description: Theology axis enforcement complete across all 12 gate-configured characters
     — each declares T1_-prefixed gates or carries explicit exemption with reason string;
@@ -159,13 +159,13 @@ acceptance_criteria:
     pointing to existing test method; meta-test validates reference resolves to real
     source
   semantic_ac_key: ac_4f32bdd90c9f9432
-  verify_command: cd /Users/lms/lemuel-xr/backend && gradle test --tests '*ContentSafetyGateEnforcementTest*'
+  verify_command: cd "$(git rev-parse --show-toplevel)/backend" && gradle test --tests '*ContentSafetyGateEnforcementTest*'
     -q
 - description: Theology L2 tests execute unconditionally in default CI — no @EnabledIfEnvironmentVariable
     gate, no GEMINI_API_KEY or external API key required; distinct from ScriptureGroundingValidationTest
     which remains gated
   semantic_ac_key: ac_dd945104dc2b800b
-  verify_command: cd /Users/lms/lemuel-xr/backend && env -u GEMINI_API_KEY gradle test
+  verify_command: cd "$(git rev-parse --show-toplevel)/backend" && env -u GEMINI_API_KEY gradle test
     --tests '*GoldenSet*' --tests '*ForbiddenToken*' -q
 ontology_schema:
   name: TheologyContentSafetyGate
