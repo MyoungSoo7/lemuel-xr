@@ -1,0 +1,306 @@
+# content/rahab/scene5.yml — Theme 20 라합 · Scene 5 「진영 밖에서 이스라엘 중으로」
+# 정본 출처는 scene1.yml 머리말과 같다.
+# 이 Scene 은 7행 중 3행(수 6:23 · 약 2:25 · 수 6:25)이 자를 근거 없이 「중」으로 잠겨 있다.
+# 수 6:17b 와 수 6:27 은 「중」이 없다 — 각각 절 내 구 단위 채택과 전문 인용이라 정확하다.
+#
+# 🚨 이 Scene 도 카드 2장이 덮는다(`rahab_stigma` · `rahab_lineage_birth`). 두 장의
+#    `consent_declined_route` 가 같은 `s5_close_on_6_23_6_27` 이므로 어느 쪽을 거절해도
+#    같은 경로가 실행된다 — 카드 이름만 보고 세면 한 장이 빠진다.
+
+character: rahab
+theme_id: 20
+scene_id: 5
+scene_name_ko: "진영 밖에서 이스라엘 중으로"
+mission_minutes: "7 (전 5 Scene 자막 합계 420초)"
+duration_seconds_target: 95
+
+exposure_grade: C
+trigger_categories:
+  - sex_work_stigma
+  - ethnic_labeling
+  - pregnancy_childbirth
+# ── §5-1 긍정 선언. 금지 목록(`staging_constraints`)만 두면 「아무 데도 안 적혀
+#    있으니 괜찮다」가 성립한다 — seed §5-1 이 그래서 이 키를 따로 요구한다.
+#    자구는 §5-1 표의 `user_presence` 칸 그대로다. 코퍼스 첫 사용례다.
+user_presence: "진영 밖 → 안, 걷지 않고 정지 시점"
+
+staging_constraints:
+  - "불변식 1 — 사용자를 라합의 몸 안에 두지 않는다."
+  - "불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다."
+  - "불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다."
+  - "진영 밖 → 안 · 정지 시점."
+  - "군중 묘사 없음."
+  - "불타는 성 묘사 없음."
+  - "공성·함락·비명 오디오 에셋 없음."
+  - "종결 자막은 정지 화면에 둔다."
+
+consent_card_id: rahab_lineage_birth
+consent_card_intensity: low_mid
+consent_covers_scenes: [5]
+voice_intensity_options: [subtitle_only, low, default]
+skip_alternative_scene_id: null
+skip_alternative_note: >-
+  마지막 Scene 이라 건너뛸 다음 Scene 이 없다. 거절은 자막 제외로만 표현되고
+  이야기는 수 6:23 → 수 6:27 로 닫힌다.
+skip_bridge_narration_ko: null
+consent_cards:
+  - consent_card_id: rahab_lineage_birth
+    consent_card_intensity: low_mid
+    consent_covers_scenes: [5]
+    consent_declined_route: s5_close_on_6_23_6_27
+    voice_intensity_options: [subtitle_only, low, default]
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-6"
+    consent_card_ko: |
+      마지막 장면에는 한 사람이 아이를 낳았다는 계보 문장이 한 줄 나옵니다.
+      · 출산 장면은 나오지 않습니다. 이름을 잇는 한 줄입니다.
+      · 이 미션은 아이가 태어난 것을 보상이나 회복의 증거로 말하지 않습니다.
+      · 건너뛰시면 그 한 줄이 나오지 않습니다. 이 장면에서 호칭이 든 줄들도 함께
+        빠집니다. 이야기는 그대로 끝맺어집니다.
+      · 그 자리에는 성경 본문이 아닌 안내 문장이 대신 뜹니다. 「본문이 아닙니다」
+        표지가 함께 붙습니다.
+      · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      계속하시겠어요?
+      [계속한다]  [계보 문장은 건너뛴다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      이 장면은 출산을 언급합니다. 이 미션은 출산을 보상이나 회복의 증거로 말하지
+      않습니다. 지금 힘들다면 {{crisis_resources.default}}
+  - consent_card_id: rahab_stigma
+    consent_card_intensity: mid
+    consent_covers_scenes: [1, 5]
+    consent_declined_route: s5_close_on_6_23_6_27
+    asked_at_scene: 1
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-1"
+    note: >-
+      미션 진입 시 한 번 물은 카드가 이 Scene 도 덮는다. 문안은 scene1.yml 에 있고
+      여기에 두 번 적지 않는다 — 자구 정본을 두 곳에 두면 한쪽만 고쳐질 자리를 만든다.
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    axis: "R2 고난 귀속 금지 · R3 회복 압박 금지"
+    note: >-
+      마감 줄이 있는 Scene 이라 낙인 소거와 보상 프레이밍이 동시에 붙는다.
+      약 2:25 는 「행함으로 의롭다 하심」을 말하지 낙인이 씻겼다고 말하지 않는다 —
+      계열 7 을 이 Scene 에 다시 건 이유다.
+    lint_forbidden_tokens:
+      - "결국 보상받았"
+      - "참으니 복이"
+      - "일곱 아들보다 귀한"
+      - "그래도 잘"
+      - "곁을 지켰"
+
+  # 마감 Scene 이라 낙인 소거가 가장 붙기 쉽다. 약 2:25 는 「행함으로 의롭다 하심」을
+  # 말하지 낙인이 씻겼다고 말하지 않는다 — 계열 7·8 을 여기 다시 거는 이유이고,
+  # 그것이 R2/R3 가 아니라 T1(신학 정통성)인 이유다.
+  - id: T1_no_repentance_narrative_lint
+    enforced_at: always
+    axis: "T1 본문에 없는 회개·정화 서사 삽입 금지"
+    note: >-
+      이 Scene 의 수 6:27 자막이 실제로 「라합은 과거를 씻고」로 시작하고 있었다
+      (2026-08-18 수정). 전문 인용이라고 적힌 카드에 본문에 없는 절이 붙는 형태가
+      이 축이 막으려는 것 그 자체다.
+    lint_forbidden_tokens:
+      - "과거를 씻고"
+      - "새사람이 되어"
+      - "더 이상 기생이"
+      - "직업을 버리고"
+
+environment:
+  location_ko: "이스라엘의 진영 밖. 정지 시점."
+  time_of_day: 낮
+  lighting: "평광. 불빛·연기 연출 없음."
+  ambient_audio: ["멀리서 오는 바람"]
+  audio_assets_forbidden: ["공성음", "함락음", "비명"]
+  assets_shared: [open_ground_generic, figure_silhouette_group_far]
+  assets_dedicated: []
+  camera_rig: static_outside_camp
+  ui_overlays:
+    - id: rahab_s5_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: rahab_s5_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: rahab
+    display_ko: "라합"
+    framing: full_body_far
+  - id: family
+    display_ko: "그의 가족"
+    framing: full_body_far
+    staging_note: "군중으로 그리지 않는다."
+
+non_scripture_narration:
+  - id: rahab_nar_s5_close
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §3"
+    shown_on_route: s5_close_on_6_23_6_27
+    position: "수 6:23 자막 직후 · 수 6:27 앞"
+    marker_ko: "본문이 아닙니다"
+    text_ko: "지금 보신 자막에는 라합이 그 뒤에 어디에서 누구와 함께 살게 되었는지를 말하는 줄들이 없습니다. 그 줄들이 빠진 것은 이 미션이 보여 드리는 범위 때문이지, 이야기가 거기서 끝나서가 아닙니다. 이 미션은 방금 보신 줄을 라합의 마지막 자리로 말하지 않습니다."
+    note: >-
+      거절 경로에서 축이 뒤집힌다 — 「진영 밖에서 이스라엘 중으로」의 뒷마디가 통째로
+      빠져 진영 밖이 마지막 자리처럼 읽힌다. 이 줄은 그 읽기를 막지만, 막았다는 것을
+      재는 수단은 없다.
+
+captions:
+  - id: rahab_s5_jos_6_17b
+    verse_ref: "수 6:17b"
+    speaker: scripture_caption
+    attribution_display_ko: "여호수아"
+    omitted_on_route: s5_close_on_6_23_6_27
+    text_ko: "기생 라합과 그 집에 동거하는 자는 모두 살려 주라 이는 우리가 보낸 사자들을 그가 숨겨 주었음이니라"
+    cut_basis: "절 내 구 단위 채택이라 그 자체가 단위다 — 「중」을 붙이지 않는다."
+    attribution_note: "화자 표기가 배제된 앞 절에 기대고 있다. 내용을 되살리지 않고 표기 필드로만 푼다."
+  - id: rahab_s5_jos_6_22
+    verse_ref: "수 6:22 중"
+    speaker: scripture_caption
+    attribution_display_ko: "여호수아"
+    omitted_on_route: s5_close_on_6_23_6_27
+    text_ko: "그 기생의 집에 들어가서 너희가 그 여인에게 맹세한 대로 그와 그에게 속한 모든 것을 이끌어 내라"
+    cut_basis: "화자 도입구와 종결구 — 「여호수아가 그 땅을 정탐한 두 사람에게 이르되」와 인용을 닫는 「하매」를 뺐다."
+  - id: rahab_s5_jos_6_23
+    verse_ref: "수 6:23 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "정탐한 젊은이들이 들어가서 라합과 그의 부모와 그의 형제와 그에게 속한 모든 것을 이끌어 내고 또 그의 친족도 다 이끌어 내어 그들을 이스라엘의 진영 밖에 두고"
+    cut_basis: null
+  - id: rahab_s5_jas_2_25
+    verse_ref: "약 2:25 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    omitted_on_route: s5_close_on_6_23_6_27
+    text_ko: "또 이와 같이 기생 라합이 사자들을 접대하여 다른 길로 나가게 할 때에 행함으로 의롭다 하심을 받은 것이 아니냐"
+    cut_basis: null
+  - id: rahab_s5_jos_6_25
+    verse_ref: "수 6:25 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    omitted_on_route: s5_close_on_6_23_6_27
+    text_ko: "여호수아가 기생 라합과 그의 아버지의 가족과 그에게 속한 모든 것을 살렸으므로 그가 오늘까지 이스라엘 중에 거주하였으니 이는 여호수아가 여리고를 정탐하려고 보낸 사자들을 숨겼음이었더라"
+    cut_basis: null
+  - id: rahab_s5_mat_1_5
+    verse_ref: "마 1:5 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    omitted_on_route: s5_close_on_6_23_6_27
+    text_ko: "살몬은 라합에게서 보아스를 낳고"
+    cut_basis: >-
+      LOCKED 카드 `rahab_lineage_birth` 가 이 자리를 「이름을 잇는 한 줄」로 잠갔다.
+      뒤에 이어지는 보아스-룻-오벳-이새는 이 미션의 범위가 아니다(그 계보는 Theme 19 의
+      자리다). ⚠️ 이 근거는 §4-2 배제 목록이 아니라 카드 문안에서 끌어온 것이라
+      다른 열 행과 등급이 다르다 — 파생 근거로 표시해 둔다.
+  - id: rahab_s5_jos_6_27
+    verse_ref: "수 6:27"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "여호와께서 여호수아와 함께 하시니 여호수아의 소문이 그 온 땅에 퍼지니라"
+    cut_basis: "전문 인용이라 「중」이 없다 — 헌장 §3-c(마지막 Scene 은 신의 행위로 닫는다)를 만족시키는 절이다."
+
+partial_marker_unbased:
+  - id: rahab_s5_jos_6_23
+    note: "덜어낼 화자 도입구가 없고 배제된 구도 없다. 절 전문인데 표기는 「중」이다."
+  - id: rahab_s5_jas_2_25
+    note: "같은 사유."
+  - id: rahab_s5_jos_6_25
+    note: "같은 사유."
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: false
+
+interactions: []
+interaction_note: "인터랙션 0종(§3-1)."
+
+branches:
+  - id: rahab_s5_closing_select
+    decision_key: consent_state
+    decision_note: >-
+      사건 분기가 아니다. 엔진이 주는 값은 `consent_declined_or_skipped` 라는 Scene 범위
+      이진값 하나뿐이고, 어느 카드를 거절했는지는 기록되지 않는다.
+    routes:
+      - when: { consent_state: granted }
+        captions_shown:
+          [
+            rahab_s5_jos_6_17b,
+            rahab_s5_jos_6_22,
+            rahab_s5_jos_6_23,
+            rahab_s5_jas_2_25,
+            rahab_s5_jos_6_25,
+            rahab_s5_mat_1_5,
+            rahab_s5_jos_6_27,
+          ]
+        closing_line_ko: "여호와께서 여호수아와 함께 하시니"
+      - when: { consent_state: declined }
+        route_id: s5_close_on_6_23_6_27
+        captions_shown: [rahab_s5_jos_6_23, rahab_s5_jos_6_27]
+        narration_shown: [rahab_nar_s5_close]
+        closing_line_ko: "여호와께서 여호수아와 함께 하시니"
+      - when: { consent_state: null }
+        route_id: s5_fallback_unknown_consent
+        fallback: true
+        captions_shown: [rahab_s5_jos_6_23, rahab_s5_jos_6_27]
+        narration_shown: [rahab_nar_s5_close]
+        closing_line_ko: "여호와께서 여호수아와 함께 하시니"
+        fallback_note: >-
+          동의 상태를 읽지 못한 경우 **거절 경로와 같은 것**을 보여 준다. 모르는 상태에서
+          더 보여 주는 쪽으로 기울면 묻지 않고 노출한 것이 된다. 룻은 이 자리에 마감 줄
+          하나만 두었으나(`content/ruth/scene5.yml`) 라합은 자막 집합까지 좁힌다.
+
+branches_note: >-
+  분기는 동의 상태에서만 생긴다(§3-3). 세 route 의 마감 줄이 같은 것은 실수가 아니라
+  헌장 §3-c 의 요구다 — 마지막은 어느 경로에서도 여호와가 주어인 절로 닫는다.
+
+closing_screen:
+  entry_mode: static_after_last_caption
+  presentation_mode: still_frame
+  environment_disabled: true
+  npc_disabled: true
+  reached_by: [s5_close_on_6_23_6_27, s5_fallback_unknown_consent, granted]
+  mission_title_ko: "먼저 있었던 일"
+  closing_footer:
+    id: rahab_f65_close
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §1"
+    text_ko: "이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다. 지금 힘들다면 {{crisis_resources.default}}"
+  ui_overlays:
+    - id: rahab_close_exit
+      position: center_bottom
+      buttons_ko: ["나가기"]
+  crisis_reminder:
+    id: crisis_reminder
+    always_visible: true
+    text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+next_scene_id: null
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["끝을 사람의 공로가 아니라 여호와의 행위로 듣는다"]
+  emotional: ["밖에 있던 자리가 마지막 자리가 아님을 본다"]
+  rational: ["살린 사실과 그 이유를 본문이 대는 대로 읽는다"]

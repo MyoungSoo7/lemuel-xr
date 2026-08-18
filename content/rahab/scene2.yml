@@ -1,0 +1,210 @@
+# content/rahab/scene2.yml — Theme 20 라합 · Scene 2 「전갈이 왔다」
+# 정본 출처는 scene1.yml 머리말과 같다. 「중」 표기의 미해소 항목도 같은 성질이다 —
+# 이 Scene 은 6행 중 2행(수 2:6 · 수 2:7)이 자를 근거 없이 「중」으로 잠겨 있다.
+
+character: rahab
+theme_id: 20
+scene_id: 2
+scene_name_ko: "전갈이 왔다"
+mission_minutes: "7 (전 5 Scene 자막 합계 420초)"
+duration_seconds_target: 80
+
+exposure_grade: C
+trigger_categories:
+  - sexual_vulnerability_context
+  - home_intrusion_search
+# ── §5-1 긍정 선언. 금지 목록(`staging_constraints`)만 두면 「아무 데도 안 적혀
+#    있으니 괜찮다」가 성립한다 — seed §5-1 이 그래서 이 키를 따로 요구한다.
+#    자구는 §5-1 표의 `user_presence` 칸 그대로다. 코퍼스 첫 사용례다.
+user_presence: "같은 자리 고정, 문을 등진 방향"
+
+staging_constraints:
+  - "불변식 1 — 사용자를 라합의 몸 안에 두지 않는다."
+  - "불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다."
+  - "불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다."
+  - "같은 자리 고정 · 문을 등진 방향 — 사용자는 Scene 1 의 자리에서 움직이지 않는다."
+  - "문은 프레임 밖에 둔다."
+  - "강제 이동 금지 — 사용자 입력 없이 위치를 옮기지 않는다."
+  - "급작 음량 변화 금지."
+  - "문 두드림·수색 음향 에셋을 두지 않는다."
+
+consent_card_id: rahab_coercion
+consent_card_intensity: mid
+consent_covers_scenes: [2]
+voice_intensity_options: [subtitle_only, low, default]
+# ── 정수를 쓰지 않는다. 룻이 남긴 함정이다(`content/ruth/README.md` R4) — 정수는 타입
+#    검사를 통과하면서 「대신 무엇이 재생되는가」를 지목하지 못한다. seed §7-2 는 이 자리에
+#    **경로 id 문자열**을 요구하고, 그 id 는 §6 Scene 경로 표의 `"s2_skip"` 하나뿐이다.
+#    ⚠️ 그 id 를 정의하는 `conditional_blocks[]` 는 이 파일이 아니라 **scene3.yml** 에 있다 —
+#    이 경로는 Scene 2 를 통째로 건너뛰므로, 정의를 여기 두면 정의를 담은 파일 자체가
+#    재생되지 않는다. 브리지 문장이 뜨는 자리도 같은 이유로 Scene 3 첫 자막 앞이다.
+skip_alternative_scene_id: "s2_skip"
+skip_bridge_narration_ko: null
+skip_bridge_note: >-
+  이 Scene 의 거절은 Scene 전체를 건너뛰고 Scene 3 으로 간다. 브리지 문장은 여기가 아니라
+  **Scene 3 첫 자막 앞**에 뜬다(`rahab_nar_s3_bridge`). 건너뛰어 재생되지 않는 Scene 에
+  브리지를 두면 그 줄은 화면에 나오지 않는다 — LOCKED-STRINGS §3 이 좌표를 문안과 같은
+  행에 잠근 이유다.
+consent_cards:
+  - consent_card_id: rahab_coercion
+    consent_card_intensity: mid
+    consent_covers_scenes: [2]
+    consent_declined_route: s2_skip
+    voice_intensity_options: [subtitle_only, low, default]
+    locked_source: "docs/RAHAB-LOCKED-STRINGS.md §2-2"
+    consent_card_ko: |
+      다음 장면에는 권력을 가진 사람이 한 여인의 집으로 사람을 보내, 집 안에 있는
+      이들을 끌어내라고 요구하는 대목이 나옵니다.
+      · 폭력이 일어나는 장면은 없습니다. 요구하는 말과, 뒤이어 성문이 닫히는 데까지입니다.
+      · 건너뛰시면 이 장면 전체가 나오지 않고 다음 장면으로 넘어갑니다.
+      · 다음 장면 첫머리에는 성경 본문이 아닌 안내 문장이 한 줄 뜹니다. 「본문이
+        아닙니다」 표지가 함께 붙습니다.
+      · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+      계속하시겠어요?
+      [계속한다]  [이 장면은 건너뛴다]
+      음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+      당신에게 일어난 일은 당신의 잘못이 아닙니다. 지금 힘들다면 {{crisis_resources.default}}
+
+crisis_reminder:
+  id: crisis_reminder
+  always_visible: true
+  text_ko: "지금 힘드시면: {{crisis_resources.default}}"
+
+post_crisis_render_policy: suppress_all_captions_except_crisis_card
+post_crisis_latch_scope: mission
+crisis_card_position: terminal_screen
+
+default_path: static_curation
+llm_optin_only: true
+
+safety_gates:
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    persist_utterance: false
+    crisis_resource_ref: crisis_resources.default
+
+  - id: R2_R3_forbidden_tokens_lint
+    enforced_at: always
+    axis: "R2 고난 귀속 금지 · R3 회복 압박 금지"
+    note: >-
+      이 Scene 이 가장 위험한 자리다 — 수색과 밀고를 「그래서 쓰임받았」 류의 인과로
+      잇는 문장이 가장 쓰기 쉬운 곳이다. 토큰은 그 표층형만 막는다.
+    lint_forbidden_tokens:
+      - "그래서 쓰임받았"
+      - "쓰시려고 그 자리에"
+      - "하시려고 그 일을 허락"
+      - "다 뜻이 있어"
+
+  # 계열 9 — 「그가 믿었기 때문에 살았다」는 R2 미끄러짐이 아니라 본문이 대지 않는
+  # 이유를 대는 것이다. 본문이 대는 이유는 숨김과 맹세다(seed §3-1). T1 축이다.
+  - id: T1_no_repentance_narrative_lint
+    enforced_at: always
+    axis: "T1 본문에 없는 회개·정화 서사 삽입 금지"
+    note: >-
+      수색과 밀고를 다루는 Scene 이라 「믿었기 때문에 숨겼다」는 인과가 가장 쓰기 쉽다.
+      본문은 라합이 무엇을 믿어서 그랬는지 원인으로 잇지 않는다.
+    lint_forbidden_tokens:
+      - "회개했기 때문에"
+      - "믿었기 때문에"
+      - "믿음 덕분에"
+
+environment:
+  location_ko: "같은 실내. 문은 닫혀 있고 프레임 밖에 있다."
+  time_of_day: 밤
+  lighting: "등불. 조도 하한 유지 — 어둠을 위협의 도구로 쓰지 않는다."
+  ambient_audio: ["실내 정적", "멀리 지나가는 발소리"]
+  audio_assets_forbidden:
+    - "문 두드리는 소리"
+    - "수색 소리"
+    - "급작 음량 변화"
+  assets_shared: [interior_room_generic, oil_lamp, figure_silhouette_x3]
+  assets_dedicated: []
+  camera_rig: fixed_back_to_door_offaxis
+  ui_overlays:
+    - id: rahab_s2_suffering_disclaimer
+      position: top_right
+      style: small_persistent
+      text_ko: |
+        이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다.
+        성경 본문을 그대로 옮길 뿐, 지금 겪고 계신 일을 설명하지 않습니다.
+        지금 계신 곳이 안전하지 않다면, 그곳에 머무는 것이 이 이야기의 교훈이 아닙니다. 안전이 우선입니다.
+        지금 힘드시면: {{crisis_resources.default}}
+    - id: rahab_s2_exit_controls
+      position: bottom_left
+      style: always_visible
+      buttons_ko: ["잠시 멈추기", "나가기"]
+
+npcs:
+  - id: rahab
+    display_ko: "라합"
+    framing: full_body_far
+  - id: kings_messenger
+    display_ko: "여리고 왕의 사람"
+    framing: offscreen_voice_only
+    staging_note: "문 밖에 둔다. 화면에 들이지 않는다 — 수색의 시각화를 만들지 않는다."
+
+captions:
+  - id: rahab_s2_jos_2_2
+    verse_ref: "수 2:2 중"
+    speaker: scripture_caption
+    attribution_display_ko: "어떤 사람"
+    text_ko: "보소서 이 밤에 이스라엘 자손 중의 몇 사람이 이 땅을 정탐하러 이리로 들어왔나이다"
+    cut_basis: "화자 도입구 — 「어떤 사람이 여리고 왕에게 말하여 이르되」를 attribution_display_ko 로 옮겼다."
+  - id: rahab_s2_jos_2_3
+    verse_ref: "수 2:3 중"
+    speaker: scripture_caption
+    attribution_display_ko: "여리고 왕"
+    text_ko: "네게로 와서 네 집에 들어간 그 사람들을 끌어내라 그들은 이 온 땅을 정탐하러 왔느니라"
+    cut_basis: "화자 도입구 — 「여리고 왕이 라합에게 사람을 보내어 이르되」를 옮겼다."
+  - id: rahab_s2_jos_2_4
+    verse_ref: "수 2:4 중"
+    speaker: scripture_caption
+    attribution_display_ko: "라합"
+    text_ko: "과연 그 사람들이 내게 왔었으나 그들이 어디에서 왔는지 나는 알지 못하였고"
+    cut_basis: "화자 도입구 — 「그 여인이 그 두 사람을 이미 숨긴지라 이르되」를 옮겼다. 숨긴 사실은 수 2:6 행이 그대로 싣는다."
+  - id: rahab_s2_jos_2_5
+    verse_ref: "수 2:5 중"
+    speaker: scripture_caption
+    attribution_display_ko: "라합"
+    text_ko: "그 사람들이 어두워 성문을 닫을 때쯤 되어 나갔으니 어디로 갔는지 내가 알지 못하나 급히 따라가라 그리하면 그들을 따라잡으리라"
+    cut_basis: "화자 종결구 — 인용을 닫는 「하였으나」를 뺐다. 화자 도입구와 같은 성격의 구다."
+  - id: rahab_s2_jos_2_6
+    verse_ref: "수 2:6 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "그가 이미 그들을 이끌고 지붕에 올라가서 그 지붕에 벌여 놓은 삼대에 숨겼더라"
+    cut_basis: null
+  - id: rahab_s2_jos_2_7
+    verse_ref: "수 2:7 중"
+    speaker: scripture_caption
+    attribution_display_ko: null
+    text_ko: "그 사람들은 요단 나루터까지 그들을 쫓아갔고 그들을 뒤쫓는 자들이 나가자 곧 성문을 닫았더라"
+    cut_basis: null
+
+partial_marker_unbased:
+  - id: rahab_s2_jos_2_6
+    note: "덜어낼 화자 도입구가 없고 배제된 구도 없다. 절 전문을 실었는데 표기는 「중」이다."
+  - id: rahab_s2_jos_2_7
+    note: "같은 사유. 앞 절반(추격 동선)을 자를 근거가 §4-2 배제 목록에 없다 — 배제된 동선 절은 2:16·2:22·2:23 이고 2:7 은 그 목록에 없다."
+
+caption_pacing:
+  auto_advance: false
+  rewind_allowed: false
+
+interactions: []
+interaction_note: "인터랙션 0종(§3-1)."
+
+branches: []
+branches_note: >-
+  사건 분기 0건. 이 Scene 의 분기는 `s2_skip` 하나이고 Scene 전체 스킵으로만 표현된다.
+
+next_scene_id: 3
+
+ai_footer:
+  text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+recovery_metric_dimensions:
+  spiritual: ["숨긴 일을 평가 없이 본다"]
+  emotional: ["문이 닫히는 감각을 안전한 거리에서 겪는다"]
+  rational: ["요구와 응답을 구분해 듣는다"]

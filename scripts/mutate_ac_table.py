@@ -71,7 +71,7 @@ AC11 = line_with("| AC-11 |")
 AC12 = line_with("| AC-12 |")
 AC15 = line_with("| AC-15 |")
 TALLY = line_with("**합계 — PASS", "16건 중")
-PASS_BULLET = line_with("- **PASS 9**")
+PASS_BULLET = line_with("- **PASS 13**")
 EXPECT = line_with("기대 rc 가 `0` 이 아닌 한 줄")
 G10 = line_with("| `G10`", "955줄")
 # 🚨 rev.15 정정 — 이 needle 은 seed 에 **한 번도 없던 문자열**이었다(`·` 구분).
@@ -86,7 +86,7 @@ G10 = line_with("| `G10`", "955줄")
 #    BLOCKED 로 두는 칸이라 변이시켜도 빨강이 안 난다」고 적혀 있었다. 그 칸은 이제
 #    `t-hist` 가 **그 판 본문과 대조해서** 판정한다(아래 HIST 변이). 옛 판 수치도
 #    더는 무판정 지대가 아니다.
-TOOLS = line_with("**합계 PASS 10 / FAIL 0 / BLOCKED 19")
+TOOLS = line_with("**합계 PASS 29 / FAIL 0 / BLOCKED 0")
 MUT14 = "검출 14 / 14"
 # rev.10 의 기록으로 적힌 수치. 오늘 재현될 수 없으니 `t-tools` 는 못 재고,
 # rev.10 커밋 본문에 실재하는지는 `t-hist` 가 잰다.
@@ -116,8 +116,10 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      "AC-9 가 지목하는 파생 키를 없는 키로 — 지목된 행이 그 실행에 없다",
      AC9, AC9.replace("`G5b` 행", "`G5z` 행")),
     ("t-derived(값)", "t-derived", "FAIL",
-     "AC-7 의 실측을 2 → 0 으로 — 파생 키들을 접은 rc 와 어긋난다",
-     AC7, AC7.replace("| 0    | **2**", "| 0    | **0**")),
+     "AC-7 의 실측을 0 → 2 로 — 파생 키들을 접은 rc 와 어긋난다."
+     " ⚠️ rev.15 까지는 방향이 반대였다(2 → 0). 대상이 생겨 그 줄이 초록이 되면서"
+     " 옛 변이가 **무효 변이**가 됐다 — 러너가 그것을 조용히 통과시키지 않고 죽었다",
+     AC7, AC7.replace("| 0    | **0**", "| 0    | **2**")),
     ("t-none", "t-none", "FAIL",
      "AC-11(판정기 없음)의 실측을 2 → 0 으로 — 미착수를 초록으로 두는 형태다",
      AC11, AC11.replace("| 0    | **2**", "| 0    | **0**")),
@@ -126,7 +128,7 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      AC12, AC12.replace("**0.37**", "**0.95**")),
     ("t-tally(수)", "t-tally", "FAIL",
      "합계의 PASS 를 9 → 8 로 — 행에서 센 것과 어긋난다",
-     TALLY, TALLY.replace("PASS 9", "PASS 8")),
+     TALLY, TALLY.replace("PASS 13", "PASS 12")),
     ("t-tally(목록)", "t-tally", "FAIL",
      "PASS 목록의 AC-15 를 AC-14 로 — 수는 그대로고 이름만 틀린 형태다",
      PASS_BULLET, PASS_BULLET.replace("AC-15", "AC-14")),
@@ -138,7 +140,7 @@ MUTANTS: list[tuple[str, str, str, str, str, str]] = [
      AC2, re.sub(r"--baseline [0-9a-f]{7,40}", "--baseline e39368c", AC2)),
     ("t-tools", "t-tools", "FAIL",
      "본문이 인용한 러너 합계를 rev.11 의 옛 값으로 — 정정 AC 가 잡은 형태다",
-     TOOLS, TOOLS.replace("PASS 10 / FAIL 0 / BLOCKED 19",
+     TOOLS, TOOLS.replace("PASS 29 / FAIL 0 / BLOCKED 0",
                           "PASS 7 / FAIL 0 / BLOCKED 20")),
     ("t-hist", "t-hist", "FAIL",
      "rev.10 의 기록을 5/2/20 → 5/3/20 으로 — 옛 수치 옮겨 적기 오기(정정 AC 형태)",

@@ -204,33 +204,13 @@
       ]
     },
     "gates:rahab": {
-      "rc": 1,
+      "rc": 0,
       "tally": [
-        10,
+        29,
         0,
-        19
+        0
       ],
-      "items": [
-        "G0a:BLOCKED",
-        "G11:BLOCKED",
-        "G1b:BLOCKED",
-        "G2:BLOCKED",
-        "G2v:BLOCKED",
-        "G3:BLOCKED",
-        "G3b:BLOCKED",
-        "G3c:BLOCKED",
-        "G3d:BLOCKED",
-        "G4:BLOCKED",
-        "G5a-i:BLOCKED",
-        "G5a-ii:BLOCKED",
-        "G5d:BLOCKED",
-        "G5e:BLOCKED",
-        "G5t:BLOCKED",
-        "G6:BLOCKED",
-        "G7:BLOCKED",
-        "G8:BLOCKED",
-        "G9:BLOCKED"
-      ]
+      "items": []
     },
     "gates:ruth": {
       "rc": 1,
@@ -263,7 +243,7 @@
     "ac-table:rahab": {
       "rc": 1,
       "tally": [
-        41,
+        42,
         1,
         1
       ],
@@ -294,17 +274,13 @@
       "items": []
     },
     "captions:rahab": {
-      "rc": 2,
+      "rc": 0,
       "tally": [
-        21,
+        24,
         0,
-        3
+        0
       ],
-      "items": [
-        "a-yml:BLOCKED 자막 배열 대조 불가 — `content/rahab/scene*.yml` 이 없다 (designer 산출물)",
-        "f-yml:BLOCKED footer 실부착 대조 불가 — `content/rahab/scene*.yml` 이 없다 (designer 산출물)",
-        "n-yml:BLOCKED 내레이션 실적재 대조 불가 — `content/rahab/scene*.yml` 이 없다 (designer 산출물)"
-      ]
+      "items": []
     }
   }
 }
