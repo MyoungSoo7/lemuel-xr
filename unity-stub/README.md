@@ -34,7 +34,7 @@ unity-stub/
 5. Play 누르면 Game View 좌상단에 status / progress 표시
 
 > AR 토글은 백엔드가 그 미션에 AR 을 열었을 때만 그려진다. 지금은
-> 요셉·모세·다윗·예수·엘리야·솔로몬·욥이 열려 있고, `mission` 을 `ruth` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
+> 요셉·모세·다윗·예수·엘리야·솔로몬·욥·룻이 열려 있고, `mission` 을 `rahab` 로 바꾸면 토글이 사라진다 — 스텁이 임의로 `mode=ar` 을
 > 던져서 400 을 받는 대신, 먼저 `/api/config/xr-modes` 로 물어보기 때문이다.
 
 ---
@@ -67,7 +67,7 @@ unity-stub/
 ```json
 { "missionId": "joseph", "modes": ["vr", "ar"] }
 ```
-예수·룻 등 에셋 없는 미션은 `["vr"]` 만 돌아온다.
+라합 등 아직 에셋이 없는 미션은 `["vr"]` 만 돌아온다.
 
 ### `GET /api/config/input-mapping?device=quest3&mode=ar`
 ```json

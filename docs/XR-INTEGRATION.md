@@ -526,7 +526,7 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
 - **모드는 폴백하지 않는다.** AR 요청에 VR 매니페스트를 대신 주면 패스스루 위에
   가짜 벽이 겹쳐 그려진다. 없으면 없다고 답한다(400).
 - 어느 미션이 AR 을 여는지는 코드가 아니라 설정이 정한다 —
-  `lemuel.xr.ar-enabled-missions` (기본 `joseph,moses,david,jesus,elijah,solomon,job`).
+  `lemuel.xr.ar-enabled-missions` (기본 `joseph,moses,david,jesus,elijah,solomon,job,ruth`).
   도메인은 여전히 모드를 모른다.
 - **용어 주의** — 여기서의 `ar` 은 _인물 미션을 패스스루로 보는 것_ 이다.
   [CROSS-MAPPING-VR-AR.md](./CROSS-MAPPING-VR-AR.md) 의 "AR 1~7 가치(일상 습관)" 와는
@@ -541,21 +541,32 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
 | elijah  | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
 | solomon | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
 | job     | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
-| ruth    | ✅\* | ❌  | 시나리오(yml)만 있고 **VR manifest 자체가 없다**. 덜어낼 원본이 없으니 AR 도 없다 |
+| ruth    | ✅\* | ✅\* | 시드 15개 (3기기 × 5씬)                                                           |
 
-\* 룻은 `scenarios/ruth.yml` 은 있으나 `manifests/ruth/` 가 없다. AR 을 열려면
-VR manifest 를 먼저 써야 한다 — 그건 파생이 아니라 씬별 자산 설계다. 예수는
-2026-08-19 에 그 순서를 밟아 열렸고, 엘리야·솔로몬·욥도 같은 날 뒤이어 같은 순서로
-열렸다 — 씬 × 4기기 VR manifest 를 먼저 쓰고, `gen_ar_manifests.py` 로 AR 을 파생한 뒤
-게이트 목록을 늘렸다.
+\* **룻은 자산만 열렸고 미션은 닫혀 있다.** 위 표의 ✅ 는 `/api/config/asset-manifest`
+가 200 을 준다는 뜻이지 사용자가 룻을 할 수 있다는 뜻이 아니다. `ScenarioYamlLoader` 는
+`Character.entries` 를 순회하는데 enum 에 `RUTH` 가 없어 `scenarios/ruth.yml` 은 여전히
+로드되지 않는다 — 그 한 줄이 인간 사인오프 2인(신학 · 정신건강·안전) 게이트이고
+(`docs/RUTH-RUNTIME-SIGNOFF.md` · `RuntimeExposureSignoffTest`), 사인오프는 아직 없다.
+자산 층에는 그 게이트가 없다는 사실을 여기 적어 둔다: manifest 는 미션 id 문자열로
+조회되며 `Character` 를 보지 않으므로, 룻 시드가 들어온 순간 룻의 **자산 목록**은
+게이트 밖에서 조회 가능해졌다. 자막·동의 카드 문안은 manifest 에 없고 낭독 트랙의
+`note` 로만 계약이 적혀 있지만, 그래도 「닫혀 있다」의 범위가 좁아진 것은 사실이다.
+
+미션을 실제로 열려면 사인오프 두 줄 외에 **런타임 결함 하나**가 먼저 고쳐져야 한다 —
+Scene 1 동의 카드의 스킵 목적지는 3 인데 그 씬의 `next` 는 2 라, 지금 코드로 enum 을
+열면 사별 서사를 건너뛰겠다고 고른 사용자가 카드가 덮기로 한 Scene 2 로 들어간다
+(백엔드에 skip 분기가 없다). `ScenarioYamlLoaderTest` 의 `skip_alternative_scene_id == next`
+불변식이 그 순간 빨개진다 — 의도된 동작이다.
 
 AR 매니페스트는 VR 에서 세 부류를 덜어낸다 — `env_*`(방 전체 환경), `*_far`(원경
 임포스터), 그리고 _남은 모델 어디에도 안 붙는 텍스처_(환경 아틀라스 등). 룸스케일에는
 지평선이 없고, 모델 없는 텍스처는 용량만 먹는다. 대신 평면 히트테스트로 소품을 놓는
-`script_ar_anchor_placement` 를 더한다. 총량은 VR 2,814MB → AR 1,863MB
-(7미션 × 3기기 × 전 씬 합계. 요셉만 보면 376MB → 219MB).
+`script_ar_anchor_placement` 를 더한다. 총량은 VR 3,256MB → AR 2,168MB
+(8미션 × 3기기 × 전 씬 합계. 요셉만 보면 376MB → 219MB).
 
-묵상 씬(`env_meditation_*` — 요셉 5, 모세 6, 다윗 6)만 예외다. 환경을 지우면 남는 게
+묵상 씬(`env_meditation_*` — 씬 번호로 요셉 5 · 모세 6 · 다윗 6 · 예수 5·7 ·
+엘리야 2·4 · 솔로몬 2·4 · 욥 1·4 · 룻 4)만 예외다. 환경을 지우면 남는 게
 거의 없어서, 환경 모델 대신 패스스루를 어둡게 덮는 `shader_ar_passthrough_dim` 으로
 바꿨다. 헤드셋은 현실을 완전히 가릴 수 없으므로 _가림_ 이 아니라 _감광_ 이다.
 
@@ -607,7 +618,7 @@ AR 매니페스트는 VR 에서 세 부류를 덜어낸다 — `env_*`(방 전�
 | 외부 게임 컨트롤러                | 추상화 이미 OpenXR 처리       | —                  |
 | 8K texture                        | 자산 크기 폭증                | V2 (Vision Pro 만) |
 
-> **AR 은 더 이상 전부 보류가 아니다.** 에셋이 있는 일곱 미션(요셉·모세·다윗·예수·엘리야·솔로몬·욥)에
+> **AR 은 더 이상 전부 보류가 아니다.** 에셋이 있는 여덟 미션(요셉·모세·다윗·예수·엘리야·솔로몬·욥·룻)에
 > `xr_mode=ar` 계약과 매니페스트가 들어왔다(§10.3). 여전히 보류인 건 위 표의 두 가지 — 세션을 넘어
 > 살아남는 _영구 앵커_ 와 패스스루 _카메라 프레임 자체_ 에 대한 접근이다. 지금
 > AR 은 세션 안에서만 유효한 앵커와, OS 가 합성해 주는 패스스루 배경만 쓴다.

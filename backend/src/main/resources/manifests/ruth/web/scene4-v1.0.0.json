@@ -1,0 +1,130 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 4,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "consent_card_required": true,
+    "night_lighting_only": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_threshing_floor_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/360/env_meditation_threshing_floor_night.jpg",
+        "size_bytes": 5600000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_grain_stack_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/models/grain_stack_lite.glb",
+        "size_bytes": 162000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_ruth_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/ruth_distant_sheet.webp",
+        "size_bytes": 1000000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_boaz_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/boaz_distant_sheet.webp",
+        "size_bytes": 1040000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_night_consent_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s4_night_consent_ko.mp3",
+        "size_bytes": 750000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 15000,
+        "format": "mp3_192kbps",
+        "note": "등급 C 동의 카드 — 기본 포커스 없음. 동의는 볼지 말지에 대한 것이지 연출 강도에 대한 것이 아니다"
+      },
+      {
+        "id": "aud_s4_ruth_3_9_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s4_ruth_3_9_ko.mp3",
+        "size_bytes": 650000,
+        "voice_id": "ruth_v1",
+        "duration_ms": 13000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s4_ruth_3_11_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s4_ruth_3_11_ko.mp3",
+        "size_bytes": 650000,
+        "voice_id": "boaz_v1",
+        "duration_ms": 13000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_night_insects_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/amb_night_insects_distant.mp3",
+        "size_bytes": 400000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps",
+        "note": "근접 오디오를 쓰지 않는다. 최소 거리 2m 는 AR 에서도 유지된다"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_night_dim_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/textures/night_dim_overlay_2k.webp",
+        "size_bytes": 440000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_threshing_night_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/Scene4ThreshingNightWeb.js",
+        "size_bytes": 32300,
+        "entry_class": "Scene4ThreshingNightWeb"
+      },
+      {
+        "id": "script_staging_constraints_guard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/StagingConstraintsGuard.js",
+        "size_bytes": 21250,
+        "entry_class": "StagingConstraintsGuard"
+      },
+      {
+        "id": "script_night_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/NightConsentGate.js",
+        "size_bytes": 22100,
+        "entry_class": "NightConsentGate"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/PersistentSafetyOverlays.js",
+        "size_bytes": 16150,
+        "entry_class": "PersistentSafetyOverlays"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10783800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

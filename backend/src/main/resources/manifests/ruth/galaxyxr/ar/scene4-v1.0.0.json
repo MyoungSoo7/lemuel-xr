@@ -1,0 +1,153 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 4,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "consent_card_required": true,
+    "consent_card_id": "ruth_scene4_night_warning",
+    "default_focus_none": true,
+    "night_lighting_only": true,
+    "spatial_audio_min_distance_m": 2,
+    "interactions_disabled": true,
+    "branches_disabled": true,
+    "released_by_consent": false,
+    "skip_alternative_scene": 5,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_grain_stack",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/models/grain_stack.glb",
+        "size_bytes": 1440000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_ruth_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/models/ruth_distant.glb",
+        "size_bytes": 2000000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_boaz_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/models/boaz_distant.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_night_consent_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/audio/s4_night_consent_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 15000,
+        "note": "등급 C 동의 카드 — 기본 포커스 없음. 동의는 볼지 말지에 대한 것이지 연출 강도에 대한 것이 아니다"
+      },
+      {
+        "id": "aud_s4_ruth_3_9_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/audio/s4_ruth_3_9_ko.wav",
+        "size_bytes": 1040000,
+        "voice_id": "ruth_v1",
+        "duration_ms": 13000
+      },
+      {
+        "id": "aud_s4_ruth_3_11_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/audio/s4_ruth_3_11_ko.wav",
+        "size_bytes": 1040000,
+        "voice_id": "boaz_v1",
+        "duration_ms": 13000
+      },
+      {
+        "id": "amb_night_insects_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/audio/amb_night_insects_distant.ogg",
+        "size_bytes": 640000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "note": "근접 오디오를 쓰지 않는다. 최소 거리 2m 는 AR 에서도 유지된다"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_grain_stack_bundled",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/textures/grain_stack_bundled_1k.ktx2",
+        "size_bytes": 1280000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_ruth_cloak",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/textures/ruth_cloak_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_boaz_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/textures/boaz_robe_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_threshing_night",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/Scene4ThreshingNight.cs.bundle",
+        "size_bytes": 30400,
+        "entry_class": "Scene4ThreshingNight"
+      },
+      {
+        "id": "script_staging_constraints_guard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/StagingConstraintsGuard.cs.bundle",
+        "size_bytes": 20000,
+        "entry_class": "StagingConstraintsGuard"
+      },
+      {
+        "id": "script_night_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/NightConsentGate.cs.bundle",
+        "size_bytes": 20800,
+        "entry_class": "NightConsentGate"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/PersistentSafetyOverlays.cs.bundle",
+        "size_bytes": 15200,
+        "entry_class": "PersistentSafetyOverlays"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13716400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -10,9 +10,14 @@ import org.springframework.stereotype.Component
 /**
  * "어떤 미션이 어떤 몰입 모드를 노출하는가" 정책.
  *
- * 현재 AR 이 열린 미션은 요셉·모세·다윗·예수·엘리야·솔로몬·욥 — AR manifest 가 실제로
- * 있는 미션들이다. 아직 씬 manifest 가 없는 미션(룻)은 닫혀 있다. 없는 걸 열어두면
- * 클라이언트는 "지원한다" 고 믿고 빈 씬을 띄운다 — 그래서 조회 전에 막는다.
+ * 현재 AR 이 열린 미션은 요셉·모세·다윗·예수·엘리야·솔로몬·욥·룻 — AR manifest 가
+ * 실제로 있는 미션 전부다. 아직 씬 manifest 가 없는 미션(라합 등 저작 중)은 닫혀 있다.
+ * 없는 걸 열어두면 클라이언트는 "지원한다" 고 믿고 빈 씬을 띄운다 — 그래서 조회 전에 막는다.
+ *
+ * ⚠️ 이 게이트는 *자산* 게이트이지 *콘텐츠 노출* 게이트가 아니다. 룻의 시나리오는
+ * `Character` enum 에 RUTH 가 없어 여전히 로드되지 않는다(사인오프 2인 대기 —
+ * `RuntimeExposureSignoffTest` · `docs/RUTH-RUNTIME-SIGNOFF.md`). 여기서 룻이 열렸다는 것은
+ * manifest 조회가 200 을 준다는 뜻일 뿐, 미션이 사용자에게 열렸다는 뜻이 아니다.
  *
  * 목록은 `scripts/gen_ar_manifests.py` 의 `AR_MISSIONS` 와 같아야 한다. 한쪽만 늘리면
  * 게이트는 열렸는데 에셋이 없거나(404), 에셋은 있는데 게이트가 닫힌(400) 상태가 된다.
@@ -23,7 +28,7 @@ import org.springframework.stereotype.Component
  */
 @Component
 class XrModePolicy(
-    @Value("\${lemuel.xr.ar-enabled-missions:joseph,moses,david,jesus,elijah,solomon,job}")
+    @Value("\${lemuel.xr.ar-enabled-missions:joseph,moses,david,jesus,elijah,solomon,job,ruth}")
     arEnabledMissions: String,
 ) {
 

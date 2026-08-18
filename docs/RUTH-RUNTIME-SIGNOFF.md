@@ -57,7 +57,24 @@ R1(자해 발화) 콘텐츠는 어떤 자동 합의로도 최종 승인할 수 �
   잡아 두었고, RUTH 를 enum 에 넣는 순간 그 테스트가 빨개진다 — 의도된 동작이다.
   Scene 3 의 `declined_route: closing`(종결 화면 이동) 도 마찬가지로 미구현이다.
   또한 그 블록에는 `skip_alternative_scene_id: 4` 가 **두 번** 적혀 있다(YAML 중복 키).
-- 위 항목들은 2026-08-12 에 기계로 확인한 것이다. 그 밖에 사람이 봐야 할 것은 여전히 사람이 봐야 한다.
+- 🚧 **2026-08-19 — 자산 층은 먼저 들어왔다. 이 게이트 밖이다.**
+  `backend/src/main/resources/manifests/ruth/` 에 VR 20장 + AR 15장이 시드됐고
+  `lemuel.xr.ar-enabled-missions` 에 `ruth` 가 들어갔다. 시나리오 노출은 그대로 닫혀
+  있지만(위 enum 한 줄), **manifest 조회에는 이 사인오프 게이트가 걸려 있지 않다** —
+  `AssetManifestController` 는 미션 id 를 문자열로 받고 `Character` 를 보지 않으므로,
+  `/api/config/asset-manifest?mission=ruth&device=quest3&scene=1` 은 지금 200 을 준다.
+  나가는 것은 자산 목록(모델·오디오·텍스처 id 와 CDN 경로, 낭독 트랙의 `note` 로 적힌
+  안전 계약)이고 자막·동의 카드 **문안은 들어 있지 않다.** 그래도 「룻은 닫혀 있다」의
+  범위가 좁아졌으므로 검토자가 이 사실을 알고 사인오프해야 한다.
+  자산 설계가 지킨 것: 아기·출산 자산 0(Scene 5 caps 에 `baby_asset_present: false` ·
+  `birth_scene_rendered: false` 로 명시) · 햅틱 0 · 시야 차단 0 · 인물은 전신 원경
+  프레이밍만 · Scene 4 는 조명만으로 밤을 만들고 최소 오디오 거리 2m 를 caps 에 박았다.
+  ⚠️ AR 은 이 미션에서 새로운 축을 하나 연다 — 패스스루는 씬을 **사용자의 실제 방**에
+  놓는다. Scene 4(등급 C · 밤 · 권력 비대칭)를 사용자의 방에 놓는 것이 VR 과 같은
+  노출인지는 `staging_constraints` 다섯 항이 답하지 않는다(그 다섯 항은 VR 을 전제로
+  쓰였다). 정신건강·안전 검토자가 이 씬의 AR 을 별도로 판단해야 한다.
+- 위 항목들은 2026-08-12 에 기계로 확인한 것이다(자산 층 항목은 2026-08-19).
+  그 밖에 사람이 봐야 할 것은 여전히 사람이 봐야 한다.
 
 ## 이 대장이 보증하지 않는 것
 
