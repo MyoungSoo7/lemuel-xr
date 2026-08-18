@@ -15,19 +15,19 @@ import org.junit.jupiter.api.Test
  */
 class XrModePolicyTest {
 
-    private val policy = XrModePolicy("joseph,moses,david") // 운영 기본값
+    private val policy = XrModePolicy("joseph,moses,david,jesus") // 운영 기본값
 
     @Test
-    fun `AR manifest 가 있는 세 미션은 AR 과 VR 둘 다`() {
-        for (mission in listOf("joseph", "moses", "david")) {
+    fun `AR manifest 가 있는 네 미션은 AR 과 VR 둘 다`() {
+        for (mission in listOf("joseph", "moses", "david", "jesus")) {
             assertThat(policy.supports(mission, XrMode.VR)).isTrue()
             assertThat(policy.supports(mission, XrMode.AR)).isTrue()
         }
     }
 
     @Test
-    fun `에셋 없는 미션은 VR 만 — 예수는 VR manifest 조차 없다`() {
-        for (mission in listOf("jesus", "ruth", "solomon", "elijah", "job")) {
+    fun `에셋 없는 미션은 VR 만 — 씬 manifest 가 아직 없다`() {
+        for (mission in listOf("ruth", "solomon", "elijah", "job")) {
             assertThat(policy.supports(mission, XrMode.VR)).isTrue()
             assertThat(policy.supports(mission, XrMode.AR)).isFalse()
         }
@@ -43,13 +43,14 @@ class XrModePolicyTest {
     fun `ar 요청은 통과 (대소문자 공백 무시)`() {
         assertThat(policy.resolve("joseph", "ar")).isEqualTo(XrMode.AR)
         assertThat(policy.resolve("DAVID", " AR ")).isEqualTo(XrMode.AR)
+        assertThat(policy.resolve("Jesus", "AR")).isEqualTo(XrMode.AR)
     }
 
     @Test
-    fun `예수 ar 요청은 E_VALIDATION 으로 거부`() {
-        assertThatThrownBy { policy.resolve("jesus", "ar") }
+    fun `에셋 없는 미션의 ar 요청은 E_VALIDATION 으로 거부`() {
+        assertThatThrownBy { policy.resolve("elijah", "ar") }
             .isInstanceOf(AppException::class.java)
-            .hasMessageContaining("jesus")
+            .hasMessageContaining("elijah")
             .hasMessageContaining("ar")
             .extracting { e -> (e as AppException).code }
             .isEqualTo(ErrorCode.E_VALIDATION)
@@ -64,10 +65,11 @@ class XrModePolicyTest {
 
     @Test
     fun `설정으로 다른 미션도 열 수 있다 — 코드 수정 없이`() {
-        val opened = XrModePolicy("joseph, moses, jesus")
+        val opened = XrModePolicy("joseph, moses, elijah")
 
-        assertThat(opened.supports("jesus", XrMode.AR)).isTrue()
+        assertThat(opened.supports("elijah", XrMode.AR)).isTrue()
         assertThat(opened.supports("david", XrMode.AR)).isFalse() // 목록에 없으면 닫힌다
+        assertThat(opened.supports("jesus", XrMode.AR)).isFalse()
     }
 
     @Test

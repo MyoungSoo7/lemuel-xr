@@ -1,0 +1,119 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 7,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "passive_only": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_river_of_life_flow",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/models/river_of_life_flow.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_disciples_looking_up_pack_11",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/models/disciples_looking_up_pack_11.glb",
+        "size_bytes": 3200000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s7_ascension_monologue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/audio/s7_ascension_monologue_ko.wav",
+        "size_bytes": 1280000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 16000
+      },
+      {
+        "id": "aud_s7_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/audio/s7_value_prompt_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s7_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/audio/s7_recovery_pack_15entries_ko.tar",
+        "size_bytes": 2880000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s7_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/audio/s7_crisis_reminder_ko.wav",
+        "size_bytes": 560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "note": "R1 — {{crisis_resources.default}} 낭독. 위기 감지 시 1번 정적 콘텐츠로 라우팅"
+      },
+      {
+        "id": "amb_flowing_water_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/audio/amb_flowing_water_soft.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_river_caustics",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/textures/river_caustics_1k.ktx2",
+        "size_bytes": 1120000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_disciples_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/textures/disciples_atlas_1k.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene7_outro_recovery",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/scripts/Scene7OutroRecovery.cs.bundle",
+        "size_bytes": 35200,
+        "entry_class": "Scene7OutroRecovery"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/scripts/RecoveryKeyRouter.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "RecoveryKeyRouter"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 14484400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

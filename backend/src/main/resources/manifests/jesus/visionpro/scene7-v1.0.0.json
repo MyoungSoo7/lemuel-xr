@@ -1,0 +1,118 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 7,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "passive_only": true,
+    "spatial_audio_mode": "personal"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_meditation_ascension_river",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/env_meditation_ascension_river.glb",
+        "size_bytes": 4320000,
+        "lod": "lod2_volumetric"
+      },
+      {
+        "id": "model_river_of_life_flow",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/river_of_life_flow.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_disciples_looking_up_pack_11",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/disciples_looking_up_pack_11.glb",
+        "size_bytes": 4800000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s7_ascension_monologue_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s7_ascension_monologue_ko.wav",
+        "size_bytes": 1920000,
+        "voice_id": "jesus_v1_soft",
+        "duration_ms": 16000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s7_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s7_value_prompt_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s7_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s7_recovery_pack_15entries_ko.tar",
+        "size_bytes": 4320000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s7_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s7_crisis_reminder_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "note": "R1 — {{crisis_resources.default}} 낭독. 위기 감지 시 1번 정적 콘텐츠로 라우팅"
+      },
+      {
+        "id": "amb_flowing_water_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/amb_flowing_water_soft.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_river_caustics",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/river_caustics_4k.ktx2",
+        "size_bytes": 1680000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_disciples_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/disciples_atlas_4k.ktx2",
+        "size_bytes": 2880000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_light_rays_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/light_rays_atlas_2k.ktx2",
+        "size_bytes": 960000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene7_outro_recovery",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/scripts/Scene7OutroRecoveryPolySpatial.cs.bundle",
+        "size_bytes": 52800,
+        "entry_class": "Scene7OutroRecoveryPolySpatial"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/scripts/RecoveryKeyRouter.cs.bundle",
+        "size_bytes": 28800,
+        "entry_class": "RecoveryKeyRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 26961600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

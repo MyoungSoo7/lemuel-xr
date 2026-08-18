@@ -1,0 +1,98 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 1,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "skippable_after_sec": 3
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_bethlehem_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/360/env_bethlehem_stable.jpg",
+        "size_bytes": 7200000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_manger_with_child_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/manger_with_child_lite.glb",
+        "size_bytes": 216000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_npc_shepherd_pack_6_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/billboards/npc_shepherd_pack_6_sheet.webp",
+        "size_bytes": 1440000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_star_light_shaft_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/star_light_shaft_lite.glb",
+        "size_bytes": 81000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s1_narration_ko.mp3",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 24000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_night_village_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_night_village_low.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      },
+      {
+        "id": "amb_choir_distant_pad",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_choir_distant_pad.mp3",
+        "size_bytes": 550000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_manger_glow_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/textures/manger_glow_overlay_2k.webp",
+        "size_bytes": 520000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_incarnation_cinematic_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/Scene1IncarnationCinematicWeb.js",
+        "size_bytes": 37400,
+        "entry_class": "Scene1IncarnationCinematicWeb"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/SkipGateIntro.js",
+        "size_bytes": 13600,
+        "entry_class": "SkipGateIntro"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 11708000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

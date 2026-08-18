@@ -1,0 +1,106 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 6,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "line_advance_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_garden_tomb_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/360/env_garden_tomb_dawn.jpg",
+        "size_bytes": 7000000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_jesus_gardener_appearance_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/jesus_gardener_appearance_lite.glb",
+        "size_bytes": 234000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_mary_magdalene_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/billboards/mary_magdalene_sheet.webp",
+        "size_bytes": 880000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_stone_rolled_away_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/models/stone_rolled_away_lite.glb",
+        "size_bytes": 144000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s6_jn20_15_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s6_jn20_15_ko.mp3",
+        "size_bytes": 410000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s6_jn20_16_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s6_jn20_16_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s6_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/s6_reflection_prompt_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "amb_dawn_birds_garden",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/audio/amb_dawn_birds_garden.mp3",
+        "size_bytes": 600000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_tomb_light_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/textures/tomb_light_overlay_2k.webp",
+        "size_bytes": 470000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene6_empty_tomb_reading_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/Scene6EmptyTombReadingWeb.js",
+        "size_bytes": 39100,
+        "entry_class": "Scene6EmptyTombReadingWeb"
+      },
+      {
+        "id": "script_name_call_moment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/web/v1.0.0/scripts/NameCallMoment.js",
+        "size_bytes": 18700,
+        "entry_class": "NameCallMoment"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 10745800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

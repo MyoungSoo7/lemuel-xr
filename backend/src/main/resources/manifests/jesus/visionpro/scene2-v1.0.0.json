@@ -1,0 +1,130 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 2,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "spatial_audio_mode": "personal",
+    "line_advance_on_gaze_dwell": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_mount_hillside_crowd",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/env_mount_hillside.glb",
+        "size_bytes": 11040000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_jesus_teaching_pose",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/jesus_teaching_pose.glb",
+        "size_bytes": 3360000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_npc_crowd_seated_pack_40",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/npc_crowd_seated_pack_40.glb",
+        "size_bytes": 8160000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_hill_flowers_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/models/hill_flowers_far.glb",
+        "size_bytes": 1440000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_line_mt5_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s2_line_mt5_3_ko.wav",
+        "size_bytes": 936000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s2_line_mt5_4_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s2_line_mt5_4_ko.wav",
+        "size_bytes": 912000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s2_line_mt5_6_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s2_line_mt5_6_ko.wav",
+        "size_bytes": 984000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8500,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/s2_reflection_prompt_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "amb_hill_breeze_birds",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/audio/amb_hill_breeze_birds.ogg",
+        "size_bytes": 1440000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_jesus_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/jesus_garment_4k.ktx2",
+        "size_bytes": 2400000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_crowd_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/crowd_atlas_4k.ktx2",
+        "size_bytes": 4080000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_imposter_hill_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/textures/hill_imposter_2k.ktx2",
+        "size_bytes": 840000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_beatitudes_reading",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/scripts/Scene2BeatitudesReadingPolySpatial.cs.bundle",
+        "size_bytes": 55200,
+        "entry_class": "Scene2BeatitudesReadingPolySpatial"
+      },
+      {
+        "id": "script_line_highlight_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/scripts/LineHighlightSync.cs.bundle",
+        "size_bytes": 24000,
+        "entry_class": "LineHighlightSync"
+      },
+      {
+        "id": "script_line_gaze_advance",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/visionpro/v1.0.0/scripts/LineGazeAdvance.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "LineGazeAdvance"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 36769200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

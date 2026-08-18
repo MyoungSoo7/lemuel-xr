@@ -1,0 +1,106 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 1,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "skippable_after_sec": 3
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_bethlehem_night_stable",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/env_bethlehem_stable.glb",
+        "size_bytes": 7040000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_manger_with_child",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/manger_with_child.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_npc_shepherd_pack_6",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/npc_shepherd_pack_6.glb",
+        "size_bytes": 2880000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_star_light_shaft",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/star_light_shaft.glb",
+        "size_bytes": 720000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s1_narration_ko.wav",
+        "size_bytes": 1920000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 24000
+      },
+      {
+        "id": "amb_night_village_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/amb_night_village_low.ogg",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 60000
+      },
+      {
+        "id": "amb_choir_distant_pad",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/amb_choir_distant_pad.ogg",
+        "size_bytes": 880000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_manger_cloth_swaddle",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/manger_cloth_swaddle_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_stable_night_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/stable_night_atlas_1k.ktx2",
+        "size_bytes": 2080000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_npc_shepherd_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/npc_shepherd_atlas_1k.ktx2",
+        "size_bytes": 1760000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_incarnation_cinematic",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/Scene1IncarnationCinematic.cs.bundle",
+        "size_bytes": 35200,
+        "entry_class": "Scene1IncarnationCinematic"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/SkipGateIntro.cs.bundle",
+        "size_bytes": 12800,
+        "entry_class": "SkipGateIntro"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 21408000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

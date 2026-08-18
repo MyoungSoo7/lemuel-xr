@@ -1,0 +1,119 @@
+{
+  "mission_id": "jesus",
+  "scene_number": 2,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_mount_hillside_crowd",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/env_mount_hillside.glb",
+        "size_bytes": 7360000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_jesus_teaching_pose",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/jesus_teaching_pose.glb",
+        "size_bytes": 2240000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_npc_crowd_seated_pack_40",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/npc_crowd_seated_pack_40.glb",
+        "size_bytes": 5440000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_hill_flowers_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/models/hill_flowers_far.glb",
+        "size_bytes": 960000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_line_mt5_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s2_line_mt5_3_ko.wav",
+        "size_bytes": 624000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s2_line_mt5_4_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s2_line_mt5_4_ko.wav",
+        "size_bytes": 608000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "aud_s2_line_mt5_6_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s2_line_mt5_6_ko.wav",
+        "size_bytes": 656000,
+        "voice_id": "jesus_v1",
+        "duration_ms": 8500
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/s2_reflection_prompt_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "amb_hill_breeze_birds",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/audio/amb_hill_breeze_birds.ogg",
+        "size_bytes": 960000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_jesus_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/jesus_garment_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_crowd_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/crowd_atlas_1k.ktx2",
+        "size_bytes": 2720000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_imposter_hill_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/textures/hill_imposter_512.ktx2",
+        "size_bytes": 560000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_beatitudes_reading",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/Scene2BeatitudesReading.cs.bundle",
+        "size_bytes": 36800,
+        "entry_class": "Scene2BeatitudesReading"
+      },
+      {
+        "id": "script_line_highlight_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/jesus/galaxyxr/v1.0.0/scripts/LineHighlightSync.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "LineHighlightSync"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 24500800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
