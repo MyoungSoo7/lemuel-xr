@@ -1,0 +1,130 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 4,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_cave_mouth_frame",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/models/cave_mouth_frame.glb",
+        "size_bytes": 1600000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_theophany_fx_wind_quake_fire",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/models/theophany_fx_wind_quake_fire.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_elijah_wrapped_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/models/elijah_wrapped_mantle.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s4_wind_quake_fire_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s4_wind_quake_fire_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000
+      },
+      {
+        "id": "aud_s4_still_small_voice_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s4_still_small_voice_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "still_small_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s4_examples_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s4_examples_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s4_framing_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/s4_framing_note_ko.wav",
+        "size_bytes": 800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "note": "신학 가드 — '세미한 소리'(왕상 19:12~13)는 내면 신비 체험이 아니라 말씀으로 찾아오시는 임재"
+      },
+      {
+        "id": "amb_cave_silence_tone",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/audio/amb_cave_silence_tone.ogg",
+        "size_bytes": 560000,
+        "voice_id": null,
+        "duration_ms": 40000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/textures/elijah_mantle_1k.ktx2",
+        "size_bytes": 1520000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_cave_rock",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/textures/cave_rock_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_fx_flame_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/textures/fx_flame_atlas_512.ktx2",
+        "size_bytes": 720000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene4_still_small_voice",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/Scene4StillSmallVoice.cs.bundle",
+        "size_bytes": 36800,
+        "entry_class": "Scene4StillSmallVoice"
+      },
+      {
+        "id": "script_line_highlight_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/LineHighlightSync.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "LineHighlightSync"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/galaxyxr/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13282800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

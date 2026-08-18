@@ -1,0 +1,110 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "consent_card_required": true,
+    "crisis_check_required": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_wilderness_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/360/env_meditation_wilderness_broom.jpg",
+        "size_bytes": 5400000,
+        "lod": "360_panorama_8k_jpeg_dim",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_broom_tree_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/broom_tree_lite.glb",
+        "size_bytes": 198000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_elijah_lying_exhausted_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/billboards/elijah_lying_exhausted_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_1kgs19_4_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s2_1kgs19_4_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "elijah_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_not_rebuked_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s2_not_rebuked_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s2_reflection_prompt_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_crisis_check_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s2_crisis_check_ko.mp3",
+        "size_bytes": 400000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps",
+        "note": "R1 crisis_check 게이트 낭독 — 동의 못 하면 즉시 {{crisis_resources.default}}"
+      },
+      {
+        "id": "amb_desert_night_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/amb_desert_night_low.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_night_dim_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/textures/night_dim_overlay_2k.webp",
+        "size_bytes": 430000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_consent_gate_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/Scene2ConsentGateWeb.js",
+        "size_bytes": 22100,
+        "entry_class": "Scene2ConsentGateWeb"
+      },
+      {
+        "id": "script_crisis_check_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/CrisisCheckGate.js",
+        "size_bytes": 18700,
+        "entry_class": "CrisisCheckGate"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 9528800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

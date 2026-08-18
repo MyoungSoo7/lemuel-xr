@@ -1,0 +1,117 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 2,
+  "device_type": "galaxyxr",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "no_form_representation": true,
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_solomon_sleeping",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/solomon_sleeping.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_light_shaft_formless",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/models/light_shaft_formless.glb",
+        "size_bytes": 720000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_dream_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s2_dream_narration_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s2_you_asked_this_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s2_you_asked_this_ko.wav",
+        "size_bytes": 1120000,
+        "voice_id": "dream_voice_v1",
+        "duration_ms": 14000
+      },
+      {
+        "id": "aud_s2_wise_heart_given_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s2_wise_heart_given_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "dream_voice_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s2_riches_also_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/s2_riches_also_ko.wav",
+        "size_bytes": 640000,
+        "voice_id": "dream_voice_v1",
+        "duration_ms": 8000
+      },
+      {
+        "id": "amb_dream_pad_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/audio/amb_dream_pad_low.ogg",
+        "size_bytes": 640000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/textures/solomon_robe_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_light_shaft_gradient",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/textures/light_shaft_gradient_512.ktx2",
+        "size_bytes": 560000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_dream_response",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/Scene2DreamResponse.cs.bundle",
+        "size_bytes": 33600,
+        "entry_class": "Scene2DreamResponse"
+      },
+      {
+        "id": "script_no_form_guard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/NoFormGuard.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "NoFormGuard"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      },
+      {
+        "id": "shader_ar_passthrough_dim",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/ar/v1.0.0/scripts/ArPassthroughDim.shader.bundle",
+        "size_bytes": 12000,
+        "entry_class": "ArPassthroughDim"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 8719600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

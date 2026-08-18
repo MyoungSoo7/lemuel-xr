@@ -1,0 +1,120 @@
+{
+  "mission_id": "job",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "consent_card_required": true,
+    "line_advance_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ash_night_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/360/env_ash_heap_night.jpg",
+        "size_bytes": 6600000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_job_crying_out_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/job_crying_out_sheet.webp",
+        "size_bytes": 1040000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_three_friends_watching_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/three_friends_watching_sheet.webp",
+        "size_bytes": 1440000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_job3_3_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s2_job3_3_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "job_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_additional_refs_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s2_additional_refs_ko.mp3",
+        "size_bytes": 700000,
+        "voice_id": "job_v1",
+        "duration_ms": 14000,
+        "format": "mp3_192kbps",
+        "note": "job-3:11 · job-6:8 추가 참조 낭독"
+      },
+      {
+        "id": "aud_s2_not_rebuked_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s2_not_rebuked_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_reflection_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s2_reflection_prompt_ko.mp3",
+        "size_bytes": 650000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 13000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_language_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s2_language_note_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "R 가드 — 비탄의 언어를 허락하되 낭만화하지 않는다. 죽음 생각이 크면 본문보다 {{crisis_resources.default}} 연결이 우선"
+      },
+      {
+        "id": "amb_night_desolate",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_night_desolate.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_lament_line_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/textures/lament_line_overlay_2k.webp",
+        "size_bytes": 460000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_consent_gate_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/Scene2ConsentGateWeb.js",
+        "size_bytes": 22100,
+        "entry_class": "Scene2ConsentGateWeb"
+      },
+      {
+        "id": "script_lament_reading_sync",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/LamentReadingSync.js",
+        "size_bytes": 18700,
+        "entry_class": "LamentReadingSync"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12980800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,127 @@
+{
+  "mission_id": "job",
+  "scene_number": 3,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ash_heap_daylight",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/env_ash_heap_daylight.glb",
+        "size_bytes": 6560000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_eliphaz_speaking",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/eliphaz_speaking.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_job_listening",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/job_listening.glb",
+        "size_bytes": 1920000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_answer_cards_3",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/models/answer_cards_3.glb",
+        "size_bytes": 560000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_friends_answers_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s3_friends_answers_ko.wav",
+        "size_bytes": 1120000,
+        "voice_id": "eliphaz_v1",
+        "duration_ms": 14000
+      },
+      {
+        "id": "aud_s3_option_heard_it_before_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s3_option_heard_it_before_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s3_option_said_it_before_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s3_option_said_it_before_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s3_option_not_sure_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s3_option_not_sure_ko.wav",
+        "size_bytes": 560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000
+      },
+      {
+        "id": "aud_s3_theology_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/s3_theology_note_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "note": "신학 가드 — 고난의 원인을 당사자의 죄로 단정하는 인과응보 서술은 하나님이 직접 책망하신 것(욥 42:7). 어떤 분기에서도 '네 탓' 프레임 금지"
+      },
+      {
+        "id": "amb_day_wind_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/audio/amb_day_wind_soft.ogg",
+        "size_bytes": 720000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_job_garment_torn",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/job_garment_torn_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_eliphaz_garment",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/eliphaz_garment_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_answer_cards_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/textures/answer_cards_atlas_512.ktx2",
+        "size_bytes": 640000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_false_comfort_pick_one",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/scripts/Scene3FalseComfortPickOne.cs.bundle",
+        "size_bytes": 40000,
+        "entry_class": "Scene3FalseComfortPickOne"
+      },
+      {
+        "id": "script_static_response_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/galaxyxr/v1.0.0/scripts/StaticResponseRouter.cs.bundle",
+        "size_bytes": 19200,
+        "entry_class": "StaticResponseRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 19499200,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

@@ -1,0 +1,106 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 1,
+  "device_type": "quest3",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "skippable_after_sec": 3
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_carmel_aftermath_dusk",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/models/env_carmel_aftermath.glb",
+        "size_bytes": 8600000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_elijah_fleeing",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/models/elijah_fleeing.glb",
+        "size_bytes": 2600000,
+        "lod": "lod3_pbr_with_imposter"
+      },
+      {
+        "id": "model_altar_smoldering_stones",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/models/altar_smoldering_stones.glb",
+        "size_bytes": 2000000,
+        "lod": "lod3_pbr"
+      },
+      {
+        "id": "model_jezreel_walls_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/models/jezreel_walls_far.glb",
+        "size_bytes": 1200000,
+        "lod": "lod3_pbr"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/audio/s1_narration_ko.wav",
+        "size_bytes": 2400000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 24000
+      },
+      {
+        "id": "amb_ridge_wind_dusk",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/audio/amb_ridge_wind_dusk.ogg",
+        "size_bytes": 1000000,
+        "voice_id": null,
+        "duration_ms": 60000
+      },
+      {
+        "id": "amb_embers_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/audio/amb_embers_low.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_elijah_mantle",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/textures/elijah_mantle_2k.ktx2",
+        "size_bytes": 1900000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_altar_soot",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/textures/altar_soot_2k.ktx2",
+        "size_bytes": 1700000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      },
+      {
+        "id": "tex_imposter_jezreel_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/textures/jezreel_imposter_1k.ktx2",
+        "size_bytes": 700000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_carmel_flight_cinematic",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/scripts/Scene1CarmelFlightCinematic.cs.bundle",
+        "size_bytes": 44000,
+        "entry_class": "Scene1CarmelFlightCinematic"
+      },
+      {
+        "id": "script_skip_gate_intro",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/quest3/v1.0.0/scripts/SkipGateIntro.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "SkipGateIntro"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 22960000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

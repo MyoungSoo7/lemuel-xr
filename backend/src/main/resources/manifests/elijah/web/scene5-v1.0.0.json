@@ -1,0 +1,118 @@
+{
+  "mission_id": "elijah",
+  "scene_number": 5,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "passive_only": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ridge_dawn_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/360/env_horeb_ridge_dawn.jpg",
+        "size_bytes": 6600000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_seven_thousand_lights_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/models/seven_thousand_lights_lite.glb",
+        "size_bytes": 198000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_elijah_standing_wrapped_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/billboards/elijah_standing_wrapped_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_seven_thousand_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s5_seven_thousand_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s5_value_prompt_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s5_recovery_pack_15entries_ko.tar",
+        "size_bytes": 1800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s5_timeline_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s5_timeline_note_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "R3 — 회복 시간표 강요 금지. 먹고 잔 뒤에도 엘리야는 두 번 더 '나만 남았다' 고 말한다(왕상 19:10·14)"
+      },
+      {
+        "id": "aud_s5_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/s5_crisis_reminder_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps",
+        "note": "R1 — {{crisis_resources.default}} 낭독. 위기 감지 시 1번 정적 콘텐츠로 라우팅"
+      },
+      {
+        "id": "amb_dawn_ridge_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/audio/amb_dawn_ridge_soft.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_lights_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/textures/lights_overlay_2k.webp",
+        "size_bytes": 420000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_outro_recovery_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/Scene5OutroRecoveryWeb.js",
+        "size_bytes": 37400,
+        "entry_class": "Scene5OutroRecoveryWeb"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/elijah/web/v1.0.0/scripts/RecoveryKeyRouter.js",
+        "size_bytes": 20400,
+        "entry_class": "RecoveryKeyRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12335800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

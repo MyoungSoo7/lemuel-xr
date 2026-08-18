@@ -1,0 +1,124 @@
+{
+  "mission_id": "job",
+  "scene_number": 3,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "pick_one_via_click": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_ash_day_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/360/env_ash_heap_daylight.jpg",
+        "size_bytes": 6800000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_eliphaz_speaking_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/eliphaz_speaking_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_job_listening_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/job_listening_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_answer_cards_3_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/models/answer_cards_3_lite.glb",
+        "size_bytes": 63000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_friends_answers_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s3_friends_answers_ko.mp3",
+        "size_bytes": 700000,
+        "voice_id": "eliphaz_v1",
+        "duration_ms": 14000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_option_heard_it_before_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s3_option_heard_it_before_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_option_said_it_before_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s3_option_said_it_before_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_option_not_sure_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s3_option_not_sure_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_theology_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s3_theology_note_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps",
+        "note": "신학 가드 — 고난의 원인을 당사자의 죄로 단정하는 인과응보 서술은 하나님이 직접 책망하신 것(욥 42:7). 어떤 분기에서도 '네 탓' 프레임 금지"
+      },
+      {
+        "id": "amb_day_wind_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_day_wind_soft.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_answer_choice_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/textures/answer_choice_overlay_2k.webp",
+        "size_bytes": 480000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_false_comfort_pick_one_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/Scene3FalseComfortPickOneWeb.js",
+        "size_bytes": 42500,
+        "entry_class": "Scene3FalseComfortPickOneWeb"
+      },
+      {
+        "id": "script_static_response_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/StaticResponseRouter.js",
+        "size_bytes": 20400,
+        "entry_class": "StaticResponseRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12425900,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

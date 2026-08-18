@@ -7,7 +7,7 @@
 //   4. manifest 안의 에셋들 R2 다운로드 시도 → 진척 + 에러 log
 //   5. R4 동의 카드 (단순 console / OnGUI button) 노출
 //
-// AR 은 요셉·모세·다윗·예수만 열려 있다 — 그 외 미션에 mode=ar 로 물으면 백엔드가 400 으로 막는다.
+// AR 은 요셉·모세·다윗·예수·엘리야·솔로몬·욥만 열려 있다 — 그 외 미션에 mode=ar 로 물으면 백엔드가 400 으로 막는다.
 
 using System;
 using System.Collections;

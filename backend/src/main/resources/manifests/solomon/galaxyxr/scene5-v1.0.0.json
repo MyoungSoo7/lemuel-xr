@@ -1,0 +1,132 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 5,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "laydown_required": false,
+    "laydown_wait_sec": 20,
+    "nudge_prompts": false
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_gibeon_altar_return_dawn",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/env_gibeon_altar_return_dawn.glb",
+        "size_bytes": 6560000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_solomon_elder_standing",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/solomon_elder_standing.glb",
+        "size_bytes": 2240000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_altar_embers",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/altar_embers.glb",
+        "size_bytes": 1280000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_laydown_objects_pack_4",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/models/laydown_objects_pack_4.glb",
+        "size_bytes": 1440000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_return_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s5_return_narration_ko.wav",
+        "size_bytes": 720000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000
+      },
+      {
+        "id": "aud_s5_fear_god_conclusion_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s5_fear_god_conclusion_ko.wav",
+        "size_bytes": 1040000,
+        "voice_id": "solomon_elder_v1",
+        "duration_ms": 13000
+      },
+      {
+        "id": "aud_s5_laydown_invitation_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s5_laydown_invitation_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "note": "R3 — 내려놓기 비강제. 20초 침묵 대기 후 완주 처리, 재촉 프롬프트 없음"
+      },
+      {
+        "id": "aud_s5_reorientation_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s5_reorientation_pack_10entries_ko.tar",
+        "size_bytes": 2400000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 150000,
+        "note": "10 = 3 hevel_labels x 3 faith_tones + 라벨 없음 default, pre-cached"
+      },
+      {
+        "id": "aud_s5_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/s5_crisis_reminder_ko.wav",
+        "size_bytes": 560000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "note": "R1 — {{crisis_resources.default}} 낭독"
+      },
+      {
+        "id": "amb_dawn_altar_soft",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/audio/amb_dawn_altar_soft.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_solomon_elder_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/solomon_elder_robe_1k.ktx2",
+        "size_bytes": 1600000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_altar_ember_glow",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/altar_ember_glow_1k.ktx2",
+        "size_bytes": 1120000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_laydown_objects_atlas",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/textures/laydown_objects_atlas_1k.ktx2",
+        "size_bytes": 1520000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_laydown_reorientation",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/scripts/Scene5LaydownReorientation.cs.bundle",
+        "size_bytes": 36800,
+        "entry_class": "Scene5LaydownReorientation"
+      },
+      {
+        "id": "script_laydown_optional_timer",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/galaxyxr/v1.0.0/scripts/LaydownOptionalTimer.cs.bundle",
+        "size_bytes": 17600,
+        "entry_class": "LaydownOptionalTimer"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 22294400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

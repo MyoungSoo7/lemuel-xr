@@ -1,0 +1,127 @@
+{
+  "mission_id": "job",
+  "scene_number": 5,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "passive_only": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_dawn_storm_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/360/env_dawn_after_storm.jpg",
+        "size_bytes": 6400000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_job_standing_quiet_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/billboards/job_standing_quiet_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_horizon_light_low_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/models/horizon_light_low_lite.glb",
+        "size_bytes": 108000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_i_have_seen_you_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_i_have_seen_you_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "job_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_value_prompt_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_suffering_footer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_suffering_footer_ko.mp3",
+        "size_bytes": 900000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 18000,
+        "format": "mp3_192kbps",
+        "note": "R2 필수 footer — 자발적 고난의 의미를 다루되, 가정폭력·종교적 학대 같은 피해 상황을 견디라는 강요가 아님을 명시하는 낭독"
+      },
+      {
+        "id": "aud_s5_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_recovery_pack_15entries_ko.tar",
+        "size_bytes": 1800000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s5_restoration_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_restoration_note_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "R3 — 결말은 의도적으로 '답 없는 만남' 에서 멈춘다. 회복 보장 서사로 맺지 않는다"
+      },
+      {
+        "id": "aud_s5_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/s5_crisis_reminder_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps",
+        "note": "R1 — {{crisis_resources.default}} 낭독"
+      },
+      {
+        "id": "amb_dawn_calm",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/audio/amb_dawn_calm.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_horizon_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/textures/horizon_overlay_2k.webp",
+        "size_bytes": 420000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_outro_meeting_not_answer_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/Scene5OutroMeetingNotAnswerWeb.js",
+        "size_bytes": 37400,
+        "entry_class": "Scene5OutroMeetingNotAnswerWeb"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/web/v1.0.0/scripts/RecoveryKeyRouter.js",
+        "size_bytes": 20400,
+        "entry_class": "RecoveryKeyRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 13045800,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

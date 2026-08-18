@@ -1,0 +1,169 @@
+{
+  "mission_id": "solomon",
+  "scene_number": 3,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "consent_card_required": true,
+    "pick_one_via_click": true,
+    "intensity_toggle": [
+      "captions_only",
+      "mild",
+      "default"
+    ]
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_throne_hall_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/360/env_throne_hall_judgment.jpg",
+        "size_bytes": 7400000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_solomon_enthroned_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/billboards/solomon_enthroned_sheet.webp",
+        "size_bytes": 1120000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_woman_a_pleading_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/billboards/woman_a_pleading_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_woman_b_standing_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/billboards/woman_b_standing_sheet.webp",
+        "size_bytes": 960000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_sword_ceremonial_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/models/sword_ceremonial_lite.glb",
+        "size_bytes": 81000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_two_women_narration_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_two_women_narration_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps",
+        "note": "요약 — '창기' 생략은 여인 비낙인화 목적의 의도적 각색(왕상 3:16)"
+      },
+      {
+        "id": "aud_s3_woman_a_claim_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_woman_a_claim_ko.mp3",
+        "size_bytes": 750000,
+        "voice_id": "woman_a_v1",
+        "duration_ms": 15000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_woman_b_claim_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_woman_b_claim_ko.mp3",
+        "size_bytes": 400000,
+        "voice_id": "woman_b_v1",
+        "duration_ms": 8000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_judgment_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_judgment_prompt_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_sword_command_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_sword_command_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "칼은 들어올려질 뿐 아기에게 닿지 않는다 — 마음을 드러내는 시험의 말"
+      },
+      {
+        "id": "aud_s3_true_mother_plea_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_true_mother_plea_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "woman_a_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_verdict_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_verdict_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "solomon_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s3_skip_summary_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/s3_skip_summary_caption_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps",
+        "note": "R4 스킵 대체 — 비묘사 요약 자막 1장 낭독 후 Scene 4 로"
+      },
+      {
+        "id": "amb_hall_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/audio/amb_hall_murmur.mp3",
+        "size_bytes": 500000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_judgment_choice_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/textures/judgment_choice_overlay_2k.webp",
+        "size_bytes": 510000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_judgment_pick_one_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/scripts/Scene3JudgmentPickOneWeb.js",
+        "size_bytes": 45900,
+        "entry_class": "Scene3JudgmentPickOneWeb"
+      },
+      {
+        "id": "script_consent_gate_infant_loss",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/scripts/ConsentGateInfantLoss.js",
+        "size_bytes": 22100,
+        "entry_class": "ConsentGateInfantLoss"
+      },
+      {
+        "id": "script_intensity_toggle",
+        "url": "https://cdn.r2.dev/lemuel-xr/solomon/web/v1.0.0/scripts/IntensityToggle.js",
+        "size_bytes": 17000,
+        "entry_class": "IntensityToggle"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 15716000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

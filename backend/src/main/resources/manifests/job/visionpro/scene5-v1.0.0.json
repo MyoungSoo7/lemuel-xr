@@ -1,0 +1,127 @@
+{
+  "mission_id": "job",
+  "scene_number": 5,
+  "device_type": "visionpro",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "passive_only": true,
+    "spatial_audio_mode": "personal"
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_dawn_after_storm",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/models/env_dawn_after_storm.glb",
+        "size_bytes": 9360000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_job_standing_quiet",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/models/job_standing_quiet.glb",
+        "size_bytes": 2880000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_horizon_light_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/models/horizon_light_low.glb",
+        "size_bytes": 1440000,
+        "lod": "lod3_pbr_upscale_4k"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_i_have_seen_you_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_i_have_seen_you_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "job_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s5_value_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_value_prompt_ko.wav",
+        "size_bytes": 1320000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s5_suffering_footer_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_suffering_footer_ko.wav",
+        "size_bytes": 2160000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 18000,
+        "note": "R2 필수 footer — 자발적 고난의 의미를 다루되, 가정폭력·종교적 학대 같은 피해 상황을 견디라는 강요가 아님을 명시하는 낭독"
+      },
+      {
+        "id": "aud_s5_recovery_pack_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_recovery_pack_15entries_ko.tar",
+        "size_bytes": 4320000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 180000,
+        "note": "15 = 5 recovery_keys x 3 faith_tones, pre-cached"
+      },
+      {
+        "id": "aud_s5_restoration_note_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_restoration_note_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "note": "R3 — 결말은 의도적으로 '답 없는 만남' 에서 멈춘다. 회복 보장 서사로 맺지 않는다"
+      },
+      {
+        "id": "aud_s5_crisis_reminder_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/s5_crisis_reminder_ko.wav",
+        "size_bytes": 840000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 7000,
+        "note": "R1 — {{crisis_resources.default}} 낭독"
+      },
+      {
+        "id": "amb_dawn_calm",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/audio/amb_dawn_calm.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 45000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_job_garment_torn",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/textures/job_garment_torn_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_horizon_gradient",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/textures/horizon_gradient_2k.ktx2",
+        "size_bytes": 840000,
+        "format": "ktx2",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_outro_meeting_not_answer",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/scripts/Scene5OutroMeetingNotAnswerPolySpatial.cs.bundle",
+        "size_bytes": 52800,
+        "entry_class": "Scene5OutroMeetingNotAnswerPolySpatial"
+      },
+      {
+        "id": "script_recovery_key_router",
+        "url": "https://cdn.r2.dev/lemuel-xr/job/visionpro/v1.0.0/scripts/RecoveryKeyRouter.cs.bundle",
+        "size_bytes": 28800,
+        "entry_class": "RecoveryKeyRouter"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 29001600,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
