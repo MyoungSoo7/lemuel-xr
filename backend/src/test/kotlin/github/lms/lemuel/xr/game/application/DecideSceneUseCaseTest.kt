@@ -38,6 +38,7 @@ class DecideSceneUseCaseTest {
         // ScenePayloadAssembler 도 실제 협력자 — 위기 토큰 치환·금지 토큰 게이트까지 통과하는지 함께 본다.
         ScenePayloadAssembler(CrisisTokenResolver { _, _ -> "109" }, SafetyGateFixtures.sanitizer()),
         SceneConvergenceResolver(DecisionKeyExtractor()),
+        SceneSkipResolver(DecisionKeyExtractor()),
     )
 
     private fun scene(id: Int, next: Int?, llmFlag: Boolean?, extras: Map<String, Any?>?): Scenario.Scene =
@@ -97,6 +98,211 @@ class DecideSceneUseCaseTest {
         verify(decisions).save(cap.capture())
         assertThat(cap.firstValue.sceneNumber).isEqualTo(2.toShort())
         assertThat(cap.firstValue.sceneName).isEqualTo("장면2")
+    }
+
+    /**
+     * R4 동의 카드의 건너뛰기 — 이 use case 가 `next` 보다 목적지를 먼저 본다는 계약.
+     *
+     * 룻 Scene 1 의 형태다: 진입 카드가 Scene 1·2 를 함께 덮으므로 목적지는 3인데 `next` 는 2다.
+     * 2026-08-20 이전 엔진은 결정만 기록하고 `next` 를 따라가서, **사별 서사를 건너뛰겠다고
+     * 고른 사용자를 그 카드가 덮기로 한 Scene 2 로 보냈다.**
+     */
+    @Test
+    fun `execute 건너뛰기는 next 가 아니라 카드가 정한 목적지로 간다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    1, 2, false,
+                    mapOf(
+                        "trigger_warning" to mapOf(
+                            "covers_scenes" to listOf(1, 2),
+                            "skip_alternative_scene_id" to 3,
+                        ),
+                    ),
+                ),
+                scene(2, 3, false, emptyMap()),
+                scene(3, null, false, emptyMap()),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(1, mapOf("value" to "skip"), null, null),
+        )
+
+        assertThat(r.currentScene).describedAs("건너뛴 사용자가 덮인 Scene 2 로 가면 안 된다").isEqualTo(3)
+        assertThat(r.scenePayload).containsEntry("sceneId", 3)
+        // 건너뛰기도 결정이다 — 기록은 그대로 남는다.
+        verify(decisions).save(any())
+    }
+
+    @Test
+    fun `execute 카드 거절은 종결 payload`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    3, 4, false,
+                    mapOf(
+                        "trigger_warning" to mapOf(
+                            "covers_scenes" to listOf(3, 5),
+                            "skip_alternative_scene_id" to 4,
+                            "declined_route" to "closing",
+                        ),
+                    ),
+                ),
+                scene(4, null, false, emptyMap()),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
+        )
+
+        assertThat(r.scenePayload).isEqualTo(mapOf("type" to "end"))
+    }
+
+    /** 마지막 씬의 축약 경로 — 씬은 그대로, 블록이 선언한 override 만 payload 에 덮인다. */
+    @Test
+    fun `execute 축약 블록 건너뛰기는 같은 scene 에 머물며 자막을 비운다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    5, null, false,
+                    mapOf(
+                        "consent_coverage" to mapOf(
+                            "inherited" to true,
+                            "skip_alternative_scene_id" to "ruth_scene5_alt_short",
+                        ),
+                        "captions" to listOf("성문 낭독 1", "성문 낭독 2"),
+                        "closing_lines" to listOf("마감 한 줄"),
+                        "closing_screen" to mapOf("kind" to "closing"),
+                        "conditional_blocks" to listOf(
+                            mapOf(
+                                "id" to "ruth_scene5_alt_short",
+                                "renders" to listOf("closing_lines", "closing_screen"),
+                                "captions" to emptyList<String>(),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(5, mapOf("value" to "skip"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(5)
+        assertThat(r.scenePayload).containsEntry("captions", emptyList<String>())
+        // 축약 경로도 마감에는 도달한다 — 블록이 renders 로 약속한 것들.
+        assertThat(r.scenePayload).containsEntry("closing_lines", listOf("마감 한 줄"))
+        assertThat(r.scenePayload).containsEntry("conditionalBlockId", "ruth_scene5_alt_short")
+    }
+
+    /**
+     * 카드 하나가 여러 씬을 덮을 때 — 건너뛰기는 목적지 하나로 끝나지 않는다.
+     *
+     * 룻의 중간 카드는 Scene 3 과 5 를 함께 덮고 목적지는 4다. 4의 `next` 는 5이므로,
+     * 선택을 들고 오지 않으면 **건너뛰기를 고른 사용자가 `next` 를 따라 Scene 5 —
+     * 같은 카드가 덮기로 한 씬 — 의 전체 자막으로 흘러들어간다.** 목적지만 지키는 건
+     * 절반짜리 보호다.
+     */
+    @Test
+    fun `execute 앞 씬에서 고른 건너뛰기는 같은 카드가 덮은 뒤 씬까지 이어진다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(4, 5, false, emptyMap()),
+                scene(
+                    5, null, false,
+                    mapOf(
+                        "consent_coverage" to mapOf(
+                            "inherited" to true,
+                            "covered_by_scene" to 3,
+                            "skip_alternative_scene_id" to "ruth_scene5_alt_short",
+                        ),
+                        "captions" to listOf("성문 낭독 1", "성문 낭독 2"),
+                        "closing_lines" to listOf("마감 한 줄"),
+                        "conditional_blocks" to listOf(
+                            mapOf(
+                                "id" to "ruth_scene5_alt_short",
+                                "renders" to listOf("closing_lines"),
+                                "captions" to emptyList<String>(),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        // Scene 3 에서 이미 건너뛰기를 골랐다 — 세션에 그 결정이 남아 있다.
+        val session = liveSession(sid, "joseph", null)
+        session.recordDecision(3, mapOf("value" to "skip"))
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(session))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(4, mapOf("value" to "go"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(5)
+        assertThat(r.scenePayload)
+            .describedAs("Scene 3 에서 건너뛴 사용자에게 Scene 5 의 성문 낭독 자막이 그대로 가면 안 된다")
+            .containsEntry("captions", emptyList<String>())
+        assertThat(r.scenePayload).containsEntry("closing_lines", listOf("마감 한 줄"))
+        assertThat(r.scenePayload).containsEntry("conditionalBlockId", "ruth_scene5_alt_short")
+    }
+
+    @Test
+    fun `execute 건너뛰지 않은 사용자는 덮인 씬의 자막을 그대로 받는다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(4, 5, false, emptyMap()),
+                scene(
+                    5, null, false,
+                    mapOf(
+                        "consent_coverage" to mapOf(
+                            "inherited" to true,
+                            "covered_by_scene" to 3,
+                            "skip_alternative_scene_id" to "ruth_scene5_alt_short",
+                        ),
+                        "captions" to listOf("성문 낭독 1", "성문 낭독 2"),
+                        "conditional_blocks" to listOf(
+                            mapOf("id" to "ruth_scene5_alt_short", "captions" to emptyList<String>()),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        val session = liveSession(sid, "joseph", null)
+        session.recordDecision(3, mapOf("value" to "continue"))
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(session))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(4, mapOf("value" to "go"), null, null),
+        )
+
+        assertThat(r.scenePayload).containsEntry("captions", listOf("성문 낭독 1", "성문 낭독 2"))
+        assertThat(r.scenePayload).doesNotContainKey("conditionalBlockId")
     }
 
     @Test

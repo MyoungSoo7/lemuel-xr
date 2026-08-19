@@ -502,7 +502,6 @@ scenes:
       skip_alternative_scene_id: 4
       # 거절 시 종결 화면으로 간다. `closing` 센티널은 전 산출물 통틀어 정확히 1건이다.
       declined_route: closing
-      skip_alternative_scene_id: 4
       consent_card_ko: |-
         여기서부터는 낯선 땅에서의 일입니다.
         한 여인이 남의 밭에서 이삭을 줍고, 사람들은 그를 "모압 여인"이라고 부릅니다.

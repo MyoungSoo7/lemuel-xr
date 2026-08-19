@@ -46,17 +46,25 @@ R1(자해 발화) 콘텐츠는 어떤 자동 합의로도 최종 승인할 수 �
   (`.yml` 이라 `code_claims_check.py` 밖, AC 31 은 다른 두 파일만 대조). 사람이 읽어야 한다.
 - `gates:ruth` 의 G0e 는 의도적으로 FAIL 상태다. 초록으로 만들지 말 것.
 - DP1~DP7 은 확정하지 않은 논점이다. 사인오프가 이것들을 확정한다는 뜻이 아니다.
-- 🚧 **런타임이 룻의 동의 카드 설계를 아직 표현하지 못한다.** 사인오프와 별개로,
-  코드가 먼저 바뀌어야 한다. Scene 1 의 `ruth_entry_consent` 는 `covers_scenes: [1, 2]`
-  라서 거절·스킵 목적지가 **Scene 3** 인데, 그 씬의 `next` 는 2다. 백엔드에는 skip 분기가
-  없고(결정을 기록한 뒤 `next` 를 따라간다) 프론트의 "건너뛰기"는 _본문을 렌더하지 않고
-  그냥 진행_ 하는 것이라, 지금 상태로 enum 을 열면 **사별 서사를 건너뛰겠다고 고른
-  사용자가 Scene 2 — 그 카드가 덮기로 한 바로 그 씬 — 으로 들어간다.**
-  다른 인물들은 `skip == next` 라서 우연히 맞아떨어졌을 뿐이다.
-  `ScenarioYamlLoaderTest` 의 `skip_alternative_scene_id == next` 불변식이 이 어긋남을
-  잡아 두었고, RUTH 를 enum 에 넣는 순간 그 테스트가 빨개진다 — 의도된 동작이다.
-  Scene 3 의 `declined_route: closing`(종결 화면 이동) 도 마찬가지로 미구현이다.
-  또한 그 블록에는 `skip_alternative_scene_id: 4` 가 **두 번** 적혀 있다(YAML 중복 키).
+- ✅ **2026-08-20 — 런타임이 룻의 동의 카드 설계를 이제 표현한다.** (이 항목은 해소됐다.
+  경위를 남긴다.) 2026-08-20 까지 백엔드에는 skip 분기가 **없었다** — 결정을 기록한 뒤
+  무조건 `next` 를 따라갔다. Scene 1 의 `ruth_entry_consent` 는 `covers_scenes: [1, 2]`
+  라서 스킵 목적지가 **Scene 3** 인데 그 씬의 `next` 는 2다. 그래서 그 상태로 enum 을
+  열었다면 **사별 서사를 건너뛰겠다고 고른 사용자가 Scene 2 — 그 카드가 덮기로 한 바로
+  그 씬 — 으로 들어갔다.** 다른 인물들은 `skip == next` 라 우연히 맞아떨어졌을 뿐이다.
+  이제 `SceneSkipResolver` 가 세 목적지를 집행한다 —
+  ① 정수 `skip_alternative_scene_id` → 그 Scene 으로 점프(룻 1→3, 4→5),
+  ② 문자열 → 마지막 Scene 의 축약 블록(`ruth_scene5_alt_short`, `captions` 가 실제로 비워짐),
+  ③ `declined_route: closing` → 종결. **스킵과 거절은 다른 동작이다**(Scene 3 주석의 요구).
+  카드가 여러 씬을 덮으면(중간 카드 = Scene 3·5) 세션에 남은 결정을 근거로 **선택을 뒤
+  씬까지 들고 간다** — 목적지 4를 지나 `next` 로 5에 도착해도 축약 경로가 유지된다.
+  목적지가 실재하지 않으면 `next` 로 흘려보내지 않고 던진다(조용한 실패의 대가가 정확히
+  이 통제가 막으려던 노출이다). `ScenarioYamlLoaderTest` 의 불변식도 `skip == next` 에서
+  **"스킵 목적지가 그 카드가 덮은 씬이면 안 된다"** 로 바뀌었다.
+  Scene 3 블록에 `skip_alternative_scene_id: 4` 가 **두 번** 적혀 있던 YAML 중복 키도
+  한 줄로 정리했다(두 값이 같아 의미 변화는 없다).
+  ⚠️ 이것은 _엔진_ 이 저작 의도를 지킨다는 뜻이지 콘텐츠가 승인됐다는 뜻이 아니다.
+  enum 은 여전히 닫혀 있고, 아래 두 사인오프가 이 파일의 게이트다.
 - 🚧 **2026-08-19 — 자산 층은 먼저 들어왔다. 이 게이트 밖이다.**
   `backend/src/main/resources/manifests/ruth/` 에 VR 20장 + AR 15장이 시드됐고
   `lemuel.xr.ar-enabled-missions` 에 `ruth` 가 들어갔다. 시나리오 노출은 그대로 닫혀

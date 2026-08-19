@@ -532,16 +532,16 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
   [CROSS-MAPPING-VR-AR.md](./CROSS-MAPPING-VR-AR.md) 의 "AR 1~7 가치(일상 습관)" 와는
   다른 축이고, 그쪽은 `ar_topic_*` 테이블이 담당한다.
 
-| 미션    | vr   | ar  | 근거                                                                              |
-| ------- | ---- | --- | --------------------------------------------------------------------------------- |
-| joseph  | ✅   | ✅  | `manifests/joseph/{device}/ar/` 시드 15개 (3기기 × 5씬)                           |
-| moses   | ✅   | ✅  | 시드 18개 (3기기 × 6씬)                                                           |
-| david   | ✅   | ✅  | 시드 18개 (3기기 × 6씬)                                                           |
-| jesus   | ✅   | ✅  | 시드 21개 (3기기 × 7씬)                                                           |
-| elijah  | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
-| solomon | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
-| job     | ✅   | ✅  | 시드 15개 (3기기 × 5씬)                                                           |
-| ruth    | ✅\* | ✅\* | 시드 15개 (3기기 × 5씬)                                                           |
+| 미션    | vr   | ar   | 근거                                                    |
+| ------- | ---- | ---- | ------------------------------------------------------- |
+| joseph  | ✅   | ✅   | `manifests/joseph/{device}/ar/` 시드 15개 (3기기 × 5씬) |
+| moses   | ✅   | ✅   | 시드 18개 (3기기 × 6씬)                                 |
+| david   | ✅   | ✅   | 시드 18개 (3기기 × 6씬)                                 |
+| jesus   | ✅   | ✅   | 시드 21개 (3기기 × 7씬)                                 |
+| elijah  | ✅   | ✅   | 시드 15개 (3기기 × 5씬)                                 |
+| solomon | ✅   | ✅   | 시드 15개 (3기기 × 5씬)                                 |
+| job     | ✅   | ✅   | 시드 15개 (3기기 × 5씬)                                 |
+| ruth    | ✅\* | ✅\* | 시드 15개 (3기기 × 5씬)                                 |
 
 \* **룻은 자산만 열렸고 미션은 닫혀 있다.** 위 표의 ✅ 는 `/api/config/asset-manifest`
 가 200 을 준다는 뜻이지 사용자가 룻을 할 수 있다는 뜻이 아니다. `ScenarioYamlLoader` 는
@@ -553,11 +553,14 @@ GET /api/config/xr-modes?mission=joseph        → {"missionId":"joseph","modes"
 게이트 밖에서 조회 가능해졌다. 자막·동의 카드 문안은 manifest 에 없고 낭독 트랙의
 `note` 로만 계약이 적혀 있지만, 그래도 「닫혀 있다」의 범위가 좁아진 것은 사실이다.
 
-미션을 실제로 열려면 사인오프 두 줄 외에 **런타임 결함 하나**가 먼저 고쳐져야 한다 —
-Scene 1 동의 카드의 스킵 목적지는 3 인데 그 씬의 `next` 는 2 라, 지금 코드로 enum 을
-열면 사별 서사를 건너뛰겠다고 고른 사용자가 카드가 덮기로 한 Scene 2 로 들어간다
-(백엔드에 skip 분기가 없다). `ScenarioYamlLoaderTest` 의 `skip_alternative_scene_id == next`
-불변식이 그 순간 빨개진다 — 의도된 동작이다.
+미션을 실제로 열려면 **사인오프 두 줄** 이 남아 있다. 함께 걸려 있던 런타임 결함 —
+Scene 1 동의 카드의 스킵 목적지는 3 인데 `next` 는 2 라 사별 서사를 건너뛰겠다고 고른
+사용자가 카드가 덮기로 한 Scene 2 로 들어가던 것 — 은 2026-08-20 에 고쳤다.
+[`SceneSkipResolver`](../backend/src/main/kotlin/github/lms/lemuel/xr/game/application/SceneSkipResolver.kt)
+가 `skip_alternative_scene_id`·`declined_route` 를 집행하고, 카드가 여러 씬을 덮으면
+(룻 중간 카드 = Scene 3·5) 그 선택을 뒤 씬까지 들고 간다. `ScenarioYamlLoaderTest` 의
+불변식도 `skip == next` 에서 **"스킵 목적지가 그 카드가 덮은 씬이면 안 된다"** 로 바뀌었다 —
+엔진이 목적지를 지키게 됐으니 검사할 것도 달라진다.
 
 AR 매니페스트는 VR 에서 세 부류를 덜어낸다 — `env_*`(방 전체 환경), `*_far`(원경
 임포스터), 그리고 _남은 모델 어디에도 안 붙는 텍스처_(환경 아틀라스 등). 룸스케일에는
