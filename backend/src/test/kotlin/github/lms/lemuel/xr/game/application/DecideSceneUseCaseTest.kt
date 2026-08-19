@@ -214,6 +214,117 @@ class DecideSceneUseCaseTest {
     }
 
     /**
+     * **실제 yml 모양으로 다시 잰다 — 위 두 테스트의 초록은 픽스처가 만든 초록이었다.**
+     *
+     * 위 픽스처는 `captions` · `closing_lines` · `conditional_blocks` 를 전부 `extras` 의
+     * *루트* 에 평평하게 놓는다. 그런데 [ScenarioYamlLoader] 는 표준 9필드만 걷어내므로,
+     * yml Scene 이 자기 `extras:` 블록을 갖고 있으면 그 안의 것들은 **한 겹 더 들어가**
+     * `payload["extras"]` 아래에 앉는다. 룻 Scene 5 가 바로 그 모양이다.
+     *
+     * 그 한 겹 때문에 `altBlockPayload` 가 두 군데서 깨져 있었다 —
+     *   · `renders` 검사가 루트만 봐서 **항상 실패**, 축약 경로 전체가 E_VALIDATION.
+     *     룻 Scene 3 에서 건너뛴 사용자가 5에 도착하는 경로라 사용자에게 닿는다.
+     *   · 통과시켜도 `captions: []` 이 루트에만 얹혀 `extras.captions` 는 그대로 남는다.
+     *     축약을 약속하고 축약하지 않는 조용한 실패다.
+     *
+     * 그래서 이 테스트는 **평평한 픽스처를 고치는 대신 한 겹 들어간 픽스처를 더한다.**
+     * 두 모양 다 지나가는 것이 계약이고, 평평한 쪽만 재는 한 이 결함은 계속 안 보인다.
+     */
+    @Test
+    fun `execute 축약 블록은 payload 가 한 겹 들어간 실제 yml 모양에서도 자막을 비운다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    5, null, false,
+                    mapOf(
+                        // 로더가 남기는 바깥 겹 — 등급·동의는 표준필드가 아니라 여기 앉는다.
+                        "exposure_grade" to "B",
+                        "consent_coverage" to mapOf(
+                            "inherited" to true,
+                            "skip_alternative_scene_id" to "ruth_scene5_alt_short",
+                        ),
+                        // yml 의 `extras:` 블록 — 저작물은 전부 이 안쪽 겹에 있다.
+                        "extras" to mapOf(
+                            "captions" to listOf("성문 낭독 1", "성문 낭독 2"),
+                            "closing_lines" to mapOf("default_ko" to "이 자리에도 그늘이 닿았다."),
+                            "closing_screen" to mapOf("entry_mode" to "closing_only"),
+                            "conditional_blocks" to listOf(
+                                mapOf(
+                                    "id" to "ruth_scene5_alt_short",
+                                    "renders" to listOf("closing_lines", "closing_screen"),
+                                    "captions" to emptyList<String>(),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(5, mapOf("value" to "skip"), null, null),
+        )
+
+        assertThat(r.currentScene).isEqualTo(5)
+        assertThat(r.scenePayload).containsEntry("conditionalBlockId", "ruth_scene5_alt_short")
+
+        @Suppress("UNCHECKED_CAST")
+        val nested = r.scenePayload["extras"] as Map<String, Any?>
+        assertThat(nested)
+            .describedAs("치환은 키가 실제로 사는 겹에 닿아야 한다 — 루트에 얹기만 하면 자막은 그대로 간다")
+            .containsEntry("captions", emptyList<String>())
+        // 블록이 renders 로 약속한 마감은 안쪽 겹에 그대로 남아 있다.
+        assertThat(nested).containsKey("closing_lines")
+        assertThat(nested).containsKey("closing_screen")
+    }
+
+    /** 두 겹 어디에도 약속한 키가 없으면 여전히 던진다 — 위 완화가 검사를 무르게 하지 않았다. */
+    @Test
+    fun `execute 축약 블록이 약속한 키가 두 겹 어디에도 없으면 던진다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    5, null, false,
+                    mapOf(
+                        "consent_coverage" to mapOf(
+                            "skip_alternative_scene_id" to "ruth_scene5_alt_short",
+                        ),
+                        "extras" to mapOf(
+                            "captions" to listOf("성문 낭독 1"),
+                            "conditional_blocks" to listOf(
+                                mapOf(
+                                    "id" to "ruth_scene5_alt_short",
+                                    // 저작에 closing_screen 이 없는데 남는다고 약속했다.
+                                    "renders" to listOf("closing_screen"),
+                                    "captions" to emptyList<String>(),
+                                ),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        assertThatThrownBy {
+            uc.execute(
+                owner, sid, Character.JOSEPH,
+                DecideSceneUseCase.Input(5, mapOf("value" to "skip"), null, null),
+            )
+        }
+            .isInstanceOf(AppException::class.java)
+            .hasMessageContaining("closing_screen")
+    }
+
+    /**
      * 카드 하나가 여러 씬을 덮을 때 — 건너뛰기는 목적지 하나로 끝나지 않는다.
      *
      * 룻의 중간 카드는 Scene 3 과 5 를 함께 덮고 목적지는 4다. 4의 `next` 는 5이므로,

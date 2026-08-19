@@ -97,8 +97,18 @@ AR 시드 15개(3기기 × 5씬)를 지웠다.** 되살리려면 목록 복구 +
   (`.yml` 이라 `code_claims_check.py` 밖, AC 31 은 다른 두 파일만 대조). 사람이 읽어야 한다.
 - `gates:ruth` 의 G0e 는 의도적으로 FAIL 상태다. 초록으로 만들지 말 것.
 - DP1~DP7 은 확정하지 않은 논점이다. 이 결정이 그것들을 확정한다는 뜻이 아니다.
-- 프론트엔드에 `ruth` 페이지가 없다. enum 이 열려도 웹에서 들어갈 입구는 없고,
-  API 로만 도달한다. 이건 노출을 좁히지만, "열었다" 는 말의 뜻도 그만큼 좁다.
+- 프론트엔드 `/ruth` 화면은 2026-08-20 에 생겼다. 그 전까지 enum 만 열리고 웹 입구가
+  없어 API 로만 도달했다 — 그동안 화면 쪽 검사기 두 개(`check_frontend_trigger_warning.py` ·
+  `mission-tap-targets.spec.ts`)는 룻을 **건너뛰고 있었다.** 지금은 둘 다 룻을 잰다.
+  다만 화면이 생겼다고 노출 결정의 범위가 넓어진 것이지 검토가 늘어난 것은 아니다.
+- 씬 배경 이미지가 한 장도 없다(`public/images/scenes/ruth` 부재). `/ruth` 는 단색
+  그라디언트로 돈다. `scene-backgrounds.test.ts` 는 그래서 룻을 의도적으로 제외한다 —
+  제외 사유를 그 파일에 적어 뒀다. 강도 조절 토글도, F66 진입 상태 게이트도 없다.
+- 거절(`declined_route: closing`)한 사용자는 저작된 마감 화면을 못 받는다.
+  `SceneSkipResolver.Skip.Closing` 이 `{"type": "end"}` 만 실어 보내서, `closing_screen.reached_by`
+  가 `consent_declined_sentinel` 을 포함하는데도 그 화면이 payload 에 안 실린다.
+  룻 Scene 3 이 리포 전체에서 유일한 `declined_route` 라 영향 범위는 좁지만, 고치려면
+  payload 규약을 바꾸는 결정이 필요해 여기 남긴다.
 
 ## 이 대장이 보증하지 않는 것
 

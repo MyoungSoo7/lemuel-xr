@@ -40,6 +40,28 @@ export interface TriggerWarning {
   /** 저작 정본 동의 카드 본문. 있으면 fallbackProse 보다 우선한다. */
   consent_card_ko?: string;
   skip_alternative_scene_id?: number;
+  /**
+   * 카드를 **거절** 했을 때의 목적지. 현재 정의된 값은 `closing` 하나뿐이다.
+   *
+   * `skip` 과 `decline` 은 다른 문이다 — skip 은 이 씬만 건너뛰고 이야기가 이어지고,
+   * decline 은 카드 자체를 거절해 종결 화면으로 간다(백엔드 `SceneSkipResolver`).
+   * 이 키를 읽지 않으면 화면은 두 문을 구별할 수 없고, 「여기서 마친다」라고 적힌
+   * 버튼이 조용히 *건너뛰기* 를 보내게 된다 — 마치겠다고 고른 사람이 다음 씬으로
+   * 들어간다. 백엔드에서 방금 고친 결함(스킵 목적지 ≠ next)과 같은 모양이다.
+   *
+   * 리포 전체에서 이 키를 선언하는 카드는 룻 Scene 3 하나다(`ruth.yml`).
+   */
+  declined_route?: string;
+  /**
+   * 건너뛴 구간을 잇는 저작된 한 줄. 현재 룻 Scene 1 진입 카드에만 있다.
+   *
+   * 그 카드는 Scene 1·2 를 함께 덮고 목적지가 3 이라, 건너뛴 사용자는 룻이라는
+   * 이름이 처음 나오는 대목을 통째로 지나친다. 이 줄이 없으면 그 사람은 **누구
+   * 이야기인지 모르는 채로** Scene 3 에 도착한다. 건너뛰기가 이야기를 잃는 일이
+   * 되지 않게 하려고 저작자가 적어 둔 다리이므로, 화면이 읽지 않으면 그 의도가
+   * yml 안에서만 참이 된다.
+   */
+  skip_bridge_narration_ko?: string;
 }
 
 /** content 를 문자열 배열로 맞춘다. 배열이 아니어도 버리지 않는다. */
@@ -134,6 +156,8 @@ export function readTriggerWarning(
     consent_card_id: toText(src.consent_card_id),
     consent_card_ko: toText(src.consent_card_ko),
     skip_alternative_scene_id: toSceneId(src.skip_alternative_scene_id),
+    declined_route: toText(src.declined_route),
+    skip_bridge_narration_ko: toText(src.skip_bridge_narration_ko),
   };
 }
 
@@ -170,7 +194,9 @@ const CONTENT_LABEL: Record<string, string> = {
 const LEVEL_LABEL: Record<string, string> = {
   low: "낮음",
   low_medium: "낮음~중간", // solomon.yml Scene 4 가 쓴다.
+  low_mid: "낮음~중간", // ruth.yml Scene 3. `low_medium` 과 같은 뜻의 다른 표기다.
   medium: "중간",
+  mid: "중간", // ruth.yml Scene 1.
   high: "높음",
 };
 
@@ -202,7 +228,17 @@ export function TriggerWarningGate({
   skipLabel?: string;
   pending: boolean;
   onContinue: () => void;
-  onSkip: () => void;
+  /**
+   * 둘째 문을 골랐을 때. **어느 문인지를 인자로 받는다.**
+   *
+   * `warning.declined_route` 가 있는 카드의 둘째 문은 건너뛰기가 아니라 *거절* 이고,
+   * 백엔드가 기다리는 결정값도 `"skip"` 이 아니라 `"decline"` 이다. 화면이 이를
+   * 구별하지 않으면 「여기서 마친다」 버튼이 다음 씬을 여는 상태로 조용히 초록이 된다.
+   *
+   * 기존 호출부는 인자를 무시하는 `() => void` 그대로 둬도 된다 — 그 카드들에는
+   * `declined_route` 가 없어 항상 `"skip"` 만 온다.
+   */
+  onSkip: (action: "skip" | "decline") => void;
   /** 강도 조절 같은 화면 고유 컨트롤 (선택). 산문과 버튼 사이에 들어간다. */
   children?: ReactNode;
 }) {
@@ -220,6 +256,18 @@ export function TriggerWarningGate({
     .join("\n");
 
   const tags = (warning.content ?? []).map((c) => CONTENT_LABEL[c] ?? c);
+
+  /*
+    둘째 문이 *거절* 인가 *건너뛰기* 인가.
+
+    `declined_route` 를 선언한 카드에서 둘째 문은 이야기를 이어 가는 문이 아니라
+    끝내는 문이고, 백엔드가 기다리는 결정값도 `"decline"` 이다(SceneSkipResolver).
+    이 구별을 화면이 안 하면 카드 문구는 「여기서 마친다」인데 실제로는 다음 씬이
+    열린다 — 그만두겠다고 고른 사람이 계속 들어가는, 가장 나쁜 방향의 불일치다.
+
+    선언이 없으면 지금까지와 똑같이 `"skip"` 이다. 기존 6개 화면의 동작은 안 바뀐다.
+  */
+  const declines = !!warning.declined_route?.trim();
 
   return (
     <div className="space-y-4 px-4 py-4 rounded-lg border border-[var(--color-primary)]/40 bg-black/30">
@@ -264,7 +312,7 @@ export function TriggerWarningGate({
         </button>
         <button
           type="button"
-          onClick={onSkip}
+          onClick={() => onSkip(declines ? "decline" : "skip")}
           disabled={pending}
           className="min-h-11 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 hover:border-[var(--color-primary)] text-sm text-[var(--color-warm)]/90 disabled:opacity-40"
         >
@@ -279,12 +327,19 @@ export function TriggerWarningGate({
         레거시 boolean 처럼 메타데이터가 없는 선언에서는 카드에 산문과 버튼만 남아,
         건너뛰면 이야기를 잃는 건지 아닌지 모르는 채로 고르게 했다. 목적지를
         모를 때도 "이어진다" 는 사실만은 말해 줄 수 있고, 그게 이 문의 요지다.
+
+        거절 문(declined_route)일 때는 반대로 **이어지지 않는다** 고 적어야 한다.
+        룻 Scene 3 은 `skip_alternative_scene_id: 4` 와 `declined_route: closing` 을
+        둘 다 선언하지만 카드가 여는 문은 「여기서 마친다」 하나다. 여기서 앞의 값을
+        읽으면 "건너뛰면 Scene 4 로 이어집니다" 라고 적힌 버튼이 종결로 보내게 된다.
       */}
       <p className="text-[10px] text-[var(--color-warm)]/40">
         {warning.level && (
           <>정서 강도: {LEVEL_LABEL[warning.level] ?? warning.level} · </>
         )}
-        {warning.skip_alternative_scene_id != null ? (
+        {declines ? (
+          <>여기서 마치면 다음 장면 없이 종결 화면으로 갑니다</>
+        ) : warning.skip_alternative_scene_id != null ? (
           <>
             건너뛰면 Scene {warning.skip_alternative_scene_id} 으로 이어집니다
           </>

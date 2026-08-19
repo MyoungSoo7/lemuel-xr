@@ -284,6 +284,37 @@ describe("경고 카드가 실제로 렌더된다", () => {
     expect(screen.queryByText(/정서 강도/)).not.toBeInTheDocument();
   });
 
+  it("ruth.yml 이 쓰는 강도 표기(mid · low_mid)도 한국어 라벨을 갖는다", () => {
+    /*
+      룻은 `mid` · `low_mid` 를 쓴다 — solomon 의 `medium` · `low_medium` 과 같은 뜻의
+      다른 표기다. 사전에 없으면 원문 노출 안전망을 타고 「정서 강도: low_mid」 라는
+      영문 토큰이 사용자에게 그대로 간다. 안전망은 *모르는* 값을 위한 자리지
+      배포된 값의 자리가 아니다.
+    */
+    const { unmount } = render(
+      <TriggerWarningGate
+        warning={{ level: "mid" }}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/정서 강도: 중간/)).toBeInTheDocument();
+    unmount();
+
+    render(
+      <TriggerWarningGate
+        warning={{ level: "low_mid" }}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+    expect(screen.getByText(/정서 강도: 낮음~중간/)).toBeInTheDocument();
+  });
+
   it("화면 고유 컨트롤(children)은 산문과 버튼 사이에 들어간다", () => {
     // jesus 화면의 '음성/자막 강도 조절' 자리. 버튼보다 앞에 있어야
     // 사용자가 강도를 낮춘 뒤 계속을 누를 수 있다.
@@ -537,5 +568,124 @@ describe("pending 중 버튼 잠금", () => {
     await user.click(건너뛰기);
     expect(onContinue).not.toHaveBeenCalled();
     expect(onSkip).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * 룻 Scene 3 (ruth.yml) — 리포 전체에서 `declined_route` 를 선언하는 유일한 카드.
+ *
+ * `skip_alternative_scene_id: 4` 와 `declined_route: closing` 을 **둘 다** 선언하지만
+ * 카드가 여는 문은 「여기서 마친다」 하나다. 앞의 값을 읽으면 종결로 보내는 버튼 밑에
+ * "Scene 4 로 이어집니다" 라고 적히게 된다 — 버튼과 안내가 서로 다른 말을 하는 카드.
+ */
+const RUTH_SCENE3: TriggerWarning = {
+  level: "low_mid",
+  content: ["bereavement"],
+  consent_card_id: "ruth_midpoint_consent",
+  skip_alternative_scene_id: 4,
+  declined_route: "closing",
+};
+
+describe("둘째 문 — 건너뛰기와 거절은 다른 문이다", () => {
+  /*
+    이 구별을 안 하면 아무것도 빨개지지 않는다. 카드는 뜨고, 버튼도 눌리고,
+    `check_frontend_trigger_warning.py` 도 "payload 를 읽고 skip 을 보낸다" 며 초록이다.
+    달라지는 건 **마치겠다고 고른 사람에게 다음 씬이 열린다** 는 것뿐이다.
+    백엔드에서 고친 결함(스킵 목적지 ≠ next)과 정확히 같은 모양의 조용한 실패다.
+  */
+  it("declined_route 가 없으면 지금까지처럼 skip 을 알린다", async () => {
+    const user = userEvent.setup();
+    const onSkip = vi.fn();
+    render(
+      <TriggerWarningGate
+        warning={JOSEPH_SCENE4}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={onSkip}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
+    expect(onSkip).toHaveBeenCalledWith("skip");
+  });
+
+  it("declined_route 를 선언한 카드의 둘째 문은 decline 을 알린다", async () => {
+    const user = userEvent.setup();
+    const onSkip = vi.fn();
+    render(
+      <TriggerWarningGate
+        warning={RUTH_SCENE3}
+        fallbackProse={기본산문}
+        skipLabel="여기서 마친다"
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={onSkip}
+      />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "여기서 마친다" }));
+    expect(onSkip).toHaveBeenCalledWith("decline");
+  });
+
+  it("거절 문의 안내는 '이어집니다' 가 아니라 '종결' 이라고 적는다", () => {
+    render(
+      <TriggerWarningGate
+        warning={RUTH_SCENE3}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={vi.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByText(/여기서 마치면 다음 장면 없이 종결 화면으로 갑니다/),
+    ).toBeInTheDocument();
+    // 같은 카드에 실려 온 skip 목적지를 읽으면 안 된다 — 이 문은 그리로 가지 않는다.
+    expect(
+      screen.queryByText(/Scene 4 으로 이어집니다/),
+    ).not.toBeInTheDocument();
+  });
+
+  it("readTriggerWarning 이 두 새 키를 payload 에서 실어 온다", () => {
+    /*
+      읽지 않으면 `declined_route` 는 yml 안에서만 참이 되고, 다리 나레이션은
+      건너뛴 사람에게 영영 안 뜬다 — 룻이라는 이름이 처음 나오는 대목을 통째로
+      지나친 채 Scene 3 에 도착한다.
+    */
+    const w = readTriggerWarning({
+      trigger_warning: {
+        declined_route: "closing",
+        skip_bridge_narration_ko: "남은 사람의 이름은 룻이었다.",
+      },
+    });
+    expect(w?.declined_route).toBe("closing");
+    expect(w?.skip_bridge_narration_ko).toBe("남은 사람의 이름은 룻이었다.");
+  });
+
+  it("공백뿐인 declined_route 는 거절 문으로 치지 않는다", async () => {
+    // 빈 값에 종결 동작을 붙이면 목적지 없는 거절이 된다 — 사용자는 어디로도 못 간다.
+    const user = userEvent.setup();
+    const onSkip = vi.fn();
+    render(
+      <TriggerWarningGate
+        warning={{ ...RUTH_SCENE3, declined_route: "   " }}
+        fallbackProse={기본산문}
+        pending={false}
+        onContinue={vi.fn()}
+        onSkip={onSkip}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "이 장면은 건너뛸게요 →" }),
+    );
+    expect(onSkip).toHaveBeenCalledWith("skip");
+    expect(
+      screen.getByText(/건너뛰면 Scene 4 으로 이어집니다/),
+    ).toBeInTheDocument();
   });
 });

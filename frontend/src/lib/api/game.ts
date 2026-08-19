@@ -51,9 +51,24 @@ export async function completeJoseph(sessionId: string, finalOutcome: string) {
   await api.post(`/api/game/joseph/${sessionId}/complete`, { finalOutcome });
 }
 
-/** B — Joseph 외 인물 ({moses,david,jesus,solomon,elijah,job}) 의 동일 흐름 generic helper. */
+/**
+ * B — Joseph 외 인물 ({moses,david,jesus,solomon,elijah,job,ruth}) 의 동일 흐름 generic helper.
+ *
+ * 이 union 은 백엔드 `Character` enum 과 손으로 맞추는 자리다. 백엔드에 인물이
+ * 등재됐는데 여기 없으면 화면을 만들 수조차 없다 — 룻이 그랬다. enum 에는 있어서
+ * `/api/game/ruth/start` 는 200 을 주는데 프론트 타입이 막아 화면이 없었고,
+ * `check_frontend_trigger_warning.py` 는 "화면이 없다" 며 판정을 건너뛰었다.
+ * 건너뛴 건 통과가 아니다.
+ */
 export type MissionCharacter =
-  "joseph" | "moses" | "david" | "jesus" | "solomon" | "elijah" | "job";
+  | "joseph"
+  | "moses"
+  | "david"
+  | "jesus"
+  | "solomon"
+  | "elijah"
+  | "job"
+  | "ruth";
 
 export async function startMission(
   character: MissionCharacter,

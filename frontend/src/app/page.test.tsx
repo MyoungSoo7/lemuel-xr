@@ -28,7 +28,7 @@ const classifyMock = vi.mocked(classifyEmotion);
  *
  *  (A) 분류를 *거치지 않고도* 콘텐츠에 들어갈 수 있는가.
  *      감정을 적는 것 자체가 부담인 사용자가 있고, 백엔드 분류가 죽어도
- *      7인물·가치빌더로는 들어갈 수 있어야 한다. 이 카드들이 조용히 사라지면
+ *      8인물·가치빌더로는 들어갈 수 있어야 한다. 이 카드들이 조용히 사라지면
  *      "글을 써야만 들어갈 수 있는 앱" 이 된다.
  *  (B) 분류 결과가 실제 사용자가 누를 수 있는 링크로 바뀌는가.
  *      미구현 인물은 링크가 "#" 이어야 하고(막다른 404 대신), 신뢰도 표기는
@@ -50,7 +50,10 @@ const RESULT: ClassifyResponse = {
   recommendations: {
     trackB: [
       { character: "elijah", rationale: "로뎀나무 아래의 탈진" },
-      { character: "ruth", rationale: "미구현 인물" },
+      // 2026-08-20 까지 이 자리는 ruth 였다. `/ruth` 화면이 생기면서 더 이상
+      // 미구현 예시가 아니게 돼 rahab 으로 바꿨다 — 게이트·자막 정본은 있는데
+      // `frontend/src/app/rahab/` 가 없는, 지금 가장 앞서 있는 화면 없는 인물이다.
+      { character: "rahab", rationale: "미구현 인물" },
     ],
     trackA: [
       { topicId: 3, title: "시편 — 탄식의 언어", rationale: "감정을 말로" },
@@ -64,7 +67,7 @@ beforeEach(() => {
 });
 
 describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
-  it("7인물 미션 카드가 전부 링크로 있다", () => {
+  it("8인물 미션 카드가 전부 링크로 있다", () => {
     renderHome();
     const missions = screen.getByRole("heading", {
       name: /각성의 순간/,
@@ -78,6 +81,9 @@ describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
       ["Solomon", "/solomon"],
       ["Job", "/job"],
       ["Elijah", "/elijah"],
+      // 룻은 2026-08-20 에 붙었다. 백엔드 enum 이 열린 뒤로도 한동안 이 목록에
+      // 없어서 웹에서 들어갈 입구가 없었다 — 여기 없으면 화면이 있어도 못 간다.
+      ["Ruth", "/ruth"],
     ]) {
       expect(
         within(missions).getByRole("link", { name: new RegExp(name) }),
@@ -100,7 +106,9 @@ describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
     // 문장과 번호가 *분류를 시도하기 전에* 이미 시야에 있어야 한다.
     renderHome();
     expect(screen.getByText(/의료·임상 도구가 아닙니다/)).toBeInTheDocument();
-    expect(screen.getByText(new RegExp(CRISIS_DEFAULT.tel))).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(CRISIS_DEFAULT.tel)),
+    ).toBeInTheDocument();
   });
 
   it("입력이 비어 있으면 제출 버튼이 잠겨 있다", () => {
@@ -245,11 +253,56 @@ describe("분류 결과", () => {
       "href",
       "/elijah",
     );
-    // 미구현 인물을 /ruth 로 보내면 404 다. 막다른 길 대신 그 자리에 머문다.
-    const ruth = screen.getByRole("link", { name: /ruth/ });
-    expect(ruth).toHaveAttribute("href", "#");
-    expect(within(ruth).getByText("Phase 2")).toBeInTheDocument();
+    // 미구현 인물을 /rahab 으로 보내면 404 다. 막다른 길 대신 그 자리에 머문다.
+    const rahab = screen.getByRole("link", { name: /rahab/ });
+    expect(rahab).toHaveAttribute("href", "#");
+    expect(within(rahab).getByText("Phase 2")).toBeInTheDocument();
     expect(screen.getByText("로뎀나무 아래의 탈진")).toBeInTheDocument();
+  });
+
+  it("Track B 의 '구현됨' 판정이 홈 카드 목록과 어긋나지 않는다", async () => {
+    // 이 화면은 인물이 열렸는지를 **두 곳에서 따로** 판정한다 — 위쪽 미션 카드는
+    // DIRECT_MISSIONS 의 `active`, 아래쪽 추천 카드는 map 안의 인라인 ACTIVE 집합.
+    // 룻을 붙일 때 둘 다 고쳐야 했고, 한쪽만 고치면 아무 테스트도 빨개지지 않은 채
+    // "홈에서는 들어가지는데 추천에서는 Phase 2 로 막히는" 반쪽 문이 남는다.
+    // 그래서 두 목록을 서로 대조한다 — 소스를 읽지 않고 렌더된 결과끼리 맞춘다.
+    const user = userEvent.setup();
+    renderHome();
+
+    const missions = screen.getByRole("heading", {
+      name: /각성의 순간/,
+    }).parentElement!;
+    const opened = within(missions)
+      .getAllByRole("link")
+      .map((a) => a.getAttribute("href"))
+      .filter((h): h is string => !!h && h.startsWith("/"))
+      .map((h) => h.slice(1));
+    expect(opened.length).toBeGreaterThan(0); // 파싱이 0건이면 아래는 아무것도 안 잰다
+
+    classifyMock.mockResolvedValue({
+      ...RESULT,
+      recommendations: {
+        ...RESULT.recommendations,
+        trackB: opened.map((character) => ({ character, rationale: "대조용" })),
+      },
+    });
+
+    await user.type(screen.getByRole("textbox"), "외로워");
+    await user.click(
+      screen.getByRole("button", { name: "감정 분석 + 본문 추천" }),
+    );
+    await screen.findByText("외로움");
+
+    const blocked = opened.filter(
+      (c) =>
+        screen
+          .getByRole("link", { name: new RegExp(c) })
+          .getAttribute("href") !== `/${c}`,
+    );
+    expect(
+      blocked,
+      `홈 카드는 열려 있는데 Track B 추천은 Phase 2 로 막는 인물: ${blocked.join(", ")}`,
+    ).toEqual([]);
   });
 
   it("Track A — 제목은 항상, 이유는 있을 때만 보여 준다", async () => {
