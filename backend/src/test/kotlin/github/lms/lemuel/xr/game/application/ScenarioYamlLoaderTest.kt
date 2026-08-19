@@ -132,10 +132,7 @@ class ScenarioYamlLoaderTest {
                       짝이 없으면 [SceneSkipResolver] 가 런타임에 던지므로, 여기서 먼저 잡는다.
                     */
                     val blockId = raw.toString()
-                    val blocks = (scene.extras?.get("conditional_blocks") as? List<*>).orEmpty()
-                        .filterIsInstance<Map<*, *>>()
-                        .mapNotNull { it["id"]?.toString() }
-                    assertThat(blocks)
+                    assertThat(conditionalBlockIdsOf(scene))
                         .describedAs(
                             "%s scene %d — 문자열 skip 목적지 '%s' 에 해당하는 conditional_blocks 항목이 없다",
                             c, scene.id, blockId,
@@ -394,13 +391,31 @@ class ScenarioYamlLoaderTest {
     }
 
     /**
+     * 로더가 표준 필드만 걷어내므로, yml 이 `extras:` 블록을 따로 두면 그 안이 한 겹 더
+     * 들어간다. 씬마다 어느 겹에 적혀 있는지가 다르다 — 룻 Scene 5 는 `consent_coverage`
+     * 가 씬 최상위인데 `conditional_blocks` 는 `extras:` 안이다. 한 겹만 보면 검사가
+     * 조용히 비게 되므로 두 겹을 다 본다. [SceneSkipResolver] 가 런타임에서 보는 곳과 같다.
+     */
+    private fun extrasRootsOf(scene: Scenario.Scene): List<Map<*, *>> =
+        listOfNotNull(scene.extras, scene.extras?.get("extras") as? Map<*, *>)
+
+    /**
      * 이 씬의 동의 블록 — 자기 카드를 띄우면 `trigger_warning`, 다른 씬의 카드에 덮이면
      * `consent_coverage` 다. 덮인 쪽만 빠뜨리면 상속된 스킵 목적지가 검사 밖으로 샌다.
      * [SceneSkipResolver.consentBlock] 과 같은 규칙을 본다.
      */
     private fun consentBlockOf(scene: Scenario.Scene): Map<*, *>? {
-        val extras = scene.extras ?: return null
-        return (extras["trigger_warning"] as? Map<*, *>)
-            ?: (extras["consent_coverage"] as? Map<*, *>)
+        for (root in extrasRootsOf(scene)) {
+            (root["trigger_warning"] as? Map<*, *>)?.let { return it }
+            (root["consent_coverage"] as? Map<*, *>)?.let { return it }
+        }
+        return null
     }
+
+    /** 이 씬 안의 축약 블록 id 들. [SceneSkipResolver.conditionalBlock] 과 같은 곳을 본다. */
+    private fun conditionalBlockIdsOf(scene: Scenario.Scene): List<String> =
+        extrasRootsOf(scene)
+            .flatMap { (it["conditional_blocks"] as? List<*>).orEmpty() }
+            .filterIsInstance<Map<*, *>>()
+            .mapNotNull { it["id"]?.toString() }
 }

@@ -15,6 +15,12 @@ import github.lms.lemuel.xr.common.ErrorCode
  *
  * 2026-08-02 Track B 확장 — SOLOMON 추가 (성공 속 허무·실존적 공허 재정향, MVP-SOLOMON.md).
  *
+ * 2026-08-20 RUTH 추가 — **이 한 줄이 곧 사용자 노출이다.** 룻은 콘텐츠가 완성된 채로
+ * 여기에 없어서 닫혀 있었다(`ScenarioYamlLoader.loadAll()` 은 디렉터리가 아니라
+ * `entries` 를 순회한다). 여는 조건은 `docs/RUTH-RUNTIME-SIGNOFF.md` 에 적혀 있고
+ * `RuntimeExposureSignoffTest` 가 그걸 집행한다 — 결정 기록 + **AR 폐쇄**.
+ * 룻만 AR 이 닫혀 있는 것은 저작이 덜 된 게 아니라 판단이 없어서 내린 결정이다.
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -26,7 +32,8 @@ enum class Character(val dbValue: String) {
     DAVID("david"),
     JOSEPH("joseph"),
     JESUS("jesus"),
-    SOLOMON("solomon");
+    SOLOMON("solomon"),
+    RUTH("ruth");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */
