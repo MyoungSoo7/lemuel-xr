@@ -29,6 +29,23 @@
     단, 자체 통제가 있어도 역전은 역전이다 — 설계 문서·게이트 스위트·검토 기록이
     없다는 사실 자체는 그대로다.
 
+"놀 수 있음" 은 화면까지 봐야 한다 (2026-08-20 교정):
+    이 스크립트는 오래 `enum + scenario` 만으로 "놀 수 있음" 을 셌다. 백엔드만 본 것이다.
+    2026-08-20 에 그게 틀렸다는 게 드러났다 — 룻은 `Character` enum 에 들어가고
+    `ruth.yml` 도 로드되니 여기서 **놀 수 있음으로 세어졌지만**, `frontend/src/app/ruth/`
+    가 없어서 웹에서 들어갈 입구가 없었다. API 로만 도달했다.
+
+    그건 노출 범위만의 문제가 아니었다. 화면을 보는 검사기 두 개
+    (`check_frontend_trigger_warning.py` · `mission-tap-targets.spec.ts`)가 화면이 없는
+    인물을 **건너뛴다.** 룻은 씬 1·3·4 에서 trigger_warning 을 선언하는데 그 배선을
+    아무도 재지 않고 있었고, 이 스크립트는 그 인물을 초록으로 세고 있었다.
+    화면 없음은 "덜 노출됨" 이 아니라 **"검사 사정권 밖"** 이다.
+
+    그래서 `화면` 을 마지막 단계로 넣고, 놀 수 있음은 `enum + scenario + 화면` 으로 센다.
+    enum 은 열렸는데 화면이 없는 인물은 따로 `API 로만 도달` 로 센다 — 역전은 아니다
+    (백엔드가 프론트보다 앞서는 건 정상 방향이다). 다만 **보이게** 둔다. 안 보여서
+    룻이 반년 가까이 그 상태로 있었다.
+
 이 초록이 말하지 않는 것:
     ① 산출물의 품질 — 파일이 있는지만 본다. 안에 뭐가 적혔는지는 안 읽는다.
     ② 사람 사인오프 — `docs/CONTENT-WORKFLOW.md` 는 신학·심리 검토자의 승인을
@@ -56,7 +73,17 @@ STAGES = [
     ("runtime_content", "런타임대본"),
     ("scenario", "시나리오"),
     ("enum", "런타임"),
+    ("screen", "화면"),
 ]
+
+# 미션 화면을 가려내는 기준. 라우트 디렉터리 이름이 곧 인물 이름이다(`/ruth`).
+# **디렉터리 존재만으로는 세지 않는다** — `topics/` `values/` 처럼 인물이 아닌 라우트도
+# 같은 자리에 있어서, 그것들을 인물로 세면 이 스크립트가 없는 인물 두 명을 만들어 내고
+# 그 둘이 곧바로 "화면만 있고 앞 단계가 전부 없는" 역전으로 빨개진다. 오경보를 끄려고
+# 인물 이름을 하드코딩하면 그 목록이 또 드리프트한다.
+# 대신 **미션 API 를 부르는가** 로 가른다. 미션 화면은 예외 없이 `@/lib/api/game` 을
+# 통해 백엔드로 나간다(2026-08-20 실측: 인물 8 = 1, topics·values = 0).
+MISSION_API_IMPORT = "@/lib/api/game"
 
 
 def enum_values() -> set[str]:
@@ -85,6 +112,25 @@ def self_controls() -> dict[str, tuple[int, int]]:
     return out
 
 
+def mission_screens() -> set[str]:
+    """`frontend/src/app/<인물>/page.tsx` 중 미션 API 를 부르는 것만 모은다.
+
+    프론트 디렉터리가 통째로 없으면 빈 집합이 아니라 예외로 올린다 — 못 읽은 것을
+    '화면 없음' 으로 세면 전 인물이 한꺼번에 API-only 로 뒤집히고, 그건 판정이 아니라
+    사고다. (self_controls 의 파싱 실패 처리와 같은 규율.)
+    """
+    app = ROOT / "frontend/src/app"
+    if not app.is_dir():
+        raise OSError(f"프론트엔드 app 디렉터리가 없다: {app}")
+    return {
+        d.name
+        for d in app.iterdir()
+        if d.is_dir()
+        and (d / "page.tsx").is_file()
+        and MISSION_API_IMPORT in (d / "page.tsx").read_text(encoding="utf-8")
+    }
+
+
 def collect() -> dict[str, dict[str, bool]]:
     stages: dict[str, set[str]] = {
         "design": {
@@ -100,6 +146,7 @@ def collect() -> dict[str, dict[str, bool]]:
         "authoring": {p.name for p in (ROOT / "content").iterdir() if p.is_dir()},
         "scenario": {p.stem for p in (ROOT / "backend/src/main/resources/scenarios").glob("*.yml")},
         "enum": enum_values(),
+        "screen": mission_screens(),
     }
     universe = sorted(set().union(*stages.values()))
     return {c: {k: c in v for k, v in stages.items()} for c in universe}
@@ -129,6 +176,7 @@ def main() -> int:
     label_of = dict(STAGES)
     inverted: dict[str, list[str]] = {}
     playable: list[str] = []
+    api_only: list[str] = []
     stalled: list[str] = []
 
     for name, has in sorted(table.items()):
@@ -143,12 +191,20 @@ def main() -> int:
         if missing:
             inverted[name] = missing
         if has["enum"] and has["scenario"]:
-            playable.append(name)
+            (playable if has["screen"] else api_only).append(name)
         elif has["authoring"]:
             stalled.append(name)
 
     print()
-    print(f"놀 수 있음 {len(playable)}: {', '.join(playable)}")
+    print(f"놀 수 있음 {len(playable)}: {', '.join(playable) or '없음'}")
+    print(f"API 로만 도달 {len(api_only)}: {', '.join(api_only) or '없음'}")
+    if api_only:
+        # 이 줄이 없어서 룻이 오래 초록으로 세어졌다. 화면이 없으면 웹 입구가 없을 뿐
+        # 아니라, 화면을 보는 검사기 두 개의 사정권 밖이다 — 건너뛴 건 통과가 아니다.
+        print(
+            "    ↑ 웹 입구가 없다. check_frontend_trigger_warning.py 와 "
+            "mission-tap-targets.spec.ts 가 이 인물을 건너뛴다."
+        )
     print(f"저작은 끝났으나 못 놂 {len(stalled)}: {', '.join(stalled) or '없음'}")
     print()
 
@@ -161,7 +217,14 @@ def main() -> int:
                 if n_gates
                 else "자체통제 없음"
             )
-            print(f"  [FAIL   ] {name} — 런타임에 올라와 있는데 앞 단계가 없다: {gone} ({own})")
+            if has["enum"]:
+                where = "런타임에 올라와 있는데"
+            else:
+                # 화면은 있는데 백엔드 enum 이 없는 경우. 지금은 해당 인물이 없지만
+                # 생기면 사용자가 미션을 눌러 500 을 받는 경로다 — 위 문구로 뭉뚱그리면
+                # 무엇이 앞서 있는지가 사라진다.
+                where = "화면이 붙어 있는데"
+            print(f"  [FAIL   ] {name} — {where} 앞 단계가 없다: {gone} ({own})")
         else:
             print(f"  [PASS   ] {name}")
 
@@ -171,6 +234,8 @@ def main() -> int:
     print("  ⚠️ 이 검사의 주장 범위: '뒤 단계가 앞 단계보다 앞서 있지 않다' 까지다.")
     print("     산출물의 품질도, 신학·심리 검토자의 사인오프도 재지 않는다 —")
     print("     전부 O 라도 그것은 '놀 수 있다'이지 '내보내도 된다'가 아니다.")
+    print("     '화면' O 도 마찬가지다 — 그 라우트에 미션 API 를 부르는 page.tsx 가")
+    print("     있다까지지, 그 화면이 씬을 제대로 돌리는지는 여기서 안 잰다.")
     return 1 if inverted else 0
 
 
