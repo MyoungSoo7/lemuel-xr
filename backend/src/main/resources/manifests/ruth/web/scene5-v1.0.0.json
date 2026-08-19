@@ -1,0 +1,170 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 5,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "passive_only": true,
+    "baby_asset_present": false,
+    "birth_scene_rendered": false
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_gate_plaza_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/360/env_bethlehem_gate_plaza_dusk.jpg",
+        "size_bytes": 7000000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_gate_pillars_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/models/gate_pillars_lite.glb",
+        "size_bytes": 171000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_elders_seated_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/elders_seated_sheet.webp",
+        "size_bytes": 1120000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_ruth_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/ruth_distant_sheet.webp",
+        "size_bytes": 1000000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_naomi_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/naomi_distant_sheet.webp",
+        "size_bytes": 1000000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_plaza_rooftops_far_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/models/plaza_rooftops_far_lite.glb",
+        "size_bytes": 99000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s5_ruth_4_11_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_ruth_4_11_ko.mp3",
+        "size_bytes": 350000,
+        "voice_id": "elders_v1",
+        "duration_ms": 7000,
+        "format": "mp3_192kbps",
+        "note": "4:11 후반(출산에 의한 가문 형성)은 낭독하지 않는다"
+      },
+      {
+        "id": "aud_s5_ruth_4_12_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_ruth_4_12_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "elders_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s5_genealogy_4_21_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_genealogy_4_21_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "recorder_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps",
+        "note": "계보 두 줄은 한 벌이다 — 4:21 이 없으면 4:22 의 이름이 화면 어디에도 정의되지 않는다"
+      },
+      {
+        "id": "aud_s5_genealogy_4_22_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_genealogy_4_22_ko.mp3",
+        "size_bytes": 450000,
+        "voice_id": "recorder_v1",
+        "duration_ms": 9000,
+        "format": "mp3_192kbps",
+        "note": "계보는 낭독한다. 출산 장면 0 · 아기 에셋 0 은 그대로다"
+      },
+      {
+        "id": "aud_s5_closing_caption_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_closing_caption_ko.mp3",
+        "size_bytes": 600000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 12000,
+        "format": "mp3_192kbps",
+        "note": "종결 자막 — 리포 전체에 한 벌만 존재한다"
+      },
+      {
+        "id": "aud_s5_closing_line_pack",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s5_closing_line_pack.tar",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 0,
+        "note": "마감 3줄 팩(정확히 3개). belonging_label 로 고르며 평가 어휘 0. faith_tone 미적용"
+      },
+      {
+        "id": "amb_plaza_dusk_low",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/amb_plaza_dusk_low.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 60000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_dusk_gradient_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/textures/dusk_gradient_overlay_2k.webp",
+        "size_bytes": 450000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene5_gate_outro_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/Scene5GateOutroWeb.js",
+        "size_bytes": 34850,
+        "entry_class": "Scene5GateOutroWeb"
+      },
+      {
+        "id": "script_closing_screen",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/ClosingScreen.js",
+        "size_bytes": 23800,
+        "entry_class": "ClosingScreen"
+      },
+      {
+        "id": "script_alt_short_block",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/AltShortBlock.js",
+        "size_bytes": 15300,
+        "entry_class": "AltShortBlock"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/PersistentSafetyOverlays.js",
+        "size_bytes": 16150,
+        "entry_class": "PersistentSafetyOverlays"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 14980100,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

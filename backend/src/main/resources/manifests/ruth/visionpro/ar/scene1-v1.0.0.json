@@ -1,0 +1,181 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 1,
+  "device_type": "visionpro",
+  "xr_mode": "ar",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": true,
+    "hand_tracking": false,
+    "eye_tracking": true,
+    "spatial_audio": true,
+    "controllers": false,
+    "haptic": false,
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "consent_card_required": true,
+    "consent_card_id": "ruth_entry_consent",
+    "intensity_preset_default": "default",
+    "intensity_presets": "subtitle_only|soft|default",
+    "skip_alternative_scene": 3,
+    "spatial_audio_mode": "personal",
+    "plane_detection": true,
+    "anchors": true,
+    "room_scale_min_meters": 2.0
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "model_boundary_stone",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/models/boundary_stone.glb",
+        "size_bytes": 1680000,
+        "lod": "lod3_pbr_upscale_4k"
+      },
+      {
+        "id": "model_ruth_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/models/ruth_distant.glb",
+        "size_bytes": 3000000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_naomi_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/models/naomi_distant.glb",
+        "size_bytes": 3000000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      },
+      {
+        "id": "model_orpah_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/models/orpah_distant.glb",
+        "size_bytes": 2760000,
+        "lod": "lod3_pbr_upscale_4k_with_micro_expressions"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s1_consent_card_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/s1_consent_card_ko.wav",
+        "size_bytes": 1920000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 16000,
+        "note": "R4 진입 동의 카드 낭독 — Scene 1·2 를 덮는다. 스킵 목적지는 Scene 3"
+      },
+      {
+        "id": "aud_s1_ruth_1_8_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/s1_ruth_1_8_ko.wav",
+        "size_bytes": 1320000,
+        "voice_id": "naomi_v1",
+        "duration_ms": 11000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s1_ruth_1_9_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/s1_ruth_1_9_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "naomi_v1",
+        "duration_ms": 10000,
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s1_ruth_1_16_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/s1_ruth_1_16_ko.wav",
+        "size_bytes": 1800000,
+        "voice_id": "ruth_v1",
+        "duration_ms": 15000,
+        "note": "소속이라는 축은 1:16 에 전부 있다. 1:17 은 낭독하지 않는다",
+        "spatial_audio_personal": true
+      },
+      {
+        "id": "aud_s1_skip_bridge_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/s1_skip_bridge_ko.wav",
+        "size_bytes": 1080000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 9000,
+        "note": "스킵 경로 브릿지 — 본편을 건너뛴 사용자도 서사가 끊기지 않는다"
+      },
+      {
+        "id": "amb_wind_dry_grass",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/audio/amb_wind_dry_grass.ogg",
+        "size_bytes": 1200000,
+        "voice_id": null,
+        "duration_ms": 60000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_boundary_stone_lichen",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/textures/boundary_stone_lichen_4k.ktx2",
+        "size_bytes": 1920000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_ruth_cloak",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/textures/ruth_cloak_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_naomi_cloak",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/textures/naomi_cloak_4k.ktx2",
+        "size_bytes": 2160000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      },
+      {
+        "id": "tex_orpah_cloak",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/textures/orpah_cloak_4k.ktx2",
+        "size_bytes": 2040000,
+        "format": "ktx2",
+        "resolution": "4096x4096"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene1_crossroads_reading",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/Scene1CrossroadsReadingPolySpatial.cs.bundle",
+        "size_bytes": 50400,
+        "entry_class": "Scene1CrossroadsReadingPolySpatial"
+      },
+      {
+        "id": "script_entry_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/EntryConsentGate.cs.bundle",
+        "size_bytes": 31200,
+        "entry_class": "EntryConsentGate"
+      },
+      {
+        "id": "script_caption_user_advance",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/CaptionUserAdvance.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "CaptionUserAdvance"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/PersistentSafetyOverlays.cs.bundle",
+        "size_bytes": 22800,
+        "entry_class": "PersistentSafetyOverlays"
+      },
+      {
+        "id": "script_eye_gaze_dwell",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/EyeGazeDwell.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "EyeGazeDwell"
+      },
+      {
+        "id": "script_ar_anchor_placement",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/visionpro/ar/v1.0.0/scripts/ArAnchorPlacement.cs.bundle",
+        "size_bytes": 18000,
+        "entry_class": "ArAnchorPlacement"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 27398400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

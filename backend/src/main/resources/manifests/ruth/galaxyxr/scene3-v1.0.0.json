@@ -1,0 +1,172 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 3,
+  "device_type": "galaxyxr",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": true,
+    "eye_tracking": false,
+    "spatial_audio": true,
+    "controllers": true,
+    "haptic": false,
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "consent_card_required": true,
+    "consent_card_id": "ruth_midpoint_consent",
+    "declined_route": "closing",
+    "skip_alternative_scene": 4,
+    "standing_height_locked": true,
+    "yield_display": false,
+    "scoring_disabled": true,
+    "target_count": null,
+    "time_limit": null
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_boaz_barley_field_afternoon",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/models/env_boaz_barley_field_afternoon.glb",
+        "size_bytes": 7360000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_barley_sheaf_bundle",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/models/barley_sheaf_bundle.glb",
+        "size_bytes": 1200000,
+        "lod": "lod4_with_imposter_far"
+      },
+      {
+        "id": "model_ruth_gleaning",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/models/ruth_gleaning.glb",
+        "size_bytes": 2160000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_boaz_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/models/boaz_distant.glb",
+        "size_bytes": 2080000,
+        "lod": "lod4_imposter_distant_npc"
+      },
+      {
+        "id": "model_field_edge_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/models/field_edge_far.glb",
+        "size_bytes": 960000,
+        "lod": "lod4_with_imposter_far"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s3_midpoint_consent_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/s3_midpoint_consent_ko.wav",
+        "size_bytes": 1200000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 15000,
+        "note": "R4 중간 동의 카드 — 거절은 종결 화면으로, 스킵은 Scene 4 로. 둘은 다른 동작이다"
+      },
+      {
+        "id": "aud_s3_ruth_2_2_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/s3_ruth_2_2_ko.wav",
+        "size_bytes": 880000,
+        "voice_id": "ruth_v1",
+        "duration_ms": 11000
+      },
+      {
+        "id": "aud_s3_ruth_2_10_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/s3_ruth_2_10_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "ruth_v1",
+        "duration_ms": 12000,
+        "note": "이 미션 전체의 축 — 무자격의 자기 진술"
+      },
+      {
+        "id": "aud_s3_ruth_2_11_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/s3_ruth_2_11_ko.wav",
+        "size_bytes": 1120000,
+        "voice_id": "boaz_v1",
+        "duration_ms": 14000,
+        "note": "무조건 축약본이다. 조건 분기로 두지 않는다. 잘라낸 자구는 정본 문서에만 둔다"
+      },
+      {
+        "id": "aud_s3_ruth_2_12_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/s3_ruth_2_12_ko.wav",
+        "size_bytes": 960000,
+        "voice_id": "boaz_v1",
+        "duration_ms": 12000,
+        "note": "2:12 후반 두 조각은 낭독하지 않는다. 매체 판단이며 절을 공로 본문으로 판정한 것이 아니다"
+      },
+      {
+        "id": "amb_harvest_distant",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/audio/amb_harvest_distant.ogg",
+        "size_bytes": 800000,
+        "voice_id": null,
+        "duration_ms": 60000
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_barley_sheaf_dry",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/textures/barley_sheaf_dry_1k.ktx2",
+        "size_bytes": 1280000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_ruth_cloak",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/textures/ruth_cloak_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_boaz_robe",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/textures/boaz_robe_1k.ktx2",
+        "size_bytes": 1440000,
+        "format": "ktx2",
+        "resolution": "1024x1024"
+      },
+      {
+        "id": "tex_imposter_field_far",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/textures/field_imposter_512.ktx2",
+        "size_bytes": 560000,
+        "format": "ktx2",
+        "resolution": "512x512"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene3_gleaning",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/scripts/Scene3Gleaning.cs.bundle",
+        "size_bytes": 35200,
+        "entry_class": "Scene3Gleaning"
+      },
+      {
+        "id": "script_midpoint_consent_gate",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/scripts/MidpointConsentGate.cs.bundle",
+        "size_bytes": 21600,
+        "entry_class": "MidpointConsentGate"
+      },
+      {
+        "id": "script_gleaning_no_score",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/scripts/GleaningNoScore.cs.bundle",
+        "size_bytes": 16000,
+        "entry_class": "GleaningNoScore"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/galaxyxr/v1.0.0/scripts/PersistentSafetyOverlays.cs.bundle",
+        "size_bytes": 15200,
+        "entry_class": "PersistentSafetyOverlays"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 24488000,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}

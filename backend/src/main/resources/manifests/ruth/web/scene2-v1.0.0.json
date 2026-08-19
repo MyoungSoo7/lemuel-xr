@@ -1,0 +1,145 @@
+{
+  "mission_id": "ruth",
+  "scene_number": 2,
+  "device_type": "web",
+  "version": "1.0.0",
+  "capabilities_min": {
+    "passthrough": false,
+    "hand_tracking": false,
+    "eye_tracking": false,
+    "spatial_audio": false,
+    "controllers": false,
+    "haptic": false,
+    "fallback_mode": "360_image_click_drag",
+    "persistent_disclaimer": true,
+    "crisis_overlay_persistent": true,
+    "exit_always_available": true,
+    "caption_auto_advance": false,
+    "caption_advance": "user",
+    "rewind_allowed": true,
+    "biometrics_used": false,
+    "vision_occlusion": false,
+    "no_timer": true,
+    "no_default_selection": true
+  },
+  "manifest": {
+    "models": [
+      {
+        "id": "env_bethlehem_gate_360",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/360/env_bethlehem_gate_noon.jpg",
+        "size_bytes": 7100000,
+        "lod": "360_panorama_8k_jpeg",
+        "type": "360_image_fallback"
+      },
+      {
+        "id": "model_gate_threshold_stones_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/models/gate_threshold_stones_lite.glb",
+        "size_bytes": 153000,
+        "lod": "lod1_low_poly"
+      },
+      {
+        "id": "model_ruth_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/ruth_distant_sheet.webp",
+        "size_bytes": 1000000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_naomi_distant_billboard",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/billboards/naomi_distant_sheet.webp",
+        "size_bytes": 1000000,
+        "lod": "billboard_sprite_sheet_2k",
+        "type": "2d_sprite"
+      },
+      {
+        "id": "model_crowd_silhouette_far_lite",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/models/crowd_silhouette_far_lite.glb",
+        "size_bytes": 117000,
+        "lod": "lod1_low_poly"
+      }
+    ],
+    "audio": [
+      {
+        "id": "aud_s2_ruth_1_19_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s2_ruth_1_19_ko.mp3",
+        "size_bytes": 300000,
+        "voice_id": "townspeople_v1",
+        "duration_ms": 6000,
+        "format": "mp3_192kbps"
+      },
+      {
+        "id": "aud_s2_ruth_1_20_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s2_ruth_1_20_ko.mp3",
+        "size_bytes": 650000,
+        "voice_id": "naomi_v1",
+        "duration_ms": 13000,
+        "format": "mp3_192kbps",
+        "note": "SR-8 — 낭독 내내 화자 표기가 붙는다. 표기가 빠지면 이 문장은 사용자 자신의 문장으로 들린다"
+      },
+      {
+        "id": "aud_s2_ruth_1_21a_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s2_ruth_1_21a_ko.mp3",
+        "size_bytes": 550000,
+        "voice_id": "naomi_v1",
+        "duration_ms": 11000,
+        "format": "mp3_192kbps",
+        "note": "1:21 후반(형벌 어휘)은 낭독하지 않는다. 자른 경계는 탄식이 아니라 형벌이다"
+      },
+      {
+        "id": "aud_s2_mourning_distance_prompt_ko",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/s2_mourning_distance_prompt_ko.mp3",
+        "size_bytes": 500000,
+        "voice_id": "narrator_v1",
+        "duration_ms": 10000,
+        "format": "mp3_192kbps",
+        "note": "타이머 없음·기본선택 없음·채점 없음. 두 선택지 모두 Scene 3 으로 간다"
+      },
+      {
+        "id": "amb_distant_murmur",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/audio/amb_distant_murmur.mp3",
+        "size_bytes": 450000,
+        "voice_id": null,
+        "duration_ms": 45000,
+        "format": "mp3_160kbps"
+      }
+    ],
+    "textures": [
+      {
+        "id": "tex_high_sun_overlay",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/textures/high_sun_overlay_2k.webp",
+        "size_bytes": 460000,
+        "format": "webp",
+        "resolution": "2048x2048"
+      }
+    ],
+    "scripts": [
+      {
+        "id": "script_scene2_empty_return_web",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/Scene2EmptyReturnWeb.js",
+        "size_bytes": 34000,
+        "entry_class": "Scene2EmptyReturnWeb"
+      },
+      {
+        "id": "script_speaker_attribution_persistent",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/SpeakerAttributionPersistent.js",
+        "size_bytes": 17850,
+        "entry_class": "SpeakerAttributionPersistent"
+      },
+      {
+        "id": "script_pick_one_no_timer",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/PickOneNoTimer.js",
+        "size_bytes": 20400,
+        "entry_class": "PickOneNoTimer"
+      },
+      {
+        "id": "script_persistent_safety_overlays",
+        "url": "https://cdn.r2.dev/lemuel-xr/ruth/web/v1.0.0/scripts/PersistentSafetyOverlays.js",
+        "size_bytes": 16150,
+        "entry_class": "PersistentSafetyOverlays"
+      }
+    ]
+  },
+  "audio_locale": "ko-KR",
+  "total_size_bytes": 12368400,
+  "cdn_base_url": "https://cdn.r2.dev/lemuel-xr/"
+}
