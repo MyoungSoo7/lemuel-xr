@@ -22,6 +22,8 @@ class DecideSceneUseCase(
     private val payloads: ScenePayloadAssembler,
     /** pick_one 의 `converges_to` 집행 — 재고 선택은 씬을 넘기지 않는다. */
     private val convergences: SceneConvergenceResolver,
+    /** R4 동의 카드의 `skip_alternative_scene_id` · `declined_route` 집행. */
+    private val skips: SceneSkipResolver,
 ) {
 
     @Transactional
@@ -47,11 +49,35 @@ class DecideSceneUseCase(
             )
         }
 
+        // R4 동의 카드의 건너뛰기·거절 — `Scene.next` 보다 먼저 본다.
+        // 저작된 목적지가 `next` 와 다를 수 있고(룻 Scene 1: skip 3 vs next 2),
+        // `next` 로 흘려보내면 건너뛰겠다고 고른 사용자가 건너뛰려던 Scene 으로 들어간다.
+        val skip = skips.resolve(scenario, currentScene, input.decision)
+        if (skip != null) {
+            val responseText = responseResolver.resolve(character, currentScene, input.decision, session)
+            return when (skip) {
+                is SceneSkipResolver.Skip.ToScene -> Result(
+                    sessionId, input.sceneId,
+                    skip.sceneId, buildFor(scenario, skip.sceneId, session), responseText,
+                )
+
+                is SceneSkipResolver.Skip.AltBlock -> Result(
+                    sessionId, input.sceneId,
+                    input.sceneId, altBlockPayload(scenario, input.sceneId, skip), responseText,
+                )
+
+                SceneSkipResolver.Skip.Closing -> Result(
+                    sessionId, input.sceneId,
+                    input.sceneId, mapOf("type" to "end"), responseText,
+                )
+            }
+        }
+
         val next = currentScene.next
         val nextPayload: Map<String, Any?> = if (next == null) {
             mapOf("type" to "end")
         } else {
-            payloads.build(scenario, next)
+            buildFor(scenario, next, session)
         }
 
         // 직전 결정에 대한 응답 텍스트 — realtime LLM vs 정적 lookup 은 ResponseResolver 가 결정.
@@ -80,6 +106,43 @@ class DecideSceneUseCase(
             throw AppException(ErrorCode.E_MODE_MISMATCH)
         }
         return session
+    }
+
+    /**
+     * 목적지 Scene 의 payload — **앞선 씬에서 고른 건너뛰기를 여기까지 들고 온다.**
+     *
+     * 동의 카드 하나가 여러 씬을 덮으므로(룻 중간 카드 = Scene 3·5), 목적지로 점프한 뒤
+     * `next` 를 따라 흘러 들어간 씬에서도 그 선택이 살아 있어야 한다. 세션에 기록된 결정이
+     * 근거다 — 클라이언트가 매 씬 다시 보내주지 않아도 보호가 이어진다.
+     */
+    private fun buildFor(scenario: Scenario, sceneId: Int, session: GameSession): Map<String, Any?> {
+        val carried = skips.carriedSkip(scenario.scene(sceneId), session.decisions)
+            ?: return payloads.build(scenario, sceneId)
+        return altBlockPayload(scenario, sceneId, carried)
+    }
+
+    /**
+     * 마지막 Scene 의 축약 경로 payload — 같은 Scene 을 다시 조립한 뒤 블록의 override 를 덮는다.
+     *
+     * 블록이 `renders` 로 "이건 남는다" 고 약속한 키가 실제로 없으면 던진다. 축약 경로가
+     * 약속한 마감을 못 주면 사용자는 이야기를 잃은 채 끝난다 — 조용히 넘길 실패가 아니다.
+     */
+    private fun altBlockPayload(
+        scenario: Scenario,
+        sceneId: Int,
+        skip: SceneSkipResolver.Skip.AltBlock,
+    ): Map<String, Any?> {
+        val payload = LinkedHashMap(payloads.build(scenario, sceneId))
+        val missing = skip.renders.filterNot { payload.containsKey(it) }
+        if (missing.isNotEmpty()) {
+            throw AppException(
+                ErrorCode.E_VALIDATION,
+                "Scene $sceneId 축약 블록 '${skip.blockId}' 가 약속한 $missing 이 payload 에 없다",
+            )
+        }
+        payload.putAll(skip.overrides)
+        payload["conditionalBlockId"] = skip.blockId
+        return payload
     }
 
     /** 결정 영속. */

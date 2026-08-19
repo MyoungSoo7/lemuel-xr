@@ -42,7 +42,14 @@ MANIFESTS = ROOT / "backend/src/main/resources/manifests"
 # AR 을 여는 미션. backend application.yml 의 `lemuel.xr.ar-enabled-missions`
 # 기본값과 같아야 한다 — 한쪽만 늘리면 게이트는 열렸는데 에셋이 없거나(404),
 # 에셋은 있는데 게이트가 닫힌(400) 상태가 된다.
-AR_MISSIONS = ("joseph", "moses", "david", "jesus", "elijah", "solomon", "job", "ruth")
+#
+# 룻은 2026-08-20 에 **뺐다.** AR 은 씬을 사용자의 실제 방에 놓는데, 룻 Scene 4
+# (밤·권력 비대칭)를 그렇게 놓는 것이 VR 과 같은 노출인지에 답할 사람이 없었다
+# (`docs/RUTH-RUNTIME-SIGNOFF.md`). 목록에서 빼는 것만으로는 부족해서 이미 생성돼
+# 있던 룻 AR 시드 15개도 같이 지웠다 — 목록만 고치면 환경변수 `XR_AR_MISSIONS` 한
+# 줄로 되살아나고, 그때 에셋이 이미 있으면 아무 저항 없이 열린다.
+# 되살리려면: 여기에 "ruth" 를 넣고 `python3 scripts/gen_ar_manifests.py ruth`.
+AR_MISSIONS = ("joseph", "moses", "david", "jesus", "elijah", "solomon", "job")
 
 # AR 을 지원하는 디바이스만. web 은 패스스루가 없어 대상이 아니다.
 AR_DEVICES = ("quest3", "visionpro", "galaxyxr")

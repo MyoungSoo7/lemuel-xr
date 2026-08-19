@@ -2,6 +2,7 @@ package github.lms.lemuel.xr.game.application
 
 import github.lms.lemuel.xr.common.AppException
 import github.lms.lemuel.xr.game.domain.Character
+import github.lms.lemuel.xr.game.domain.Scenario
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeAll
@@ -95,33 +96,52 @@ class ScenarioYamlLoaderTest {
                 assertThat(s.scene(next).id).isEqualTo(next)
             }
 
-            // trigger_warning 의 skip 경로도 실재하는 씬을 가리켜야 한다 (R4 우회 경로 무결성)
+            /*
+              R4 우회 경로 무결성.
+
+              2026-08-20 까지 여기 있던 단언은 `skip_alternative_scene_id == next` 였다.
+              백엔드에 skip 분기가 없어서 건너뛴 사용자가 실제로는 next 로 갔기 때문에,
+              *어긋나지 않게 못 박는 것* 이 그때 할 수 있는 최선이었다. 이제 엔진이
+              [SceneSkipResolver] 로 목적지를 집행하므로 둘은 달라도 된다 — 대신 검사해야 할
+              것이 바뀐다. **목적지가 그 카드가 덮기로 한 씬이면 안 된다.** 그게 어긋나면
+              건너뛰기 버튼은 있는데 건너뛴 내용을 그대로 만나는, 가장 나쁜 종류의 통제가 된다.
+            */
             for (scene in s.scenes) {
-                @Suppress("UNCHECKED_CAST")
-                val tw = scene.extras?.get("trigger_warning") as? Map<String, Any?> ?: continue
-                val skipTo = tw["skip_alternative_scene_id"] as? Int ?: continue
-                assertThat(ids)
-                    .describedAs("%s scene %d — skip_alternative_scene_id=%d 미존재", c, scene.id, skipTo)
-                    .contains(skipTo)
-                assertThat(skipTo)
-                    .describedAs("%s scene %d — skip 경로가 트리거 씬 자신 또는 그 이전을 가리킨다", c, scene.id)
-                    .isGreaterThan(scene.id)
+                val consent = consentBlockOf(scene) ?: continue
+                val covers = (consent["covers_scenes"] as? List<*>)?.filterIsInstance<Int>() ?: emptyList()
+                val raw = consent["skip_alternative_scene_id"] ?: continue
 
-                /*
-                  백엔드에는 "skip" 결정에 대한 별도 분기가 없다 — 결정을 기록하고 next 를 따라간다.
-                  그래서 프론트의 건너뛰기는 *본문을 렌더하지 않고 그냥 진행* 하는 것으로 구현돼 있고,
-                  두 값이 어긋나면 건너뛴 사람이 skip_alternative_scene_id 가 아니라 next 로 간다.
-                  조용히 어긋난다 — 화면도 안 죽고 로그도 안 남는다. 그래서 여기서 못 박는다.
-
-                  둘을 갈라야 할 진짜 이유가 생기면, 이 단언을 지우기 전에 백엔드에 skip 분기를 먼저 넣어라.
-                */
-                assertThat(skipTo)
-                    .describedAs(
-                        "%s scene %d — skip_alternative_scene_id(%d) 와 next(%s) 가 다르다. " +
-                            "백엔드는 skip 을 따로 처리하지 않으므로 건너뛴 사용자는 next 로 간다",
-                        c, scene.id, skipTo, scene.next,
-                    )
-                    .isEqualTo(scene.next)
+                if (raw is Int) {
+                    assertThat(ids)
+                        .describedAs("%s scene %d — skip_alternative_scene_id=%d 미존재", c, scene.id, raw)
+                        .contains(raw)
+                    assertThat(raw)
+                        .describedAs("%s scene %d — skip 경로가 트리거 씬 자신 또는 그 이전을 가리킨다", c, scene.id)
+                        .isGreaterThan(scene.id)
+                    assertThat(covers)
+                        .describedAs(
+                            "%s scene %d — skip 목적지(%d)가 이 카드가 덮기로 한 씬 %s 안에 있다. " +
+                                "건너뛴 사용자가 건너뛴 내용으로 들어간다",
+                            c, scene.id, raw, covers,
+                        )
+                        .doesNotContain(raw)
+                } else {
+                    /*
+                      문자열 목적지는 다음 씬이 없는 마지막 씬의 *축약 경로* 다 — 같은 씬에
+                      머물며 conditional_blocks 의 같은 id 를 쓴다(ruth.yml 머리 주석의 계약).
+                      짝이 없으면 [SceneSkipResolver] 가 런타임에 던지므로, 여기서 먼저 잡는다.
+                    */
+                    val blockId = raw.toString()
+                    assertThat(conditionalBlockIdsOf(scene))
+                        .describedAs(
+                            "%s scene %d — 문자열 skip 목적지 '%s' 에 해당하는 conditional_blocks 항목이 없다",
+                            c, scene.id, blockId,
+                        )
+                        .contains(blockId)
+                    assertThat(scene.next)
+                        .describedAs("%s scene %d — 축약 블록 목적지는 마지막 씬에서만 쓴다", c, scene.id)
+                        .isNull()
+                }
             }
         }
     }
@@ -369,4 +389,33 @@ class ScenarioYamlLoaderTest {
         assertThatThrownBy { empty.forCharacter(Character.JOSEPH) }
             .isInstanceOf(AppException::class.java)
     }
+
+    /**
+     * 로더가 표준 필드만 걷어내므로, yml 이 `extras:` 블록을 따로 두면 그 안이 한 겹 더
+     * 들어간다. 씬마다 어느 겹에 적혀 있는지가 다르다 — 룻 Scene 5 는 `consent_coverage`
+     * 가 씬 최상위인데 `conditional_blocks` 는 `extras:` 안이다. 한 겹만 보면 검사가
+     * 조용히 비게 되므로 두 겹을 다 본다. [SceneSkipResolver] 가 런타임에서 보는 곳과 같다.
+     */
+    private fun extrasRootsOf(scene: Scenario.Scene): List<Map<*, *>> =
+        listOfNotNull(scene.extras, scene.extras?.get("extras") as? Map<*, *>)
+
+    /**
+     * 이 씬의 동의 블록 — 자기 카드를 띄우면 `trigger_warning`, 다른 씬의 카드에 덮이면
+     * `consent_coverage` 다. 덮인 쪽만 빠뜨리면 상속된 스킵 목적지가 검사 밖으로 샌다.
+     * [SceneSkipResolver.consentBlock] 과 같은 규칙을 본다.
+     */
+    private fun consentBlockOf(scene: Scenario.Scene): Map<*, *>? {
+        for (root in extrasRootsOf(scene)) {
+            (root["trigger_warning"] as? Map<*, *>)?.let { return it }
+            (root["consent_coverage"] as? Map<*, *>)?.let { return it }
+        }
+        return null
+    }
+
+    /** 이 씬 안의 축약 블록 id 들. [SceneSkipResolver.conditionalBlock] 과 같은 곳을 본다. */
+    private fun conditionalBlockIdsOf(scene: Scenario.Scene): List<String> =
+        extrasRootsOf(scene)
+            .flatMap { (it["conditional_blocks"] as? List<*>).orEmpty() }
+            .filterIsInstance<Map<*, *>>()
+            .mapNotNull { it["id"]?.toString() }
 }

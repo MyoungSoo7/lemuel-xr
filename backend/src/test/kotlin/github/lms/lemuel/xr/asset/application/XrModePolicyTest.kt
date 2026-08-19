@@ -16,16 +16,30 @@ import org.junit.jupiter.api.Test
 class XrModePolicyTest {
 
     private val policy =
-        XrModePolicy("joseph,moses,david,jesus,elijah,solomon,job,ruth") // 운영 기본값
+        XrModePolicy("joseph,moses,david,jesus,elijah,solomon,job") // 운영 기본값
 
     @Test
-    fun `AR manifest 가 있는 여덟 미션은 AR 과 VR 둘 다`() {
+    fun `AR manifest 가 있는 일곱 미션은 AR 과 VR 둘 다`() {
         for (mission in
-            listOf("joseph", "moses", "david", "jesus", "elijah", "solomon", "job", "ruth")
+            listOf("joseph", "moses", "david", "jesus", "elijah", "solomon", "job")
         ) {
             assertThat(policy.supports(mission, XrMode.VR)).isTrue()
             assertThat(policy.supports(mission, XrMode.AR)).isTrue()
         }
+    }
+
+    /**
+     * 룻은 시나리오가 열려 있어도 AR 은 닫혀 있다 — 저작이 덜 된 게 아니라 **결정** 이다.
+     *
+     * 패스스루는 씬을 사용자의 실제 방에 놓는다. Scene 4(밤·권력 비대칭)를 그렇게 놓는 것이
+     * VR 과 같은 노출인지에 답할 사람이 없었고, 답 없이 열지 않는 쪽을 골랐다
+     * (`docs/RUTH-RUNTIME-SIGNOFF.md`). 라합의 "아직 못 만들었다" 와 구분해서 못 박아 둔다 —
+     * 둘 다 `supports(..., AR) == false` 지만 되돌리는 조건이 다르다.
+     */
+    @Test
+    fun `룻은 VR 만 — 저작이 아니라 판단 때문에 AR 이 닫혀 있다`() {
+        assertThat(policy.supports("ruth", XrMode.VR)).isTrue()
+        assertThat(policy.supports("ruth", XrMode.AR)).isFalse()
     }
 
     @Test

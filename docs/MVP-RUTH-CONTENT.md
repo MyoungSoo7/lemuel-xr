@@ -1,16 +1,17 @@
 # MVP-RUTH — XR 실 콘텐츠 (Scene 별 대본·인터랙션·자원)
 
-> ⚠️ **인간 사인오프 대기** — 이 문서는 설계(`docs/MVP-RUTH.md`)와 저작(`content/ruth/*.yml`)을
+> ⚠️ **전문 검토 없이 열려 있다** — 이 문서는 설계(`docs/MVP-RUTH.md`)와 저작(`content/ruth/*.yml`)을
 > 런타임 산출물(`backend/src/main/resources/scenarios/ruth.yml`)로 옮기는 **런타임 대본**이다.
-> `docs/CONTENT-WORKFLOW.md` 의 신학·정신건강 검토자 2인 사인오프는 **아직 없다.**
+> `docs/CONTENT-WORKFLOW.md` 가 말하는 신학·정신건강 검토자 2인 사인오프는 **받지 않았다.**
 > 이 문서 어디에도 "검토를 통과했다" 는 진술이 없다.
-> 사인오프 대장은 `docs/RUTH-RUNTIME-SIGNOFF.md` 이고, 그 두 줄은 `RuntimeExposureSignoffTest`
-> 가 읽는다 — 2026-08-12 부터 이 게이트는 문장이 아니라 테스트다.
 >
-> **런타임 노출은 아직 닫혀 있다** — `Character` enum 에 `RUTH` 가 없고,
-> `ScenarioYamlLoader.loadAll()` 은 `Character.entries` 만 순회한다(`ScenarioYamlLoader.kt:28`).
-> 그래서 `scenarios/ruth.yml` 은 존재하되 **로드되지 않는다.** enum 추가가 곧 노출이며,
-> 그 한 줄이 사인오프 게이트다.
+> **2026-08-20 — 런타임 노출을 열었다.** `Character` enum 에 `RUTH("ruth")` 가 들어갔다.
+> `ScenarioYamlLoader.loadAll()` 은 `Character.entries` 만 순회하므로(`ScenarioYamlLoader.kt:28`)
+> 그 한 줄이 곧 노출이었고, 이제 `scenarios/ruth.yml` 은 실제로 로드된다.
+> 결정 근거·범위·딸린 조치(AR 폐쇄)는 `docs/RUTH-RUNTIME-SIGNOFF.md` 에 있고
+> `RuntimeExposureSignoffTest` 가 그것을 집행한다 — 이 게이트가 요구하는 것은
+> 전문가 서명이 아니라 **누가 알고서 열기로 했는가의 기록** 이다.
+> 아래 §8 체크리스트의 미완 항목들은 그 결정으로 해소되지 **않았다.**
 
 **이 문서가 하지 않은 것 (먼저 밝힌다)**
 
@@ -542,8 +543,11 @@ SR-1 종결 자막 — 룻 2:12 중 — 「이스라엘의 하나님 여호와�
       `baby_asset_present` / `birth_scene_rendered` 를 읽는 검사기는 리포 전체에 0건이다
       (2026-08-11 재확인 — 앞서 "§4-2 미등재"라고만 적었던 기술을 정정한다)
 
-`Character` enum 에 `RUTH` 를 추가하는 것은 **위 두 사인오프가 끝난 뒤**다.
-이 문서와 `scenarios/ruth.yml` 이 다 있어도 그것은 "놀 수 있다"이지 **"내보내도 된다"가 아니다.**
+2026-08-20 에 `Character` enum 에 `RUTH` 를 추가했다 — **위 항목들이 해소돼서가 아니다.**
+요구를 두 사람의 사인오프에서 **기록된 결정 + 기계로 집행되는 조치 하나**(AR 폐쇄)로
+바꾸고 그 조건을 채운 것이다(`docs/RUTH-RUNTIME-SIGNOFF.md`). 위 미완 항목은 그대로 미완이며,
+전문 신학 검토도 전문 정신건강 검토도 받지 않았다. 즉 지금 상태는 "검토를 통과했다"가
+아니라 **"누가 알고서 감수했다"** 이다.
 
 ---
 

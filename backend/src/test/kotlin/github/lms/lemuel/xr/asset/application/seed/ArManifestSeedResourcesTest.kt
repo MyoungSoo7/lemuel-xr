@@ -18,9 +18,15 @@ class ArManifestSeedResourcesTest {
     private val json = ObjectMapper()
     private val resolver = PathMatchingResourcePatternResolver()
 
-    /** AR 을 여는 미션 — application.yml `lemuel.xr.ar-enabled-missions` 기본값과 같다. */
+    /**
+     * AR 을 여는 미션 — application.yml `lemuel.xr.ar-enabled-missions` 기본값과 같다.
+     *
+     * 룻은 2026-08-20 에 빠졌다. 목록에서만 빼면 환경변수 한 줄로 되살아나므로
+     * 시드 15개도 같이 지웠고, 그래서 아래 `AR 시드는 게이트가 연 미션에만 존재한다`
+     * 가 그 삭제를 계속 지킨다 — 시드가 슬쩍 돌아오면 이 테스트가 빨개진다.
+     */
     private val arMissions =
-        setOf("joseph", "moses", "david", "jesus", "elijah", "solomon", "job", "ruth")
+        setOf("joseph", "moses", "david", "jesus", "elijah", "solomon", "job")
 
     /** 패스스루가 있는 기기만. web 은 대상이 아니다. */
     private val arDevices = setOf("quest3", "visionpro", "galaxyxr")
@@ -61,8 +67,9 @@ class ArManifestSeedResourcesTest {
             .map { it.coords }.toSet()
 
         assertThat(ar.map { it.coords }.toSet()).isEqualTo(vrCoords)
-        // (요셉 5 + 모세 6 + 다윗 6 + 예수 7 + 엘리야 5 + 솔로몬 5 + 욥 5 + 룻 5) x 3 기기
-        assertThat(ar).hasSize(132)
+        // (요셉 5 + 모세 6 + 다윗 6 + 예수 7 + 엘리야 5 + 솔로몬 5 + 욥 5) x 3 기기
+        // 룻(5 x 3 = 15)은 빠져 있다 — 위 `arMissions` 주석 참조.
+        assertThat(ar).hasSize(117)
     }
 
     @Test
