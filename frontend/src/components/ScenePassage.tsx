@@ -32,9 +32,16 @@ import { PassageBody } from "@/components/PassageBody";
  *    `TriggerWarningGate` 바깥에 놓이면 동의 전에 자극 본문이 노출된다.
  *    `scripts/mission_passage_check.py` 가 그 배치를 전수로 잰다.
  *
- * 번역본은 지정하지 않는다 — `fetchScripturePassage` 의 기본값 `modern` 을 쓴다.
+ * 번역본은 지정하지 않는다 — `fetchScripturePassage` 의 기본값을 쓴다. 그 기본값은
+ * 2026-08-21 부터 `rev`(개역개정) 다. 그 전에는 `modern`(KLB) 이었고, 같은 화면 위쪽
+ * 모놀로그는 개역개정 자구라 **같은 절이 두 자구로 위아래에 붙어 있었다** — 시 23:1 ·
+ * 삼상 17:45 · 마 5:3 · 창 45:5 가 정면으로 겹쳤고, 겹치지 않는 절까지 합치면 미션
+ * 4편 화면 전체가 두 역본을 섞어 읽혔다.
+ *
  * 백엔드에 폴백이 없어서(`GetScripturePassageUseCase` 는 없으면 던진다) 라벨을 여기서
- * 바꾸면 그 즉시 전 씬이 404 가 된다.
+ * 바꾸면 그 라벨의 시드 행이 없는 참조는 그 즉시 404 가 된다. 그래서 라벨을 옮기기 전에
+ * `V20260821030000` 이 rev 92행을 modern 과 **같은 참조 집합** 으로 채웠고, 그 마이그레이션
+ * 끝의 DO 블록이 "rev 가 못 덮는 참조" 를 0 으로 강제한다.
  */
 export function ScenePassage({
   reference,

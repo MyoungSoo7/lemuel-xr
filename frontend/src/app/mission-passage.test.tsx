@@ -62,7 +62,7 @@ const MARKER = "여기에-API-본문이-온다";
 const PASSAGE = {
   id: 1,
   reference: REF,
-  translation: "modern",
+  translation: "rev",
   book: "열왕기상",
   bookCode: "1kgs",
   chapter: 19,
