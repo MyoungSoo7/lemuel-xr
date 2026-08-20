@@ -15,7 +15,7 @@ CI 게이트 러너 — 판정 결과가 **기록된 기준선과 같은지**를
     기록으로 남겨야 하기 때문이다(`ac_table_check.py` 의 `t-baseline` 과 같은 규율).
 
 이 초록이 말하지 않는 것:
-    ① 게이트가 통과한다 — 아니다. 러너 18개 중 13개가 아직 rc≠0 이다(2026-08-20;
+    ① 게이트가 통과한다 — 아니다. 러너 19개 중 14개가 아직 rc≠0 이다(2026-08-20;
        마무리 줄은 이 숫자를 손으로 박지 않고 매 실행마다 센다).
     ② 콘텐츠가 안전하다 — BLOCKED 항목은 여전히 판정 불가 상태다.
     ③ 기준선이 옳다 — 기준선은 "오늘 이랬다"는 기록이지 목표가 아니다.
@@ -105,6 +105,11 @@ def runners() -> list[tuple[str, list[str], str]]:
     # 아니라 자구 정렬로 갚았다 — `V20260820113000`. 지금은 92행 전부 PASS 다.
     # `--refresh` 는 네트워크를 타므로 CI 에서 돌리지 않는다(고정 해시만 읽는다).
     out.append(("scripture-text:all", ["scripts/scripture_text_check.py"], "text"))
+    # 위 둘의 공통 사각지대 — **화면이 그 본문을 여느냐.** 2026-08-20 까지 답은
+    # "아니오" 였고, 그런데도 위 두 러너는 초록이었다(참조 60개 PASS · 자구 92행 PASS).
+    # 열 수 있다와 열린다 사이의 거리를 아무도 재지 않으면, 갚은 빚이 화면에 도달하지
+    # 않은 채로 장부만 깨끗해진다. 자세한 사정은 `scripts/mission_passage_check.py` 머리말.
+    out.append(("mission-passage:all", ["scripts/mission_passage_check.py"], "text"))
     return out
 
 

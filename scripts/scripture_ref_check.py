@@ -151,9 +151,11 @@ def main() -> int:
     passes = len(rows) - fails
     print(f"\n--- PASS {passes} / FAIL {fails} / BLOCKED 0 ---")
     print("  ⚠️ 이 검사의 주장 범위: 조회 키가 시드 행과 맞느냐 까지다.")
-    print("     자구가 맞는지도, translation 이 무엇인지도, 그 본문을 화면이")
-    print("     실제로 여는지도 재지 않는다 — 지금 미션 화면은 이 값을 렌더조차")
-    print("     하지 않는다. 초록이 나와도 그것은 '열 수 있다' 이지 '열린다' 가 아니다.")
+    print("     자구가 맞는지도(scripture_text_check.py), 그 본문을 화면이 실제로")
+    print("     여는지도(mission_passage_check.py + mission-passage.test.tsx) 여기서는")
+    print("     재지 않는다. 초록이 나와도 그것은 '열 수 있다' 이지 '열린다' 가 아니다.")
+    print("     ─ 2026-08-20 까지 미션 화면은 이 값을 렌더조차 하지 않았고, 그동안")
+    print("       이 검사는 8인물 PASS 였다. 그 거리를 잰 러너가 그때 생겼다.")
     return 1 if fails else 0
 
 

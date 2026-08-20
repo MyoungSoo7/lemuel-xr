@@ -21,6 +21,7 @@ import {
   type Scene4LastStone,
 } from "@/lib/content/david-monologues";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import { CrisisReminder } from "@/components/CrisisReminder";
 import {
   TriggerWarningGate,
@@ -129,6 +130,12 @@ export default function DavidPage() {
     (extras[key] as T | undefined) ?? (payload[key] as T | undefined);
 
   const crisisReminder = field<string>("crisis_reminder");
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다
+  // (extras 안에 산다 — 그래서 payload 직독이 아니라 field 로 읽는다).
+  const additionalRefs = field<string[]>("additional_refs");
 
   const advance = (sceneId: number, decision: unknown) => {
     decide.mutate({ sceneId, decision });
@@ -214,6 +221,12 @@ export default function DavidPage() {
           />
         ) : (
           <>
+            {/* 성경 본문 — 동의 게이트 *안쪽* 이다(Scene 5 는 대치 장면 경고를 단다). */}
+            <ScenePassage
+              reference={scriptureRef}
+              additional={additionalRefs}
+            />
+
             {/* Scene 1 — contemplative (시편 23 도입 내레이션 렌더 후 계속) */}
             {sceneType === "contemplative" && (
               <>

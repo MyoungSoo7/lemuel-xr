@@ -299,6 +299,17 @@
         0
       ],
       "items": []
+    },
+    "mission-passage:all": {
+      "rc": 1,
+      "tally": [
+        9,
+        1,
+        0
+      ],
+      "items": [
+        "frontend-quotes:FAIL — 프론트 문자열에 성경 인용 47건이 원문 대조 없이 박혀 있다 (david-monologues.ts:N, jesus-monologues.ts:N, joseph-monologues.ts:N, moses-monolo"
+      ]
     }
   }
 }

@@ -99,15 +99,23 @@ describe("PassageModal", () => {
 
   it("주제·인물 태그가 있으면 인물 코드는 한국어로, 모르는 코드는 원문으로 뜬다", async () => {
     mockFetch.mockResolvedValue(
-      본문({ themeTags: ["위로", "인도"], characterTags: ["david", "ruth"] }),
+      본문({
+        themeTags: ["위로", "인도"],
+        characterTags: ["david", "ruth", "rahab"],
+      }),
     );
     감싸기(<PassageModal reference="시편 23:1-3" onClose={vi.fn()} />);
 
     expect(await screen.findByText("#위로")).toBeInTheDocument();
     expect(screen.getByText("#인도")).toBeInTheDocument();
     expect(screen.getByText("👤 다윗")).toBeInTheDocument();
+    // 룻·솔로몬은 2026-08-20 에 라벨 사전에 들어왔다. 그전까지 시드에 `ruth` 태그가
+    // 실린 행은 칩에 영문 슬러그가 그대로 떴고, 이 검사는 그 상태를 *기대값으로*
+    // 굳혀 두고 있었다 — 빠진 라벨을 "모르는 코드" 로 읽은 탓이다.
+    expect(screen.getByText("👤 룻")).toBeInTheDocument();
     // 라벨 사전에 없는 인물은 코드 그대로 — 조용히 사라지지 않는다.
-    expect(screen.getByText("👤 ruth")).toBeInTheDocument();
+    // (라합은 아직 시드 파이프라인 단계라 라벨이 없다.)
+    expect(screen.getByText("👤 rahab")).toBeInTheDocument();
   });
 
   it("태그가 null 이면 태그 영역 자체가 없다", async () => {
