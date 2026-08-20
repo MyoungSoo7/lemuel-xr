@@ -292,58 +292,13 @@
       "items": []
     },
     "scripture-text:all": {
-      "rc": 1,
+      "rc": 0,
       "tally": [
-        48,
-        25,
-        19
+        92,
+        0,
+        0
       ],
-      "items": [
-        "1kgs-19:11:BLOCKED 절 범위가 번역본 단위와 다름 (시드 11-13 · KLB 11-11) — 대조 불가",
-        "1kgs-19:18:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "1kgs-19:4:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "1kgs-19:5:BLOCKED 절 범위가 번역본 단위와 다름 (시드 5-8 · KLB 5-5) — 대조 불가",
-        "eccl-12:13:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "eccl-3:1:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "gen-39:20:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "gen-41:25:BLOCKED 절 범위가 번역본 단위와 다름 (시드 25-32 · KLB 25-25) — 대조 불가",
-        "gen-41:33:BLOCKED 절 범위가 번역본 단위와 다름 (시드 33-36 · KLB 33-33) — 대조 불가",
-        "gen-41:39:BLOCKED 절 범위가 번역본 단위와 다름 (시드 39-41 · KLB 39-39) — 대조 불가",
-        "gen-41:53:BLOCKED 절 범위가 번역본 단위와 다름 (시드 53-54 · KLB 53-53) — 대조 불가",
-        "gen-42:6:FAIL translation='modern' 인데 KLB 자구와 다름 (V2__seed_scripture_genesis_41_45.sql)",
-        "gen-45:4:BLOCKED 절 범위가 번역본 단위와 다름 (시드 4-5 · KLB 4-4) — 대조 불가",
-        "gen-45:5:FAIL translation='modern' 인데 KLB 자구와 다름 (V2__seed_scripture_genesis_41_45.sql)",
-        "gen-50:20:FAIL translation='modern' 인데 KLB 자구와 다름 (V2__seed_scripture_genesis_41_45.sql)",
-        "isa-51:7:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "job-23:3:BLOCKED 절 범위가 번역본 단위와 다름 (시드 3-5 · KLB 3-3) — 대조 불가",
-        "job-38:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-7 · KLB 1-1) — 대조 불가",
-        "job-38:4:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "job-3:11:BLOCKED 절 범위가 번역본 단위와 다름 (시드 11-13 · KLB 11-11) — 대조 불가",
-        "job-3:3:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "job-42:5:BLOCKED 절 범위가 번역본 단위와 다름 (시드 5-6 · KLB 5-5) — 대조 불가",
-        "job-6:8:BLOCKED 절 범위가 번역본 단위와 다름 (시드 8-9 · KLB 8-8) — 대조 불가",
-        "job-7:11:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "matt-26:39:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "matt-27:46:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "matt-6:26:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "prov-10:19:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "prov-29:25:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "prov-3:5:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "prov-4:23:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "ps-130:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-4 · KLB 1-1) — 대조 불가",
-        "ps-137:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-4 · KLB 1-1) — 대조 불가",
-        "ps-13:1:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "ps-22:14:BLOCKED 절 범위가 번역본 단위와 다름 (시드 14-15 · KLB 14-14) — 대조 불가",
-        "ps-22:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-2 · KLB 1-1) — 대조 불가",
-        "ps-23:1:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "ps-42:11:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "ps-42:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-3 · KLB 1-1) — 대조 불가",
-        "ps-57:1:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)",
-        "ps-88:13:BLOCKED 절 범위가 번역본 단위와 다름 (시드 13-14 · KLB 13-13) — 대조 불가",
-        "ps-88:18:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260522003800__seed_stage1_lament_passages.sql)",
-        "ps-88:1:BLOCKED 절 범위가 번역본 단위와 다름 (시드 1-3 · KLB 1-1) — 대조 불가",
-        "ps-90:1:FAIL translation='modern' 인데 KLB 자구와 다름 (V20260717073355__seed_ar_topic_passages.sql)"
-      ]
+      "items": []
     }
   }
 }

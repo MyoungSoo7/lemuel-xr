@@ -15,7 +15,8 @@ CI 게이트 러너 — 판정 결과가 **기록된 기준선과 같은지**를
     기록으로 남겨야 하기 때문이다(`ac_table_check.py` 의 `t-baseline` 과 같은 규율).
 
 이 초록이 말하지 않는 것:
-    ① 게이트가 통과한다 — 아니다. 지금은 12개 전부 rc=1 이다.
+    ① 게이트가 통과한다 — 아니다. 러너 18개 중 13개가 아직 rc≠0 이다(2026-08-20;
+       마무리 줄은 이 숫자를 손으로 박지 않고 매 실행마다 센다).
     ② 콘텐츠가 안전하다 — BLOCKED 항목은 여전히 판정 불가 상태다.
     ③ 기준선이 옳다 — 기준선은 "오늘 이랬다"는 기록이지 목표가 아니다.
 
@@ -98,10 +99,10 @@ def runners() -> list[tuple[str, list[str], str]]:
     # 46행 시드로 전부 갚아 지금은 8인물 PASS 다. 기준선의 일은 이제 되돌아가는 것을
     # 잡는 것이다. 자세한 사정은 `scripts/scripture_ref_check.py` 머리말.
     out.append(("scripture-ref:all", ["scripts/scripture_ref_check.py"], "text"))
-    # 행이 **있느냐** 다음 질문 — 그 자구가 `translation` 라벨과 맞느냐. KLB 축자
-    # 해시(`scripts/klb_reference_hashes.json`) 대조다. 도입 시점 25행 FAIL 은
-    # 전부 기존 시드이고(신규 46행은 전부 PASS), 어느 번역본으로 정렬할지는
-    # 라이선스 결정이라 코드가 정할 수 없다 — 기준선에 그 빚을 세워 둔다.
+    # 행이 **있느냐** 다음 질문 — 그 자구가 `translation` 라벨과 맞느냐. 라벨별로
+    # 다른 원문 해시를 댄다(`modern`→KLB · `rev`→개역개정). 도입 시점 FAIL 44행은
+    # 전부 기존 시드였고, 개역개정과도 안 맞아(46행 중 6행만 일치) 라벨 정정이
+    # 아니라 자구 정렬로 갚았다 — `V20260820113000`. 지금은 92행 전부 PASS 다.
     # `--refresh` 는 네트워크를 타므로 CI 에서 돌리지 않는다(고정 해시만 읽는다).
     out.append(("scripture-text:all", ["scripts/scripture_text_check.py"], "text"))
     return out
@@ -275,7 +276,13 @@ def main() -> int:
     n_drift = verdicts.count("drift") + verdicts.count("new")
     n_same = verdicts.count("ok")
     print(f"\n--- 일치 {n_same} / 드리프트 {n_drift} / 판정불가 {len(blocked)} ---")
-    print("  ⚠️ 이 초록은 '게이트가 통과했다'가 아니다 — 지금 12개 게이트는 전부 rc=1 이다.")
+    # 이 줄에 숫자를 손으로 박아 두면 늙는다 — 실제로 늙어서, 러너가 18개가 되고
+    # 그중 5개가 rc=0 이 된 뒤에도 "12개 전부 rc=1" 이라고 찍고 있었다. 센다.
+    n_red = sum(1 for r in observed.values() if r["rc"] != 0)
+    print(
+        f"  ⚠️ 이 초록은 '게이트가 통과했다'가 아니다 — 지금 러너 {len(observed)}개 중"
+        f" {n_red}개가 rc≠0 이다."
+    )
     print("     '기록해 둔 판정 결과에서 벗어나지 않았다' 까지가 이 검사의 주장 범위다.")
 
     if blocked:
