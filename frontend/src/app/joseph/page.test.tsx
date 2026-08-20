@@ -126,9 +126,7 @@ describe("요셉 미션 — 씬 상태 기계", () => {
         "파라오의 꿈을 해석한다. 7년 풍년과 7년 흉년이 다가온다.",
       ),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText(/살찐 일곱 소는 일곱 해의 풍년이요/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/일곱 좋은 암소는 일곱 해요/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "계속 →" })).toBeEnabled();
   });
 

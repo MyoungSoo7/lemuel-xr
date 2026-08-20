@@ -194,6 +194,11 @@ jobs:
               # 이 잡이 안 돌고, 화면 없는 경고(= 안 뜨는 동의 카드)가 그대로 머지된다.
               - 'backend/src/main/resources/scenarios/**'
               - 'scripts/check_frontend_trigger_warning.py'
+              # 인용 대조 게이트는 정본 표와 판정기 자신도 입력이다. 표를 손으로
+              # 고치면서 프론트를 안 건드리면 이 잡이 안 돌고, 훼손된 자구가
+              # *정본 쪽을 고쳐서* 초록이 되는 길이 열린다.
+              - 'docs/verses-monologues-gae.txt'
+              - 'scripts/check_monologue_quotes.py'
 
   backend:
     needs: changes
@@ -456,6 +461,21 @@ jobs:
       # 위와 같은 이유로 setup-python 을 붙이지 않는다 (표준 라이브러리만 쓴다).
       - name: R4 consent gate wiring
         run: python3 scripts/check_frontend_trigger_warning.py
+
+      # 모놀로그 성경 인용 원문 대조 게이트 (2026-08-21 신설).
+      #
+      # DB 본문은 2026-07-18 교정 마이그레이션(V20260718004903) 이후 원문 대조
+      # 체계 안에 있는데, **프론트 문자열은 그 체계 밖이었다** — 이 게이트를 만들기
+      # 전까지 frontend/src/lib/content/*-monologues.ts 를 읽는 스크립트가 리포에
+      # 하나도 없었다. 전수 대조에서 47건 중 21건이 개역개정과 달랐다
+      # (어미·인칭 변형, 무표시 중간절단, 원문에 없는 쉼표).
+      #
+      # 이것도 gate-baseline 이 아니라 **진짜 합격·불합격**이다. 21건을 다 고쳐
+      # 지금 실제로 초록이므로, 빨강이면 그건 새로 들어온 훼손이다.
+      # 정본 표(docs/verses-monologues-gae.txt)는 리포에 있으므로 CI 는 네트워크를
+      # 쓰지 않는다 — 1차 출처 파싱은 --refresh 로 사람이 돌린다.
+      - name: Monologue scripture quote gate
+        run: python3 scripts/check_monologue_quotes.py
 
       # 모바일 레이아웃 게이트 (2026-08-12 신설).
       #
