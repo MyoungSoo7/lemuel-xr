@@ -330,7 +330,7 @@ scenes:
     type: interaction
     interaction: scripture_reading
     duration_sec: 80
-    scripture_ref: ruth-1:8,1:9,1:16
+    scripture_ref: ruth-1:8
     next: 2
     exposure_grade: B
     trigger_warning:
@@ -357,6 +357,7 @@ scenes:
       skip_bridge_narration_ko: 두 며느리 중 하나는 돌아가고, 하나는 남았다. 남은 사람의 이름은 룻이었다.
     extras:
       anchor: 모압에서 유다로 가는 길. 경계석 하나.
+      additional_refs: ["ruth-1:9", "ruth-1:16"] # 예전 `ruth-1:8,1:9,1:16` 을 절 단위로 편 것
       environment:
         camera_rig: fixed_wide_at_roadside
         time_of_day: overcast_noon
@@ -405,7 +406,7 @@ scenes:
     type: interaction
     interaction: pick_one
     duration_sec: 90
-    scripture_ref: ruth-1:19,1:20,1:21a
+    scripture_ref: ruth-1:19
     next: 3
     exposure_grade: B
     # G7 — 동의 키는 5개 Scene **전부** 에 있어야 한다. 이 Scene 은 자기 카드를 띄우지
@@ -419,6 +420,7 @@ scenes:
       skip_alternative_scene_id: 3
     extras:
       anchor: 베들레헴 성읍 어귀. 보리 추수가 막 시작된 때.
+      additional_refs: ["ruth-1:20", "ruth-1:21"] # 예전 `ruth-1:19,1:20,1:21a` 을 절 단위로 편 것
       environment:
         camera_rig: fixed_wide_outside_gate
         time_of_day: high_sun
@@ -496,7 +498,7 @@ scenes:
     type: interaction
     interaction: grab_and_place
     duration_sec: 110
-    scripture_ref: ruth-2:2,2:10,2:11,2:12
+    scripture_ref: ruth-2:2
     next: 4
     exposure_grade: B
     trigger_warning:
@@ -525,6 +527,7 @@ scenes:
         지금 힘드시면: {{crisis_resources.default}}
     extras:
       anchor: 보아스의 보리밭. 추수 중.
+      additional_refs: ["ruth-2:10", "ruth-2:11", "ruth-2:12"] # 예전 `ruth-2:2,2:10,2:11,2:12` 을 절 단위로 편 것
       environment:
         camera_rig: standing_height_field_edge
         time_of_day: afternoon
@@ -602,7 +605,7 @@ scenes:
     type: interaction
     interaction: scripture_reading
     duration_sec: 60
-    scripture_ref: ruth-3:9,3:11
+    scripture_ref: ruth-3:9
     next: 5
     exposure_grade: C
     trigger_warning:
@@ -627,6 +630,7 @@ scenes:
         지금 힘드시면: {{crisis_resources.default}}
     extras:
       anchor: 타작 마당. 곡식 단이 쌓여 있다.
+      additional_refs: ["ruth-3:11"] # 예전 `ruth-3:9,3:11` 을 절 단위로 편 것
       # 이 Scene 에서만 다시 적는다. 등급 C 이고 방금 위에서 동의 카드를 한 장 더 받았기
       # 때문에, "동의를 받았으니 연출을 열어도 된다"는 오독이 실제로 발생하는 유일한 자리다.
       # 동의는 **볼지 말지** 에 대한 것이지 연출 강도에 대한 것이 아니다.
@@ -667,7 +671,7 @@ scenes:
     title: 성문에서
     type: outro
     duration_sec: 90
-    scripture_ref: ruth-4:11,4:12,4:21,4:22
+    scripture_ref: ruth-4:11
     next: null
     exposure_grade: B
     # G7 — Scene 3 의 중간 카드(covers_scenes: [3, 5])에 덮인다.
@@ -680,6 +684,9 @@ scenes:
       skip_alternative_scene_id: ruth_scene5_alt_short
     extras:
       anchor: 베들레헴 성문. 장로 열 명이 앉아 있다.
+      # 예전 `ruth-4:11,4:12,4:21,4:22` 을 절 단위로 편 것. 21-22절(오벳→이새→다윗)은
+      # KLB 가 18-22절을 한 덩어리로 번역해서 시드 행 키가 `ruth-4:18` 이다.
+      additional_refs: ["ruth-4:12", "ruth-4:18"]
       environment:
         camera_rig: fixed_wide_plaza_edge
         time_of_day: late_afternoon

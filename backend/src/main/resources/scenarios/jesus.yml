@@ -142,7 +142,7 @@ scenes:
     type: interaction
     interaction: scripture_reading
     duration_sec: 90
-    scripture_ref: mt-5:3
+    scripture_ref: matt-5:3 # book_code 정본은 `matt` (V6__scripture_embeddings.sql:11)
     extras:
       anchor: 뒤집힌 복·마음의 가난
       lines:

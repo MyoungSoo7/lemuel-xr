@@ -94,10 +94,16 @@ def runners() -> list[tuple[str, list[str], str]]:
     out.append(("captions:ruth", ["scripts/check_ruth_captions.py", "--all"], "text"))
     out.append(("captions:rahab", ["scripts/check_rahab_captions.py"], "text"))
     # 시나리오 `scripture_ref` → `scripture_passages` 행 대조. 2026-08-20 도입 시점에
-    # **8인물 전부 FAIL**(참조 44개 중 31개가 안 열린다) 이라 초록으로 출발하지 않는다.
-    # 기준선에 그 상태를 박아 두는 것이 목적이다 — 더 나빠지면 드리프트로 뜨고,
-    # 고치면 `-` 로 뜬다. 자세한 사정은 `scripts/scripture_ref_check.py` 머리말.
+    # **8인물 전부 FAIL**(참조 44개 중 31개가 안 열린다) 이었고, 같은 날 규약 제정 +
+    # 46행 시드로 전부 갚아 지금은 8인물 PASS 다. 기준선의 일은 이제 되돌아가는 것을
+    # 잡는 것이다. 자세한 사정은 `scripts/scripture_ref_check.py` 머리말.
     out.append(("scripture-ref:all", ["scripts/scripture_ref_check.py"], "text"))
+    # 행이 **있느냐** 다음 질문 — 그 자구가 `translation` 라벨과 맞느냐. KLB 축자
+    # 해시(`scripts/klb_reference_hashes.json`) 대조다. 도입 시점 25행 FAIL 은
+    # 전부 기존 시드이고(신규 46행은 전부 PASS), 어느 번역본으로 정렬할지는
+    # 라이선스 결정이라 코드가 정할 수 없다 — 기준선에 그 빚을 세워 둔다.
+    # `--refresh` 는 네트워크를 타므로 CI 에서 돌리지 않는다(고정 해시만 읽는다).
+    out.append(("scripture-text:all", ["scripts/scripture_text_check.py"], "text"))
     return out
 
 
