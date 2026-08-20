@@ -17,7 +17,8 @@
 
 export type SceneId = 1 | 2 | 3 | 4 | 5;
 export type Scene2Choice = "save_20" | "save_33" | "save_50";
-export type Scene3Pattern = "farmer_first" | "immigrant_first" | "merchant_first";
+export type Scene3Pattern =
+  "farmer_first" | "immigrant_first" | "merchant_first";
 export type Scene4Choice = "reveal" | "test" | "silent";
 
 /**
@@ -26,7 +27,7 @@ export type Scene4Choice = "reveal" | "test" | "silent";
  * 백성은 굶을 것이다")를 함께 노출한다 (free will vs predestination — 단일 입장 채택 없이 병치).
  */
 export const scene1Dream =
-  "\"살찐 일곱 소는 일곱 해의 풍년이요, 마른 일곱 소는 일곱 해의 흉년이라\"(창 41:26~27).\n\n" +
+  '"일곱 좋은 암소는 일곱 해요 … 파리하고 흉한 일곱 소는 칠 년이요"(창 41:26~27).\n\n' +
   "나는 이 꿈의 의미를 알 것 같다. " +
   "그러나 알고도 그 뜻을 따라 *행동하지 않는다면*, 그 백성은 굶을 것이다. " +
   "다가오는 7년과 그 다음 7년 — 무엇을 준비할 것인가.";
@@ -70,29 +71,31 @@ export const scene4Reactions: Record<Scene4Choice, string> = {
 
 export const scene5OutroByScene3: Record<Scene3Pattern, string> = {
   farmer_first:
-    '"하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니" (창 45:5)\n\n' +
+    '"하나님이 생명을 구원하시려고 나를 당신들보다 먼저 보내셨나이다" (창 45:5)\n\n' +
     "이집트는 살았다. 너의 결정 7년이 한 나라의 양식이 되었다. " +
     "다만 국경 너머의 굶주린 자들을 기억하라 — 다음 부름은 그쪽일 수 있다.\n\n" +
-    "\"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사 많은 백성의 생명을 " +
-    "구원하게 하셨나니\"(창 50:20). 요셉 서사의 정점이다 — 악은 악으로 남았으되, 하나님은 그 위에서 선을 이루셨다.",
+    '"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사 오늘과 같이 많은 백성의 ' +
+    '생명을 구원하게 하시려 하셨나니"(창 50:20). 요셉 서사의 정점이다 — 악은 악으로 남았으되, 하나님은 그 위에서 선을 이루셨다.',
   immigrant_first:
-    '"하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니" (창 45:5)\n\n' +
+    '"하나님이 생명을 구원하시려고 나를 당신들보다 먼저 보내셨나이다" (창 45:5)\n\n' +
     "너를 판 형제가 너의 양식으로 살았다. " +
     "원망과 용서의 거리를 너는 직접 걸었다.\n\n" +
-    "\"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사\"(창 50:20). " +
+    '"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사"(창 50:20). ' +
     "이 말은 *가해의 정당화가 아니다* — 형의 죄는 여전히 죄로 남는다(요셉은 형들을 무죄로 선언하지 않았다). " +
     "다만 하나님은 그 죄를 *뚫고* 선을 이루셨을 뿐이다. 너의 상처도, 너의 회복도 여전히 너의 것이다.",
   merchant_first:
-    '"하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니" (창 45:5)\n\n' +
+    '"하나님이 생명을 구원하시려고 나를 당신들보다 먼저 보내셨나이다" (창 45:5)\n\n' +
     "재정은 견고해졌고 통치는 강해졌다. " +
     "그러나 굶주린 자의 원망이 너의 다음 결정을 무겁게 만들 것이다. " +
     "다시 7년이 온다면, 너는 어떤 줄을 먼저 부르겠는가?\n\n" +
-    "\"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사 많은 백성의 생명을 " +
-    "구원하게 하셨나니\"(창 50:20). 통치의 무게 위에도, 사람을 살리려는 그 선한 뜻이 흐른다.",
+    '"당신들은 나를 해하려 하였으나 하나님은 그것을 선으로 바꾸사 오늘과 같이 많은 백성의 ' +
+    '생명을 구원하게 하시려 하셨나니"(창 50:20). 통치의 무게 위에도, 사람을 살리려는 그 선한 뜻이 흐른다.',
 };
 
 /** Scene 3 의 *우선 큐 선택* (prototype 단순화) 을 outcome 패턴으로 변환. */
-export function scene3DecisionToPattern(decision: unknown): Scene3Pattern | null {
+export function scene3DecisionToPattern(
+  decision: unknown,
+): Scene3Pattern | null {
   if (typeof decision !== "object" || decision === null) return null;
   const priority = (decision as { priority?: string }).priority;
   if (priority === "farmer") return "farmer_first";

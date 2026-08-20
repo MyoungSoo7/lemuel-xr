@@ -13,7 +13,7 @@
  *  - 모세의 소명·해방은 *하나님의 부르심* 에 대한 순종으로 다룬다 (출 3~14).
  *  - 정치적 해방(출애굽)이라도 특정 정파 선동 금지. 해방 신학의 급진주의
  *    (혁명 신학·만인구원) 는 개혁주의 범위 밖 — 배제.
- *  - 섭리(providence)는 인간 책임을 지우지 않는다. "하나님이 함께 가신다"(출 3:12)
+ *  - 섭리(providence)는 인간 책임을 지우지 않는다. "내가 반드시 너와 함께 있으리라"(출 3:12)
  *    는 소명은 두려움을 *없애는* 것이 아니라 *동행하시는* 약속이다.
  *
  * 정신건강 안전선 —
@@ -26,11 +26,7 @@
 export type Scene2Gesture = "reverence" | "hesitation";
 export type Scene3Pattern = "all_throw" | "all_heart" | "mixed";
 export type Scene3Card =
-  | "who_am_i"
-  | "who_sent_me"
-  | "trust_me"
-  | "cant_speak"
-  | "send_other";
+  "who_am_i" | "who_sent_me" | "trust_me" | "cant_speak" | "send_other";
 export type Scene4Choice = "cast_now" | "hesitate" | "with_aaron";
 export type Scene5Gesture = "lift_staff";
 
@@ -66,7 +62,7 @@ export const scene2Monologues: Record<Scene2Gesture, string> = {
 export const scene3Outcomes: Record<Scene3Pattern, string> = {
   all_throw:
     "다섯 변명을 모두 내려놓았다. " +
-    "\"제가 누구이기에\"(출 3:11), \"말이 둔하니\"(출 4:10) — 그 말들이 거짓은 아니다. " +
+    '"내가 누구이기에"(출 3:11), "혀가 둔한 자"(출 4:10) — 그 말들이 거짓은 아니다. ' +
     "다만 부름의 무게는 네 자격에 달린 것이 아니라, 함께 가시는 분께 달렸다(출 3:12).",
   all_heart:
     "다섯 변명을 모두 품에 안았다. 자기방어는 정직한 고백이다 — 너는 정말 두렵다. " +
@@ -89,20 +85,20 @@ export const scene3Outcomes: Record<Scene3Pattern, string> = {
  */
 export const scene3CardResponses: Record<Scene3Card, string> = {
   who_am_i:
-    "\"내가 반드시 너와 함께 있으리라\"(출 3:12). " +
-    "\"제가 누구이기에\"라는 물음의 답은 *네가 누구인가* 가 아니라, *누가 함께 가는가* 였다.",
+    '"내가 반드시 너와 함께 있으리라"(출 3:12). ' +
+    '"내가 누구이기에"라는 물음의 답은 *네가 누구인가* 가 아니라, *누가 함께 가는가* 였다.',
   who_sent_me:
-    "\"나는 스스로 있는 자이니라 … 스스로 있는 자가 나를 너희에게 보내셨다 하라\"(출 3:14). " +
+    '"나는 스스로 있는 자이니라 … 스스로 있는 자가 나를 너희에게 보내셨다 하라"(출 3:14). ' +
     "이름을 여쭙는 자리에서, 그분은 자기 존재로 답하셨다. " +
     "(이 이름은 '스스로 계신 분'(E.J. Young)으로도, '함께 있으실 분'(Brueggemann)으로도 읽힌다 — 한 줄로 다 담기지 않는 이름이다.)",
   trust_me:
-    "\"네 손에 있는 것이 무엇이냐 … 그것을 땅에 던지라\"(출 4:2~5). " +
+    '"네 손에 있는 것이 무엇이냐 … 그것을 땅에 던지라"(출 4:2~5). ' +
     "믿지 않으면 어쩌나 하는 두려움 앞에서, 그분은 네가 이미 쥐고 있는 지팡이 하나를 가리키셨다.",
   cant_speak:
-    "\"누가 사람의 입을 지었느냐 … 이제 가라 내가 네 입과 함께 있어서 할 말을 가르치리라\"(출 4:11~12). " +
+    '"누가 사람의 입을 지었느냐 … 이제 가라 내가 네 입과 함께 있어서 할 말을 가르치리라"(출 4:11~12). ' +
     "말이 둔한 것은 *능력의 결* 일 뿐, *인격의 결* 이 아니다. 둔한 입에도 그분이 함께 계신다.",
   send_other:
-    "\"네 형 아론이 있지 아니하냐 … 내가 네 입과 그의 입에 함께 있어서 할 말을 가르치리라\"(출 4:14~16). " +
+    '"네 형 아론이 있지 아니하냐 … 내가 네 입과 그의 입에 함께 있어서 너희들이 행할 일을 가르치리라"(출 4:14~16). ' +
     "다른 이를 보내달라는 회피 앞에서도, 그분은 꾸짖어 내치는 대신 *함께 걸을 사람* 을 붙여 주셨다.",
 };
 
@@ -123,7 +119,7 @@ export const scene4Reactions: Record<Scene4Choice, string> = {
 export const scene5Monologue: Record<Scene5Gesture, string> = {
   lift_staff:
     "지팡이를 들고 손을 바다 위로 뻗는다(출 14:21). " +
-    "\"두려워하지 말고 가만히 서서 여호와께서 행하시는 구원을 보라\"(출 14:13). " +
+    '"너희는 두려워하지 말고 가만히 서서 여호와께서 오늘 너희를 위하여 행하시는 구원을 보라"(출 14:13). ' +
     "길을 여는 것은 네 손의 힘이 아니다. 네 몫은 손을 드는 것, 그 하나였다.",
 };
 
@@ -184,10 +180,7 @@ export function buildScene3Echo(
   const thrown = SCENE3_CARD_ORDER.filter(
     (id) => assignments[id] === "throw" && scene3CardResponses[id],
   );
-  const cards =
-    thrown.length > 0
-      ? thrown
-      : (["who_am_i"] as Scene3Card[]); // all_heart 등 — 대표 응답만
+  const cards = thrown.length > 0 ? thrown : (["who_am_i"] as Scene3Card[]); // all_heart 등 — 대표 응답만
   const responses = cards.map((id) => scene3CardResponses[id]).join("\n\n");
   return `${base}\n\n${responses}`;
 }
