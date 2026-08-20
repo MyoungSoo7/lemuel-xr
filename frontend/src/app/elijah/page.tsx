@@ -12,6 +12,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
@@ -128,6 +129,12 @@ export default function ElijahPage() {
   const needsConsent = !!warning && !consented;
 
   const anchor = field<string>("anchor");
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다
+  // (extras 안에 산다 — 그래서 payload 직독이 아니라 field 로 읽는다).
+  const additionalRefs = field<string[]>("additional_refs");
   const staticText = field<string>("static_text");
   const reflectionPrompt = field<string>("reflection_prompt");
   const crisisCheck = field<boolean>("crisis_check") === true;
@@ -221,6 +228,11 @@ export default function ElijahPage() {
                   </div>
                 </>
               )}
+              {/* 성경 본문 — 동의 게이트 *안쪽* 이다. Scene 2 는 죽음 갈구(왕상 19:4). */}
+              <ScenePassage
+                reference={scriptureRef}
+                additional={additionalRefs}
+              />
               {reflectionPrompt && (
                 <p className="text-sm italic text-[var(--color-warm)]/70 border-l-2 border-[var(--color-primary)]/40 pl-3 whitespace-pre-line">
                   {reflectionPrompt}

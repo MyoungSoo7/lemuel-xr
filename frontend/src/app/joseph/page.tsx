@@ -20,6 +20,7 @@ import {
 } from "@/lib/content/joseph-monologues";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import { CrisisReminder } from "@/components/CrisisReminder";
 import {
   TriggerWarningGate,
@@ -122,8 +123,17 @@ export default function JosephPage() {
     `extras[key] ?? payload[key]` 순으로 보는 것과 같은 이유다.
   */
   const extras = (payload.extras as Record<string, unknown>) ?? {};
-  const crisisReminder = (extras.crisis_reminder ??
-    payload.crisis_reminder) as string | undefined;
+  const crisisReminder = (extras.crisis_reminder ?? payload.crisis_reminder) as
+    string | undefined;
+
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다.
+  // 이 화면에는 공용 field 헬퍼가 없어 extras 를 직접 읽는다(joseph.yml 은 현재
+  // 이 키를 쓰지 않지만, 저작이 붙는 날 화면이 조용히 1절만 띄우지 않도록 배선해 둔다).
+  const additionalRefs = (extras.additional_refs ?? payload.additional_refs) as
+    string[] | undefined;
 
   // R4 — 게이트 여부는 payload 가 정한다. 씬 번호를 조건으로 쓰지 않는다:
   // yml 이 다른 씬에 경고를 붙이면 그 씬도 자동으로 닫혀야 한다.
@@ -215,6 +225,12 @@ export default function JosephPage() {
           />
         ) : (
           <>
+            {/* 성경 본문 — 동의 게이트 *안쪽* 이다(Scene 4 는 배신·재회 경고를 단다). */}
+            <ScenePassage
+              reference={scriptureRef}
+              additional={additionalRefs}
+            />
+
             {sceneType === "cinematic" && (
               <>
                 {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}

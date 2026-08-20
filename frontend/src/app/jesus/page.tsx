@@ -23,6 +23,7 @@ import {
   iamOf,
 } from "@/lib/content/jesus-monologues";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
@@ -152,6 +153,12 @@ export default function JesusPage() {
 
   // R4 — 게이트 여부는 payload 가 정한다. 씬 타입을 조건으로 쓰지 않는다:
   // yml 이 다른 씬에 경고를 붙이면 그 씬도 자동으로 닫혀야 한다.
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다
+  // (extras 안에 산다 — 그래서 payload 직독이 아니라 field 로 읽는다).
+  const additionalRefs = field<string[]>("additional_refs");
   const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !passionConsented;
 
@@ -238,6 +245,12 @@ export default function JesusPage() {
           />
         ) : (
           <>
+            {/* 성경 본문 — 동의 게이트 *안쪽* 이다(Scene 4·5 는 겟세마네·십자가 경고를 단다). */}
+            <ScenePassage
+              reference={scriptureRef}
+              additional={additionalRefs}
+            />
+
             {/* Scene 1 — cinematic (성육신). 캡션만이 아니라 성육신 본문을 렌더한 뒤 계속. */}
             {sceneType === "cinematic" && (
               <>

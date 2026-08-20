@@ -6,6 +6,7 @@ import Link from "next/link";
 import { NarrationAudioButton } from "@/components/NarrationAudioButton";
 import { CrisisReminder } from "@/components/CrisisReminder";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
@@ -206,6 +207,13 @@ export default function RuthPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  // 종결 화면(`type: "end"`)에는 참조가 없다 — 그때는 컴포넌트가 null 을 낸다.
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다
+  // (extras 안에 산다 — 그래서 payload 직독이 아니라 field 로 읽는다).
+  const additionalRefs = field<string[]>("additional_refs");
   const warning = readTriggerWarning(payload);
   const needsConsent = !ended && !!warning && !consented;
   const doors = cardDoors(warning?.consent_card_ko);
@@ -290,7 +298,16 @@ export default function RuthPage() {
               onSkip={onSecondDoor}
             />
           ) : (
-            <Captions captions={captions} />
+            <>
+              <Captions captions={captions} />
+              {/* 성경 본문 — 동의 게이트 *안쪽* 이다(룻의 세 카드가 이 자리를 막는다). */}
+              <div className="mt-4">
+                <ScenePassage
+                  reference={scriptureRef}
+                  additional={additionalRefs}
+                />
+              </div>
+            </>
           )}
         </div>
       </section>

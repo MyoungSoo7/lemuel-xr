@@ -11,6 +11,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import { SceneBootState } from "@/components/SceneBootState";
+import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
@@ -189,6 +190,12 @@ export default function SolomonPage() {
   const interaction = (payload.interaction as string) ?? "";
   const sceneType = rawType === "interaction" ? interaction : rawType;
 
+  // 씬마다 선언된 성경 참조. extras 가 아니라 payload 최상위다
+  // (ScenePayloadAssembler.build — `sc.scriptureRef?.let { p["scriptureRef"] = it }`).
+  const scriptureRef = payload.scriptureRef as string | undefined;
+  // 절 단위 관례상 편 전체를 쓰는 씬은 나머지 절을 `additional_refs` 로 편다
+  // (extras 안에 산다 — 그래서 payload 직독이 아니라 field 로 읽는다).
+  const additionalRefs = field<string[]>("additional_refs");
   const warning = readTriggerWarning(payload);
   const needsConsent = !!warning && !consented;
 
@@ -287,7 +294,16 @@ export default function SolomonPage() {
               />
             </TriggerWarningGate>
           ) : (
-            <ScriptBeats beats={beats} audio={!captionsOnly} />
+            <>
+              <ScriptBeats beats={beats} audio={!captionsOnly} />
+              {/* 성경 본문 — 동의 게이트 *안쪽* 이다(Scene 3·4 는 정본 카드를 단다). */}
+              <div className="mt-4">
+                <ScenePassage
+                  reference={scriptureRef}
+                  additional={additionalRefs}
+                />
+              </div>
+            </>
           )}
         </div>
       </section>
