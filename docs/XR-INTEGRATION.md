@@ -563,8 +563,29 @@ VR 과 같은 노출인지에 답할 사람이 없었고, 답 없이 열지 않�
 집행하는 것은 **기록된 노출 결정 한 줄 + AR 폐쇄** 다. 전문 신학·정신건강 검토는 받지
 않았으며 그 사실은 대장에 남아 있다.
 
-다만 **프론트엔드에 `ruth` 페이지는 없다** — 웹에서 들어갈 입구가 없어 지금은 API 로만
-도달한다. "열었다" 의 범위가 그만큼 좁다는 뜻이다.
+**프론트엔드 `/ruth` 화면은 2026-08-20 에 붙였다.** 그 전까지는 enum 만 열려 있고 웹에서
+들어갈 입구가 없어 API 로만 도달했다. 이건 노출 범위만의 문제가 아니었다 — 화면을 보는
+검사기 두 개가 룻을 **조용히 건너뛰고 있었다.** `check_frontend_trigger_warning.py` 는
+`frontend/src/app/ruth/page.tsx` 가 없으니 NOTE 만 남기고 넘어갔고,
+`mission-tap-targets.spec.ts` 의 인물 목록에도 룻이 없었다. 룻은 씬 1·3·4 에서
+`trigger_warning` 을 선언하는데, 그 배선이 맞는지 아무도 안 재고 있었다는 뜻이다.
+**건너뛴 건 통과가 아니다.** 지금은 둘 다 룻을 사정권에 넣는다.
+
+화면이 생기면서 딸려 온 것 두 가지. 첫째, 동의 카드의 **두 문**이 실제로 다른 문이 됐다 —
+`TriggerWarningGate` 의 `onSkip` 이 `"skip" | "decline"` 을 받고, `declined_route` 가 선언된
+카드(룻 Scene 3, 리포 전체에서 유일)만 거절 문을 그린다. 둘째, `DecideSceneUseCase.altBlockPayload`
+가 payload 의 **두 겹**을 못 보던 결함을 고쳤다 — `ScenarioYamlLoader` 는 표준 9필드만
+벗겨내므로 yml 씬의 `extras:` 블록은 `payload["extras"]` 한 겹 안쪽에 앉는데, 축약 블록의
+`renders` 검사와 `overrides` 치환은 루트만 보고 있었다. 사용자가 실제로 밟는 경로(Scene 3
+건너뛰기 → 4 → 5 `carriedSkip`)에서 항상 `E_VALIDATION` 이 나거나, 자막을 비우겠다는 치환이
+루트에만 얹혀 **자막이 그대로 나가는** 두 갈래였다. 한 겹 들어간 픽스처를 테스트에 더했다 —
+평평한 픽스처만 재던 것이 이 결함을 가리고 있었다.
+
+아직 없는 것도 적어 둔다: 씬 배경 이미지가 한 장도 없어(`public/images/scenes/ruth` 부재)
+화면은 단색 그라디언트로 돌고, 강도 조절 토글도 F66 진입 상태 게이트도 없다. 그리고
+거절한 사용자는 저작된 마감 화면을 못 받는다 — `SceneSkipResolver.Skip.Closing` 이
+`{"type": "end"}` 만 실어 보내기 때문이다(`closing_screen.reached_by` 는
+`consent_declined_sentinel` 을 포함하는데도). 이건 payload 규약을 바꾸는 결정이라 남겨 뒀다.
 
 함께 걸려 있던 런타임 결함 —
 Scene 1 동의 카드의 스킵 목적지는 3 인데 `next` 는 2 라 사별 서사를 건너뛰겠다고 고른

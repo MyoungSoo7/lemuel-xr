@@ -23,6 +23,20 @@ import { describe, expect, it } from "vitest";
 const APP_DIR = join(__dirname);
 const PUBLIC_DIR = join(__dirname, "..", "..", "public");
 
+/*
+  ruth 가 없는 것은 **의도된 제외** 다 — 목록을 갱신하다 빠뜨린 게 아니다.
+
+  `public/images/scenes/` 에 ruth 폴더가 없다. 한 장도 저작되지 않았고, 그래서
+  `/ruth` 화면은 배경 이미지 대신 단색 그라디언트를 쓴다. 즉 이 파일이 찾는
+  `backgroundImage: url(...)` 문자열 자체가 그 페이지에 없다.
+
+  여기 이름을 넣으면 위의 "패턴이 바뀌었다" 단언이 곧바로 빨개진다 — 없는 자산을
+  요구하는 빨강은 고칠 수 없는 빨강이고, 그걸 끄려고 가짜 경로를 적으면 5장 전부
+  검은 화면이 되면서 이 검사만 초록이 된다. 정확히 이 파일이 막으려는 실패다.
+
+  **배경이 저작되면 그때 여기에 ruth 를 넣는다.** 그 전까지 이 제외는 "배경 없음"
+  이라는 사실의 기록이지 면제가 아니다.
+*/
 const CHARACTERS = [
   "david",
   "elijah",

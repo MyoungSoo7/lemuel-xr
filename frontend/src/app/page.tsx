@@ -79,6 +79,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "로뎀나무 아래 — 먼저 먹고 자도 됩니다",
     active: true,
   },
+  {
+    href: "/ruth",
+    name: "Ruth",
+    korean: "룻",
+    tagline: "무자격자가 속하게 되는 것 — 속하게 한 것은 내가 한 일이 아니다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -249,6 +256,7 @@ export default function HomePage() {
                       "solomon",
                       "job",
                       "elijah",
+                      "ruth",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`

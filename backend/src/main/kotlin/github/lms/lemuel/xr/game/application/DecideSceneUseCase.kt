@@ -126,6 +126,24 @@ class DecideSceneUseCase(
      *
      * 블록이 `renders` 로 "이건 남는다" 고 약속한 키가 실제로 없으면 던진다. 축약 경로가
      * 약속한 마감을 못 주면 사용자는 이야기를 잃은 채 끝난다 — 조용히 넘길 실패가 아니다.
+     *
+     * ─────────────── payload 가 두 겹인 것을 여기서도 본다 ───────────────
+     *
+     * [ScenarioYamlLoader] 는 표준 9필드만 걷어내고 나머지를 `scene.extras` 로 둔다.
+     * yml Scene 이 자기 `extras:` 블록을 갖고 있으면 그것이 **한 겹 더 들어가서**
+     * `payload["extras"]` 아래에 앉는다. 룻 Scene 5 가 그 모양이고,
+     * `renders: [closing_lines, closing_screen]` 도 `overrides: {captions: []}` 도
+     * 전부 그 안쪽 겹에 있다.
+     *
+     * 루트만 보면 두 가지가 동시에 깨진다 —
+     *   · `renders` 검사가 **항상 실패해서** 축약 경로 전체가 E_VALIDATION 으로 죽는다.
+     *     (룻 Scene 3 에서 건너뛴 사용자가 Scene 5 에 도착하는 경로가 여기다)
+     *   · 설령 통과해도 `captions: []` 가 루트에 얹힐 뿐 `extras.captions` 는 그대로라,
+     *     빼기로 한 성문 낭독 자막 2장이 **그대로 화면에 남는다.** 축약을 약속하고
+     *     축약하지 않는, 조용한 실패다.
+     *
+     * 그래서 키가 실제로 사는 겹을 찾아 그 자리에 덮는다. 두 겹 어디에도 없던 키는
+     * 블록이 새로 들이는 값이므로 루트에 둔다.
      */
     private fun altBlockPayload(
         scenario: Scenario,
@@ -133,14 +151,31 @@ class DecideSceneUseCase(
         skip: SceneSkipResolver.Skip.AltBlock,
     ): Map<String, Any?> {
         val payload = LinkedHashMap(payloads.build(scenario, sceneId))
-        val missing = skip.renders.filterNot { payload.containsKey(it) }
+        val nested = (payload["extras"] as? Map<*, *>)?.let { inner ->
+            LinkedHashMap<String, Any?>().apply {
+                inner.forEach { (k, v) -> k?.toString()?.let { put(it, v) } }
+            }
+        }
+
+        val missing = skip.renders.filterNot {
+            payload.containsKey(it) || nested?.containsKey(it) == true
+        }
         if (missing.isNotEmpty()) {
             throw AppException(
                 ErrorCode.E_VALIDATION,
                 "Scene $sceneId 축약 블록 '${skip.blockId}' 가 약속한 $missing 이 payload 에 없다",
             )
         }
-        payload.putAll(skip.overrides)
+
+        skip.overrides.forEach { (key, value) ->
+            if (!payload.containsKey(key) && nested?.containsKey(key) == true) {
+                nested[key] = value
+            } else {
+                payload[key] = value
+            }
+        }
+        if (nested != null) payload["extras"] = nested
+
         payload["conditionalBlockId"] = skip.blockId
         return payload
     }

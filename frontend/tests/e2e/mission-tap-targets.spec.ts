@@ -81,6 +81,9 @@ const CHARACTERS = [
   "/jesus",
   "/moses",
   "/solomon",
+  // 2026-08-20 추가. 룻은 백엔드가 열린 뒤에도 화면이 없어 이 검사의 사정권 밖이었다 —
+  // 목록에 없는 인물은 「깨끗함」이 아니라 **한 번도 안 잼** 이다.
+  "/ruth",
 ];
 
 /**
@@ -144,7 +147,9 @@ for (const route of CHARACTERS) {
       if (total > 0) measured++;
       // 여러 걸음에 걸쳐 모으므로 `tapReport` 대신 씬 이름을 붙인 자체 형식을 쓴다.
       for (const s of small) {
-        violations.add(`  [${scene}] ${s.tag} "${s.name}" ${s.w}×${s.h} — ${s.cls}`);
+        violations.add(
+          `  [${scene}] ${s.tag} "${s.name}" ${s.w}×${s.h} — ${s.cls}`,
+        );
       }
 
       const candidates = page.locator(
