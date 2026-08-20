@@ -93,6 +93,11 @@ def runners() -> list[tuple[str, list[str], str]]:
     # 존재하지만 돌지 않는 검사기는 검사기가 아니라 문서다.
     out.append(("captions:ruth", ["scripts/check_ruth_captions.py", "--all"], "text"))
     out.append(("captions:rahab", ["scripts/check_rahab_captions.py"], "text"))
+    # 시나리오 `scripture_ref` → `scripture_passages` 행 대조. 2026-08-20 도입 시점에
+    # **8인물 전부 FAIL**(참조 44개 중 31개가 안 열린다) 이라 초록으로 출발하지 않는다.
+    # 기준선에 그 상태를 박아 두는 것이 목적이다 — 더 나빠지면 드리프트로 뜨고,
+    # 고치면 `-` 로 뜬다. 자세한 사정은 `scripts/scripture_ref_check.py` 머리말.
+    out.append(("scripture-ref:all", ["scripts/scripture_ref_check.py"], "text"))
     return out
 
 
