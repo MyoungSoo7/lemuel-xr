@@ -310,6 +310,18 @@
       "items": [
         "frontend-quotes:FAIL — 프론트 문자열에 성경 인용 47건이 원문 대조 없이 박혀 있다 (david-monologues.ts:N, jesus-monologues.ts:N, joseph-monologues.ts:N, moses-monolo"
       ]
+    },
+    "divine-title:all": {
+      "rc": 0,
+      "tally": [
+        0,
+        0,
+        2
+      ],
+      "items": [
+        "divine-title:exposed:BLOCKED — 노출 텍스트에서 하나님을 '신' 으로 부르는 자리 12건 (시나리오 7 + 프론트 2 + 시드 3). 호칭 규약이 아직 없어 옳고 그름을 판정하지 않는다",
+        "divine-title:mirrors:BLOCKED — 같은 문장을 흉내 내는 테스트 픽스처 4건. 정본을 고치면 따라 고쳐야 하는 자리다"
+      ]
     }
   }
 }
