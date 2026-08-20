@@ -30,9 +30,12 @@ scenes:
     interaction: contemplative
     duration_sec: 60
     narration_id: david.scene1.narration
-    scripture_ref: ps-23:1-6
+    scripture_ref: ps-23:1
     extras:
       anchor: 평온·자기 존재감
+      # 시 23 편 전체를 앰비언스로 쓴다. 참조 키는 절 단위(docs/SCRIPTURE-REF-CONVENTION.md)
+      # 라서 나머지 다섯 절을 편다 — 예전 `ps-23:1-6` 은 조회되지 않는 문자열이었다.
+      additional_refs: ["ps-23:2", "ps-23:3", "ps-23:4", "ps-23:5", "ps-23:6"]
       activity: lyre_strings
       strings_count: 25
       skippable_after_sec: 3 # safety — 조용한 도입이 지루한 사용자 보호 (users.skip_intro_silence)
@@ -63,7 +66,8 @@ scenes:
     type: interaction
     interaction: gesture_sequence
     duration_sec: 120
-    scripture_ref: 1sam-17:38-39
+    # KLB 는 38-39절을 합쳐 번역한다 — 시드 행 `1sam-17:38` 이 두 절을 다 담는다.
+    scripture_ref: 1sam-17:38
     extras:
       anchor: 자기 정체성·해방
       steps:
@@ -140,12 +144,13 @@ scenes:
     title: 회복
     type: outro
     duration_sec: 30
-    scripture_ref: 1sam-17:46-47
+    scripture_ref: 1sam-17:46
     # CROSS-MAPPING-VR-AR.md §3 — 다윗이 빛내는 AR 1~7 가치 (●●●)
     linked_values: [1, 4, 7] # 일기(솔직함) · 시편(시편 저자) · 사람(사울 추격 두려움)
     value_prompt: "다윗의 시편은 그의 *일기장* 이었습니다. 좋은 일만 적는 일기가 건강한 일기가 아닙니다. 오늘 *솔직한 한 줄* 을 적어보세요."
     extras:
       anchor: 자기 작음의 평화
+      additional_refs: ["1sam-17:47"] # 예전 `1sam-17:46-47` 을 절 단위로 편 것
       stones_remaining: 4
       static_monologue: "돌은 다섯 개였고 쓰인 것은 하나였습니다. 남은 네 개는 실패의 대비가 아니라 *작음 그대로 준비된 자* 의 평화였습니다. 오늘 당신의 작음도 결격 사유가 아닙니다."
       recovery_keys:
