@@ -294,7 +294,7 @@
     "scripture-text:all": {
       "rc": 0,
       "tally": [
-        92,
+        184,
         0,
         0
       ],
@@ -308,7 +308,7 @@
         0
       ],
       "items": [
-        "frontend-quotes:FAIL — 프론트 문자열에 성경 인용 47건이 원문 대조 없이 박혀 있다 (david-monologues.ts:N, jesus-monologues.ts:N, joseph-monologues.ts:N, moses-monolo"
+        "frontend-quotes:FAIL — 성경 본문의 사본이 프론트 문자열에 47건 남아 있다 (david-monologues.ts:N, jesus-monologues.ts:N, joseph-monologues.ts:N, moses-monologues."
       ]
     },
     "divine-title:all": {

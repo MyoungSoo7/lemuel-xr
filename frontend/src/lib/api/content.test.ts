@@ -135,12 +135,15 @@ describe("토픽 · 카드 · 성경 본문", () => {
   });
 
   it("fetchScripturePassage 는 본문 객체를 그대로(봉투 없이) 준다", async () => {
-    const passage = { id: 1, reference: "Psalm 23:1", translation: "modern" };
+    const passage = { id: 1, reference: "Psalm 23:1", translation: "rev" };
     get.mockResolvedValue(ok(passage));
 
     await expect(fetchScripturePassage("Psalm 23:1")).resolves.toBe(passage);
-    // 번역본 미지정 시 기본값 modern — 화면이 매번 넘기지 않아도 같은 본문이 온다.
-    expect(lastGet()[1]?.params).toEqual({ translation: "modern" });
+    // 번역본 미지정 시 기본값 rev(개역개정) — 화면이 매번 넘기지 않아도 같은 본문이 온다.
+    // 2026-08-21 에 modern(KLB) 에서 옮겼다. 모놀로그가 개역개정 자구라 한 화면에 같은
+    // 절이 두 자구로 떴다. 이 단언이 그 기본값을 못박는다 — 백엔드에도 같은 기본값이
+    // 있어서(`ScriptureController`) 한쪽만 바뀌면 조용히 어긋난다.
+    expect(lastGet()[1]?.params).toEqual({ translation: "rev" });
   });
 
   it("fetchScripturePassage 는 번역본을 지정하면 그것을 쓴다", async () => {

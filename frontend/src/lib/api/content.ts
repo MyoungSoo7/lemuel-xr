@@ -46,17 +46,39 @@ export async function fetchTopics(): Promise<Topic[]> {
   return res.data.topics;
 }
 
-export async function fetchTopicCards(topicId: number, emotion?: string, limit = 5): Promise<TopicCard[]> {
-  const res = await api.get<CardsResponse>(`/api/content/topics/${topicId}/cards`, {
-    params: { emotion, limit },
-  });
+export async function fetchTopicCards(
+  topicId: number,
+  emotion?: string,
+  limit = 5,
+): Promise<TopicCard[]> {
+  const res = await api.get<CardsResponse>(
+    `/api/content/topics/${topicId}/cards`,
+    {
+      params: { emotion, limit },
+    },
+  );
   return res.data.cards;
 }
 
-export async function fetchScripturePassage(reference: string, translation = "modern"): Promise<ScripturePassage> {
-  const res = await api.get<ScripturePassage>(`/api/scripture/${encodeURIComponent(reference)}`, {
-    params: { translation },
-  });
+/**
+ * 본문 한 건. 기본 번역본은 `rev`(개역개정) — 2026-08-21 에 `modern`(현대인의 성경)
+ * 에서 옮겼다. 프론트 모놀로그가 개역개정 자구인데 이 API 가 KLB 를 내려 보내 한
+ * 화면에 같은 절이 두 자구로 떴다(시 23:1 · 삼상 17:45 · 마 5:3 · 창 45:5).
+ *
+ * 백엔드도 같은 기본값이지만(`ScriptureController`) 여기서 명시해 보낸다 — 기본값이
+ * 두 곳에 있으면 한쪽만 바뀌는 드리프트가 조용히 난다. `content.test.ts` 가 이 파라미터를
+ * 못박는다.
+ */
+export async function fetchScripturePassage(
+  reference: string,
+  translation = "rev",
+): Promise<ScripturePassage> {
+  const res = await api.get<ScripturePassage>(
+    `/api/scripture/${encodeURIComponent(reference)}`,
+    {
+      params: { translation },
+    },
+  );
   return res.data;
 }
 
@@ -86,8 +108,12 @@ export async function fetchBookmarks(): Promise<BookmarkedCard[]> {
 }
 
 /** 담기 — 멱등. */
-export async function addBookmark(topicContentId: number): Promise<BookmarkDto> {
-  const res = await api.post<BookmarkDto>("/api/content/bookmarks", { topicContentId });
+export async function addBookmark(
+  topicContentId: number,
+): Promise<BookmarkDto> {
+  const res = await api.post<BookmarkDto>("/api/content/bookmarks", {
+    topicContentId,
+  });
   return res.data;
 }
 
@@ -106,10 +132,7 @@ export type PracticeTopicId = 6 | 7;
  * Theme 7: 'courage_act'   | 'thought_record'
  */
 export type PracticeKind =
-  | "heart_checkin"
-  | "boundary_sentence"
-  | "courage_act"
-  | "thought_record";
+  "heart_checkin" | "boundary_sentence" | "courage_act" | "thought_record";
 
 export interface PracticeCreateRequest {
   topicId: PracticeTopicId;
@@ -151,12 +174,17 @@ export interface PracticeListResponse {
   actionCount: number;
 }
 
-export async function recordPractice(req: PracticeCreateRequest): Promise<PracticeResponse> {
+export async function recordPractice(
+  req: PracticeCreateRequest,
+): Promise<PracticeResponse> {
   const res = await api.post<PracticeResponse>("/api/content/practice", req);
   return res.data;
 }
 
-export async function fetchPractices(topicId: PracticeTopicId, limit = 20): Promise<PracticeListResponse> {
+export async function fetchPractices(
+  topicId: PracticeTopicId,
+  limit = 20,
+): Promise<PracticeListResponse> {
   const res = await api.get<PracticeListResponse>("/api/content/practice", {
     params: { topicId, limit },
   });
@@ -225,21 +253,31 @@ export interface EcclesiastesListResponse {
 }
 
 export async function fetchEcclesiastesCategories(): Promise<EcclesiastesCategoriesResponse> {
-  const res = await api.get<EcclesiastesCategoriesResponse>("/api/content/ecclesiastes/categories");
+  const res = await api.get<EcclesiastesCategoriesResponse>(
+    "/api/content/ecclesiastes/categories",
+  );
   return res.data;
 }
 
 export async function recordEcclesiastesView(
   req: EcclesiastesCreateRequest,
 ): Promise<EcclesiastesResponse> {
-  const res = await api.post<EcclesiastesResponse>("/api/content/ecclesiastes", req);
+  const res = await api.post<EcclesiastesResponse>(
+    "/api/content/ecclesiastes",
+    req,
+  );
   return res.data;
 }
 
-export async function fetchEcclesiastesViews(limit = 20): Promise<EcclesiastesListResponse> {
-  const res = await api.get<EcclesiastesListResponse>("/api/content/ecclesiastes", {
-    params: { limit },
-  });
+export async function fetchEcclesiastesViews(
+  limit = 20,
+): Promise<EcclesiastesListResponse> {
+  const res = await api.get<EcclesiastesListResponse>(
+    "/api/content/ecclesiastes",
+    {
+      params: { limit },
+    },
+  );
   return res.data;
 }
 
@@ -272,7 +310,9 @@ export interface GuidanceResponse {
 }
 
 /** GET /journal/guidance — 감정으로 조회. 미지정이면 전체 카탈로그. */
-export async function fetchJournalGuidance(emotion?: string): Promise<GuidanceResponse> {
+export async function fetchJournalGuidance(
+  emotion?: string,
+): Promise<GuidanceResponse> {
   const res = await api.get<GuidanceResponse>("/api/content/journal/guidance", {
     params: emotion ? { emotion } : undefined,
   });
@@ -284,7 +324,10 @@ export async function requestJournalGuidance(req: {
   text?: string;
   emotion?: string;
 }): Promise<GuidanceResponse> {
-  const res = await api.post<GuidanceResponse>("/api/content/journal/guidance", req);
+  const res = await api.post<GuidanceResponse>(
+    "/api/content/journal/guidance",
+    req,
+  );
   return res.data;
 }
 
@@ -326,14 +369,21 @@ export interface ProverbsInteractionResponse {
 }
 
 export async function fetchProverbsThemes(): Promise<ProverbsThemeListResponse> {
-  const res = await api.get<ProverbsThemeListResponse>("/api/content/proverbs/themes");
+  const res = await api.get<ProverbsThemeListResponse>(
+    "/api/content/proverbs/themes",
+  );
   return res.data;
 }
 
-export async function fetchProverbsByTheme(theme: string): Promise<ProverbsByThemeResponse> {
-  const res = await api.get<ProverbsByThemeResponse>("/api/content/proverbs/by-theme", {
-    params: { theme },
-  });
+export async function fetchProverbsByTheme(
+  theme: string,
+): Promise<ProverbsByThemeResponse> {
+  const res = await api.get<ProverbsByThemeResponse>(
+    "/api/content/proverbs/by-theme",
+    {
+      params: { theme },
+    },
+  );
   return res.data;
 }
 
