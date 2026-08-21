@@ -140,8 +140,158 @@ class DecideSceneUseCaseTest {
         verify(decisions).save(any())
     }
 
+    /**
+     * 거절한 사용자도 **저작된 종결 화면**을 받는다.
+     *
+     * ⚠️ 이 테스트는 2026-08-22 이전에 `isEqualTo(mapOf("type" to "end"))` 였다.
+     * 즉 **결함을 기대값으로 고정하고 있었다.** 룻 Scene 5 의 `closing_screen` 은
+     * `reached_by` 에 `consent_declined_sentinel` 을 명시하고 「덜 본 사람에게 덜한 결말을
+     * 주지 않는다」고 적어 두었는데, 코드는 빈 `end` 를 보냈고 테스트는 그 빈 `end` 를
+     * 정답으로 못박았다. 초록이었지만 저작과 반대였다.
+     *
+     * 그 화면의 `ui_overlays` 가 `[suffering_disclaimer, crisis_reminder, exit_button]` 라,
+     * 빠진 것은 자막이 아니라 **위기 안내와 나가기 버튼**이었다.
+     */
     @Test
-    fun `execute 카드 거절은 종결 payload`() {
+    fun `execute 카드 거절은 저작된 종결 화면을 싣는다`() {
+        val sid = UUID.randomUUID()
+        val closingScreen = mapOf(
+            "entry_mode" to "closing_only",
+            "reached_by" to listOf("consent_declined_sentinel", "full_path_completion"),
+            "ui_overlays" to listOf("suffering_disclaimer", "crisis_reminder", "exit_button"),
+        )
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    3, 4, false,
+                    mapOf(
+                        "trigger_warning" to mapOf(
+                            "covers_scenes" to listOf(3, 5),
+                            "skip_alternative_scene_id" to 4,
+                            "declined_route" to "closing",
+                        ),
+                    ),
+                ),
+                scene(4, null, false, mapOf("closing_screen" to closingScreen)),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
+        )
+
+        // `type: end` 는 그대로 — 클라이언트가 "끝났다" 를 읽는 자리다. 종결 화면은 덧붙임이다.
+        assertThat(r.scenePayload).containsEntry("type", "end")
+        assertThat(r.scenePayload["closing_screen"])
+            .describedAs("거절한 사용자에게 저작된 종결 화면이 안 갔다 — 위기 안내와 나가기 버튼이 그 안에 있다")
+            .isEqualTo(closingScreen)
+        // 저작된 이름 그대로여야 한다. `/ruth` 의 field() 가 이 이름으로 읽는다.
+        assertThat(r.scenePayload)
+            .describedAs("camelCase 로 실으면 백엔드만 고쳐진 것처럼 보이고 화면은 그대로 빈다")
+            .doesNotContainKey("closingScreen")
+    }
+
+    /**
+     * 거절한 사용자는 **거절한 내용을 받지 않는다.**
+     *
+     * 종결 화면은 Scene 5 안에 있는데, 중간 동의 카드의 `covers_scenes` 는 [3, 5] 다 —
+     * 거절은 Scene 5 의 내용까지 거절한 것이다. Scene payload 를 통째로 넘기면 성문 낭독
+     * 자막이 딸려 가서, 안 보겠다고 고른 사람에게 그 내용을 보여 주게 된다.
+     * 그래서 [DecideSceneUseCase] 는 실을 키를 허용목록으로 고른다.
+     */
+    @Test
+    fun `execute 카드 거절은 거절한 씬의 본문을 싣지 않는다`() {
+        val sid = UUID.randomUUID()
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(3, 4, false, mapOf("trigger_warning" to mapOf("declined_route" to "closing"))),
+                scene(
+                    4, null, false,
+                    mapOf(
+                        "extras" to mapOf(
+                            "closing_screen" to mapOf("entry_mode" to "closing_only"),
+                            "crisis_reminder" to "{{crisis_resources.default}}.",
+                            // 거절한 사용자가 보면 안 되는 것들.
+                            "captions" to listOf(mapOf("text_ko" to "성문 낭독 자막")),
+                            "npcs" to listOf("보아스"),
+                            "environment" to mapOf("anchor" to "베들레헴 성문"),
+                        ),
+                    ),
+                ),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
+        )
+
+        assertThat(r.scenePayload.keys)
+            .describedAs("거절한 사용자에게 실리는 키는 허용목록뿐이어야 한다")
+            .containsExactlyInAnyOrder("type", "closing_screen", "crisis_reminder")
+        // 위기 안내는 토큰이 아니라 치환된 문자열로 가야 한다 — 사용자가 중괄호를 보면 안 된다.
+        assertThat(r.scenePayload["crisis_reminder"] as String)
+            .describedAs("위기 안내 토큰이 치환되지 않은 채 사용자에게 갔다")
+            .doesNotContain("{{")
+            .contains("109")
+    }
+
+    /**
+     * 실제 룻이 쓰는 모양 — 종결 화면이 **중첩 `extras` 블록 안**에 있다.
+     *
+     * ⚠️ 위 테스트만 있었을 때 이 고침은 초록인 채로 틀렸다. 픽스처가 `closing_screen` 을
+     * Scene 최상위에 두었는데 `ruth.yml` 은 자기 `extras:` 블록 안에 둔다
+     * (`scenes[4].extras.closing_screen`). 로더가 표준필드만 걷어내니 그 블록은
+     * `scene.extras["extras"]` 로 **한 겹 더 들어간다.** 최상위만 보던 코드는 실제 룻에서
+     * 화면을 못 찾아 던졌을 것이다 — 거절한 사용자에게 500 을 주는, 고치려던 것보다 나쁜 결과.
+     * 실 yml 에 대고 재는 `DeclinedRouteClosingScreenTest` 가 그걸 잡았고, 그 깊이를 여기 못박는다.
+     */
+    @Test
+    fun `execute 거절 종결 화면이 중첩 extras 안에 있어도 찾는다`() {
+        val sid = UUID.randomUUID()
+        val closingScreen = mapOf(
+            "entry_mode" to "closing_only",
+            "ui_overlays" to listOf("suffering_disclaimer", "crisis_reminder", "exit_button"),
+        )
+        val scenario = Scenario(
+            "ruth", "룻",
+            listOf(
+                scene(
+                    3, 4, false,
+                    mapOf("trigger_warning" to mapOf("declined_route" to "closing")),
+                ),
+                // ruth.yml 과 같은 모양: Scene 이 명시한 `extras:` 블록 한 겹 안쪽.
+                scene(4, null, false, mapOf("extras" to mapOf("closing_screen" to closingScreen))),
+            ),
+        )
+        whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
+        whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
+
+        val r = uc.execute(
+            owner, sid, Character.JOSEPH,
+            DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
+        )
+
+        assertThat(r.scenePayload["closing_screen"])
+            .describedAs("중첩 extras 블록에 저작된 종결 화면을 못 찾았다 — 실제 ruth.yml 이 이 모양이다")
+            .isEqualTo(closingScreen)
+    }
+
+    /**
+     * `declined_route: closing` 을 선언해 놓고 종결 화면을 저작하지 않으면 던진다.
+     *
+     * 조용히 `end` 로 흘리면 방금 고친 결함이 **새 인물에서 그대로 재발하고**, 그때도
+     * 아무도 모른다 — 그 침묵이 이 버그를 오래 살렸다.
+     */
+    @Test
+    fun `execute 종결 화면 없이 거절 경로를 선언하면 던진다`() {
         val sid = UUID.randomUUID()
         val scenario = Scenario(
             "ruth", "룻",
@@ -162,12 +312,13 @@ class DecideSceneUseCaseTest {
         whenever(sessions.findById(sid)).thenReturn(Optional.of(liveSession(sid, "joseph", null)))
         whenever(loader.forCharacter(Character.JOSEPH)).thenReturn(scenario)
 
-        val r = uc.execute(
-            owner, sid, Character.JOSEPH,
-            DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
-        )
-
-        assertThat(r.scenePayload).isEqualTo(mapOf("type" to "end"))
+        assertThatThrownBy {
+            uc.execute(
+                owner, sid, Character.JOSEPH,
+                DecideSceneUseCase.Input(3, mapOf("value" to "decline"), null, null),
+            )
+        }.isInstanceOf(AppException::class.java)
+            .hasMessageContaining("closing_screen")
     }
 
     /** 마지막 씬의 축약 경로 — 씬은 그대로, 블록이 선언한 override 만 payload 에 덮인다. */
