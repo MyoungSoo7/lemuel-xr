@@ -66,14 +66,14 @@ npcs:
 narration_blocks:
   - id: nb_s2_arrival
     speaker: narrator
-    text_ko: "네가 아버지에게서 보내져 왔다. 떡과 치즈를 형들에게 가져왔다. 너는 아직 심부름꾼일 뿐이다. (삼상 17:17~18)"
+    text_ko: "네가 아버지에게서 보내져 왔다. 떡과 치즈를 형들에게 가져왔다. 너는 아직 심부름꾼일 뿐이다. (삼상 17:17~18 참조)"
     audio_clip_id: aud_s2_arrival_ko
     start_at_seconds: 0.0
     duration_seconds: 14.0
     hidden_until_event: null
   - id: nb_s2_eliab_rebuke
     speaker: eliab
-    text_ko: "네가 어찌하여 이리로 내려왔느냐? 들에 있는 양들을 누구에게 맡겼느냐? 나는 네 교만과 네 마음의 완악함을 아노니, 네가 전쟁을 구경하러 온 것이라. (삼상 17:28)"
+    text_ko: "네가 어찌하여 이리로 내려왔느냐 들에 있는 양들을 누구에게 맡겼느냐 나는 네 교만과 네 마음의 완악함을 아노니 네가 전쟁을 구경하러 왔도다 (삼상 17:28)"
     audio_clip_id: aud_s2_eliab_rebuke_ko
     start_at_seconds: 15.0
     duration_seconds: 16.0

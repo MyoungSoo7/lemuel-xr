@@ -88,7 +88,7 @@ narration_blocks:
     hidden_until_event: "ending_tone:balanced"
   - id: nb_s4_common_gen_45_5
     speaker: joseph_self
-    text_ko: "하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니 (창 45:5)"
+    text_ko: "하나님이 생명을 구원하시려고 나를 당신들보다 먼저 보내셨나이다 (창 45:5)"
     audio_clip_id: aud_s4_common_gen45_5_ko
     start_at_seconds: 16.0
     duration_seconds: 10.0

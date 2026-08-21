@@ -50,14 +50,14 @@ npcs:
 narration_blocks:
   - id: nb_s2_jezebel_threat
     speaker: messenger
-    text_ko: "이세벨이 전하기를 — '내가 내일 이맘때에는 반드시 네 생명을 저 사람들 중 한 사람의 생명 같게 하리라' (열왕기상 19:2)"
+    text_ko: "내가 내일 이맘때에는 반드시 네 생명을 저 사람들 중 한 사람의 생명과 같게 하리라 (열왕기상 19:2)"
     audio_clip_id: aud_s2_threat_ko
     start_at_seconds: 0.0
     duration_seconds: 14.0
     hidden_until_event: null
   - id: nb_s2_flee
     speaker: narrator
-    text_ko: "그가 이 형편을 보고 일어나 자기의 생명을 위해 도망하였다. (열왕기상 19:3)"
+    text_ko: "그가 이 형편을 보고 일어나 자기의 생명을 위해 도망하여… (열왕기상 19:3)"
     audio_clip_id: aud_s2_flee_ko
     start_at_seconds: 20.0
     duration_seconds: 10.0

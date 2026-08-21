@@ -98,7 +98,7 @@ narration_blocks:
     hidden_until_event: user_approached
   - id: nb_s2_bush_calling_name
     speaker: burning_bush
-    text_ko: "모세야, 모세야 (출 3:4)"
+    text_ko: "모세야 모세야 (출 3:4)"
     audio_clip_id: aud_s2_bush_calling_name_ko
     start_at_seconds: 52.0
     duration_seconds: 4.0
@@ -106,7 +106,7 @@ narration_blocks:
     spatial_3d_panning: left_right_both_simultaneous
   - id: nb_s2_response_subtitle
     speaker: subtitle_only
-    text_ko: "내가 여기 있나이다. (출 3:4)"
+    text_ko: "내가 여기 있나이다 (출 3:4)"
     audio_clip_id: null
     start_at_seconds: 56.0
     duration_seconds: 4.0

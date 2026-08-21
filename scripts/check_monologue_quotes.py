@@ -36,14 +36,29 @@
                   **주석 안은 허용** 이고(신학 근거를 적는 자리다) 정본 대조만 한다.
                   코드 안이면 실패다 — 두 벌 상태로 되돌아간 것이기 때문이다.
     E. yml        시나리오·XR 콘텐츠 yml 이 **성경이라고 딱지 붙여 보여 주는 문자열** 이
-                  정본과 같은가. 두 형태를 본다.
+                  정본과 같은가. 네 형태를 본다.
                     E1 라벨   `{ label: "…", scripture: ex-3:11 }` — 라벨이 그 절의 자구인가.
                     E2 인용   `"…" (출 3:12)` — 따옴표 인용 + 참조.
+                    E3 자막   `text_ko: "<절 전문> (창 12:1)"` — XR 낭독 자막. 따옴표가
+                              없을 뿐 화면은 이것을 성경으로 읽어 준다(TTS 가 그대로 읽는다).
+                    E4 강조   `*자구* (출 3:12)` — 따옴표 대신 별표로 두른 인용.
                   2026-08-21 이전에는 둘 다 아무도 안 쟀고, `moses.yml` 카드 라벨 5장 중
                   넷이 의역이었다("제가 누구이기에" / 출 3:11 은 "내가 누구이기에").
                   화면은 `scripture:` 딱지로 "이건 성경이다" 라고 말하면서 성경이 아닌
                   문장을 보여 주고 있었다. 같은 날 `david.yml`·`jesus.yml`·`joseph.yml` 의
                   인용 5건, `content/moses/scene3.yml` 카드 1장도 같은 이유로 고쳤다.
+
+E3·E4 는 왜 나중에 붙었나 (2026-08-22)
+    E1·E2 를 신설한 2026-08-21 시점에 낭독 자막 172건은 **미완화 노출로 docstring 에
+    적어만 두고 재지 않았다.** 그때 손으로 전수 대조한 결과가 32건 불일치였고(자구 변형
+    20 · 무표시 절단 5 · 구두점 7), 게이트를 그날 넓혔다면 즉시 빨강이었기 때문이다.
+    빨강을 baseline 으로 덮는 것은 이 게이트가 고치려던 바로 그 거짓 초록이라, 노출로
+    등재하고 다음 PR 로 미뤘다. 이 파일은 그 다음 PR 이다 — 32건을 개역개정으로
+    정리하고(그중 5건은 애초에 인용이 아니어서 "참조/정서" 표기로 내렸다) 축을 넓혔다.
+    대표적으로 `david/scene3.yml` 사울 대사는 개역한글 자구였고(개역개정은 "네가 가서
+    저 블레셋 사람과 싸울 수 없으리니"), `david/scene5.yml` 은 삼상 17:45 에서 "네가
+    모욕하는 이스라엘 군대의" 를 표시 없이 들어내고 있었다 — 모놀로그에서 고쳤던 바로
+    그 절단이 낭독판에 그대로 남아 있었다.
 
 C 가 `scripture_text_check.py` 와 겹치는 것에 대하여
     겹친다. 그쪽은 시드 201행 전체를 KRV/KLB 해시와 대조한다. 여기는 모놀로그가 여는
@@ -80,16 +95,13 @@ C 가 `scripture_text_check.py` 와 겹치는 것에 대하여
       문맥상 엉뚱한 절을 끌어다 쓴 것은 사람의 몫이다.
     - **인용부호 없이 본문에 녹인 성경 자구.** 참조도 따옴표도 없으면 D 의 추출 대상
       밖이다. 그건 `verse_lines_check.py` 계열의 몫이다.
-    - **`content/**/*.yml` 의 낭독 자막 179건.** XR 낭독판은 `text_ko: "<절 전문> (창 12:1)"`
-      형태로 성경을 통째로 싣는다. E2 는 *따옴표로 감싼 인용* 만 잡으므로 이 형태는
-      밖이다. 2026-08-21 에 손으로 전수 대조한 결과 **179건 중 32건이 개역개정과
-      다르다** (자구 변형 20 · 무표시 절단 5 · 구두점 7). 대표적으로
-      `david/scene3.yml:96` 사울 대사는 개역한글 자구이고(개역개정은 "네가 가서 저
-      블레셋 사람과 싸울 수 없으리니"), `david/scene5.yml:119` 는 삼상 17:45 에서
-      "네가 모욕하는 이스라엘 군대의" 를 표시 없이 들어냈다 — 모놀로그에서 고쳤던
-      바로 그 절단이 낭독판에 그대로 남아 있다. **미완화 노출로 여기 적어 둔다.**
-      게이트를 넓히려면 그 32건을 먼저 정리해야 한다. 지금 넓히면 즉시 빨강이고,
-      빨강을 baseline 으로 덮으면 이 게이트가 2026-08-21 에 고친 그 거짓 초록이 된다.
+    - **"이 참조는 인용이 아니다" 라고 스스로 선언한 문자열.** 괄호 안 참조 뒤에
+      한정어(참조·정서·배경·맥락·요약)가 붙으면 E3·E4 는 그 문자열을 재지 않는다.
+      해설문을 성경 자구로 재면 고칠 수 없는 실패가 나기 때문이다(저자가 성경이라고
+      주장한 적이 없다). 이 한정어는 게이트를 조용히 끄는 스위치가 아니다 — **화면에
+      그대로 떠서** 사용자가 인용이 아님을 읽고, 요약줄이 그 건수를 항상 같이 낸다.
+      그래도 남용은 가능하다: 틀린 자막에 "참조" 를 붙이면 빨강이 사라진다. 기계가
+      막을 수 있는 것은 여기까지고, 그 다음은 리뷰가 센 건수를 보는 것이다.
     - **인용과 참조가 떨어져 있는 문장.** `jesus.yml` 의 `context_line` 은
       `'…알겠사옵나이까' 하는 도마에게 (요 14:5)` 라 따옴표와 참조 사이에 산문이 낀다.
       E2 의 추출 대상 밖이다(그 한 건은 같은 날 손으로 대조해 고쳤다).
@@ -163,12 +175,66 @@ PUNCT = ",.!?;:·…‥、。~-–—"
 
 CITE_RE = re.compile(r"^([가-힣]+)\s?(\d+):(\d+)(?:[-~](\d+))?$")
 
+# 정경 이름의 전체 표기 → 약칭. `content/**/*.yml` 자막은 "(창세기 12:1)" 처럼 전체
+# 이름으로 참조를 달고, TS 모놀로그·시나리오 yml 은 "(창 12:1)" 로 단다. 정본 표는
+# 약칭 하나로 키를 잡아야 한다 — 안 그러면 같은 절이 두 이름으로 두 번 쌓이고,
+# 한쪽만 고친 오자가 다른 쪽 키에 그대로 남는다.
+BOOK_ALIAS = {
+    "창세기": "창", "출애굽기": "출", "레위기": "레", "민수기": "민", "신명기": "신",
+    "여호수아": "수", "사사기": "삿", "룻기": "룻", "사무엘상": "삼상", "사무엘하": "삼하",
+    "열왕기상": "왕상", "열왕기하": "왕하", "에스더": "에", "욥기": "욥", "시편": "시",
+    "잠언": "잠", "전도서": "전", "이사야": "사", "예레미야": "렘", "에스겔": "겔",
+    "다니엘": "단", "마태복음": "마", "마가복음": "막", "누가복음": "눅",
+    "요한복음": "요", "사도행전": "행",
+}
+
+
+def norm_book(name: str) -> str:
+    return BOOK_ALIAS.get(name, name)
+
+
 # E1 은 `cards:` 아래 항목만 본다. 같은 `scripture:` 키가 두 계약을 지고 있기 때문이다.
 #   cards   — "이 라벨이 곧 그 절의 자구" (moses.yml 다섯 변명 카드)
 #   options — "이 선택지가 그 절과 관련" (jesus.yml 의 "길 — 어디로 가야 할지 모를 때",
 #             `scripture: jn-14:6` 은 씬 전체가 여는 절이고 라벨은 설명문이다)
 # 후자를 자구로 재면 설계상 인용이 아닌 문자열을 인용으로 몰아 실패시킨다.
 CARDS_KEY = "cards"
+
+# E3 대상 키 — XR 낭독 자막이 성경 전문을 싣는 자리. `text_ko` 가 거의 전부지만,
+# 같은 형태를 몇 개 키가 나눠 쓴다(카드 전문·기본 자막·요약 자막). 키를 늘릴 때는
+# "그 값이 화면에 그대로 뜨는 자막인가" 를 기준으로 판단한다.
+CAPTION_KEYS = {
+    "text_ko",
+    "card_text_ko",
+    "default_text_ko",
+    "summary_text_ko",
+    "reorientation_text_ko",
+}
+
+# `<자구> (창 12:1)` — 자막 전체가 인용이고 참조가 꼬리에 붙는 형태.
+CAPTION_RE = re.compile(
+    r"^(?P<text>.+?)\s*\((?P<book>[가-힣]+)\s?(?P<ch>\d+):(?P<v>\d+)(?:[-~](?P<ve>\d+))?\)$"
+)
+
+# `*자구* (출 3:12)` — 따옴표 대신 강조 별표로 두른 인용. yml 자막에서만 본다.
+# TS 쪽에도 같은 형태가 있지만 거기 별표는 설계 주석의 소제목이라("*섭리 도입* (창 41:26)")
+# 자구 주장이 아니다. 파일 종류로 나누는 편이 화자 목록보다 덜 틀린다.
+EMPH = re.compile(r"\*(?P<text>[^*\n]{2,200})\*\s*" + REF)
+
+# 참조를 달았지만 *인용이 아닌* 자막. 해설·안내 문장이 근거 절을 괄호로 가리키는
+# 형태다("…라는 뜻이다 (창 45:5)"). 자구로 재면 저자가 쓴 산문을 성경과 대조하게 되고,
+# 그 실패는 고칠 수 없다 — 애초에 성경이라고 주장한 적이 없기 때문이다.
+# 판별을 화자로 하려다 실패했다 — `narrator` 자막 22건 중 20건이 축자 인용이었다.
+# 화자는 "누가 말하는가" 이지 "인용인가" 가 아니다. 그래서 *표기* 로 나눈다:
+# 괄호 안 참조 뒤에 한정어(참조·정서·배경·맥락·요약)가 붙으면 인용 주장이 아니다.
+#
+# 이 한정어는 게이트를 조용히 끄는 스위치가 아니다 — 화면에 그대로 떠서 사용자가
+# "(열왕기상 19:14 정서)" 를 읽고 그것이 인용이 아님을 안다. 저자가 이미 쓰던 표기를
+# (`content/elijah/scene4.yml` 의 "(열왕기상 19:3 정서)") 규칙으로 올린 것이다.
+# 남용을 막는 것은 금지가 아니라 노출이다 — 아래 요약줄이 그 건수를 항상 같이 낸다.
+KIND_KO = {"label": "라벨", "quote": "인용", "caption": "자막", "emphasis": "강조"}
+
+REF_ONLY = re.compile(r"\(([가-힣]+)\s?\d+:\d+(?:[-~]\d+)?\s+(참조|정서|배경|맥락|요약)\)")
 
 
 def sources() -> list[Path]:
@@ -205,6 +271,25 @@ def walk_cards(node) -> list[dict]:
     return found
 
 
+def walk_captions(node, speaker=None) -> list[tuple[str, str | None]]:
+    """자막 문자열을 화자와 함께 모은다.
+
+    화자는 같은 매핑에 있는 `speaker` 를 쓰고, 없으면 바깥 매핑의 것을 물려받는다.
+    `beats:` 항목처럼 화자가 한 단계 위에 붙는 스키마가 섞여 있기 때문이다.
+    """
+    found: list[tuple[str, str | None]] = []
+    if isinstance(node, dict):
+        here = node.get("speaker") if isinstance(node.get("speaker"), str) else speaker
+        for key, value in node.items():
+            if key in CAPTION_KEYS and isinstance(value, str):
+                found.append((value, here))
+            found += walk_captions(value, here)
+    elif isinstance(node, list):
+        for item in node:
+            found += walk_captions(item, speaker)
+    return found
+
+
 def parse_yml(raw: str) -> list[dict]:
     """yml 한 파일에서 E1 라벨·E2 인용을 뽑는다.
 
@@ -227,13 +312,46 @@ def parse_yml(raw: str) -> list[dict]:
                 "pos": at if at >= 0 else 0,
             }
         )
+    for text, speaker in walk_captions(yaml.safe_load(raw)):
+        m = CAPTION_RE.match(text.strip())
+        if not m:
+            continue
+        body = m.group("text").strip()
+        # 통째로 따옴표에 싸인 자막은 E2 가 이미 잰다. 여기서 또 재면 같은 실패가 두 번 뜬다.
+        if body[:1] in QUOTE_CHARS and body[-1:] in QUOTE_CHARS:
+            continue
+        at = raw.find(text.strip()[:40])
+        out.append(
+            {
+                "kind": "caption",
+                "text": body,
+                "book": norm_book(m.group("book")),
+                "chapter": int(m.group("ch")),
+                "verse": int(m.group("v")),
+                "end": int(m.group("ve")) if m.group("ve") else None,
+                "speaker": speaker,
+                "pos": at if at >= 0 else 0,
+            }
+        )
     prepared, idx = prepare(raw)
+    for m in EMPH.finditer(prepared):
+        out.append(
+            {
+                "kind": "emphasis",
+                "text": m.group("text"),
+                "book": norm_book(m.group(2)),
+                "chapter": int(m.group(3)),
+                "verse": int(m.group(4)),
+                "end": int(m.group(5)) if m.group(5) else None,
+                "pos": idx[m.start()],
+            }
+        )
     for m in QUOTED.finditer(prepared):
         out.append(
             {
                 "kind": "quote",
                 "text": m.group("text"),
-                "book": m.group(2),
+                "book": norm_book(m.group(2)),
                 "chapter": int(m.group(3)),
                 "verse": int(m.group(4)),
                 "end": int(m.group(5)) if m.group(5) else None,
@@ -376,7 +494,7 @@ def parse_literals(raw: str) -> list[dict]:
         out.append(
             {
                 "text": m.group("text").strip(),
-                "book": m.group(2),
+                "book": norm_book(m.group(2)),
                 "chapter": int(m.group(3)),
                 "verse": int(m.group(4)),
                 "end": int(m.group(5)) if m.group(5) else None,
@@ -529,6 +647,7 @@ BOOK_CODE = {
     "마": "mat", "막": "mrk", "눅": "luk", "요": "jhn", "행": "act",
     "롬": "rom", "고전": "1co", "고후": "2co", "갈": "gal", "엡": "eph",
     "빌": "php", "골": "col", "히": "heb", "약": "jas", "계": "rev",
+    "에": "est",
 }
 TAG = re.compile(r"<[^>]+>")
 # 각주 팝업(`<div class=D2 …>`)은 화면에서 숨어 있지만 마크업상 절 본문 **뒤** 에
@@ -803,12 +922,19 @@ def main() -> int:
             )
 
     # ── E. yml 이 성경이라 딱지 붙인 문자열 ───────────────────────────────
+    #   E1 라벨   `cards:` 의 label — `scripture:` 가 그 절의 자구라고 딱지 붙인 것
+    #   E2 인용   따옴표 + 참조
+    #   E3 자막   `text_ko` 류 낭독 자막 전체가 인용이고 참조가 꼬리에 붙은 것
+    #   E4 강조   따옴표 대신 별표로 두른 인용
     e_items: list[dict] = []
     for f in yml_sources():
         raw = f.read_text(encoding="utf-8")
         for item in parse_yml(raw):
             item["site"] = f"{f.relative_to(ROOT)}:{line_of(raw, item['pos'])}"
             e_items.append(item)
+    ref_only_n = sum(
+        len(REF_ONLY.findall(f.read_text(encoding="utf-8"))) for f in yml_sources()
+    )
     e_tally: dict[str, int] = {}
     for item in e_items:
         if item["kind"] == "label":
@@ -831,7 +957,7 @@ def main() -> int:
         item["verdict"] = verdict
         e_tally[verdict] = e_tally.get(verdict, 0) + 1
         if verdict not in PASSING:
-            kind = "라벨" if item["kind"] == "label" else "인용"
+            kind = KIND_KO[item["kind"]]
             fails.append(
                 f"✗ [E {kind}] [{verdict}] {where}  {item['site']}\n"
                 f"    문자열 {item['text']}\n"
@@ -871,9 +997,12 @@ def main() -> int:
         f" · C 시드↔정본 {len(c_refs)}건 ({c_sum})"
         f" · D 리터럴 {len(literals)}건 (주석 {in_comment_n} · 코드 "
         f"{len(literals) - in_comment_n})"
-        f" · E yml {len(e_items)}건 "
-        f"(라벨 {sum(1 for x in e_items if x['kind'] == 'label')} · "
-        f"인용 {sum(1 for x in e_items if x['kind'] == 'quote')})"
+        f" · E yml {len(e_items)}건 ("
+        + " · ".join(
+            f"{KIND_KO[k]} {sum(1 for x in e_items if x['kind'] == k)}"
+            for k in ("label", "quote", "caption", "emphasis")
+        )
+        + f") · 참조 표기 {ref_only_n}건"
     )
     if fails:
         print(f"실패 {len(fails)}건")

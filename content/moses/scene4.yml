@@ -72,7 +72,7 @@ narration_blocks:
     note: "Pre-Scene 4 R4 2차 동의 카드 통과 후 진입. skip 선택 시 narration_only_path 로 분기"
   - id: nb_s4_bush_question_staff
     speaker: burning_bush
-    text_ko: "네 손에 있는 것이 무엇이냐. (출 4:2)"
+    text_ko: "네 손에 있는 것이 무엇이냐 (출 4:2)"
     audio_clip_id: aud_s4_bush_q_staff_ko
     start_at_seconds: 0.0
     duration_seconds: 4.0
@@ -86,21 +86,21 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s4_bush_command_throw
     speaker: burning_bush
-    text_ko: "그것을 땅에 던지라. (출 4:3)"
+    text_ko: "그것을 땅에 던지라 (출 4:3)"
     audio_clip_id: aud_s4_bush_throw_ko
     start_at_seconds: 10.0
     duration_seconds: 4.0
     hidden_until_event: null
   - id: nb_s4_bush_command_grab_tail
     speaker: burning_bush
-    text_ko: "네 손을 내밀어 그 꼬리를 잡으라. (출 4:4)"
+    text_ko: "네 손을 내밀어 그 꼬리를 잡으라 (출 4:4)"
     audio_clip_id: aud_s4_bush_grab_tail_ko
     start_at_seconds: 30.0
     duration_seconds: 5.0
     hidden_until_event: staff_thrown_to_snake
   - id: nb_s4_bush_command_hand_to_chest
     speaker: burning_bush
-    text_ko: "네 손을 품에 넣으라. (출 4:6)"
+    text_ko: "네 손을 품에 넣으라 (출 4:6)"
     audio_clip_id: aud_s4_bush_hand_in_ko
     start_at_seconds: 60.0
     duration_seconds: 4.0
@@ -115,7 +115,7 @@ narration_blocks:
     note: "나병 묘사는 시각적 자극 없음 — 부드러운 흰 빛 layer 만"
   - id: nb_s4_bush_command_hand_again
     speaker: burning_bush
-    text_ko: "네 손을 다시 품에 넣으라. (출 4:7)"
+    text_ko: "네 손을 다시 품에 넣으라 (출 4:7)"
     audio_clip_id: aud_s4_bush_hand_in_again_ko
     start_at_seconds: 80.0
     duration_seconds: 4.0

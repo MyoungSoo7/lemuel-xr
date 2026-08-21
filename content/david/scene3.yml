@@ -93,7 +93,7 @@ narration_blocks:
     note: "3초 침묵 후 사용자가 주변 둘러봄 — 사울 군대 위축 표정 강조 (LOD 가까운 단계)"
   - id: nb_s3_saul_approach
     speaker: saul
-    text_ko: "네가 이 블레셋 사람을 대적하여 함께 싸우기에 능치 못하리니, 너는 소년이요 그는 어려서부터 용사임이니라. (삼상 17:33)"
+    text_ko: "네가 가서 저 블레셋 사람과 싸울 수 없으리니 너는 소년이요 그는 어려서부터 용사임이니라 (삼상 17:33)"
     audio_clip_id: aud_s3_saul_approach_ko
     start_at_seconds: 40.0
     duration_seconds: 12.0
@@ -107,14 +107,14 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s3_armor_caption
     speaker: scripture_caption
-    text_ko: "왕이 자기 군복으로 다윗에게 입히고 놋 투구를 그의 머리에 씌우고 또 그에게 갑옷을 입히매… (삼상 17:38)"
+    text_ko: "이에 사울이 자기 군복을 다윗에게 입히고 놋 투구를 그의 머리에 씌우고 또 그에게 갑옷을 입히매… (삼상 17:38)"
     audio_clip_id: aud_s3_armor_caption_ko
     start_at_seconds: 65.0
     duration_seconds: 8.0
     hidden_until_event: armor_wear_start
   - id: nb_s3_david_decision
     speaker: david_inner
-    text_ko: "내가 익히지 아니하였으니 이것을 입고 가지 못하겠나이다. (삼상 17:39)"
+    text_ko: "익숙하지 못하니 이것을 입고 가지 못하겠나이다 (삼상 17:39)"
     audio_clip_id: aud_s3_david_decision_ko
     start_at_seconds: 95.0
     duration_seconds: 8.0

@@ -46,7 +46,7 @@ npcs:
 narration_blocks:
   - id: nb_s3_lack_1
     speaker: scripture_caption
-    text_ko: "나는 자식이 없사오니 나의 상속자는 다메섹 사람 엘리에셀이니이다 (창세기 15:2)"
+    text_ko: "나는 자식이 없사오니 나의 상속자는 이 다메섹 사람 엘리에셀이니이다 (창세기 15:2)"
     citation_id: A_gen15_2
     audio_clip_id: aud_s3_lack_1_ko
     start_at_seconds: 0.0
