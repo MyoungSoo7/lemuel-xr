@@ -28,7 +28,7 @@ npcs: []
 narration_blocks:
   - id: nb_s5_scripture_centered
     speaker: scripture_text_only
-    text_ko: "하나님이 생명을 구원하시려고 나를 너희 앞서 보내셨나니\n(창 45:5)"
+    text_ko: "하나님이 생명을 구원하시려고 나를 당신들보다 먼저 보내셨나이다\n(창 45:5)"
     audio_clip_id: aud_s5_gen45_5_ko_softvoice
     audio_clip_id_optout: null
     start_at_seconds: 0.0

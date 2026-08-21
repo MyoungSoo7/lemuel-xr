@@ -84,7 +84,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s3_sword_order
     speaker: solomon_self
-    text_ko: "칼을 가져오라 … 산 아이를 둘로 나누어 반은 이 여자에게 주고 반은 저 여자에게 주라 (열왕기상 3:24~25)"
+    text_ko: "칼을 내게로 가져오라 … 산 아이를 둘로 나누어 반은 이 여자에게 주고 반은 저 여자에게 주라 (열왕기상 3:24~25)"
     audio_clip_id: aud_s3_sword_order_ko
     audio_clip_id_low: aud_s3_sword_order_ko_low
     start_at_seconds: 70.0

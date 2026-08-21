@@ -55,7 +55,7 @@ npcs:
 narration_blocks:
   - id: nb_s5_goliath_third_shout
     speaker: goliath
-    text_ko: "네가 나를 개로 여기고 막대기를 가지고 내게 나아왔느냐… 네 살을 공중의 새와 들짐승에게 주리라. (삼상 17:43~44)"
+    text_ko: "네가 나를 개로 여기고 막대기를 가지고 내게 나아왔느냐… 내가 네 살을 공중의 새들과 들짐승들에게 주리라 (삼상 17:43~44)"
     audio_clip_id: aud_s5_goliath_third_shout_ko_strong
     audio_clip_id_low: aud_s5_goliath_third_shout_ko_low
     audio_clip_id_off: null
@@ -116,7 +116,7 @@ narration_blocks:
     hidden_until_event: "first_stone_emotion:null"
   - id: nb_s5_scripture_caption
     speaker: scripture_caption
-    text_ko: "너는 칼과 창과 단창으로 내게 나아오거니와 나는 만군의 여호와의 이름으로 네게 나아가노라. (삼상 17:45)"
+    text_ko: "너는 칼과 창과 단창으로 내게 나아오거니와 나는 만군의 여호와의 이름 곧 네가 모욕하는 이스라엘 군대의 하나님의 이름으로 네게 나아가노라 (삼상 17:45)"
     audio_clip_id: aud_s5_scripture_caption_ko
     start_at_seconds: 30.0
     duration_seconds: 10.0

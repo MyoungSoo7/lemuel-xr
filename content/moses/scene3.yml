@@ -157,7 +157,7 @@ narration_blocks:
     follow_up_block: nb_s3_comfort_card_1
   - id: nb_s3_bush_response_card_2
     speaker: burning_bush
-    text_ko: "스스로 있는 자니라… 너는 이스라엘 자손에게 이같이 이르라 *스스로 있는 자* 가 나를 너희에게 보내셨다 하라 (출 3:14)"
+    text_ko: "나는 스스로 있는 자이니라… 너는 이스라엘 자손에게 이같이 이르기를 *스스로 있는 자* 가 나를 너희에게 보내셨다 하라 (출 3:14)"
     audio_clip_id: aud_s3_bush_card_2_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0
@@ -183,7 +183,7 @@ narration_blocks:
     follow_up_block: nb_s3_comfort_card_4
   - id: nb_s3_bush_response_card_5
     speaker: burning_bush
-    text_ko: "네 형 아론이 있지 아니하냐… 네가 그에게 말하고 그의 입에 말을 줄 것이요 내가 네 입과 그의 입에 함께 있어서 (출 4:14~16)"
+    text_ko: "네 형 아론이 있지 아니하냐… 너는 그에게 말하고 그의 입에 할 말을 주라 내가 네 입과 그의 입에 함께 있어서 (출 4:14~15)"
     audio_clip_id: aud_s3_bush_card_5_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0

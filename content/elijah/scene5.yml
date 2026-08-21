@@ -56,7 +56,7 @@ narration_blocks:
     hidden_until_event: null
     # F-6.3 opt-out 기본 ON: 정적 큐레이션(본문 한 줄)이 *기본 경로*. LLM 생성은 사용자가 명시적으로 켠 경우에만 쓰는 *opt-in 예외 경로*(fallback 아님).
     default_path: static_curation
-    default_text_ko: "그러나 내가 이스라엘 가운데에 칠천 명을 남기리니 다 바알에게 무릎을 꿇지 아니하였느니라 (열왕기상 19:18)"
+    default_text_ko: "그러나 내가 이스라엘 가운데에 칠천 명을 남기리니 다 바알에게 무릎을 꿇지 아니하고 다 바알에게 입맞추지 아니한 자니라 (열왕기상 19:18)"
     llm_optin_only: true # 기본 OFF — AI 응답을 사용자가 명시적으로 opt-in 했을 때만 활성
     llm_prompt_key_map:
       loneliness: "elijah_s5_god_response_loneliness"
@@ -65,7 +65,7 @@ narration_blocks:
     conditional_softening_ref: F66_recovery_state_gate # 취약 상태 이력 시 소프트닝/스킵 (Edit D)
   - id: nb_s5_mantle_caption
     speaker: scripture_caption
-    text_ko: "엘리야가 그리로부터 떠나 … 겉옷을 그의 위에 던지니라 (열왕기상 19:19)"
+    text_ko: "엘리야가 거기서 떠나… 겉옷을 그의 위에 던졌더니 (열왕기상 19:19)"
     audio_clip_id: aud_s5_mantle_ko
     start_at_seconds: 18.0
     duration_seconds: 8.0

@@ -49,7 +49,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s4_wind
     speaker: scripture_caption
-    text_ko: "크고 강한 바람이… 그러나 여호와께서 바람 가운데에 계시지 아니하며 (열왕기상 19:11)"
+    text_ko: "크고 강한 바람이… 바람 가운데에 여호와께서 계시지 아니하며 (열왕기상 19:11)"
     audio_clip_id: aud_s4_wind_ko
     start_at_seconds: 15.0
     duration_seconds: 8.0
@@ -57,7 +57,7 @@ narration_blocks:
     intensity_aware: true
   - id: nb_s4_quake
     speaker: scripture_caption
-    text_ko: "지진이… 지진 가운데에도 계시지 아니하며 (열왕기상 19:11)"
+    text_ko: "지진이… 지진 가운데에도 여호와께서 계시지 아니하며 (열왕기상 19:11)"
     audio_clip_id: aud_s4_quake_ko
     start_at_seconds: 25.0
     duration_seconds: 7.0
@@ -65,7 +65,7 @@ narration_blocks:
     intensity_aware: true
   - id: nb_s4_fire
     speaker: scripture_caption
-    text_ko: "불이… 불 가운데에도 계시지 아니하더니 (열왕기상 19:12)"
+    text_ko: "불이… 불 가운데에도 여호와께서 계시지 아니하더니 (열왕기상 19:12)"
     audio_clip_id: aud_s4_fire_ko
     start_at_seconds: 35.0
     duration_seconds: 7.0
@@ -135,12 +135,12 @@ branches:
     llm_optin_only: true
     routes:
       - when: { lament_label: loneliness }
-        card_text_ko: "오직 나만 홀로 남았습니다 (열왕기상 19:14)"
+        card_text_ko: "오직 나만 홀로 남았습니다 (열왕기상 19:14 정서)"
         gesture: card_to_chest
         llm_prompt_key: "elijah_s4_lament_loneliness_1_3"
         carry_to_scene5: { god_response_tone: not_alone_seven_thousand }
       - when: { lament_label: burnout }
-        card_text_ko: "내가 열심을 다했으나 소용이 없습니다 (열왕기상 19:14)"
+        card_text_ko: "내가 열심을 다했으나 소용이 없습니다 (열왕기상 19:14 정서)"
         gesture: card_place_down
         llm_prompt_key: "elijah_s4_lament_burnout_2_3"
         carry_to_scene5: { god_response_tone: companion_elisha }

@@ -52,7 +52,7 @@ npcs:
 narration_blocks:
   - id: nb_s4_scripture_caption
     speaker: scripture_caption
-    text_ko: "시냇가에서 매끄러운 돌 다섯을 골라 자기 목자의 제구 곧 주머니에 넣고… (삼상 17:40)"
+    text_ko: "시내에서 매끄러운 돌 다섯을 골라서 자기 목자의 제구 곧 주머니에 넣고… (삼상 17:40)"
     audio_clip_id: aud_s4_scripture_caption_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0
