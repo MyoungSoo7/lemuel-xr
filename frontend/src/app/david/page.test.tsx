@@ -17,12 +17,29 @@ vi.mock("@/lib/api/game", () => ({
   completeMission: vi.fn(),
 }));
 
+/*
+  성경 자구는 `/api/scripture` 에서 온다. 실물 왕복만 막고, 응답은 **시드 SQL 을 그대로
+  읽어** 돌려준다(`src/test/seed-passages.ts`) — 자구 사본을 테스트에 또 적으면 이 변경이
+  없애려던 "두 벌" 이 세 벌이 된다.
+
+  이 모킹이 없으면 `MonologueText` 가 전부 "본문 로드 중..." 으로 남는다. 그때 실패하는
+  것은 모놀로그 단언이므로, 원인이 배선이 아니라 자구 공급이라는 게 바로 보이지 않는다.
+*/
+vi.mock("@/lib/api/content", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/content")>()),
+  fetchScripturePassage: vi.fn(),
+}));
+
 import {
   completeMission,
   decideMission,
   startMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+
+import { fetchScripturePassage } from "@/lib/api/content";
+import { render as renderMonologue, seedPassage } from "@/test/seed-passages";
+import type { Monologue } from "@/lib/content/scripture-quote";
 import {
   scene1Psalm23,
   scene2Reactions,
@@ -188,12 +205,20 @@ function deferred<T>() {
  * 부분 일치가 아니라 완전 일치를 쓴다.
  */
 const squash = (s: string) => s.replace(/\s+/g, " ").trim();
-const paragraphMatcher =
-  (expected: string) => (_content: string, el: Element | null) =>
-    el?.tagName === "P" && squash(el.textContent ?? "") === squash(expected);
-const findParagraph = (expected: string) =>
+/**
+ * 기대값은 이제 문자열이 아니라 **모놀로그 조각 배열** 이다(`scripture-quote.ts`). 화면에
+ * 뜨는 것은 그 조각에 `/api/scripture` 자구를 채운 결과이므로, 비교 전에 같은 규칙으로
+ * 해석해 둔다 — 조각 배열을 그대로 비교하면 인용이 통째로 빠져도 매칭이 성립한다.
+ * 해석은 매처마다 한 번만 한다(매처 함수는 DOM 노드마다 불린다).
+ */
+const paragraphMatcher = (expected: Monologue) => {
+  const text = squash(renderMonologue(expected));
+  return (_content: string, el: Element | null) =>
+    el?.tagName === "P" && squash(el.textContent ?? "") === text;
+};
+const findParagraph = (expected: Monologue) =>
   screen.findByText(paragraphMatcher(expected));
-const queryParagraph = (expected: string) =>
+const queryParagraph = (expected: Monologue) =>
   screen.queryByText(paragraphMatcher(expected));
 
 function renderPage() {
@@ -225,6 +250,7 @@ Object.defineProperty(window, "location", {
 });
 
 beforeEach(() => {
+  vi.mocked(fetchScripturePassage).mockImplementation(seedPassage);
   navigatedTo = null;
   startMock.mockReset();
   decideMock.mockReset();

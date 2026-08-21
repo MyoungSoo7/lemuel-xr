@@ -199,6 +199,13 @@ jobs:
               # *정본 쪽을 고쳐서* 초록이 되는 길이 열린다.
               - 'docs/verses-monologues-gae.txt'
               - 'scripts/check_monologue_quotes.py'
+              # 자구가 프론트를 떠나 시드로 옮겨 간 뒤(2026-08-21)로는 **시드도 입력**
+              # 이다. C 축이 그 시드를 정본과 대조하고, A 축이 그 시드로 클립을 푼다.
+              # 여기 없으면 시드만 고친 PR 에서 잡이 안 돌아, 훼손된 자구가 화면에
+              # 도달하는 그 순간에 게이트가 침묵한다. 프론트 테스트도 같은 시드를
+              # 읽는다(frontend/src/test/seed-passages.ts).
+              - 'backend/src/main/resources/db/migration/**'
+              - 'scripts/scripture_text_check.py'
 
   backend:
     needs: changes
@@ -462,7 +469,7 @@ jobs:
       - name: R4 consent gate wiring
         run: python3 scripts/check_frontend_trigger_warning.py
 
-      # 모놀로그 성경 인용 원문 대조 게이트 (2026-08-21 신설).
+      # 모놀로그 성경 인용 게이트 (2026-08-21 신설 · 같은 날 재작성).
       #
       # DB 본문은 2026-07-18 교정 마이그레이션(V20260718004903) 이후 원문 대조
       # 체계 안에 있는데, **프론트 문자열은 그 체계 밖이었다** — 이 게이트를 만들기
@@ -470,8 +477,15 @@ jobs:
       # 하나도 없었다. 전수 대조에서 47건 중 21건이 개역개정과 달랐다
       # (어미·인칭 변형, 무표시 중간절단, 원문에 없는 쉼표).
       #
-      # 이것도 gate-baseline 이 아니라 **진짜 합격·불합격**이다. 21건을 다 고쳐
-      # 지금 실제로 초록이므로, 빨강이면 그건 새로 들어온 훼손이다.
+      # 그 21건의 원인이 "자구가 DB 와 프론트 두 벌" 이라, 같은 날 프론트에서 자구를
+      # 걷어내고 /api/scripture 에서 받게 바꿨다. 그 순간 원래 질문("프론트 자구가
+      # 정본과 같은가")은 **잴 대상이 없어져 구조적으로 실패할 수 없게** 됐고, 이
+      # 게이트는 주석에 남은 4건만 보고 초록을 냈다. 그래서 질문을 넷으로 바꿔 다시
+      # 썼다: A 클립이 시드로 풀리는가 · B 인용 표기가 그 참조를 덮는가 ·
+      # C 시드 자구가 개역개정 축자인가 · D 자구가 코드로 다시 기어들어왔는가.
+      #
+      # 이것도 gate-baseline 이 아니라 **진짜 합격·불합격**이다. 지금 실제로 초록이므로
+      # (A 43/43 · B 43/43 · C 30 MATCH · D 코드 0), 빨강이면 새로 들어온 훼손이다.
       # 정본 표(docs/verses-monologues-gae.txt)는 리포에 있으므로 CI 는 네트워크를
       # 쓰지 않는다 — 1차 출처 파싱은 --refresh 로 사람이 돌린다.
       - name: Monologue scripture quote gate

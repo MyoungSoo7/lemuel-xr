@@ -172,7 +172,11 @@ KRV_SCRIPT_RE = re.compile(r"<script\b.*?</script>", re.S)
 # 각주 팝업(class=D2)은 화면에 숨어 있지만 마크업상 본문 뒤에 붙어 있다. 그냥 두면
 # "교훈"(시 42:1) · "시 22:1"(마 27:46) 이 절 끝에 따라붙는다.
 KRV_POPUP_RE = re.compile(r"<div[^>]*class=D2\b.*?</div>", re.S | re.I)
-KRV_FOOTMARK_RE = re.compile(r"[ㄱ-ㅎ]\)")
+# 각주 표시는 두 벌이다 — 관주는 `ㄱ)`, 난하주는 `4)` 처럼 **숫자** 다. 초판은 앞의
+# 한 벌만 지웠고, 그 결과 `jn-1:14` 이 "은혜와 4)진리가 충만하더라" 로 시드에 앉았다
+# (`V20260821030000` 에 그대로 실려 배포됨). 숫자 표시를 빼먹으면 각주 번호가 성경
+# 본문인 척 화면에 뜬다.
+KRV_FOOTMARK_RE = re.compile(r"(?:[ㄱ-ㅎ]|\d+)\)")
 
 
 def fetch_chapter_krv(book: str, chapter: int) -> dict[tuple[int, int], str]:

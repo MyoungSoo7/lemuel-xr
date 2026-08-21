@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { NarrationAudioButton } from "@/components/NarrationAudioButton";
+import { MonologueText } from "@/components/MonologueText";
 import {
   startMission,
   decideMission,
@@ -11,6 +11,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  allRefs,
   scene1Incarnation,
   scene2Beatitudes,
   scene3Touch,
@@ -22,6 +23,8 @@ import {
   scene7CrisisReminder,
   iamOf,
 } from "@/lib/content/jesus-monologues";
+import type { Monologue } from "@/lib/content/scripture-quote";
+import { useMonologueTexts } from "@/lib/hooks/useMonologueTexts";
 import { SceneBootState } from "@/components/SceneBootState";
 import { ScenePassage } from "@/components/ScenePassage";
 import {
@@ -63,7 +66,11 @@ type Scene = JosephStartResponse;
 
 interface DecisionEcho {
   fromScene: number;
-  text: string;
+  /**
+   * 자구가 아니라 *조각* 을 든다 — 성경 인용은 `/api/scripture` 에서 채워진다.
+   * backend 의 `responseText` 는 산문 한 덩어리이므로 `[text]` 로 감싸 넣는다.
+   */
+  monologue: Monologue;
 }
 
 interface OptionLike {
@@ -95,8 +102,10 @@ export default function JesusPage() {
     onSuccess: (d, vars) => {
       // backend responseText 우선, 없으면 frontend fallback (jesus 는 항상 fallback).
       const local = buildLocalEcho(vars.sceneId, vars.decision);
-      const text = d.responseText ?? local ?? null;
-      if (text) setEcho({ fromScene: vars.sceneId, text });
+      const monologue: Monologue | null = d.responseText
+        ? [d.responseText]
+        : (local ?? null);
+      if (monologue) setEcho({ fromScene: vars.sceneId, monologue });
       else setEcho(null);
       setPassionConsented(false); // R4 — 다음 씬 진입 시 동의 게이트 초기화
       setScene(d);
@@ -109,10 +118,13 @@ export default function JesusPage() {
   }, [scene, start]);
 
   // Scene 7 (outro) 진입 시 승천·생명의 강 텍스트
-  const outroText = useMemo(() => {
+  const outroMonologue = useMemo(() => {
     if (scene?.currentScene !== 7) return null;
     return scene7Ascension;
   }, [scene?.currentScene]);
+
+  // 이 화면의 모놀로그가 인용하는 절 전부를 한 번에 연다(`ScenePassage` 와 캐시 공유).
+  const monologueTexts = useMonologueTexts(allRefs);
 
   if (!scene) {
     return (
@@ -174,10 +186,11 @@ export default function JesusPage() {
       {/* Decision echo — 직전 결정/씬의 모놀로그 */}
       {echo && (
         <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
-          <p className="whitespace-pre-line">{echo.text}</p>
-          <div className="mt-2">
-            <NarrationAudioButton text={echo.text} onUnavailable="hide" />
-          </div>
+          <MonologueText
+            monologue={echo.monologue}
+            source={monologueTexts}
+            audioWrapperClassName="mt-2"
+          />
           <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
             * AI 보조 — 본문은 성경 참조 *
           </p>
@@ -256,15 +269,11 @@ export default function JesusPage() {
               <>
                 {scene.currentScene === 1 && (
                   <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                      {scene1Incarnation}
-                    </p>
-                    <div className="mt-3">
-                      <NarrationAudioButton
-                        text={scene1Incarnation}
-                        onUnavailable="hide"
-                      />
-                    </div>
+                    <MonologueText
+                      monologue={scene1Incarnation}
+                      source={monologueTexts}
+                      className="text-sm text-[var(--color-warm)]/90 leading-relaxed"
+                    />
                   </div>
                 )}
                 <button
@@ -345,12 +354,20 @@ export default function JesusPage() {
             {/* Scene 7 — outro (승천·생명의 강 + 위기 라우팅) */}
             {sceneType === "outro" && (
               <div className="text-center space-y-4">
-                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-                  {outroText}
-                </p>
-                <p className="text-xs whitespace-pre-line text-[var(--color-warm)]/60 max-w-prose mx-auto not-italic">
-                  {scene7CrisisReminder}
-                </p>
+                <MonologueText
+                  monologue={outroMonologue}
+                  source={monologueTexts}
+                  audio={false}
+                  className="text-base text-[var(--color-warm)]/90 italic max-w-prose mx-auto"
+                />
+                {/* R1 — 위기 안내는 인용이 없다. `/api/scripture` 가 통째로 죽어도 뜬다. */}
+                <MonologueText
+                  monologue={scene7CrisisReminder}
+                  source={monologueTexts}
+                  audio={false}
+                  testId="crisis-reminder-text"
+                  className="text-xs text-[var(--color-warm)]/60 max-w-prose mx-auto not-italic"
+                />
                 <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
                   * AI 보조 — 본문은 성경 참조 *
                 </p>
@@ -530,7 +547,10 @@ function GestureSequence({
  * Scene 5 skip(건너뛰기) 시엔 십자가 고난 echo 를 띄우지 않는다 (R4).
  * Scene 4 는 선택(길/진리/생명)에 따른 예수의 응답 + teaching_note.
  */
-function buildLocalEcho(fromScene: number, decision: unknown): string | null {
+function buildLocalEcho(
+  fromScene: number,
+  decision: unknown,
+): Monologue | null {
   switch (fromScene) {
     case 2: // 팔복
       return scene2Beatitudes;
@@ -538,8 +558,9 @@ function buildLocalEcho(fromScene: number, decision: unknown): string | null {
       return scene3Touch;
     case 4: {
       // 길·진리·생명 — 선택 분기 응답 + 세 얼굴이 한 분임(요 14:6 의도)
+      // 이어붙이기는 *조각 단위* 다. 문자열로 먼저 합치면 인용 위치를 잃는다.
       const iam = iamOf(readValue(decision));
-      return `${scene4Iam[iam]}\n\n${scene4Teaching}`;
+      return [...scene4Iam[iam], "\n\n", ...scene4Teaching];
     }
     case 5:
       // 건너뛰기(skip) 시엔 십자가 고난 묘사 echo 를 띄우지 않는다 (R4).

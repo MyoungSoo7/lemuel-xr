@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { render } from "@/test/seed-passages";
 import {
   scene1Dream,
   scene2Monologues,
@@ -19,6 +20,11 @@ import {
  *
  * 선택지 id 의 정본은 `backend/src/main/resources/scenarios/joseph.yml` 이다. 프론트 Record 의
  * 키가 그 id 집합과 어긋나는 순간 조회가 undefined 로 떨어진다 — 그 어긋남을 여기서 잡는다.
+ *
+ * 모놀로그는 이제 자구가 아니라 산문 + 인용 *조각* 이다(`scripture-quote.ts`). 그래서 여기서
+ * 재는 "비어 있지 않다" 는 `render()` 로 시드 자구를 채운 뒤의 **화면 문자열** 이어야 한다 —
+ * 조각만 보면 인용이 통째로 못 풀려도 배열은 여전히 비어 있지 않기 때문이다. `render()` 는
+ * 해석에 실패하면 던진다.
  */
 
 /** joseph.yml Scene 2 `options[].id` (47~49행). 저장 비율 3분기. */
@@ -35,8 +41,9 @@ describe("요셉 미션 모놀로그", () => {
   describe("씬 1~5 가 빠짐없이 텍스트를 갖는다", () => {
     // 씬 연속성. 5개 씬 중 하나라도 텍스트 소스가 없으면 그 씬은 빈 화면이 된다.
     it("Scene 1 도입부가 비어 있지 않다", () => {
-      expect(scene1Dream.trim().length).toBeGreaterThan(0);
-      expect(scene1Dream).toMatch(SCRIPTURE_REF);
+      const text = render(scene1Dream);
+      expect(text.trim().length).toBeGreaterThan(0);
+      expect(text).toMatch(SCRIPTURE_REF);
     });
 
     it("Scene 2~5 의 모든 분기 텍스트가 비어 있지 않다", () => {
@@ -49,8 +56,9 @@ describe("요셉 미션 모놀로그", () => {
       for (const record of records) {
         const entries = Object.entries(record);
         expect(entries.length).toBeGreaterThan(0);
-        for (const [key, text] of entries) {
-          expect(typeof text, `${key} 는 문자열이어야 한다`).toBe("string");
+        for (const [key, monologue] of entries) {
+          // 해석 실패는 `render` 가 던진다 — 여기까지 왔다면 인용이 전부 자구를 얻었다.
+          const text = render(monologue);
           expect(text.trim().length, `${key} 가 빈 문자열`).toBeGreaterThan(0);
           // 문자열 연결 중 undefined 가 섞여 들어가는 사고를 잡는다.
           expect(text).not.toContain("undefined");
@@ -87,8 +95,13 @@ describe("요셉 미션 모놀로그", () => {
         const pattern = scene3DecisionToPattern({ priority: id });
         expect(pattern, `${id} 가 매핑되지 않음`).not.toBeNull();
         // 매핑만 되고 텍스트가 없으면 결국 빈 화면이다. 텍스트까지 확인해야 의미가 있다.
-        expect(scene3Outcomes[pattern as Scene3Pattern]).toBeTruthy();
-        expect(scene5OutroByScene3[pattern as Scene3Pattern]).toBeTruthy();
+        // 빈 배열도 truthy 라 `toBeTruthy` 로는 못 잡는다 — 해석한 길이로 잰다.
+        expect(
+          render(scene3Outcomes[pattern as Scene3Pattern]).length,
+        ).toBeGreaterThan(0);
+        expect(
+          render(scene5OutroByScene3[pattern as Scene3Pattern]).length,
+        ).toBeGreaterThan(0);
       }
     });
 
@@ -114,22 +127,25 @@ describe("요셉 미션 모놀로그", () => {
 
   describe("결말 텍스트의 성질", () => {
     it("세 결말이 서로 다르다 — 복붙으로 분기가 무의미해지는 회귀 방지", () => {
-      const outros = Object.values(scene5OutroByScene3);
+      // 조각 배열끼리는 참조 비교라 늘 다르다. **해석한 문자열** 로 재야 복붙을 잡는다.
+      const outros = Object.values(scene5OutroByScene3).map(render);
       expect(new Set(outros).size).toBe(outros.length);
-      const outcomes = Object.values(scene3Outcomes);
+      const outcomes = Object.values(scene3Outcomes).map(render);
       expect(new Set(outcomes).size).toBe(outcomes.length);
     });
 
     it("모든 결말이 본문 인용을 포함한다", () => {
-      for (const [key, text] of Object.entries(scene5OutroByScene3)) {
-        expect(text, `${key} 결말에 성경 인용 없음`).toMatch(SCRIPTURE_REF);
+      for (const [key, monologue] of Object.entries(scene5OutroByScene3)) {
+        expect(render(monologue), `${key} 결말에 성경 인용 없음`).toMatch(
+          SCRIPTURE_REF,
+        );
       }
     });
 
     it("결말은 창 50:20 을 공통 축으로 갖는다", () => {
       // 파일 상단이 선언한 신학 축(요셉 서사의 정점). 한 분기만 빠지면 톤이 어긋난다.
-      for (const text of Object.values(scene5OutroByScene3)) {
-        expect(text).toContain("창 50:20");
+      for (const monologue of Object.values(scene5OutroByScene3)) {
+        expect(render(monologue)).toContain("창 50:20");
       }
     });
   });

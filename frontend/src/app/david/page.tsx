@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
-import { NarrationAudioButton } from "@/components/NarrationAudioButton";
+import { MonologueText } from "@/components/MonologueText";
 import {
   startMission,
   decideMission,
@@ -11,6 +11,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  allRefs,
   scene1Psalm23,
   scene2Reactions,
   scene4LastStone,
@@ -20,6 +21,8 @@ import {
   type Scene2Choice,
   type Scene4LastStone,
 } from "@/lib/content/david-monologues";
+import type { Monologue } from "@/lib/content/scripture-quote";
+import { useMonologueTexts } from "@/lib/hooks/useMonologueTexts";
 import { SceneBootState } from "@/components/SceneBootState";
 import { ScenePassage } from "@/components/ScenePassage";
 import { CrisisReminder } from "@/components/CrisisReminder";
@@ -47,7 +50,11 @@ type Scene = JosephStartResponse;
 
 interface DecisionEcho {
   fromScene: number;
-  text: string;
+  /**
+   * 자구가 아니라 *조각* 을 든다 — 성경 인용은 `/api/scripture` 에서 채워진다.
+   * backend 의 `responseText` 는 산문 한 덩어리이므로 `[text]` 로 감싸 넣는다.
+   */
+  monologue: Monologue;
 }
 
 interface OptionLike {
@@ -85,8 +92,10 @@ export default function DavidPage() {
     onSuccess: (d, vars) => {
       // backend responseText 우선, 없으면 frontend fallback (david 는 항상 fallback).
       const local = buildLocalEcho(vars.sceneId, vars.decision);
-      const text = d.responseText ?? local?.text ?? null;
-      if (text) setEcho({ fromScene: vars.sceneId, text });
+      const monologue: Monologue | null = d.responseText
+        ? [d.responseText]
+        : (local?.monologue ?? null);
+      if (monologue) setEcho({ fromScene: vars.sceneId, monologue });
       if (local?.lastStone) setLastStone(local.lastStone);
       setViolenceConsented(false); // R4 — 다음 씬 진입 시 동의 게이트 초기화
       setScene(d);
@@ -99,12 +108,15 @@ export default function DavidPage() {
   }, [scene, start]);
 
   // Scene 6 (outro) 진입 시 마지막으로 쥔 돌(감정) 기반 결말 톤
-  const outroText = useMemo(() => {
+  const outroMonologue = useMemo(() => {
     if (scene?.currentScene !== 6) return null;
     return lastStone
       ? scene6OutroByLastStone[lastStone]
       : scene6OutroByLastStone.trust; // fallback — 신뢰
   }, [scene?.currentScene, lastStone]);
+
+  // 이 화면의 모놀로그가 인용하는 절 전부를 한 번에 연다(`ScenePassage` 와 캐시 공유).
+  const monologueTexts = useMonologueTexts(allRefs);
 
   if (!scene) {
     return (
@@ -165,10 +177,11 @@ export default function DavidPage() {
       {/* Decision echo — 직전 결정의 모놀로그 / 아웃컴 */}
       {echo && (
         <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
-          <p className="whitespace-pre-line">{echo.text}</p>
-          <div className="mt-2">
-            <NarrationAudioButton text={echo.text} onUnavailable="hide" />
-          </div>
+          <MonologueText
+            monologue={echo.monologue}
+            source={monologueTexts}
+            audioWrapperClassName="mt-2"
+          />
           <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
             * AI 보조 — 본문은 성경 참조 *
           </p>
@@ -232,15 +245,11 @@ export default function DavidPage() {
               <>
                 {scene.currentScene === 1 && (
                   <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                      {scene1Psalm23}
-                    </p>
-                    <div className="mt-3">
-                      <NarrationAudioButton
-                        text={scene1Psalm23}
-                        onUnavailable="hide"
-                      />
-                    </div>
+                    <MonologueText
+                      monologue={scene1Psalm23}
+                      source={monologueTexts}
+                      className="text-sm text-[var(--color-warm)]/90 leading-relaxed"
+                    />
                   </div>
                 )}
                 <button
@@ -312,9 +321,12 @@ export default function DavidPage() {
             {/* Scene 6 — outro */}
             {sceneType === "outro" && (
               <div className="text-center space-y-4">
-                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-                  {outroText}
-                </p>
+                <MonologueText
+                  monologue={outroMonologue}
+                  source={monologueTexts}
+                  audio={false}
+                  className="text-base text-[var(--color-warm)]/90 italic max-w-prose mx-auto"
+                />
                 <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
                   * AI 보조 — 본문은 성경 참조 *
                 </p>
@@ -499,10 +511,11 @@ function StonePicker({
 function buildLocalEcho(
   fromScene: number,
   decision: unknown,
-): { text: string; lastStone?: Scene4LastStone } | null {
+): { monologue: Monologue; lastStone?: Scene4LastStone } | null {
   if (fromScene === 2) {
     const key = readValue(decision) as Scene2Choice | null;
-    if (key && key in scene2Reactions) return { text: scene2Reactions[key] };
+    if (key && key in scene2Reactions)
+      return { monologue: scene2Reactions[key] };
     return null;
   }
   if (fromScene === 4) {
@@ -510,14 +523,14 @@ function buildLocalEcho(
     const stone = (priority?.replace(/^last_/, "") ??
       null) as Scene4LastStone | null;
     if (stone && stone in scene4LastStone) {
-      return { text: scene4LastStone[stone], lastStone: stone };
+      return { monologue: scene4LastStone[stone], lastStone: stone };
     }
     return null;
   }
   if (fromScene === 5) {
     // 건너뛰기(skip) 시엔 폭력 묘사 echo 를 띄우지 않는다 (R4).
     if (readValue(decision) === "skip") return null;
-    return { text: scene5Monologue.throw };
+    return { monologue: scene5Monologue.throw };
   }
   return null;
 }
