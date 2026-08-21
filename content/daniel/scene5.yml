@@ -84,7 +84,7 @@ npcs:
 narration_blocks:
   - id: nb_s5_window_6_10
     speaker: scripture_caption
-    text_ko: "다니엘이 이 조서에 왕의 도장이 찍힌 것을 알고도 자기 집에 돌아가서는 윗방에 올라가 예루살렘으로 향한 창문을 열고 전에 하던 대로 하루 세 번씩 무릎을 꿇고 기도하며 그의 하나님께 감사하였더라 (다니엘 6:10)"
+    text_ko: "다니엘이 이 조서에 왕의 도장이 찍힌 것을 알고도 자기 집에 돌아가서는 윗방에 올라가 예루살렘으로 향한 창문을 열고 전에 하던 대로 하루 세 번씩 무릎을 꿇고 기도하며 그의 하나님께 감사하였더라 (단 6:10)"
     audio_clip_id: aud_s5_6_10_ko
     start_at_seconds: 0.0
     duration_seconds: 20.0
@@ -100,7 +100,7 @@ narration_blocks:
     note: "비성경 브리지 — 6:11-15(고발 경위)는 §2 범위 밖이라 자막화하지 않는다. 두 경로(전체/스킵) 공통."
   - id: nb_s5_thrown_6_16
     speaker: scripture_caption
-    text_ko: "이에 왕이 명령하매 다니엘을 끌어다가 사자 굴에 던져 넣는지라 왕이 다니엘에게 이르되 네가 항상 섬기는 너의 하나님이 너를 구원하시리라 하니라 (다니엘 6:16)"
+    text_ko: "이에 왕이 명령하매 다니엘을 끌어다가 사자 굴에 던져 넣는지라 왕이 다니엘에게 이르되 네가 항상 섬기는 너의 하나님이 너를 구원하시리라 하니라 (단 6:16)"
     audio_clip_id: aud_s5_6_16_ko
     start_at_seconds: 27.0
     duration_seconds: 12.0
@@ -110,7 +110,7 @@ narration_blocks:
     note: "dwell_limit 대상(seed §4 R1) — 투척 직후 최대 3초 내 6:22 로 전환. 굴 안 폐쇄 상태에 체류시키지 않는다. omits_assets: model_lion, sfx_lion_growl 과 연동."
   - id: nb_s5_sealed_6_17
     speaker: scripture_caption
-    text_ko: "이에 돌을 굴려다가 굴 어귀를 막으매 왕이 그의 도장과 귀족들의 도장으로 봉하였으니 이는 다니엘에 대한 조치를 고치지 못하게 하려 함이었더라 (다니엘 6:17)"
+    text_ko: "이에 돌을 굴려다가 굴 어귀를 막으매 왕이 그의 도장과 귀족들의 도장으로 봉하였으니 이는 다니엘에 대한 조치를 고치지 못하게 하려 함이었더라 (단 6:17)"
     audio_clip_id: aud_s5_6_17_ko
     start_at_seconds: 39.0
     duration_seconds: 12.0
@@ -120,7 +120,7 @@ narration_blocks:
     note: "dwell_limit 대상. omits_assets: env_den_interior, vfx_stone_seal, haptic_impact 와 연동."
   - id: nb_s5_dawn_6_19
     speaker: scripture_caption
-    text_ko: "이튿날에 왕이 새벽에 일어나 급히 사자 굴로 가서 (다니엘 6:19)"
+    text_ko: "이튿날에 왕이 새벽에 일어나 급히 사자 굴로 가서 (단 6:19)"
     audio_clip_id: aud_s5_6_19_ko
     start_at_seconds: 51.0
     duration_seconds: 6.0
@@ -128,7 +128,7 @@ narration_blocks:
     condition_gate: daniel_scene5_full
   - id: nb_s5_king_cry_6_20
     speaker: darius_king
-    text_ko: "다니엘이 든 굴에 가까이 이르러서 슬피 소리 질러 다니엘에게 묻되 살아 계시는 하나님의 종 다니엘아 네가 항상 섬기는 네 하나님이 사자들에게서 능히 너를 구원하셨느냐 하니라 (다니엘 6:20)"
+    text_ko: "다니엘이 든 굴에 가까이 이르러서 슬피 소리 질러 다니엘에게 묻되 살아 계시는 하나님의 종 다니엘아 네가 항상 섬기는 네 하나님이 사자들에게서 능히 너를 구원하셨느냐 하니라 (단 6:20)"
     audio_clip_id: aud_s5_6_20_ko
     start_at_seconds: 57.0
     duration_seconds: 14.0
@@ -136,7 +136,7 @@ narration_blocks:
     condition_gate: daniel_scene5_full
   - id: nb_s5_daniel_reply_6_21
     speaker: daniel_self
-    text_ko: "다니엘이 왕에게 아뢰되 왕이여 원하건대 왕은 만수무강 하옵소서 (다니엘 6:21)"
+    text_ko: "다니엘이 왕에게 아뢰되 왕이여 원하건대 왕은 만수무강 하옵소서 (단 6:21)"
     audio_clip_id: aud_s5_6_21_ko
     start_at_seconds: 71.0
     duration_seconds: 6.0
@@ -144,7 +144,7 @@ narration_blocks:
     condition_gate: daniel_scene5_full
   - id: nb_s5_preserved_6_22
     speaker: daniel_self
-    text_ko: "나의 하나님이 이미 그의 천사를 보내어 사자들의 입을 봉하셨으므로 사자들이 나를 상해하지 못하였사오니 이는 나의 무죄함이 그 앞에 명백함이오며 또 왕이여 나는 왕에게도 해를 끼치지 아니하였나이다 하니라 (다니엘 6:22)"
+    text_ko: "나의 하나님이 이미 그의 천사를 보내어 사자들의 입을 봉하셨으므로 사자들이 나를 상해하지 못하였사오니 이는 나의 무죄함이 그 앞에 명백함이오며 또 왕이여 나는 왕에게도 해를 끼치지 아니하였나이다 하니라 (단 6:22)"
     audio_clip_id: aud_s5_6_22_ko
     start_at_seconds: 77.0
     duration_seconds: 16.0
@@ -152,7 +152,7 @@ narration_blocks:
     note: "보전 anchor. 두 경로(전체/스킵) 공통 — 스킵 경로에서는 nb_s5_report_bridge 직후 여기로 직행한다. '천사'의 신원(피조 천사 vs 신현)은 확정 서술하지 않고 본문 어휘 그대로(disputed_point 4)."
   - id: nb_s5_mission_end_6_23
     speaker: scripture_caption
-    text_ko: "왕이 심히 기뻐서 명하여 다니엘을 굴에서 올리라 하매 그들이 다니엘을 굴에서 올린즉 그의 몸이 조금도 상하지 아니하였으니 이는 그가 자기의 하나님을 믿음이었더라 (다니엘 6:23)"
+    text_ko: "왕이 심히 기뻐서 명하여 다니엘을 굴에서 올리라 하매 그들이 다니엘을 굴에서 올린즉 그의 몸이 조금도 상하지 아니하였으니 이는 그가 자기의 하나님을 믿음이었더라 (단 6:23)"
     audio_clip_id: aud_s5_6_23_ko
     start_at_seconds: 95.0
     duration_seconds: 10.0

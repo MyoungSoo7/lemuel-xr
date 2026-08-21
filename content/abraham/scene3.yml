@@ -46,7 +46,7 @@ npcs:
 narration_blocks:
   - id: nb_s3_lack_1
     speaker: scripture_caption
-    text_ko: "나는 자식이 없사오니 나의 상속자는 이 다메섹 사람 엘리에셀이니이다 (창세기 15:2)"
+    text_ko: "나는 자식이 없사오니 나의 상속자는 이 다메섹 사람 엘리에셀이니이다 (창 15:2)"
     citation_id: A_gen15_2
     audio_clip_id: aud_s3_lack_1_ko
     start_at_seconds: 0.0
@@ -55,7 +55,7 @@ narration_blocks:
     note: "인용 자막 전용 — 사용자 1인칭 절망 서술로 LLM 재생성 금지(R1 스코프)."
   - id: nb_s3_lack_2
     speaker: scripture_caption
-    text_ko: "주께서 내게 씨를 주지 아니하셨으니 내 집에서 길린 자가 내 상속자가 될 것이니이다 (창세기 15:3)"
+    text_ko: "주께서 내게 씨를 주지 아니하셨으니 내 집에서 길린 자가 내 상속자가 될 것이니이다 (창 15:3)"
     citation_id: A_gen15_3
     audio_clip_id: aud_s3_lack_2_ko
     start_at_seconds: 13.0
@@ -64,7 +64,7 @@ narration_blocks:
     note: "인용 자막 전용 — 사용자 1인칭 절망 서술로 LLM 재생성 금지(R1 스코프)."
   - id: nb_s3_stars
     speaker: voice_of_yhwh_v1
-    text_ko: "그를 이끌고 밖으로 나가 이르시되 하늘을 우러러 뭇별을 셀 수 있나 보라 또 그에게 이르시되 네 자손이 이와 같으리라 (창세기 15:5)"
+    text_ko: "그를 이끌고 밖으로 나가 이르시되 하늘을 우러러 뭇별을 셀 수 있나 보라 또 그에게 이르시되 네 자손이 이와 같으리라 (창 15:5)"
     citation_id: A_gen15_5
     audio_clip_id: aud_s3_stars_ko
     start_at_seconds: 25.0
@@ -72,7 +72,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s3_belief
     speaker: narrator_v1
-    text_ko: "아브람이 여호와를 믿으니 여호와께서 이를 그의 의로 여기시고 (창세기 15:6)"
+    text_ko: "아브람이 여호와를 믿으니 여호와께서 이를 그의 의로 여기시고 (창 15:6)"
     citation_id: A_gen15_6
     audio_clip_id: aud_s3_belief_ko
     start_at_seconds: 56.0
@@ -80,7 +80,7 @@ narration_blocks:
     hidden_until_event: stars_gaze_resolved
   - id: nb_s3_four_hundred
     speaker: voice_of_yhwh_v1
-    text_ko: "여호와께서 아브람에게 이르시되 너는 반드시 알라 네 자손이 이방에서 객이 되어 그들을 섬기겠고 그들은 사백 년 동안 네 자손을 괴롭히리니 (창세기 15:13)"
+    text_ko: "여호와께서 아브람에게 이르시되 너는 반드시 알라 네 자손이 이방에서 객이 되어 그들을 섬기겠고 그들은 사백 년 동안 네 자손을 괴롭히리니 (창 15:13)"
     citation_id: A_gen15_13
     audio_clip_id: aud_s3_four_hundred_ko
     start_at_seconds: 67.0
@@ -89,7 +89,7 @@ narration_blocks:
     note: "dwell_limit 적용 블록 — 아래 safety_gates.dwell_limit_on_four_hundred_years 참조. 최대 3초 내 15:16 전환."
   - id: nb_s3_reason
     speaker: narrator_v1
-    text_ko: "네 자손은 사대 만에 이 땅으로 돌아오리니 이는 아모리 족속의 죄악이 아직 가득 차지 아니함이니라 하시더니 (창세기 15:16)"
+    text_ko: "네 자손은 사대 만에 이 땅으로 돌아오리니 이는 아모리 족속의 죄악이 아직 가득 차지 아니함이니라 하시더니 (창 15:16)"
     citation_id: A_gen15_16
     audio_clip_id: aud_s3_reason_ko
     start_at_seconds: 79.0

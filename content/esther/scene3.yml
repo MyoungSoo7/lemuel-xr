@@ -54,7 +54,7 @@ npcs:
 narration_blocks:
   - id: nb_s3_esther_reply_4_11
     speaker: scripture_caption
-    text_ko: "왕의 신하들과 왕의 각 지방 백성이 다 알거니와 남녀를 막론하고 부름을 받지 아니하고 안뜰에 들어가서 왕에게 나가면 오직 죽이는 법이요 왕이 그 자에게 금 규를 내밀어야 살 것이라 이제 내가 부름을 입어 왕에게 나가지 못한 지가 이미 삼십 일이라 하라 하니라 (에스더 4:11)"
+    text_ko: "왕의 신하들과 왕의 각 지방 백성이 다 알거니와 남녀를 막론하고 부름을 받지 아니하고 안뜰에 들어가서 왕에게 나가면 오직 죽이는 법이요 왕이 그 자에게 금 규를 내밀어야 살 것이라 이제 내가 부름을 입어 왕에게 나가지 못한 지가 이미 삼십 일이라 하라 하니라 (에 4:11)"
     audio_clip_id: aud_s3_esther_reply_4_11_ko
     start_at_seconds: 0.0
     duration_seconds: 22.0
@@ -62,14 +62,14 @@ narration_blocks:
     note: "에스더가 하닥을 통해 모르드개에게 보낸 회답 — 위험을 축소하지 않고 있는 그대로 전달."
   - id: nb_s3_mordecai_reply_4_13
     speaker: scripture_caption
-    text_ko: "모르드개가 그를 시켜 에스더에게 회답하되 너는 왕궁에 있으니 모든 유다인 중에 홀로 목숨을 건지리라 생각하지 말라 (에스더 4:13)"
+    text_ko: "모르드개가 그를 시켜 에스더에게 회답하되 너는 왕궁에 있으니 모든 유다인 중에 홀로 목숨을 건지리라 생각하지 말라 (에 4:13)"
     audio_clip_id: aud_s3_mordecai_reply_4_13_ko
     start_at_seconds: 22.0
     duration_seconds: 14.0
     hidden_until_event: null
   - id: nb_s3_mordecai_reply_4_14
     speaker: scripture_caption
-    text_ko: "이 때에 네가 만일 잠잠하여 말이 없으면 유다인은 다른 데로 말미암아 놓임과 구원을 얻으려니와 너와 네 아버지 집은 멸망하리라 네가 왕후의 자리를 얻은 것이 이 때를 위함이 아닌지 누가 알겠느냐 하니 (에스더 4:14)"
+    text_ko: "이 때에 네가 만일 잠잠하여 말이 없으면 유다인은 다른 데로 말미암아 놓임과 구원을 얻으려니와 너와 네 아버지 집은 멸망하리라 네가 왕후의 자리를 얻은 것이 이 때를 위함이 아닌지 누가 알겠느냐 하니 (에 4:14)"
     audio_clip_id: aud_s3_mordecai_reply_4_14_ko
     start_at_seconds: 36.0
     duration_seconds: 26.0

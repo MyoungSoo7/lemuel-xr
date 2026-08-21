@@ -52,7 +52,7 @@ npcs:
 narration_blocks:
   - id: nb_s1_concealment
     speaker: scripture_caption
-    text_ko: "에스더가 자기의 민족과 종족을 말하지 아니하니 이는 모르드개가 명령하여 말하지 말라 하였음이라 (에스더 2:10)"
+    text_ko: "에스더가 자기의 민족과 종족을 말하지 아니하니 이는 모르드개가 명령하여 말하지 말라 하였음이라 (에 2:10)"
     audio_clip_id: aud_s1_concealment_ko
     start_at_seconds: 0.0
     duration_seconds: 12.0
@@ -62,7 +62,7 @@ narration_blocks:
       두 절 모두 배제 대상은 아니나 2:20 은 사용하지 않는다."
   - id: nb_s1_haman_accusation
     speaker: haman
-    text_ko: "하만이 아하수에로 왕에게 아뢰되 한 민족이 왕의 나라 각 지방 백성 중에 흩어져 거하는데 그 법률이 만민의 것과 달라서 왕의 법률을 지키지 아니하오니 용납하는 것이 왕에게 무익하니이다 (에스더 3:8)"
+    text_ko: "하만이 아하수에로 왕에게 아뢰되 한 민족이 왕의 나라 각 지방 백성 중에 흩어져 거하는데 그 법률이 만민의 것과 달라서 왕의 법률을 지키지 아니하오니 용납하는 것이 왕에게 무익하니이다 (에 3:8)"
     audio_clip_id: aud_s1_haman_accusation_ko
     start_at_seconds: 12.0
     duration_seconds: 20.0
@@ -73,7 +73,7 @@ narration_blocks:
       '내가 숨긴 그것이 지금 고발당하고 있다'를 성립시킨다(seed §1-2)."
   - id: nb_s1_haman_bribe
     speaker: haman
-    text_ko: "왕이 옳게 여기시거든 조서를 내려 그들을 진멸하소서 내가 은 일만 달란트를 왕의 일을 맡은 자의 손에 맡겨 왕의 금고에 드리리이다 하니 (에스더 3:9)"
+    text_ko: "왕이 옳게 여기시거든 조서를 내려 그들을 진멸하소서 내가 은 일만 달란트를 왕의 일을 맡은 자의 손에 맡겨 왕의 금고에 드리리이다 하니 (에 3:9)"
     audio_clip_id: aud_s1_haman_bribe_ko
     start_at_seconds: 32.0
     duration_seconds: 12.0
@@ -81,7 +81,7 @@ narration_blocks:
     note: "R4 동의 사용자에게만 노출. consent_skipped 사용자는 이 블록을 보지 않고 nb_s1_alt_summary 로 대체."
   - id: nb_s1_edict_full
     speaker: scripture_caption
-    text_ko: "이에 그 조서를 역졸에게 맡겨 왕의 각 지방에 보내니 열두째 달 곧 아달월 십삼일 하루 동안에 모든 유다인을 젊은이 늙은이 어린이 여인들을 막론하고 죽이고 도륙하고 진멸하고 또 그 재산을 탈취하라 하였고 (에스더 3:13)"
+    text_ko: "이에 그 조서를 역졸에게 맡겨 왕의 각 지방에 보내니 열두째 달 곧 아달월 십삼일 하루 동안에 모든 유다인을 젊은이 늙은이 어린이 여인들을 막론하고 죽이고 도륙하고 진멸하고 또 그 재산을 탈취하라 하였고 (에 3:13)"
     audio_clip_id: aud_s1_edict_full_ko
     start_at_seconds: 44.0
     duration_seconds: 14.0
@@ -115,11 +115,11 @@ branches: []
 safety_gates:
   - id: R4_pre_scene0_consent_required # 엘리야 scene1.yml:88 과 동일 id 형식
     enforced_at: before_scene_enter
-    description: "Pre-Scene 0 동의 게이트 — 집단 학살 조서(에스더 3:13)·민족 말살 위협 사전 고지 + 위기 자원 {{crisis_resources.default}}"
+    description: "Pre-Scene 0 동의 게이트 — 집단 학살 조서(에 3:13)·민족 말살 위협 사전 고지 + 위기 자원 {{crisis_resources.default}}"
     consent_card_id: esther_scene1_edict_warning
     consent_card_ko: |
       다음 장면은 한 민족 전체를 없애라는 국가 조서를 다룹니다.
-      · 조서 본문(에스더 3:13)에는 어린이와 여인을 포함해 죽이라는 표현이 인용 자막으로 잠시 나옵니다.
+      · 조서 본문(에 3:13)에는 어린이와 여인을 포함해 죽이라는 표현이 인용 자막으로 잠시 나옵니다.
       · 약 1분. 곧이어 그 소식을 들은 사람들의 장면으로 이어집니다.
       · 이 묵상은 정체를 드러낼 것인가를 다룹니다. 드러내는 것이 정답인 묵상이 아닙니다.
         드러내지 않기로 하는 것도 이 묵상 안에서 온전한 선택입니다.

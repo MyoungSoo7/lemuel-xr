@@ -115,7 +115,7 @@ const PAYLOADS: Record<number, Record<string, unknown>> = {
     next: 5,
     extras: {
       context_line:
-        "'주여 주께서 어디로 가시는지 우리가 알지 못하거늘 그 길을 어찌 알겠사옵나이까' 하는 도마에게 (요 14:5)",
+        "'주여 주께서 어디로 가시는지 우리가 알지 못하거늘 그 길을 어찌 알겠사옵나이까' (요 14:5) 하는 도마에게",
       options: [
         { id: "the_way", label: "길 — 어디로 가야 할지 모를 때" },
         { id: "the_truth", label: "진리 — 무엇이 참인지 흔들릴 때" },
@@ -581,7 +581,7 @@ describe("Jesus 미션 화면", () => {
         }),
       ).toBeInTheDocument();
       expect(await findParagraph(scene3Touch)).toBeInTheDocument();
-      expect(screen.getByText(/하는 도마에게 \(요 14:5\)/)).toBeInTheDocument();
+      expect(screen.getByText(/\(요 14:5\) 하는 도마에게/)).toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: /생명 —/ }));
 
       // Scene 5 — 선택한 문(생명)의 응답 + 하나의 문이라는 teaching 이 함께 온다.

@@ -59,7 +59,7 @@ npcs:
 narration_blocks:
   - id: nb_s1_names_changed
     speaker: scripture_caption
-    text_ko: "환관장이 그들의 이름을 고쳐 다니엘은 벨드사살이라 하고 하나냐는 사드락이라 하고 미사엘은 메삭이라 하고 아사랴는 아벳느고라 하였더라 (다니엘 1:7)"
+    text_ko: "환관장이 그들의 이름을 고쳐 다니엘은 벨드사살이라 하고 하나냐는 사드락이라 하고 미사엘은 메삭이라 하고 아사랴는 아벳느고라 하였더라 (단 1:7)"
     audio_clip_id: aud_s1_names_changed_ko
     start_at_seconds: 5.0
     duration_seconds: 16.0

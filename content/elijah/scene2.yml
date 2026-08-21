@@ -50,21 +50,21 @@ npcs:
 narration_blocks:
   - id: nb_s2_jezebel_threat
     speaker: messenger
-    text_ko: "내가 내일 이맘때에는 반드시 네 생명을 저 사람들 중 한 사람의 생명과 같게 하리라 (열왕기상 19:2)"
+    text_ko: "내가 내일 이맘때에는 반드시 네 생명을 저 사람들 중 한 사람의 생명과 같게 하리라 (왕상 19:2)"
     audio_clip_id: aud_s2_threat_ko
     start_at_seconds: 0.0
     duration_seconds: 14.0
     hidden_until_event: null
   - id: nb_s2_flee
     speaker: narrator
-    text_ko: "그가 이 형편을 보고 일어나 자기의 생명을 위해 도망하여… (열왕기상 19:3)"
+    text_ko: "그가 이 형편을 보고 일어나 자기의 생명을 위해 도망하여… (왕상 19:3)"
     audio_clip_id: aud_s2_flee_ko
     start_at_seconds: 20.0
     duration_seconds: 10.0
     hidden_until_event: null
   - id: nb_s2_rotem_lament
     speaker: elijah_inner
-    text_ko: "여호와여 넉넉하오니 지금 내 생명을 거두시옵소서 나는 내 조상들보다 낫지 못하니이다 (열왕기상 19:4)"
+    text_ko: "여호와여 넉넉하오니 지금 내 생명을 거두시옵소서 나는 내 조상들보다 낫지 못하니이다 (왕상 19:4)"
     audio_clip_id: aud_s2_rotem_lament_ko
     audio_clip_id_low: aud_s2_rotem_lament_ko_low
     audio_clip_id_off: null # 자막만 옵션
@@ -110,7 +110,7 @@ safety_gates:
     consent_card_id: elijah_scene2_rotem_warning
     consent_card_ko: |
       다음 장면은 큰 승리 다음의 무너짐과 탈진을 다룹니다.
-      · 엘리야가 지쳐 "생명을 거두소서" 라고 말하는 성경 본문(열왕기상 19:4)이 인용 자막으로 잠시 나옵니다.
+      · 엘리야가 지쳐 "생명을 거두소서" 라고 말하는 성경 본문(왕상 19:4)이 인용 자막으로 잠시 나옵니다.
       · 약 1~2분. 곧이어 돌봄과 회복의 장면으로 이어집니다.
       · 이 묵상은 소진 뒤의 돌봄과 회복을 다룹니다. 다만 당신의 소진이 안전하지 않은 환경(가정·교회·직장의 학대)에서 온 것이라면, 그곳으로 다시 돌아가는 것이 회복이 아닐 수 있습니다. 그곳을 떠나는 것도 정당한 회복입니다. 안전이 우선입니다.
       계속하시겠어요?

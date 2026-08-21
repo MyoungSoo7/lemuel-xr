@@ -55,12 +55,12 @@ npcs:
     position: [-1.2, 1.6, 1.0]
     initial_animation: walk_alongside_herd
     visual_traits: [abstract_silhouette_low_detail]
-    note: "롯 — 동행(창세기 12:4). 실사 얼굴 형상 배제, 대사 없음."
+    note: "롯 — 동행(창 12:4). 실사 얼굴 형상 배제, 대사 없음."
 
 narration_blocks:
   - id: nb_s1_call
     speaker: voice_of_yhwh_v1
-    text_ko: "여호와께서 아브람에게 이르시되 너는 너의 고향과 친척과 아버지의 집을 떠나 내가 네게 보여 줄 땅으로 가라 (창세기 12:1)"
+    text_ko: "여호와께서 아브람에게 이르시되 너는 너의 고향과 친척과 아버지의 집을 떠나 내가 네게 보여 줄 땅으로 가라 (창 12:1)"
     verbatim_note: "개역개정 원문 대조 완료 — '고향과 친척과 아버지의 집' 개역개정 표기 그대로."
     citation_id: A_gen12_1
     audio_clip_id: aud_s1_call_ko
@@ -69,7 +69,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s1_blessing
     speaker: voice_of_yhwh_v1
-    text_ko: "내가 너로 큰 민족을 이루고 네게 복을 주어 네 이름을 창대하게 하리니 너는 복이 될지라 (창세기 12:2)"
+    text_ko: "내가 너로 큰 민족을 이루고 네게 복을 주어 네 이름을 창대하게 하리니 너는 복이 될지라 (창 12:2)"
     citation_id: A_gen12_2
     audio_clip_id: aud_s1_blessing_ko
     start_at_seconds: 14.0
@@ -77,7 +77,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s1_departed
     speaker: narrator_v1
-    text_ko: "이에 아브람이 여호와의 말씀을 따라갔고 롯도 그와 함께 갔으며 아브람이 하란을 떠날 때에 칠십오 세였더라 (창세기 12:4)"
+    text_ko: "이에 아브람이 여호와의 말씀을 따라갔고 롯도 그와 함께 갔으며 아브람이 하란을 떠날 때에 칠십오 세였더라 (창 12:4)"
     citation_id: A_gen12_4
     audio_clip_id: aud_s1_departed_ko
     start_at_seconds: 40.0

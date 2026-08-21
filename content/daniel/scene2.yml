@@ -58,14 +58,14 @@ npcs:
 narration_blocks:
   - id: nb_s2_resolve_1_8
     speaker: scripture_caption
-    text_ko: "다니엘은 뜻을 정하여 왕의 음식과 그가 마시는 포도주로 자기를 더럽히지 아니하리라 하고 자기를 더럽히지 아니하도록 환관장에게 구하니 (다니엘 1:8)"
+    text_ko: "다니엘은 뜻을 정하여 왕의 음식과 그가 마시는 포도주로 자기를 더럽히지 아니하리라 하고 자기를 더럽히지 아니하도록 환관장에게 구하니 (단 1:8)"
     audio_clip_id: aud_s2_1_8_ko
     start_at_seconds: 0.0
     duration_seconds: 12.0
     hidden_until_event: null
   - id: nb_s2_favor_1_9
     speaker: scripture_caption
-    text_ko: "하나님이 다니엘로 하여금 환관장에게 은혜와 긍휼을 얻게 하신지라 (다니엘 1:9)"
+    text_ko: "하나님이 다니엘로 하여금 환관장에게 은혜와 긍휼을 얻게 하신지라 (단 1:9)"
     audio_clip_id: aud_s2_1_9_ko
     start_at_seconds: 22.0
     duration_seconds: 8.0
@@ -73,7 +73,7 @@ narration_blocks:
     note: "faith_tone strong 근거절(seed §6). '인간 결단 단독 서사'로 읽히지 않도록 1:8 바로 뒤에 배치(seed §13)."
   - id: nb_s2_refusal_1_10
     speaker: chief_eunuch
-    text_ko: "환관장이 다니엘에게 이르되 내가 내 주 왕을 두려워하노라 그가 너희 먹을 것과 너희 마실 것을 지정하셨거늘 너희의 얼굴이 초췌하여 같은 또래의 소년들만 못한 것을 그가 보게 할 것이 무엇이냐 그렇게 되면 너희 때문에 내 머리가 왕 앞에서 위태롭게 되리라 하니라 (다니엘 1:10)"
+    text_ko: "환관장이 다니엘에게 이르되 내가 내 주 왕을 두려워하노라 그가 너희 먹을 것과 너희 마실 것을 지정하셨거늘 너희의 얼굴이 초췌하여 같은 또래의 소년들만 못한 것을 그가 보게 할 것이 무엇이냐 그렇게 되면 너희 때문에 내 머리가 왕 앞에서 위태롭게 되리라 하니라 (단 1:10)"
     audio_clip_id: aud_s2_1_10_ko
     start_at_seconds: 32.0
     duration_seconds: 16.0
@@ -81,7 +81,7 @@ narration_blocks:
     note: "거절 사유 = 외모라는 관찰 가능한 지표(seed §5). 이후 1:12-13 제안이 정확히 이 지표에 답한다 — 요약·윤문 없이 전문 사용(seed §1-1 v2 정정 기록)."
   - id: nb_s2_seek_overseer_1_11
     speaker: scripture_caption
-    text_ko: "환관장이 다니엘과 하나냐와 미사엘과 아사랴를 감독하게 한 자에게 다니엘이 말하되 (다니엘 1:11)"
+    text_ko: "환관장이 다니엘과 하나냐와 미사엘과 아사랴를 감독하게 한 자에게 다니엘이 말하되 (단 1:11)"
     audio_clip_id: aud_s2_1_11_ko
     start_at_seconds: 60.0
     duration_seconds: 6.0
@@ -89,7 +89,7 @@ narration_blocks:
     note: "seek_ally 근거절. 선택 카드와 무관하게 항상 재생 — 실제로 일어난 사건이기 때문."
   - id: nb_s2_proposal_1_12_13
     speaker: daniel_self
-    text_ko: "청하오니 당신의 종들을 열흘 동안 시험하여 채식을 주어 먹게 하고 물을 주어 마시게 한 후에 당신 앞에서 우리의 얼굴과 왕의 음식을 먹는 소년들의 얼굴을 비교하여 보아서 당신이 보는 대로 종들에게 행하소서 하매 (다니엘 1:12-13)"
+    text_ko: "청하오니 당신의 종들을 열흘 동안 시험하여 채식을 주어 먹게 하고 물을 주어 마시게 한 후에 당신 앞에서 우리의 얼굴과 왕의 음식을 먹는 소년들의 얼굴을 비교하여 보아서 당신이 보는 대로 종들에게 행하소서 하매 (단 1:12-13)"
     audio_clip_id: aud_s2_1_12_13_ko
     start_at_seconds: 68.0
     duration_seconds: 15.0
@@ -97,7 +97,7 @@ narration_blocks:
     note: "verifiable_proposal 근거절. '얼굴을 비교하여'가 1:10 의 외모 지표에 대한 직접 응답 — 나레이션에서 이 대응 관계를 지우지 말 것."
   - id: nb_s2_agreement_1_14
     speaker: scripture_caption
-    text_ko: "그가 그들의 말을 따라 열흘 동안 시험하더니 (다니엘 1:14)"
+    text_ko: "그가 그들의 말을 따라 열흘 동안 시험하더니 (단 1:14)"
     audio_clip_id: aud_s2_1_14_ko
     start_at_seconds: 85.0
     duration_seconds: 5.0

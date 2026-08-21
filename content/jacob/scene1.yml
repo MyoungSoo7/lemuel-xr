@@ -44,7 +44,7 @@ npcs:
 narration_blocks:
   - id: nb_s1_jacob_lie
     speaker: jacob_inner
-    text_ko: "나는 아버지의 맏아들 에서로소이다 아버지께서 내게 명하신 대로 내가 하였사오니 원하건대 일어나 앉아서 내가 사냥한 고기를 잡수시고 아버지 마음껏 내게 축복하소서 (창세기 27:19)"
+    text_ko: "나는 아버지의 맏아들 에서로소이다 아버지께서 내게 명하신 대로 내가 하였사오니 원하건대 일어나 앉아서 내가 사냥한 고기를 잡수시고 아버지 마음껏 내게 축복하소서 (창 27:19)"
     audio_clip_id: aud_s1_lie_ko
     start_at_seconds: 5.0
     duration_seconds: 14.0
@@ -52,7 +52,7 @@ narration_blocks:
     note: "alt_routes[1_alt] 진입 시 이 블록은 재생되지 않고 summary_text_ko(요약 자막)로 대체된다."
   - id: nb_s1_isaac_realize
     speaker: isaac_npc
-    text_ko: "네 아우가 와서 속여 네 복을 빼앗았도다 (창세기 27:35)"
+    text_ko: "네 아우가 와서 속여 네 복을 빼앗았도다 (창 27:35)"
     audio_clip_id: aud_s1_isaac_realize_ko
     start_at_seconds: 34.0
     duration_seconds: 8.0
@@ -69,7 +69,7 @@ alt_routes:
   - id: 1_alt
     triggered_by: consent_card_skip # cc_jacob_skip 선택 시
     presentation_mode: summary_caption_only
-    summary_text_ko: "야곱은 축복을 속임으로 취했다. (창세기 27:19, 27:35 요약)"
+    summary_text_ko: "야곱은 축복을 속임으로 취했다. (창 27:19, 27:35 요약)"
     carries_to_scene2: { presentation_mode: caption_only_no_audio }
     note: "27:19 재연 없이 요약 자막만 제공 → Scene 2 의 27:34 도 소리 없이 자막으로만 노출된다(seed §3-1)."
 

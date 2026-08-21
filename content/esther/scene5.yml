@@ -55,14 +55,14 @@ npcs:
 narration_blocks:
   - id: nb_s5_enter_court
     speaker: scripture_caption
-    text_ko: "제삼일에 에스더가 왕후의 예복을 입고 왕궁 안 뜰 곧 어전 맞은편에 서니 왕이 어전에서 전 문을 대하여 왕좌에 앉았다가 (에스더 5:1)"
+    text_ko: "제삼일에 에스더가 왕후의 예복을 입고 왕궁 안 뜰 곧 어전 맞은편에 서니 왕이 어전에서 전 문을 대하여 왕좌에 앉았다가 (에 5:1)"
     audio_clip_id: aud_s5_enter_court_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0
     hidden_until_event: null
   - id: nb_s5_scepter_extended
     speaker: scripture_caption
-    text_ko: "왕후 에스더가 뜰에 선 것을 본즉 매우 사랑스러우므로 손에 잡았던 금 규를 그에게 내미니 에스더가 가까이 가서 금 규 끝을 만진지라 (에스더 5:2)"
+    text_ko: "왕후 에스더가 뜰에 선 것을 본즉 매우 사랑스러우므로 손에 잡았던 금 규를 그에게 내미니 에스더가 가까이 가서 금 규 끝을 만진지라 (에 5:2)"
     audio_clip_id: aud_s5_scepter_extended_ko
     start_at_seconds: 10.0
     duration_seconds: 10.0
@@ -70,7 +70,7 @@ narration_blocks:
     dwell_limit_exempt: true # 이 정적은 사용자가 통제하는 시간 — dwell_limit 대상 아님(seed §4-0/§6 항목1)
   - id: nb_s5_first_question_5_3
     speaker: ahasuerus
-    text_ko: "왕이 이르되 왕후 에스더여 그대의 소원이 무엇이며 요구가 무엇이냐 나라의 절반이라도 그대에게 주겠노라 하니 (에스더 5:3)"
+    text_ko: "왕이 이르되 왕후 에스더여 그대의 소원이 무엇이며 요구가 무엇이냐 나라의 절반이라도 그대에게 주겠노라 하니 (에 5:3)"
     audio_clip_id: aud_s5_first_question_5_3_ko
     start_at_seconds: 20.0
     duration_seconds: 10.0
@@ -78,7 +78,7 @@ narration_blocks:
     note: "왕의 첫 번째 물음."
   - id: nb_s5_first_delay_5_4
     speaker: scripture_caption
-    text_ko: "에스더가 이르되 오늘 내가 왕을 위하여 잔치를 베풀었사오니 왕이 좋게 여기시거든 하만과 함께 오소서 하니 (에스더 5:4)"
+    text_ko: "에스더가 이르되 오늘 내가 왕을 위하여 잔치를 베풀었사오니 왕이 좋게 여기시거든 하만과 함께 오소서 하니 (에 5:4)"
     audio_clip_id: aud_s5_first_delay_5_4_ko
     start_at_seconds: 30.0
     duration_seconds: 8.0
@@ -88,7 +88,7 @@ narration_blocks:
       넣지 않는다(seed §3-2)."
   - id: nb_s5_second_question_5_6
     speaker: ahasuerus
-    text_ko: "잔치의 술을 마실 때에 왕이 에스더에게 이르되 그대의 소청이 무엇이뇨 곧 허락하겠노라 그대의 요구가 무엇이뇨 나라의 절반이라 할지라도 시행하겠노라 하니 (에스더 5:6)"
+    text_ko: "잔치의 술을 마실 때에 왕이 에스더에게 이르되 그대의 소청이 무엇이뇨 곧 허락하겠노라 그대의 요구가 무엇이뇨 나라의 절반이라 할지라도 시행하겠노라 하니 (에 5:6)"
     audio_clip_id: aud_s5_second_question_5_6_ko
     start_at_seconds: 38.0
     duration_seconds: 8.0
@@ -97,7 +97,7 @@ narration_blocks:
     note: "왕의 두 번째 물음 — 5:3 과 거의 같은 문장."
   - id: nb_s5_second_delay_5_8
     speaker: scripture_caption
-    text_ko: "내가 만일 왕의 목전에서 은혜를 입었고 왕이 내 소청을 허락하시며 내 요구를 시행하시기를 좋게 여기시면 내가 왕과 하만을 위하여 베푸는 잔치에 또 오소서 내일은 왕의 말씀대로 하리이다 하니라 (에스더 5:8)"
+    text_ko: "내가 만일 왕의 목전에서 은혜를 입었고 왕이 내 소청을 허락하시며 내 요구를 시행하시기를 좋게 여기시면 내가 왕과 하만을 위하여 베푸는 잔치에 또 오소서 내일은 왕의 말씀대로 하리이다 하니라 (에 5:8)"
     audio_clip_id: aud_s5_second_delay_5_8_ko
     start_at_seconds: 46.0
     duration_seconds: 8.0
@@ -114,7 +114,7 @@ narration_blocks:
     note: "하룻밤 경과를 나타내는 2초 암전. dwell_limit 대상 아님(고정 연출 시간)."
   - id: nb_s5_third_question_7_2
     speaker: ahasuerus
-    text_ko: "왕이 이 둘째 날 잔치에 술을 마실 때에 다시 에스더에게 물어 이르되 왕후 에스더여 그대의 소청이 무엇이냐 곧 허락하겠노라 그대의 요구가 무엇이냐 곧 나라의 절반이라 할지라도 시행하겠노라 (에스더 7:2)"
+    text_ko: "왕이 이 둘째 날 잔치에 술을 마실 때에 다시 에스더에게 물어 이르되 왕후 에스더여 그대의 소청이 무엇이냐 곧 허락하겠노라 그대의 요구가 무엇이냐 곧 나라의 절반이라 할지라도 시행하겠노라 (에 7:2)"
     audio_clip_id: aud_s5_third_question_7_2_ko
     start_at_seconds: 56.0
     duration_seconds: 6.0
@@ -122,7 +122,7 @@ narration_blocks:
     note: "왕의 세 번째 물음."
   - id: nb_s5_disclosure_7_3_4
     speaker: scripture_caption
-    text_ko: "왕후 에스더가 대답하여 이르되 왕이여 내가 만일 왕의 목전에서 은혜를 입었으며 왕이 좋게 여기시면 내 소청대로 내 생명을 내게 주시고 내 요구대로 내 민족을 내게 주소서 나와 내 민족이 팔려서 죽임과 도륙함과 진멸함을 당하게 되었나이다 만일 우리가 노비로 팔렸더라면 내가 잠잠하였으리이다 그래도 대적이 왕의 손해를 보충하지 못하였으리이다 하니 (에스더 7:3-4)"
+    text_ko: "왕후 에스더가 대답하여 이르되 왕이여 내가 만일 왕의 목전에서 은혜를 입었으며 왕이 좋게 여기시면 내 소청대로 내 생명을 내게 주시고 내 요구대로 내 민족을 내게 주소서 나와 내 민족이 팔려서 죽임과 도륙함과 진멸함을 당하게 되었나이다 만일 우리가 노비로 팔렸더라면 내가 잠잠하였으리이다 그래도 대적이 왕의 손해를 보충하지 못하였으리이다 하니 (에 7:3-4)"
     audio_clip_id: aud_s5_disclosure_7_3_4_ko
     start_at_seconds: 62.0
     duration_seconds: 16.0
@@ -132,7 +132,7 @@ narration_blocks:
       류를 쓰지 않는다."
   - id: nb_s5_haman_named_7_6
     speaker: scripture_caption
-    text_ko: "에스더가 이르되 대적과 원수는 이 악한 하만이니이다 하니 하만이 왕과 왕후 앞에서 두려워하거늘 (에스더 7:6)"
+    text_ko: "에스더가 이르되 대적과 원수는 이 악한 하만이니이다 하니 하만이 왕과 왕후 앞에서 두려워하거늘 (에 7:6)"
     audio_clip_id: aud_s5_haman_named_7_6_ko
     start_at_seconds: 78.0
     duration_seconds: 8.0
@@ -142,7 +142,7 @@ narration_blocks:
       이어가지 않는다 — 전면 배제 대상(seed §2-2 (C)(D))."
   - id: nb_s5_closing_scripture_8_6
     speaker: scripture_caption
-    text_ko: "내가 어찌 내 민족이 화 당함을 차마 보며 내 친척의 멸망함을 차마 보리이까 하니 (에스더 8:6)"
+    text_ko: "내가 어찌 내 민족이 화 당함을 차마 보며 내 친척의 멸망함을 차마 보리이까 하니 (에 8:6)"
     audio_clip_id: aud_s5_closing_scripture_8_6_ko
     start_at_seconds: 86.0
     duration_seconds: 4.0

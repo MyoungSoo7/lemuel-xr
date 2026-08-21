@@ -50,7 +50,7 @@ npcs:
 narration_blocks:
   - id: nb_s3_women_enter
     speaker: narrator
-    text_ko: "그 때에 두 여자가 왕에게 와서 그 앞에 섰더라 (열왕기상 3:16, 요약)"
+    text_ko: "그 때에 두 여자가 왕에게 와서 그 앞에 섰더라 (왕상 3:16, 요약)"
     audio_clip_id: aud_s3_women_enter_ko
     start_at_seconds: 0.0
     duration_seconds: 8.0
@@ -58,7 +58,7 @@ narration_blocks:
     note: "'창기' 생략은 여인 비낙인화 목적의 의도적 각색 — 원문: '그 때에 창기 두 여자가 왕에게 와서 그 앞에 서며'"
   - id: nb_s3_woman_a_claim
     speaker: woman_a
-    text_ko: "이 여자가 밤에 아이를 잃고, 내가 잠든 사이에 내 아들을 데려다가 자기 품에 뉘었나이다. 산 아이가 내 아들이니이다. (열왕기상 3:19~21, 요약)"
+    text_ko: "이 여자가 밤에 아이를 잃고, 내가 잠든 사이에 내 아들을 데려다가 자기 품에 뉘었나이다. 산 아이가 내 아들이니이다. (왕상 3:19~21, 요약)"
     audio_clip_id: aud_s3_woman_a_ko
     audio_clip_id_low: aud_s3_woman_a_ko_low
     start_at_seconds: 10.0
@@ -68,7 +68,7 @@ narration_blocks:
     note: "영아 사망은 '아이를 잃고' 로만 — 경위 묘사 배제(R4 mid 절제)."
   - id: nb_s3_woman_b_claim
     speaker: woman_b
-    text_ko: "아니라 산 것은 내 아들이요 죽은 것은 네 아들이라 (열왕기상 3:22)"
+    text_ko: "아니라 산 것은 내 아들이요 죽은 것은 네 아들이라 (왕상 3:22)"
     audio_clip_id: aud_s3_woman_b_ko
     audio_clip_id_low: aud_s3_woman_b_ko_low
     start_at_seconds: 26.0
@@ -84,7 +84,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s3_sword_order
     speaker: solomon_self
-    text_ko: "칼을 내게로 가져오라 … 산 아이를 둘로 나누어 반은 이 여자에게 주고 반은 저 여자에게 주라 (열왕기상 3:24~25)"
+    text_ko: "칼을 내게로 가져오라 … 산 아이를 둘로 나누어 반은 이 여자에게 주고 반은 저 여자에게 주라 (왕상 3:24~25)"
     audio_clip_id: aud_s3_sword_order_ko
     audio_clip_id_low: aud_s3_sword_order_ko_low
     start_at_seconds: 70.0
@@ -94,14 +94,14 @@ narration_blocks:
     note: "칼은 들어올려질 뿐 아기에게 닿지 않음. 강도 '자막만' 선택 시 칼 연출 정지 이미지+자막 처리."
   - id: nb_s3_true_mother_cry
     speaker: woman_a
-    text_ko: "청하건대 내 주여 산 아이를 그에게 주시고 아무쪼록 죽이지 마옵소서 (열왕기상 3:26)"
+    text_ko: "청하건대 내 주여 산 아이를 그에게 주시고 아무쪼록 죽이지 마옵소서 (왕상 3:26)"
     audio_clip_id: aud_s3_true_mother_ko
     start_at_seconds: 84.0
     duration_seconds: 9.0
     hidden_until_event: sword_route_chosen
   - id: nb_s3_verdict
     speaker: solomon_self
-    text_ko: "산 아이를 저 여자에게 주고 결코 죽이지 말라 저가 그의 어머니이니라 (열왕기상 3:27)"
+    text_ko: "산 아이를 저 여자에게 주고 결코 죽이지 말라 저가 그의 어머니이니라 (왕상 3:27)"
     audio_clip_id: aud_s3_verdict_ko
     start_at_seconds: 96.0
     duration_seconds: 9.0
@@ -109,7 +109,7 @@ narration_blocks:
     note: "칼 즉시 거둠 — 아기는 어머니 품으로. 위협 상태에 머무는 시간 최소화."
   - id: nb_s3_awe
     speaker: narrator
-    text_ko: "온 이스라엘이 왕이 심리하여 판결함을 듣고 왕을 두려워하였으니 이는 하나님의 지혜가 그의 속에 있어 판결함을 봄이더라 (열왕기상 3:28)"
+    text_ko: "온 이스라엘이 왕이 심리하여 판결함을 듣고 왕을 두려워하였으니 이는 하나님의 지혜가 그의 속에 있어 판결함을 봄이더라 (왕상 3:28)"
     audio_clip_id: aud_s3_awe_ko
     start_at_seconds: 108.0
     duration_seconds: 10.0
@@ -165,7 +165,7 @@ safety_gates:
     consent_card_id: solomon_scene3_judgment_warning
     consent_card_intensity: mid
     consent_card_ko: |
-      다음 장면은 성경에서 가장 유명한 재판(열왕기상 3:16~28)을 다룹니다.
+      다음 장면은 성경에서 가장 유명한 재판(왕상 3:16~28)을 다룹니다.
       · 갓난아기를 잃은 어머니의 이야기가 대사로 언급됩니다. (시각적 묘사는 없습니다)
       · "칼을 가져오라"는 명령이 나옵니다. 칼은 아기에게 닿지 않으며, 마음을 드러내는 시험의 말로만 쓰입니다.
       · 아기를 잃은 경험, 유산·사산·산후 상실의 경험이 있으시다면 이 장면이 힘드실 수 있습니다.
@@ -175,7 +175,7 @@ safety_gates:
       음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
       지금 힘드시면: {{crisis_resources.default}}
     skip_alternative_scene_id: 4
-    skip_bridge_caption_ko: "왕은 칼을 가져오라 명하여 두 여인의 마음을 드러냈고, 산 아기는 참 어머니의 품으로 돌아갔다. 온 이스라엘이 왕 안에 있는 하나님의 지혜를 보고 두려워하였다. (열왕기상 3:27~28 요약)"
+    skip_bridge_caption_ko: "왕은 칼을 가져오라 명하여 두 여인의 마음을 드러냈고, 산 아기는 참 어머니의 품으로 돌아갔다. 온 이스라엘이 왕 안에 있는 하나님의 지혜를 보고 두려워하였다. (왕상 3:27~28 요약)"
     skip_bridge_note: "요약 자막 1장(비묘사) 노출 후 Scene 4 진행 — 서사 연속성 유지 (결정 D)."
     voice_intensity_options: [subtitle_only, low, default]
   - id: no_deceased_infant_visualization

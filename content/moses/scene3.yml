@@ -218,7 +218,7 @@ narration_blocks:
     start_at_seconds: 0.0
     duration_seconds: 9.0
     hidden_until_event: bush_response_card_4_complete
-    example_balanced_ko: "'하나님이 우리 체질을 아시며 우리가 진토임을 기억하심이로다' (시 103:14) — 능력의 결핍을 *진단* 으로만 두자. *인격의 결핍* 으로 미끄러뜨리지 않아도 된다. 당신의 입이 둔한 것은 *당신이 가치 없다는 뜻이 아니다*."
+    example_balanced_ko: "하나님은 '우리의 체질을 아시며 우리가 단지 먼지뿐임을 기억하심이로다' (시 103:14) — 능력의 결핍을 *진단* 으로만 두자. *인격의 결핍* 으로 미끄러뜨리지 않아도 된다. 당신의 입이 둔한 것은 *당신이 가치 없다는 뜻이 아니다*."
   - id: nb_s3_comfort_card_5
     speaker: comfort_text
     text_ko: "{{matched_comfort_card_5_by_faith_tone}}"

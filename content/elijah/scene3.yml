@@ -41,14 +41,14 @@ npcs:
 narration_blocks:
   - id: nb_s3_arise_eat_1
     speaker: angel
-    text_ko: "일어나서 먹으라 (열왕기상 19:5)"
+    text_ko: "일어나서 먹으라 (왕상 19:5)"
     audio_clip_id: aud_s3_arise_eat_1_ko
     start_at_seconds: 0.0
     duration_seconds: 6.0
     hidden_until_event: null
   - id: nb_s3_arise_eat_2
     speaker: angel
-    text_ko: "일어나 먹으라 네가 갈 길을 다 가지 못할까 하노라 (열왕기상 19:7)"
+    text_ko: "일어나 먹으라 네가 갈 길을 다 가지 못할까 하노라 (왕상 19:7)"
     audio_clip_id: aud_s3_arise_eat_2_ko
     start_at_seconds: 50.0
     duration_seconds: 8.0
@@ -56,7 +56,7 @@ narration_blocks:
     note: "두 번째 깨움 — 회복은 한 번에 끝나지 않는다. 재촉이 아닌 다독임."
   - id: nb_s3_strength_of_food
     speaker: narrator
-    text_ko: "그가 일어나 먹고 마시고 그 음식물의 힘을 의지하여 사십 주 사십 야를 갔다. (열왕기상 19:8, 요약)"
+    text_ko: "그가 일어나 먹고 마시고 그 음식물의 힘을 의지하여 사십 주 사십 야를 갔다. (왕상 19:8, 요약)"
     audio_clip_id: aud_s3_strength_ko
     start_at_seconds: 75.0
     duration_seconds: 12.0

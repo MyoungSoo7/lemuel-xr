@@ -56,14 +56,14 @@ narration_blocks:
     note: "비성경 나레이터 브리지 문장 — 성경 인용 아님, 시간 경과 고지용."
   - id: nb_s3_appearance_1_15
     speaker: scripture_caption
-    text_ko: "열흘 후에 그들의 얼굴이 더욱 아름답고 살이 더욱 윤택하여 왕의 음식을 먹는 다른 소년들보다 더 좋아 보인지라 (다니엘 1:15)"
+    text_ko: "열흘 후에 그들의 얼굴이 더욱 아름답고 살이 더욱 윤택하여 왕의 음식을 먹는 다른 소년들보다 더 좋아 보인지라 (단 1:15)"
     audio_clip_id: aud_s3_1_15_ko
     start_at_seconds: 10.0
     duration_seconds: 12.0
     hidden_until_event: null
   - id: nb_s3_provision_1_16
     speaker: scripture_caption
-    text_ko: "그리하여 감독하는 자가 그들에게 지정된 음식과 마실 포도주를 제하고 채식을 주니라 (다니엘 1:16)"
+    text_ko: "그리하여 감독하는 자가 그들에게 지정된 음식과 마실 포도주를 제하고 채식을 주니라 (단 1:16)"
     audio_clip_id: aud_s3_1_16_ko
     start_at_seconds: 24.0
     duration_seconds: 11.0
@@ -71,7 +71,7 @@ narration_blocks:
     note: "협상 상대가 감독관임을 최종 확증하는 절(seed §1-1). 자막 화자는 overseer_official 이 아니라 scripture_caption 유지 — 이 절은 결과 서술이지 대사가 아니다."
   - id: nb_s3_wisdom_1_17
     speaker: scripture_caption
-    text_ko: "하나님이 이 네 소년에게 학문을 주시고 모든 서적을 깨닫게 하시고 지혜를 주셨으니 다니엘은 또 모든 환상과 꿈을 깨달아 알더라 (다니엘 1:17)"
+    text_ko: "하나님이 이 네 소년에게 학문을 주시고 모든 서적을 깨닫게 하시고 지혜를 주셨으니 다니엘은 또 모든 환상과 꿈을 깨달아 알더라 (단 1:17)"
     audio_clip_id: aud_s3_1_17_ko
     start_at_seconds: 37.0
     duration_seconds: 8.0

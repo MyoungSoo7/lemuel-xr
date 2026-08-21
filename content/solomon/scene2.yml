@@ -40,14 +40,14 @@ npcs:
 narration_blocks:
   - id: nb_s2_dream_intro
     speaker: narrator
-    text_ko: "기브온에서 밤에 여호와께서 꿈에 솔로몬에게 나타나셨다. (열왕기상 3:5, 요약)"
+    text_ko: "기브온에서 밤에 여호와께서 꿈에 솔로몬에게 나타나셨다. (왕상 3:5, 요약)"
     audio_clip_id: aud_s2_dream_intro_ko
     start_at_seconds: 0.0
     duration_seconds: 8.0
     hidden_until_event: null
   - id: nb_s2_answer_pleased
     speaker: dream_voice
-    text_ko: "네가 이것을 구하도다 자기를 위하여 장수하기를 구하지 아니하며 부도 구하지 아니하며 자기 원수의 생명을 멸하기도 구하지 아니하고 오직 송사를 듣고 분별하는 지혜를 구하였으니 (열왕기상 3:11)"
+    text_ko: "네가 이것을 구하도다 자기를 위하여 장수하기를 구하지 아니하며 부도 구하지 아니하며 자기 원수의 생명을 멸하기도 구하지 아니하고 오직 송사를 듣고 분별하는 지혜를 구하였으니 (왕상 3:11)"
     verbatim_note: "개역개정 원문 대조 완료(2026-07-22, 대한성서공회) — 어미 변경 없는 verbatim (T4)."
     audio_clip_id: aud_s2_answer_pleased_ko
     start_at_seconds: 10.0
@@ -55,14 +55,14 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s2_wisdom_given
     speaker: dream_voice
-    text_ko: "내가 네 말대로 하여 네게 지혜롭고 총명한 마음을 주노니 (열왕기상 3:12)"
+    text_ko: "내가 네 말대로 하여 네게 지혜롭고 총명한 마음을 주노니 (왕상 3:12)"
     audio_clip_id: aud_s2_wisdom_given_ko
     start_at_seconds: 23.0
     duration_seconds: 8.0
     hidden_until_event: null
   - id: nb_s2_beyond_asking
     speaker: dream_voice
-    text_ko: "내가 또 네가 구하지 아니한 부귀와 영광도 네게 주노니 (열왕기상 3:13)"
+    text_ko: "내가 또 네가 구하지 아니한 부귀와 영광도 네게 주노니 (왕상 3:13)"
     audio_clip_id: aud_s2_beyond_asking_ko
     start_at_seconds: 33.0
     duration_seconds: 8.0

@@ -54,14 +54,14 @@ npcs:
 narration_blocks:
   - id: nb_s2_mordecai_mourning
     speaker: scripture_caption
-    text_ko: "모르드개가 이 모든 일을 알고 자기의 옷을 찢고 굵은 베 옷을 입고 재를 뒤집어쓰고 성중에 나가서 대성 통곡하며 (에스더 4:1)"
+    text_ko: "모르드개가 이 모든 일을 알고 자기의 옷을 찢고 굵은 베 옷을 입고 재를 뒤집어쓰고 성중에 나가서 대성 통곡하며 (에 4:1)"
     audio_clip_id: aud_s2_mordecai_mourning_ko
     start_at_seconds: 0.0
     duration_seconds: 16.0
     hidden_until_event: null
   - id: nb_s2_city_mourning
     speaker: scripture_caption
-    text_ko: "왕의 명령과 조서가 각 지방에 이르매 유다인이 크게 애통하여 금식하며 울며 부르짖고 굵은 베 옷을 입고 재에 누운 자가 무수하더라 (에스더 4:3)"
+    text_ko: "왕의 명령과 조서가 각 지방에 이르매 유다인이 크게 애통하여 금식하며 울며 부르짖고 굵은 베 옷을 입고 재에 누운 자가 무수하더라 (에 4:3)"
     audio_clip_id: aud_s2_city_mourning_ko
     start_at_seconds: 16.0
     duration_seconds: 20.0
@@ -71,7 +71,7 @@ narration_blocks:
       원경에서만(가까이 끌어오지 않는다)."
   - id: nb_s2_hatach_delivers
     speaker: scripture_caption
-    text_ko: "또 유다인을 진멸하라고 수산 궁에서 내린 조서 초본을 하닥에게 주어 에스더에게 보여 알게 하고 또 그에게 부탁하여 왕에게 나아가서 그 앞에서 자기 민족을 위하여 간절히 구하라 하니 (에스더 4:8)"
+    text_ko: "또 유다인을 진멸하라고 수산 궁에서 내린 조서 초본을 하닥에게 주어 에스더에게 보여 알게 하고 또 그에게 부탁하여 왕에게 나아가서 그 앞에서 자기 민족을 위하여 간절히 구하라 하니 (에 4:8)"
     audio_clip_id: aud_s2_hatach_delivers_ko
     start_at_seconds: 36.0
     duration_seconds: 24.0
