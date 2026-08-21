@@ -44,6 +44,15 @@ import java.nio.file.Path
  * 대장에 적혀 있다. 여기서 재는 것은 "결정 기록과 AR 폐쇄 없이 노출이 열리지
  * 않았는가" 하나뿐이다. 이 테스트를 지우는 것도 물리적으로는 가능하지만,
  * 그 삭제는 diff 에 남는다.
+ *
+ * ──────────────────── 2026-08-22 — 옆문을 막았다 ────────────────────
+ *
+ * 위 두 요구는 **룻에만** 걸려 있었고, 세 번째 테스트가 「enum 에 없는 시나리오」로
+ * 새 인물을 잡기로 되어 있었다. 그런데 그 검사는 **yml 이 먼저, enum 이 나중** 인
+ * 순서에서만 작동한다. 아직 안 열린 여섯은 시나리오 yml 자체가 없어서 열릴 때
+ * 두 줄이 한 커밋에 들어오고, 그러면 중간 상태가 존재하지 않아 아무것도 안 걸렸다.
+ * 규칙은 실패 문구에 이미 적혀 있었고 집행만 없었다 — 그 자리를
+ * `룻 이후 열리는 인물은 노출 대장 없이 열리지 않는다` 가 채운다.
  */
 class RuntimeExposureSignoffTest {
 
@@ -121,6 +130,72 @@ class RuntimeExposureSignoffTest {
             .isEmpty()
     }
 
+    /**
+     * 룻 이전에 열린 일곱. **대장 없이 열려 있다** — 승인 목록이 아니라 기록된 빚이다.
+     *
+     * 이 집합에 이름을 더 넣어 새 인물을 통과시키는 것은 게이트를 지우는 것과 같다.
+     * 아래 두 번째 단정이 그것을 막는다(개수 고정).
+     */
+    private val preLedgerExposure = setOf(
+        "david", "elijah", "jesus", "job", "joseph", "moses", "solomon",
+    )
+
+    /**
+     * 룻 **이후** 열리는 인물은 노출 대장 없이 열리지 않는다.
+     *
+     * ─────────────────────────── 왜 이 테스트를 더 만들었나 ───────────────────────────
+     *
+     * 아래 `enum 에 없는 시나리오는 …` 는 **yml 이 먼저 생기고 enum 이 나중에 오는** 순서만
+     * 잡는다. 룻이 실제로 그랬기 때문에 그 모양으로 쓰였다 — yml 이 오래 디스크에 있었고
+     * enum 한 줄이 마지막에 들어갔다.
+     *
+     * 그런데 남은 여섯(abraham·daniel·esther·jacob·peter·rahab)은 그 순서로 오지 않는다.
+     * 시나리오 yml 이 아직 하나도 없어서, 열릴 때는 **yml 과 enum 줄이 같은 커밋에** 들어온다.
+     * 그러면 「enum 에 없는 시나리오」는 한순간도 존재하지 않고 그 테스트는 초록으로 지나간다.
+     * 대장을 요구하는 검사는 파일 이름이 `RUTH-` 로 박힌 것 하나뿐이라 역시 안 걸린다.
+     * **즉 룻 대장이 만든 게이트에는, 두 줄을 한꺼번에 넣으면 통과하는 옆문이 있었다.**
+     * 그 옆문은 위 테스트의 실패 문구가 「새 인물도 노출 대장을 만들어라」라고 이미 말하고
+     * 있던 것이라, 규칙은 있었고 집행만 없던 자리다.
+     *
+     * ─────────────────────────── 왜 일곱을 면제하나 ───────────────────────────
+     *
+     * 이미 열려 있는 일곱에 대장을 소급 요구하면 방법은 하나뿐이다 — **아무도 검토하지
+     * 않은 항목에 결정자 이름을 적는 것.** 그건 이 파일 머리말이 「빈 통제」라고 부르며
+     * 철회한 바로 그 짓이고, 기계가 사람 이름을 대신 적는 것은 더 나쁘다. 그래서 일곱은
+     * 면제하되 **면제라고 적어 둔다.** 이 집합은 승인이 아니라 남아 있는 빚의 목록이다.
+     */
+    @Test
+    fun `룻 이후 열리는 인물은 노출 대장 없이 열리지 않는다`() {
+        val exposed = Character.entries.map { it.dbValue }.toSet()
+
+        // 면제 목록이 실재와 갈라지면 먼저 그걸 드러낸다. 열려 있지도 않은 이름이
+        // 목록에 남아 있으면, 나중에 그 이름을 다시 열 때 조용히 면제된다.
+        assertThat(preLedgerExposure)
+            .describedAs("면제 목록에 열려 있지 않은 이름이 있다 — 다시 열릴 때 조용히 통과한다")
+            .isSubsetOf(exposed)
+        assertThat(preLedgerExposure)
+            .describedAs(
+                "룻 이전 노출 면제 목록이 늘었다. 새 인물을 여기 넣어 통과시키는 것은 " +
+                    "게이트를 지우는 것과 같다 — 대장(docs/{인물}-RUNTIME-SIGNOFF.md)을 만들어라",
+            )
+            .hasSize(7)
+
+        val missing = exposed.filterNot { it in preLedgerExposure }.sorted().filter { character ->
+            val ledger = repoRoot().resolve("docs/${character.uppercase()}-RUNTIME-SIGNOFF.md")
+            !Files.exists(ledger) || decisionLine.find(Files.readString(ledger, StandardCharsets.UTF_8)) == null
+        }
+
+        assertThat(missing)
+            .describedAs(
+                "노출 대장 없이(또는 «노출 결정» 줄이 빈 채로) 열린 인물이 있다: %s. " +
+                    "enum 한 줄이 곧 사용자 노출이다 — docs/{인물}-RUNTIME-SIGNOFF.md 를 " +
+                    "docs/RUTH-RUNTIME-SIGNOFF.md 형식으로 만들고, 결정자 이름과 날짜를 " +
+                    "**사람이** 채운 뒤에 열어라",
+                missing,
+            )
+            .isEmpty()
+    }
+
     /** enum 에 없는 시나리오 yml 이 또 생기면, 그것도 같은 게이트를 거쳐야 한다는 사실을 드러낸다. */
     @Test
     fun `enum 에 없는 시나리오는 룻 하나뿐이다`() {
@@ -139,8 +214,9 @@ class RuntimeExposureSignoffTest {
         assertThat(onDisk.filterNot { it in exposed })
             .describedAs(
                 "enum 에 없는 시나리오 yml 이 늘었다. 파일만 두면 로드되지 않아 안전해 보이지만, " +
-                    "그 상태를 지키는 게이트는 룻 것뿐이다 — 새 인물도 노출 대장을 만들어라 " +
-                    "(docs/RUTH-RUNTIME-SIGNOFF.md 형식)",
+                    "그건 아직 안 열렸다는 뜻일 뿐이다 — 열 때는 " +
+                    "docs/{인물}-RUNTIME-SIGNOFF.md 를 만들어라 (RUTH 형식). " +
+                    "그 요구는 위 «룻 이후 열리는 인물은 …» 이 집행한다",
             )
             .isSubsetOf("ruth")
     }
