@@ -25,7 +25,23 @@ vi.mock("@/lib/api/game", () => ({
   completeJoseph: vi.fn(),
 }));
 
+/*
+  성경 자구는 `/api/scripture` 에서 온다. 실물 왕복만 막고, 응답은 **시드 SQL 을 그대로
+  읽어** 돌려준다(`src/test/seed-passages.ts`) — 자구 사본을 테스트에 또 적으면 이 변경이
+  없애려던 "두 벌" 이 세 벌이 된다.
+
+  이 모킹이 없으면 `MonologueText` 가 전부 "본문 로드 중..." 으로 남는다. 그때 실패하는
+  것은 모놀로그 단언이므로, 원인이 배선이 아니라 자구 공급이라는 게 바로 보이지 않는다.
+*/
+vi.mock("@/lib/api/content", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/content")>()),
+  fetchScripturePassage: vi.fn(),
+}));
+
 import { startJoseph, decideJoseph, completeJoseph } from "@/lib/api/game";
+
+import { fetchScripturePassage } from "@/lib/api/content";
+import { seedPassage } from "@/test/seed-passages";
 // 위기 문구 픽스처는 정본에서 만든다. 번호를 여기에 적으면 정본이 바뀔 때
 // 테스트만 옛 번호를 지키고 초록을 유지한다 — check_frontend_hotline.py 가 막는 것.
 import { CRISIS_DEFAULT } from "@/lib/crisis-resources";
@@ -105,6 +121,7 @@ function renderPage() {
 }
 
 beforeEach(() => {
+  vi.mocked(fetchScripturePassage).mockImplementation(seedPassage);
   vi.mocked(startJoseph).mockReset();
   vi.mocked(decideJoseph).mockReset();
   vi.mocked(completeJoseph).mockReset();

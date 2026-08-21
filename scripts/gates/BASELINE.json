@@ -294,22 +294,20 @@
     "scripture-text:all": {
       "rc": 0,
       "tally": [
-        184,
+        201,
         0,
         0
       ],
       "items": []
     },
     "mission-passage:all": {
-      "rc": 1,
+      "rc": 0,
       "tally": [
-        9,
-        1,
+        10,
+        0,
         0
       ],
-      "items": [
-        "frontend-quotes:FAIL — 성경 본문의 사본이 프론트 문자열에 47건 남아 있다 (david-monologues.ts:N, jesus-monologues.ts:N, joseph-monologues.ts:N, moses-monologues."
-      ]
+      "items": []
     },
     "divine-title:all": {
       "rc": 0,

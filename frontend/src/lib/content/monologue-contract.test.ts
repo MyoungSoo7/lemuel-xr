@@ -3,17 +3,30 @@ import * as david from "./david-monologues";
 import * as jesus from "./jesus-monologues";
 import * as joseph from "./joseph-monologues";
 import * as moses from "./moses-monologues";
+import { refsOf, type Monologue } from "./scripture-quote";
+import { render } from "@/test/seed-passages";
+import {
+  entriesOf,
+  isMonologue,
+  isMonologueRecord,
+  REFS_EXPORT,
+} from "@/test/monologue-shape";
 
 /**
  * 네 인물 파일의 *공통 규약* 을 잰다.
  *
  * 왜 별도 파일인가 — 인물 페이지(`src/app/{joseph,david,moses,jesus}/page.tsx`)는 서로 다른
- * 컴포넌트지만 같은 관용(씬 1 도입 문자열 + 분기 Record + 조회 함수)을 전제로 쓰여 있다.
+ * 컴포넌트지만 같은 관용(씬 1 도입 모놀로그 + 분기 Record + 조회 함수)을 전제로 쓰여 있다.
  * **한 인물만 모양이 다르면 그 인물에서만 화면이 깨진다** — 그리고 그건 그 미션을 실제로
  * 끝까지 플레이해 보기 전엔 아무도 모른다. 그래서 모양 자체를 여기서 고정한다.
  *
  * 개별 파일 테스트가 "이 인물의 키가 yml 과 맞는가" 를 잰다면, 이 파일은
  * "네 인물이 서로 같은 규약을 지키는가" 를 잰다.
+ *
+ * 규약은 2026-08-21 에 한 번 바뀌었다. 예전에는 "export 는 문자열이거나 문자열 Record"
+ * 였지만, 성경 자구가 `/api/scripture` 로 옮겨 가면서 이제 **산문 + 인용 조각의 배열**
+ * (`Monologue`) 이다. 그래서 여기서 재는 문자열은 전부 `render()` 로 시드 자구를 채운
+ * 결과여야 한다 — 조각만 보면 인용 쪽에 들어온 금지 어휘·빈 문자열을 통째로 놓친다.
  */
 
 type Mod = Record<string, unknown>;
@@ -25,58 +38,60 @@ const CHARACTERS: Array<{ name: string; mod: Mod; scenes: number }> = [
   { name: "jesus", mod: jesus as Mod, scenes: 7 },
 ];
 
-/** 모듈이 내보낸 모든 사용자 노출 문자열을 평탄화한다. (함수는 제외) */
+/**
+ * 모듈이 내보낸 모든 사용자 노출 문자열을 평탄화한다 — **해석한 뒤의** 문자열이다.
+ * 조각 단계에서 재면 인용 자구가 검사 밖으로 빠진다. 함수와 `allRefs` 는 제외.
+ */
 function allTexts(mod: Mod): Array<[string, string]> {
-  const out: Array<[string, string]> = [];
-  for (const [name, value] of Object.entries(mod)) {
-    if (typeof value === "string") {
-      out.push([name, value]);
-    } else if (typeof value === "object" && value !== null) {
-      for (const [key, text] of Object.entries(
-        value as Record<string, unknown>,
-      )) {
-        if (typeof text === "string") out.push([`${name}.${key}`, text]);
-      }
-    }
-  }
-  return out;
+  return entriesOf(mod).map(([name, monologue]) => [name, render(monologue)]);
 }
 
 describe("인물 모놀로그 공통 규약", () => {
   describe("모든 인물이 같은 shape 관용을 따른다", () => {
     it.each(CHARACTERS)(
-      "$name — 씬 1 도입 문자열을 정확히 하나 갖는다",
+      "$name — 씬 1 도입 모놀로그를 정확히 하나 갖는다",
       ({ mod }) => {
-        // 페이지는 예외 없이 씬 1 을 '선택지 없는 단일 문자열'로 렌더한다.
-        // 여기가 Record 로 바뀌면 그 인물의 도입 화면만 [object Object] 가 된다.
+        // 페이지는 예외 없이 씬 1 을 '선택지 없는 단일 모놀로그'로 렌더한다.
         const scene1 = Object.entries(mod).filter(([name]) =>
           name.startsWith("scene1"),
         );
         expect(scene1.length).toBe(1);
-        expect(typeof scene1[0][1]).toBe("string");
-        expect((scene1[0][1] as string).trim().length).toBeGreaterThan(0);
+        // 분기 Record 가 아니라 단일 모놀로그여야 한다 — Record 로 바뀌면 그 인물의
+        // 도입 화면만 조회 키가 없어 빈다.
+        expect(isMonologue(scene1[0][1])).toBe(true);
+        expect(render(scene1[0][1] as Monologue).trim().length).toBeGreaterThan(
+          0,
+        );
       },
     );
 
     it.each(CHARACTERS)(
-      "$name — 내보낸 값은 문자열 / 문자열 Record / 함수 셋 중 하나뿐이다",
+      "$name — 내보낸 값은 모놀로그 / 모놀로그 Record / 함수 / allRefs 뿐이다",
       ({ name, mod }) => {
-        // 중첩 객체나 배열이 섞이면 공용 렌더 관용(문자열 그대로 출력)이 그 인물에서만 깨진다.
+        // 공용 렌더 경로는 `MonologueText` 하나다. 그 컴포넌트가 못 받는 모양이
+        // 한 인물에게만 섞이면 그 인물에서만 화면이 깨진다.
         for (const [key, value] of Object.entries(mod)) {
-          if (typeof value === "string" || typeof value === "function")
-            continue;
+          if (typeof value === "function" || key === REFS_EXPORT) continue;
           expect(
-            typeof value === "object" &&
-              value !== null &&
-              !Array.isArray(value),
+            isMonologue(value) || isMonologueRecord(value),
             `${name}.${key} 가 예상 밖 형태`,
           ).toBe(true);
-          for (const [k, v] of Object.entries(
-            value as Record<string, unknown>,
-          )) {
-            expect(typeof v, `${name}.${key}.${k}`).toBe("string");
-          }
         }
+      },
+    );
+
+    it.each(CHARACTERS)(
+      "$name — 화면이 열어야 할 참조 전부를 allRefs 로 내보낸다",
+      ({ name, mod }) => {
+        // 페이지는 이 하나를 `useMonologueTexts` 에 넘긴다. 여기서 빠진 참조는
+        // 조회되지 않고, 그 인용을 쓰는 모놀로그는 통째로 렌더를 포기한다
+        // (`resolveMonologue` 는 all-or-nothing) — 문장 하나가 아니라 문단이 사라진다.
+        const declared = mod[REFS_EXPORT];
+        expect(Array.isArray(declared), `${name}.allRefs 없음`).toBe(true);
+        const used = new Set(
+          entriesOf(mod).flatMap(([, m]) => refsOf(m as Monologue)),
+        );
+        expect([...used].sort()).toEqual([...(declared as string[])].sort());
       },
     );
 
@@ -138,10 +153,9 @@ describe("인물 모놀로그 공통 규약", () => {
         // 한 Record 안의 두 선택지가 같은 문장이면 그 분기는 사실상 죽은 분기다
         // (사용자는 다른 선택을 했는데 같은 화면을 본다).
         for (const [key, value] of Object.entries(mod)) {
-          if (typeof value !== "object" || value === null) continue;
-          const texts = Object.values(value as Record<string, unknown>).filter(
-            (v): v is string => typeof v === "string",
-          );
+          if (!isMonologueRecord(value)) continue;
+          // 조각 배열끼리는 참조 비교라 늘 다르다. 해석한 문자열로 재야 복붙을 잡는다.
+          const texts = Object.values(value).map(render);
           if (texts.length < 2) continue;
           expect(new Set(texts).size, `${name}.${key} 에 중복 텍스트`).toBe(
             texts.length,
@@ -191,11 +205,17 @@ describe("인물 모놀로그 공통 규약", () => {
     });
 
     it("각 fallback 값이 실제 텍스트를 갖는다 — fallback 이 빈 화면이면 의미 없다", () => {
-      expect(david.scene6OutroByLastStone[david.lastStoneOf([])]).toBeTruthy();
+      // 빈 배열도 truthy 라, 해석한 길이로 재야 실제로 글이 뜨는지 안다.
       expect(
-        moses.scene6OutroByScene3[moses.scene3AssignmentsToPattern({})],
-      ).toBeTruthy();
-      expect(jesus.scene4Iam[jesus.iamOf(null)]).toBeTruthy();
+        render(david.scene6OutroByLastStone[david.lastStoneOf([])]).length,
+      ).toBeGreaterThan(0);
+      expect(
+        render(moses.scene6OutroByScene3[moses.scene3AssignmentsToPattern({})])
+          .length,
+      ).toBeGreaterThan(0);
+      expect(render(jesus.scene4Iam[jesus.iamOf(null)]).length).toBeGreaterThan(
+        0,
+      );
     });
 
     it("[알려진 불일치] jesus 만 분기 키 outro Record 가 없다", () => {
@@ -204,7 +224,7 @@ describe("인물 모놀로그 공통 규약", () => {
       // 공용 outro 컴포넌트를 만들면 jesus 에서만 모양이 다르다는 뜻 — 현 상태를 고정해 둔다.
       const outroRecordOf = (mod: Mod) =>
         Object.entries(mod).find(
-          ([k, v]) => /Outro/.test(k) && typeof v === "object" && v !== null,
+          ([k, v]) => /Outro/.test(k) && isMonologueRecord(v),
         );
       expect(outroRecordOf(joseph as Mod)?.[0]).toBe("scene5OutroByScene3");
       expect(outroRecordOf(david as Mod)?.[0]).toBe("scene6OutroByLastStone");

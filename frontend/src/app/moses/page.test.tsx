@@ -10,6 +10,10 @@ import {
   completeMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+
+import { fetchScripturePassage } from "@/lib/api/content";
+import { render as renderMonologue, seedPassage } from "@/test/seed-passages";
+import type { Monologue } from "@/lib/content/scripture-quote";
 import {
   scene1Wilderness,
   scene2Monologues,
@@ -41,6 +45,19 @@ vi.mock("@/lib/api/game", () => ({
   startMission: vi.fn(),
   decideMission: vi.fn(),
   completeMission: vi.fn(),
+}));
+
+/*
+  성경 자구는 `/api/scripture` 에서 온다. 실물 왕복만 막고, 응답은 **시드 SQL 을 그대로
+  읽어** 돌려준다(`src/test/seed-passages.ts`) — 자구 사본을 테스트에 또 적으면 이 변경이
+  없애려던 "두 벌" 이 세 벌이 된다.
+
+  이 모킹이 없으면 `MonologueText` 가 전부 "본문 로드 중..." 으로 남는다. 그때 실패하는
+  것은 모놀로그 단언이므로, 원인이 배선이 아니라 자구 공급이라는 게 바로 보이지 않는다.
+*/
+vi.mock("@/lib/api/content", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/content")>()),
+  fetchScripturePassage: vi.fn(),
 }));
 
 const mockStart = vi.mocked(startMission);
@@ -199,10 +216,20 @@ async function assignAll(
 /**
  * 정본 문구는 줄바꿈(\n\n)을 품고 있다. testing-library 의 기본 normalizer 는
  * *요소 쪽* 공백만 접기 때문에, 기대 문자열도 같은 규칙으로 접어야 대조가 된다.
+ *
+ * 정본은 이제 자구가 아니라 조각 배열이다(`scripture-quote.ts`) — 성경 본문은
+ * `/api/scripture` 가 채운다. 그래서 접기 전에 먼저 **해석** 한다. 조각 배열을 그대로
+ * 문자열화해 비교하면 인용이 하나도 안 풀려도 대조가 성립한다.
  */
-const collapse = (s: string) => s.replace(/\s+/g, " ").trim();
+const collapse = (monologue: Monologue) =>
+  renderMonologue(monologue).replace(/\s+/g, " ").trim();
+
+/** 정규식·부분일치용 앞머리. 해석한 **화면 문자열** 에서 잘라야 인용까지 검사에 든다. */
+const head = (monologue: Monologue, n = 20) =>
+  renderMonologue(monologue).slice(0, n);
 
 beforeEach(() => {
+  vi.mocked(fetchScripturePassage).mockImplementation(seedPassage);
   mockStart.mockReset();
   mockDecide.mockReset();
   mockComplete.mockReset();
@@ -396,14 +423,14 @@ describe("Moses Scene 3 — 다섯 변명의 카드 (distribute)", () => {
       },
     });
     const echo = await screen.findByText(
-      new RegExp(scene3Outcomes.all_throw.slice(0, 20)),
+      new RegExp(head(scene3Outcomes.all_throw)),
     );
     // 내려놓은 카드마다 떨기나무 본문 응답(§3.4)이 붙는다.
     expect(echo).toHaveTextContent(
-      scene3CardResponses.who_am_i.slice(0, 20).trim(),
+      head(scene3CardResponses.who_am_i).trim(),
     );
     expect(echo).toHaveTextContent(
-      scene3CardResponses.send_other.slice(0, 20).trim(),
+      head(scene3CardResponses.send_other).trim(),
     );
   });
 
@@ -424,7 +451,7 @@ describe("Moses Scene 3 — 다섯 변명의 카드 (distribute)", () => {
     // 자기방어를 실패로 읽지 않는 정본 문구가 그대로 나와야 한다.
     expect(
       await screen.findByText(
-        new RegExp(scene3Outcomes.all_heart.slice(0, 20)),
+        new RegExp(head(scene3Outcomes.all_heart)),
       ),
     ).toBeInTheDocument();
   });
@@ -562,7 +589,7 @@ describe("Moses — yml 과 프론트 정본이 어긋날 때", () => {
 
     // Scene 3 의 echo 가 Scene 5 화면에 그대로 살아 있다.
     expect(
-      screen.getByText(new RegExp(scene3Outcomes.all_throw.slice(0, 20))),
+      screen.getByText(new RegExp(head(scene3Outcomes.all_throw))),
     ).toBeInTheDocument();
   });
 });

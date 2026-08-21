@@ -1,26 +1,48 @@
 #!/usr/bin/env python3
-"""프론트 모놀로그 성경 인용 원문 대조 게이트.
+"""프론트 모놀로그 성경 인용 게이트.
 
-`frontend/src/lib/content/*-monologues.ts` 안에 `"자구"(참조)` 형태로 박힌 인용을
-전부 뽑아 **개역개정 정본**(`docs/verses-monologues-gae.txt`)에 실재하는지 잰다.
+`frontend/src/lib/content/*-monologues.ts` 의 인용이 개역개정 정본과 맞는지 잰다.
+정본은 `docs/verses-monologues-gae.txt` (대한성서공회 GAE 기계 파싱).
 
-왜 이 파일이 필요한가 (2026-08-21 신설)
-    DB 쪽 성경 본문은 2026-07-18 의 교정 마이그레이션(`V20260718004903`) 이후
-    원문 대조 체계 안에 있다. 그런데 **프론트 문자열은 그 체계 밖이었다** —
-    2026-08-21 전수 대조 시점까지 이 네 파일을 읽는 스크립트가 리포에 하나도
-    없었다. 그날 32건 중 16건이 원문과 달랐다(어미 변형 10 · 무표시 중간절단 5 ·
-    원문에 없는 쉼표 1). 틀렸다고 확인된 적이 없었던 게 아니라, **한 번도
-    대조된 적이 없었다.** 그 상태가 되풀이되지 않게 고정하는 것이 이 게이트다.
+왜 이 파일이 있었나 (2026-08-21 신설)
+    DB 성경 본문은 2026-07-18 교정 마이그레이션(`V20260718004903`) 이후 원문 대조
+    체계 안에 있었다. 그런데 **프론트 문자열은 그 체계 밖이었다** — 그날 전수 대조
+    시점까지 이 네 파일을 읽는 스크립트가 리포에 하나도 없었고, 32건 중 16건이
+    원문과 달랐다(어미 변형 10 · 무표시 중간절단 5 · 원문에 없는 쉼표 1).
+    틀렸다고 확인된 적이 없었던 게 아니라 **한 번도 대조된 적이 없었다.**
 
-기존 게이트와 무엇이 다른가
-    `quote_sweep.py` 는 docs/*.md 를, `verse_lines_check.py` 는 자막 줄을 본다.
-    둘 다 `frontend/src/lib/content/` 를 입력으로 갖지 않는다. 그리고 TS 소스는
-    문서와 달리 **문자열 리터럴이 `" +` 로 쪼개져** 있어서, 문서용 추출기를 그대로
-    들이대면 인용의 반쪽만 본다 — 실제로 삼상 17:45 는 뒤쪽 조각만 우연히 맞아
-    통과했고 앞쪽에서 잘려 나간 절이 통째로 미탐이었다. 여기서는 리터럴을 먼저
-    이어 붙인 뒤 추출한다.
+왜 다시 쓰였나 (2026-08-21, 모놀로그 API 전환)
+    그 32건을 만든 근본 원인은 성경 자구가 **두 벌**(DB + 프론트 상수) 이었다는 것이다.
+    그래서 프론트에서 자구를 걷어내고 `/api/scripture` 응답에서 받게 바꿨다
+    (`scripture-quote.ts`). 소스에는 이제 자구 대신 `q("시 23:1", ["ps-23:1", 0, 6])`
+    처럼 **참조 + 낱말 인덱스** 만 남는다.
 
-판정 등급
+    그 순간 이 게이트의 원래 질문("프론트 자구가 정본과 같은가")은 **구조적으로 실패할
+    수 없는 질문** 이 됐다. 프론트에 잴 자구가 없기 때문이다. 실제로 전환 직후 이
+    스크립트는 주석에 남은 인용 4건만 보고 "전건 통과" 를 냈다 — 32건을 지키던 게이트가
+    4건짜리로 쪼그라든 것을 아무도 알 수 없는 초록이었다. **그 초록이 거짓말이라서**
+    질문을 다음 넷으로 바꿔 다시 썼다.
+
+무엇을 재는가
+    A. 해석       모든 `q()` 가 시드 자구로 실제로 풀리는가 (인덱스 범위·lastWordChars).
+                  실패하면 `resolveMonologue` 가 null 을 돌려 **문단이 통째로 사라진다**
+                  — 한 문장이 비는 게 아니라 화면에서 없어진다.
+    B. cite↔ref   인용 표기(`"출 4:14~16"`)가 클립이 여는 참조를 실제로 덮는가.
+                  덮지 않으면 독자는 읽지도 않은 절을 출처로 믿는다. 자구는 맞는데
+                  출처만 틀린 이 형태는 사람 눈으로 거의 안 잡힌다.
+    C. 시드↔정본  클립이 여는 참조의 **시드 자구** 가 개역개정 정본과 축자로 같은가.
+                  프론트가 읽는 것은 이제 시드이므로, 축자 대조의 대상도 시드다.
+    D. 하드코딩   소스에 `"자구"(참조)` 형태의 성경 자구가 다시 박히지 않았는가.
+                  **주석 안은 허용** 이고(신학 근거를 적는 자리다) 정본 대조만 한다.
+                  코드 안이면 실패다 — 두 벌 상태로 되돌아간 것이기 때문이다.
+
+C 가 `scripture_text_check.py` 와 겹치는 것에 대하여
+    겹친다. 그쪽은 시드 201행 전체를 KRV/KLB 해시와 대조한다. 여기는 모놀로그가 여는
+    30여 참조만, **해시가 아니라 자구로** 잰다. 해시는 "다르다" 만 말하고 어디가
+    다른지는 안 말한다. 이 게이트가 남긴 실패 출력은 사람이 바로 고칠 수 있는 형태다.
+    중복이지만 값이 다른 중복이라 남긴다.
+
+판정 등급 (A · C · D 공통)
     MATCH          정본 해당 절의 축자 부분문자열                      통과
     ELLIPSIS       생략부호(…)로 이은 축자 조각이 순서대로 전부 있음   통과
     PUNCT_ONLY     구두점만 다름 (원문에 없는 쉼표 삽입 등)            실패
@@ -28,27 +50,31 @@
     ALTERED        어미·인칭·역본 혼합 등 자구 자체가 다름             실패
     NO_CANON       참조가 정본 표에 없다 — 판정 불가                   실패
 
-    ELLIPSIS 를 통과로 두는 것은 *생략했다는 사실을 독자에게 표시했기 때문*이다.
-    SPLICE_NOMARK 는 자구가 전부 원문이어도 실패다 — 표시 없이 중간을 들어내면
-    한정어가 사라져 뜻이 바뀌고(삼상 17:45 의 "네가 모욕하는 이스라엘 군대의"),
-    독자는 잘렸다는 것을 알 길이 없다.
+    ELLIPSIS 를 통과로 두는 것은 *생략했다는 사실을 독자에게 표시했기 때문* 이다.
+    `resolveQuote` 가 클립 사이를 " … " 로 잇는 것이 그 표시다. SPLICE_NOMARK 는
+    자구가 전부 원문이어도 실패다 — 표시 없이 중간을 들어내면 한정어가 사라져 뜻이
+    바뀌고(삼상 17:45 의 "네가 모욕하는 이스라엘 군대의"), 독자는 잘렸다는 것을 알
+    길이 없다.
 
 역본 정책
-    개역개정 하나로만 잰다. `docs/CONTENT-WORKFLOW.md` 가 "MVP 는 개역개정 우선"
-    으로 정해 두었고, 현대인의 성경은 `docs/BACKEND-ARCHITECTURE.md` 위험 #4 에서
-    라이선스 분쟁 항목으로 잡혀 있다(완화책이 "개역개정 fallback"). 정본을 하나로
-    묶어 두지 않으면 한 문장 안에서 두 역본이 섞이는 실패가 다시 난다 —
-    2026-08-21 에 시 62:5 와 요 14:6 이 정확히 그 형태였다.
+    개역개정 하나로만 잰다. `docs/CONTENT-WORKFLOW.md` 가 "MVP 는 개역개정 우선" 으로
+    정해 두었고, 현대인의 성경은 `docs/BACKEND-ARCHITECTURE.md` 위험 #4 에서 라이선스
+    분쟁 항목으로 잡혀 있다. 시드 쪽도 `translation='rev'` 행만 본다 —
+    `fetchScripturePassage` 의 기본값이 그것이라, 다른 역본을 재면 화면과 다른 것을
+    재게 된다(#84 가 정확히 그 사고였다).
 
 이 게이트가 **못 잡는 것** (적지 않으면 초록이 거짓말이 된다)
-    - **인용부호 없이 쓴 성경 자구.** 참조도 따옴표도 없이 본문에 녹인 문장은
-      추출 대상 밖이다. 그건 `verse_lines_check.py` 계열의 몫이다.
-    - **참조는 맞는데 절 선택이 부적절한 경우.** 자구가 그 절에 실재하면 통과다.
-      문맥상 엉뚱한 절을 끌어다 쓴 것은 사람이 판정한다.
-    - **시나리오 yml 의 카드 라벨.** `moses.yml` 의 `label:` 은 참조를 달고 있지만
-      따옴표 인용 형식이 아니라 여기 안 걸린다. 2026-08-21 현재 "제가 누구이기에"
+    - **클립 구간이 뜻을 왜곡하는 경우.** 인덱스가 절 안에 있고 자구가 원문이면 통과다.
+      "그 구간을 고른 것이 정당한가" 는 사람이 판정한다. 기계가 볼 수 있는 것은
+      `docs/monologue-quotes.lock.txt` 의 diff 뿐이다.
+    - **참조는 맞는데 절 선택이 부적절한 경우.** B 는 표기와 참조가 *서로* 맞는지만 본다.
+      문맥상 엉뚱한 절을 끌어다 쓴 것은 사람의 몫이다.
+    - **인용부호 없이 본문에 녹인 성경 자구.** 참조도 따옴표도 없으면 D 의 추출 대상
+      밖이다. 그건 `verse_lines_check.py` 계열의 몫이다.
+    - **시나리오 yml 의 카드 라벨.** `moses.yml` 의 `label:` 은 참조를 달지만 따옴표
+      인용 형식이 아니라 여기 안 걸린다. 2026-08-21 현재 "제가 누구이기에"
       (출 3:11 은 "내가 누구이기에") 처럼 의역 라벨이 남아 있다 — 알고 남긴 것이다.
-    - **정본 표 자체의 오류.** 표는 bskorea HTML 을 기계 파싱해 만들지만, 그 파싱이
+    - **정본 표 자체의 오류.** 표는 bskorea HTML 을 기계 파싱해 만든다. 그 파싱이
       틀리면 게이트는 틀린 기준으로 초록을 낸다. `--refresh` 로 재생성해 diff 가
       비는지가 유일한 확인 수단이다.
 
@@ -60,7 +86,7 @@
 rc
     0  전건 통과
     1  실패 건 있음
-    2  판정 불가 (정본 표 없음 · 소스 파일 없음 · 인용 0건)
+    2  판정 불가 (정본 표 없음 · 소스 없음 · 시드 없음 · 인용 0건)
 """
 
 from __future__ import annotations
@@ -73,9 +99,28 @@ import unicodedata
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scripture_text_check import seeded_rows  # noqa: E402  시드 파서를 두 벌 두지 않는다
+
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "frontend/src/lib/content"
 CANON = ROOT / "docs/verses-monologues-gae.txt"
+
+# 화면이 읽는 역본. `frontend/src/lib/api/content.ts` 의 기본값과 같아야 한다.
+TRANSLATION = "rev"
+
+# 시드 `book_code` → 정본 표·인용 표기의 한글 약칭.
+# `docs/SCRIPTURE-REF-CONVENTION.md` 가 "같은 책이 두 약어로 살면 안 된다" 로 고정한
+# 그 약어들이다(`mt` 가 아니라 `matt`). 모르는 코드는 조용히 넘기지 않고 판정불가로 낸다.
+BOOK_KO = {
+    "gen": "창", "ex": "출", "lev": "레", "num": "민", "deut": "신",
+    "josh": "수", "judg": "삿", "ruth": "룻", "1sam": "삼상", "2sam": "삼하",
+    "1kgs": "왕상", "2kgs": "왕하", "job": "욥", "ps": "시", "prov": "잠",
+    "eccl": "전", "isa": "사", "jer": "렘", "ezek": "겔", "dan": "단",
+    "matt": "마", "mk": "막", "lk": "눅", "jn": "요", "acts": "행",
+    "rom": "롬", "1cor": "고전", "2cor": "고후", "gal": "갈", "eph": "엡",
+    "phil": "빌", "col": "골", "heb": "히", "jas": "약", "rev": "계",
+}
 
 # ── 추출 ──────────────────────────────────────────────────────────────────
 # `\n` 은 문단 경계 표식으로 남긴다 — 인용이 줄바꿈을 넘어 다음 문단을 삼키지
@@ -93,56 +138,198 @@ MD = re.compile(r"[*_`]")                # 인용 안에 들어간 마크다운 
 QUOTE_CHARS = "\"“”„‟'‘’「」『』《》〈〉"
 PUNCT = ",.!?;:·…‥、。~-–—"
 
-
-def prepare(src: str) -> str:
-    src = src.replace("\\n", SENTINEL)
-    src = src.replace('\\"', '"').replace("\\'", "'")
-    return JOIN.sub("", src)
-
-
-def find_line(raw: str, text: str) -> int:
-    """이어붙이기 전 원본에서 인용의 첫 조각이 나오는 줄을 되찾는다."""
-    probe = text[:12].replace('"', "")
-    for i, line in enumerate(raw.splitlines(), 1):
-        if probe and probe in line.replace('\\"', '"'):
-            return i
-    return 0
+CITE_RE = re.compile(r"^([가-힣]+)\s?(\d+):(\d+)(?:[-~](\d+))?$")
 
 
 def sources() -> list[Path]:
-    return sorted(
-        p for p in SRC_DIR.glob("*-monologues.ts") if not p.name.endswith(".test.ts")
-    )
+    """콘텐츠 모듈 전부. `*-monologues.ts` 로 좁히지 않는다.
+
+    D 축(하드코딩 회귀)이 좁으면 자구를 `scripture-quote.ts` 같은 이웃 파일로 옮겨
+    박는 것만으로 게이트를 빠져나간다. A·B 축은 `q()` 가 있는 파일에서만 셈이 돌므로
+    넓혀도 셈이 늘지 않는다 — 주석 속 사용 예시는 아래에서 걸러낸다.
+    """
+    return sorted(p for p in SRC_DIR.glob("*.ts") if not p.name.endswith(".test.ts"))
 
 
-def extract() -> tuple[list[dict], list[tuple]]:
-    pairs: list[dict] = []
-    refs: set[tuple] = set()
-    for f in sources():
-        raw = f.read_text(encoding="utf-8")
-        joined = prepare(raw)
-        for m in QUOTED.finditer(joined):
-            pairs.append(
-                {
-                    "site": f"{f.name}:{find_line(raw, m.group('text'))}",
-                    "text": m.group("text").strip(),
-                    "book": m.group(2),
-                    "chapter": int(m.group(3)),
-                    "verse": int(m.group(4)),
-                    "end": int(m.group(5)) if m.group(5) else None,
-                }
+def comment_spans(src: str) -> list[tuple[int, int]]:
+    """주석 구간 [start, end). 문자열·템플릿 리터럴 안의 `//` 를 주석으로 오인하지 않는다.
+
+    D 축이 "주석 안이냐 코드 안이냐" 로 판정을 가르므로, 이 구분이 틀리면 하드코딩
+    회귀를 통과시키거나 정당한 신학 주석을 실패로 낸다. 그래서 정규식이 아니라
+    상태 기계로 훑는다.
+    """
+    spans: list[tuple[int, int]] = []
+    i, n = 0, len(src)
+    while i < n:
+        c = src[i]
+        if c == "/" and i + 1 < n and src[i + 1] == "/":
+            j = src.find("\n", i)
+            j = n if j < 0 else j
+            spans.append((i, j))
+            i = j
+        elif c == "/" and i + 1 < n and src[i + 1] == "*":
+            j = src.find("*/", i + 2)
+            j = n if j < 0 else j + 2
+            spans.append((i, j))
+            i = j
+        elif c in "\"'`":
+            i += 1
+            while i < n and src[i] != c:
+                i += 2 if src[i] == "\\" else 1
+            i += 1
+        else:
+            i += 1
+    return spans
+
+
+def in_comment(spans: list[tuple[int, int]], pos: int) -> bool:
+    return any(a <= pos < b for a, b in spans)
+
+
+def line_of(src: str, pos: int) -> int:
+    return src.count("\n", 0, pos) + 1
+
+
+def parse_clips(src: str) -> list[dict]:
+    """`q("표기", ["ref", from, to], ["ref", from, to, lastWordChars]) ` 를 뽑는다.
+
+    괄호 균형으로 끊는다 — 정규식 하나로 끝내려 하면 인자가 줄을 넘어갈 때
+    조각만 잡는다. 그 형태의 미탐이 이 파일의 초판을 망쳤다(리터럴 `" +` 분할).
+
+    주석 속 `q(...)` 는 사용 예시다(`scripture-quote.ts` 머리말). 세면 화면에 없는
+    인용이 셈에 들어가고, 예시가 낡으면 있지도 않은 실패가 뜬다.
+    """
+    spans = comment_spans(src)
+    out: list[dict] = []
+    for m in re.finditer(r"\bq\(", src):
+        if in_comment(spans, m.start()):
+            continue
+        depth, i, n = 0, m.start() + 1, len(src)
+        while i < n:
+            if src[i] == "(":
+                depth += 1
+            elif src[i] == ")":
+                depth -= 1
+                if depth == 0:
+                    break
+            i += 1
+        body = src[m.end() : i]
+        cite_m = re.match(r'\s*"([^"]+)"', body)
+        if not cite_m:
+            continue
+        clips = [
+            {
+                "ref": c.group(1),
+                "from": int(c.group(2)),
+                "to": int(c.group(3)),
+                "last": int(c.group(4)) if c.group(4) else None,
+            }
+            for c in re.finditer(
+                r'\[\s*"([^"]+)"\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*(\d+)\s*)?\]', body
             )
-        for m in re.finditer(REF, joined):
-            refs.add(
-                (
-                    m.group(1),
-                    int(m.group(2)),
-                    int(m.group(3)),
-                    int(m.group(4)) if m.group(4) else None,
-                )
-            )
-    # end=None 과 int 가 섞이므로 정렬 키에서 None 을 0 으로 눕힌다.
-    return pairs, sorted(refs, key=lambda r: (r[0], r[1], r[2], r[3] or 0))
+        ]
+        out.append(
+            {
+                "cite": cite_m.group(1),
+                "clips": clips,
+                "pos": m.start(),
+            }
+        )
+    return out
+
+
+ESCAPE = re.compile(r"\\n|\\\"|\\'")
+
+
+def prepare(src: str) -> tuple[str, list[int]]:
+    """비교용 형태 + **원본 오프셋 지도**.
+
+    `\\n` 은 문단 경계 표식으로 남기고, 줄을 넘겨 이어 붙인 리터럴(`" +\\n  "`)은
+    한 덩어리로 만든다. 둘 다 길이를 바꾸므로 변환 뒤 위치로는 원본을 못 짚는다.
+
+    지도가 왜 필요한가: D 축은 인용이 **주석 안이냐 코드 안이냐** 로 판정을 가른다.
+    초판은 위치를 잃고 `raw.find(자구 앞머리)` 로 되찾았는데, 같은 자구가 주석에도
+    있으면 코드에 박힌 회귀가 주석 건으로 붙어 **코드 하드코딩이 통과했다**. 위치는
+    추측하지 말고 들고 다녀야 한다.
+    """
+    edits: list[tuple[int, int, str]] = [
+        (m.start(), m.end(), SENTINEL if m.group() == "\\n" else m.group()[1])
+        for m in ESCAPE.finditer(src)
+    ]
+    edits += [(m.start(), m.end(), "") for m in JOIN.finditer(src)]
+
+    out: list[str] = []
+    idx: list[int] = []
+    i = 0
+    for a, b, rep in sorted(edits):
+        if a < i:  # 겹치는 변환은 먼저 잡은 쪽이 이긴다
+            continue
+        out.append(src[i:a])
+        idx.extend(range(i, a))
+        out.append(rep)
+        idx.extend([a] * len(rep))
+        i = b
+    out.append(src[i:])
+    idx.extend(range(i, len(src)))
+    return "".join(out), idx
+
+
+def parse_literals(raw: str) -> list[dict]:
+    """소스에 자구가 그대로 박힌 `"…"(참조)` 를 뽑는다 (D 축)."""
+    joined, idx = prepare(raw)
+    spans = comment_spans(raw)
+    out: list[dict] = []
+    for m in QUOTED.finditer(joined):
+        pos = idx[m.start()]
+        out.append(
+            {
+                "text": m.group("text").strip(),
+                "book": m.group(2),
+                "chapter": int(m.group(3)),
+                "verse": int(m.group(4)),
+                "end": int(m.group(5)) if m.group(5) else None,
+                "line": line_of(raw, pos),
+                "comment": in_comment(spans, pos),
+            }
+        )
+    return out
+
+
+# ── 시드 자구 ─────────────────────────────────────────────────────────────
+def seed_texts() -> dict[str, str]:
+    """`translation='rev'` 시드 행. 프론트가 `/api/scripture` 로 받는 그 자구다."""
+    return {r["ref"]: r["text"] for r in seeded_rows() if r["trans"] == TRANSLATION}
+
+
+def resolve_clip(clip: dict, text: str) -> str | None:
+    """`scripture-quote.ts` 의 `resolveClip` 과 **같은 규칙** 으로 자른다.
+
+    두 구현이 어긋나면 여기가 통과시킨 것을 화면이 못 그리거나 그 반대가 된다.
+    낱말 분리는 공백 기준, 끝 낱말만 `lastWordChars` 글자로 자른다(조사 절단).
+    """
+    words = [w for w in re.split(r"\s+", text) if w]
+    if clip["from"] < 0 or clip["to"] > len(words) or clip["from"] >= clip["to"]:
+        return None
+    picked = words[clip["from"] : clip["to"]]
+    if clip["last"] is not None:
+        last = picked[-1]
+        if clip["last"] <= 0 or clip["last"] > len(last):
+            return None
+        picked[-1] = last[: clip["last"]]
+    return " ".join(picked)
+
+
+def resolve_quote(entry: dict, texts: dict[str, str]) -> str | None:
+    parts = []
+    for clip in entry["clips"]:
+        text = texts.get(clip["ref"])
+        if text is None:
+            return None
+        part = resolve_clip(clip, text)
+        if part is None:
+            return None
+        parts.append(part)
+    return " … ".join(parts)
 
 
 # ── 정규화 ────────────────────────────────────────────────────────────────
@@ -159,7 +346,7 @@ def loose(s: str) -> str:
     return re.sub(r"[%s]" % re.escape(PUNCT), "", base(s))
 
 
-def words(s: str) -> list[str]:
+def words_of(s: str) -> list[str]:
     s = unicodedata.normalize("NFC", s)
     s = MD.sub("", FOOTNOTE.sub("", s))
     s = re.sub(r"[%s]" % re.escape(QUOTE_CHARS + PUNCT), "", s)
@@ -204,6 +391,14 @@ def canon_text(table, book, chapter, verse, end) -> str | None:
     return " ".join(parts)
 
 
+def split_ref(ref: str) -> tuple[str, int, int] | None:
+    """`ex-4:12` → (`출`, 4, 12). 모르는 책 코드면 None."""
+    m = re.fullmatch(r"([a-z0-9]+)-(\d+):(\d+)", ref)
+    if not m or m.group(1) not in BOOK_KO:
+        return None
+    return BOOK_KO[m.group(1)], int(m.group(2)), int(m.group(3))
+
+
 # ── 판정 ──────────────────────────────────────────────────────────────────
 def classify(quote: str, canon: str) -> str:
     q_b, c_b = base(quote), base(canon)
@@ -216,7 +411,7 @@ def classify(quote: str, canon: str) -> str:
         return "ELLIPSIS"
     if loose(quote) in loose(canon):
         return "PUNCT_ONLY"
-    w = [re.sub(r"\s", "", x) for x in words(quote)]
+    w = [re.sub(r"\s", "", x) for x in words_of(quote)]
     if len(w) >= 2 and ordered_in(w, loose(canon)):
         return "SPLICE_NOMARK"
     return "ALTERED"
@@ -237,13 +432,18 @@ NOTE = {
 BOOK_CODE = {
     "창": "gen", "출": "exo", "레": "lev", "민": "num", "신": "deu",
     "수": "jos", "삿": "jdg", "룻": "rut", "삼상": "1sa", "삼하": "2sa",
-    "왕상": "1ki", "왕하": "2ki", "시": "psa", "잠": "pro", "사": "isa",
-    "렘": "jer", "겔": "ezk", "단": "dan",
+    "왕상": "1ki", "왕하": "2ki", "욥": "job", "시": "psa", "잠": "pro",
+    "전": "ecc", "사": "isa", "렘": "jer", "겔": "ezk", "단": "dan",
     "마": "mat", "막": "mrk", "눅": "luk", "요": "jhn", "행": "act",
     "롬": "rom", "고전": "1co", "고후": "2co", "갈": "gal", "엡": "eph",
     "빌": "php", "골": "col", "히": "heb", "약": "jas", "계": "rev",
 }
 TAG = re.compile(r"<[^>]+>")
+# 각주 팝업(`<div class=D2 …>`)은 화면에서 숨어 있지만 마크업상 절 본문 **뒤** 에
+# 붙어 있다. 태그만 걷어내면 그 안의 주석 문구가 절 끝에 따라붙는다 — 초판의
+# `요 1:14` 가 "…진리가 충만하더라 헬, 참이" 로 끝났다. 각주 *번호* 만 지우고
+# 각주 *본문* 을 안 지운 탓이다. 둘을 다 지워야 본문만 남는다.
+POPUP = re.compile(r"<div[^>]*class=D2\b.*?</div>", re.S | re.I)
 UA = "Mozilla/5.0 (compatible; lemuel-xr quote gate)"
 
 
@@ -263,6 +463,7 @@ def fetch_chapter(book: str, chapter: int) -> dict[int, str]:
     req = urllib.request.Request(url, headers={"User-Agent": UA})
     with urllib.request.urlopen(req, timeout=30) as r:
         page = r.read().decode("utf-8", "replace")
+    page = POPUP.sub("", page)
     out: dict[int, str] = {}
     for m in re.finditer(
         r'<span class="number">(\d+)(?:&nbsp;|\s)*</span>(.*?)'
@@ -276,19 +477,43 @@ def fetch_chapter(book: str, chapter: int) -> dict[int, str]:
     return out
 
 
-def refresh() -> int:
-    _, refs = extract()
-    needed: set[tuple[str, int, int]] = set()
-    for book, chapter, verse, end in refs:
-        for v in range(verse, (end if end and end >= verse else verse) + 1):
-            needed.add((book, chapter, v))
+def needed_refs() -> set[tuple[str, int, int]]:
+    """정본 표가 덮어야 하는 절 집합 — 클립이 여는 참조 + 주석 인용의 참조.
 
-    chapters = sorted({(b, c) for b, c, _ in needed})
+    `q()` 의 표기(`출 4:14~16`)가 아니라 **클립 참조** 를 기준으로 삼는다. 표기는
+    그 응답이 근거로 삼은 단락을 가리키느라 실제로 읽는 절보다 넓을 수 있다 —
+    표기를 기준으로 표를 만들면 읽지도 않는 절을 정본에 쌓는다.
+    """
+    need: set[tuple[str, int, int]] = set()
+    unknown: set[str] = set()
+    for f in sources():
+        raw = f.read_text(encoding="utf-8")
+        for entry in parse_clips(raw):
+            for clip in entry["clips"]:
+                parsed = split_ref(clip["ref"])
+                if parsed is None:
+                    unknown.add(clip["ref"])
+                else:
+                    need.add(parsed)
+        for lit in parse_literals(raw):
+            last = lit["end"] if lit["end"] and lit["end"] >= lit["verse"] else lit["verse"]
+            for v in range(lit["verse"], last + 1):
+                need.add((lit["book"], lit["chapter"], v))
+    if unknown:
+        raise SystemExit(
+            f"[판정불가] 모르는 책 코드: {', '.join(sorted(unknown))} — BOOK_KO 에 추가하라"
+        )
+    return need
+
+
+def refresh() -> int:
+    need = needed_refs()
+    chapters = sorted({(b, c) for b, c, _ in need})
     table: dict[tuple[str, int, int], str] = {}
     for book, chapter in chapters:
         print(f"  {book} {chapter} …", file=sys.stderr)
         verses = fetch_chapter(book, chapter)
-        for b, c, v in sorted(x for x in needed if x[0] == book and x[1] == chapter):
+        for b, c, v in sorted(x for x in need if x[0] == book and x[1] == chapter):
             text = verses.get(v)
             if not text:
                 print(f"[판정불가] {b} {c}:{v} 본문을 못 읽었다", file=sys.stderr)
@@ -297,13 +522,16 @@ def refresh() -> int:
         time.sleep(1.2)  # 1차 출처에 대한 예의
 
     order = list(BOOK_CODE)
-    rows = sorted(table.items(), key=lambda kv: (order.index(kv[0][0]), kv[0][1], kv[0][2]))
+    rows = sorted(
+        table.items(), key=lambda kv: (order.index(kv[0][0]), kv[0][1], kv[0][2])
+    )
     body = [
         "# docs/verses-monologues-gae.txt — 프론트 모놀로그 인용 대조 정본 (개역개정)",
         "#",
         "# 무엇인가",
-        "#   frontend/src/lib/content/*-monologues.ts 가 인용하는 절의 개역개정 본문이다.",
-        "#   scripts/check_monologue_quotes.py 가 이 표에 대고 자구를 잰다.",
+        "#   frontend/src/lib/content/*-monologues.ts 의 인용이 여는 절의 개역개정 본문이다.",
+        "#   소스에는 자구가 없고 참조 + 낱말 인덱스만 있다(scripture-quote.ts) — 자구는",
+        "#   시드에서 온다. scripts/check_monologue_quotes.py 가 그 시드를 이 표에 대고 잰다.",
         "#",
         "# 출처",
         "#   대한성서공회 개역개정 HTML 기계 파싱. 손으로 옮겨 적지 않았다.",
@@ -336,44 +564,160 @@ def main() -> int:
         return 2
 
     table = load_canon()
-    pairs, refs = extract()
-    if not pairs:
-        # 인용이 0건이면 이 게이트는 아무것도 지키지 않는다. 조용한 초록은
-        # 추출기가 죽은 것과 구별되지 않으므로 판정 불가로 낸다.
-        print("[판정불가] 인용을 한 건도 못 뽑았다 — 추출기나 소스 형식을 확인하라")
+    seeds = seed_texts()
+    if not seeds:
+        print(f"[판정불가] 시드에 translation='{TRANSLATION}' 행이 없다")
         return 2
 
-    failed = []
-    for p in pairs:
-        canon = canon_text(table, p["book"], p["chapter"], p["verse"], p["end"])
-        verdict = "NO_CANON" if canon is None else classify(p["text"], canon)
-        p["verdict"], p["canon"] = verdict, canon or ""
-        if verdict not in PASSING:
-            failed.append(p)
+    quotes: list[dict] = []
+    literals: list[dict] = []
+    for f in sources():
+        raw = f.read_text(encoding="utf-8")
+        for entry in parse_clips(raw):
+            entry["site"] = f"{f.name}:{line_of(raw, entry['pos'])}"
+            quotes.append(entry)
+        for lit in parse_literals(raw):
+            lit["site"] = f"{f.name}:{lit['line']}"
+            literals.append(lit)
 
-    ref_only = len(refs) - len({(p["book"], p["chapter"], p["verse"], p["end"]) for p in pairs})
-    tally = {}
-    for p in pairs:
-        tally[p["verdict"]] = tally.get(p["verdict"], 0) + 1
+    if not quotes:
+        # 인용이 0건이면 이 게이트는 아무것도 지키지 않는다. 조용한 초록은 추출기가
+        # 죽은 것과 구별되지 않으므로 판정 불가로 낸다. 2026-08-21 의 재작성이 바로
+        # 이 형태의 거짓 초록(32건 → 4건) 때문에 있었다.
+        print("[판정불가] q() 인용을 한 건도 못 뽑았다 — 추출기나 소스 형식을 확인하라")
+        return 2
+
+    fails: list[str] = []
+
+    # ── A. 해석 ───────────────────────────────────────────────────────────
+    a_ok = 0
+    for entry in quotes:
+        if not entry["clips"]:
+            fails.append(f"✗ [A 해석] {entry['site']}  q(\"{entry['cite']}\") 에 클립이 없다")
+            continue
+        text = resolve_quote(entry, seeds)
+        if text is None:
+            missing = [c["ref"] for c in entry["clips"] if c["ref"] not in seeds]
+            why = (
+                f"시드에 없는 참조 {', '.join(missing)}"
+                if missing
+                else "낱말 인덱스가 절 밖이다"
+            )
+            fails.append(
+                f"✗ [A 해석] {entry['site']}  q(\"{entry['cite']}\") — {why}\n"
+                f"    → 화면에서 이 문단이 통째로 사라진다 (resolveMonologue 는 all-or-nothing)"
+            )
+            continue
+        entry["text"] = text
+        a_ok += 1
+
+    # ── B. cite ↔ ref ────────────────────────────────────────────────────
+    b_ok = 0
+    for entry in quotes:
+        m = CITE_RE.fullmatch(entry["cite"].strip())
+        if not m:
+            fails.append(
+                f"✗ [B cite] {entry['site']}  표기를 못 읽었다: \"{entry['cite']}\""
+            )
+            continue
+        ko, ch, vs = m.group(1), int(m.group(2)), int(m.group(3))
+        ve = int(m.group(4)) if m.group(4) else vs
+        bad = []
+        for clip in entry["clips"]:
+            parsed = split_ref(clip["ref"])
+            if parsed is None:
+                bad.append(f"{clip['ref']} (모르는 책 코드)")
+            elif parsed != (ko, ch, parsed[2]) or not (vs <= parsed[2] <= ve):
+                bad.append(f"{clip['ref']} → {parsed[0]} {parsed[1]}:{parsed[2]}")
+        if bad:
+            fails.append(
+                f"✗ [B cite] {entry['site']}  표기 \"{entry['cite']}\" 가 안 덮는 참조: "
+                f"{', '.join(bad)}\n"
+                f"    → 독자는 읽지도 않은 절을 출처로 믿는다"
+            )
+            continue
+        b_ok += 1
+
+    # ── C. 시드 ↔ 정본 ────────────────────────────────────────────────────
+    c_refs = sorted({c["ref"] for e in quotes for c in e["clips"]})
+    c_tally: dict[str, int] = {}
+    for ref in c_refs:
+        parsed = split_ref(ref)
+        seed = seeds.get(ref)
+        if parsed is None or seed is None:
+            fails.append(
+                f"✗ [C 시드] {ref} — "
+                + ("모르는 책 코드" if parsed is None else "시드에 행이 없다")
+            )
+            continue
+        canon = canon_text(table, parsed[0], parsed[1], parsed[2], None)
+        verdict = "NO_CANON" if canon is None else classify(seed, canon)
+        # 시드는 절 *전체* 라 정본과 축자로 같아야 한다. 부분문자열 통과(MATCH)로는
+        # 시드가 뒤가 잘려 있어도 초록이 된다 — 길이까지 같은지 함께 본다.
+        if verdict == "MATCH" and canon is not None and base(seed) != base(canon):
+            verdict = "SPLICE_NOMARK"
+        c_tally[verdict] = c_tally.get(verdict, 0) + 1
+        if verdict not in PASSING:
+            fails.append(
+                f"✗ [C 시드] [{verdict}] {parsed[0]} {parsed[1]}:{parsed[2]} ({ref})\n"
+                f"    시드   {seed[:140]}\n"
+                f"    개역개정 {(canon or '')[:140]}\n"
+                f"    → {NOTE[verdict]}"
+            )
+
+    # ── D. 하드코딩 회귀 ──────────────────────────────────────────────────
+    d_tally: dict[str, int] = {}
+    for lit in literals:
+        canon = canon_text(table, lit["book"], lit["chapter"], lit["verse"], lit["end"])
+        verdict = "NO_CANON" if canon is None else classify(lit["text"], canon)
+        lit["verdict"], lit["canon"] = verdict, canon or ""
+        d_tally[verdict] = d_tally.get(verdict, 0) + 1
+        where = "주석" if lit["comment"] else "코드"
+        if not lit["comment"]:
+            fails.append(
+                f"✗ [D 하드코딩] {lit['site']}  코드에 성경 자구가 박혔다\n"
+                f"    인용 {lit['text'][:100]}\n"
+                f"    → 자구는 /api/scripture 에서 받아라 (q(\"{lit['book']} "
+                f"{lit['chapter']}:{lit['verse']}\", [...]) 형태)"
+            )
+        elif verdict not in PASSING:
+            fails.append(
+                f"✗ [D {where}] [{verdict}] {lit['book']} {lit['chapter']}:{lit['verse']}"
+                f"  {lit['site']}\n"
+                f"    인용   {lit['text']}\n"
+                f"    개역개정 {lit['canon'][:140]}\n"
+                f"    → {NOTE[verdict]}"
+            )
 
     if args.list:
-        for p in pairs:
-            mark = "  " if p["verdict"] in PASSING else "✗ "
-            print(f"{mark}[{p['verdict']}] {p['book']} {p['chapter']}:{p['verse']} {p['site']}")
-            print(f"      인용 {p['text']}")
+        for entry in quotes:
+            mark = "  " if entry.get("text") else "✗ "
+            print(f"{mark}[A] {entry['site']}  ({entry['cite']})")
+            if entry.get("text"):
+                print(f'      "{entry["text"]}"')
+        for lit in literals:
+            mark = "  " if lit["verdict"] in PASSING and lit["comment"] else "✗ "
+            print(
+                f"{mark}[D/{'주석' if lit['comment'] else '코드'}] [{lit['verdict']}] "
+                f"{lit['book']} {lit['chapter']}:{lit['verse']}  {lit['site']}"
+            )
 
-    for p in failed:
-        print(f"✗ [{p['verdict']}] {p['book']} {p['chapter']}:{p['verse']}  {p['site']}")
-        print(f"    인용   {p['text']}")
-        print(f"    개역개정 {p['canon'][:140]}")
-        print(f"    → {NOTE[p['verdict']]}")
+    for line in fails:
+        print(line)
 
-    summary = " · ".join(f"{k} {v}" for k, v in sorted(tally.items()))
-    print(f"\n인용 {len(pairs)}건 ({summary}) / 참조만 달고 자구 없음 {ref_only}건")
-    if failed:
-        print(f"실패 {len(failed)}건 — 개역개정 축자로 고치거나, 생략이면 … 로 표시하라")
+    c_sum = " · ".join(f"{k} {v}" for k, v in sorted(c_tally.items())) or "0건"
+    in_comment_n = sum(1 for x in literals if x["comment"])
+    print(
+        f"\nA 해석 {a_ok}/{len(quotes)}"
+        f" · B cite↔ref {b_ok}/{len(quotes)}"
+        f" · C 시드↔정본 {len(c_refs)}건 ({c_sum})"
+        f" · D 리터럴 {len(literals)}건 (주석 {in_comment_n} · 코드 "
+        f"{len(literals) - in_comment_n})"
+    )
+    if fails:
+        print(f"실패 {len(fails)}건")
         return 1
-    print("전건 개역개정 축자 (생략은 … 로 표시됨)")
+    print("전건 통과 — 프론트에 성경 자구 없음 · 시드가 개역개정 축자 · 표기가 참조를 덮음")
     return 0
 
 

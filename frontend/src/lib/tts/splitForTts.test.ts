@@ -11,6 +11,7 @@ import {
   scene3AssignmentsToPattern,
   scene3CardResponses,
 } from "@/lib/content/moses-monologues";
+import { render } from "@/test/seed-passages";
 
 describe("splitForTts", () => {
   it("상한 이하는 원문 그대로 한 조각이다 — 캐시 키가 바뀌면 안 된다", () => {
@@ -94,13 +95,19 @@ describe("splitForTts", () => {
       ),
     ) as Record<string, "throw" | "heart">[];
 
+    /**
+     * echo 는 이제 산문 + 인용 *조각* 이다(`scripture-quote.ts`) — 성경 자구는
+     * `/api/scripture` 가 채운다. TTS 가 읽는 것은 그 자구까지 채워진 문자열이므로,
+     * 길이·조각 수는 반드시 해석한 뒤에 재야 한다. 조각 배열의 길이를 재면 문단 수를
+     * 재는 셈이라 이 파일의 모든 수가 무의미해진다.
+     */
+    const echoText = (assignments: Record<string, "throw" | "heart">) =>
+      render(buildScene3Echo(scene3AssignmentsToPattern(assignments), assignments));
+
     it("전수 32조합이 모두 상한 이하로 나뉜다", () => {
       let 넘던_조합 = 0;
       for (const assignments of 조합) {
-        const text = buildScene3Echo(
-          scene3AssignmentsToPattern(assignments),
-          assignments,
-        );
+        const text = echoText(assignments);
         if (text.length > TTS_BACKEND_MAX_CHARS) 넘던_조합 += 1;
         for (const chunk of splitForTts(text)) {
           expect(chunk.length).toBeLessThanOrEqual(TTS_MAX_CHARS);
@@ -123,10 +130,7 @@ describe("splitForTts", () => {
     it("전수 32조합의 모든 조각이 합성 타임아웃 안에 끝난다", () => {
       const 예산초 = TTS_TIMEOUT_SECONDS * 0.9; // 10% 는 큐·전송 몫으로 남긴다
       for (const assignments of 조합) {
-        const text = buildScene3Echo(
-          scene3AssignmentsToPattern(assignments),
-          assignments,
-        );
+        const text = echoText(assignments);
         for (const chunk of splitForTts(text)) {
           expect(chunk.length * TTS_SECONDS_PER_CHAR_WORST).toBeLessThan(
             예산초,
@@ -145,11 +149,7 @@ describe("splitForTts", () => {
       const 조각들 = (max: number) => {
         const out = new Set<string>();
         for (const assignments of 조합) {
-          const text = buildScene3Echo(
-            scene3AssignmentsToPattern(assignments),
-            assignments,
-          );
-          splitForTts(text, max).forEach((c) => out.add(c));
+          splitForTts(echoText(assignments), max).forEach((c) => out.add(c));
         }
         return out;
       };
@@ -165,11 +165,7 @@ describe("splitForTts", () => {
       // 여유분 없이 타임아웃 그대로 재는 것에 주의 — "여유가 모자란" 조합이 아니라
       // "실제로 못 끝내는" 조합의 수다.
       const 못_끝내는 = 조합.filter((assignments) => {
-        const text = buildScene3Echo(
-          scene3AssignmentsToPattern(assignments),
-          assignments,
-        );
-        return splitForTts(text, TTS_BACKEND_MAX_CHARS).some(
+        return splitForTts(echoText(assignments), TTS_BACKEND_MAX_CHARS).some(
           (c) => c.length * TTS_SECONDS_PER_CHAR_WORST >= TTS_TIMEOUT_SECONDS,
         );
       });
@@ -187,11 +183,11 @@ describe("splitForTts", () => {
         cards.map((c) => [c, "heart"]),
       ) as Record<string, "heart">;
 
-      const 긴글 = buildScene3Echo("all_throw", 전부_내려놓기);
+      const 긴글 = render(buildScene3Echo("all_throw", 전부_내려놓기));
       expect(긴글.length).toBeGreaterThan(TTS_MAX_CHARS);
       expect(splitForTts(긴글).length).toBeGreaterThan(1);
 
-      const 짧은글 = buildScene3Echo("all_heart", 전부_품기);
+      const 짧은글 = render(buildScene3Echo("all_heart", 전부_품기));
       expect(짧은글.length).toBeLessThanOrEqual(TTS_MAX_CHARS);
       expect(splitForTts(짧은글)).toEqual([짧은글]);
     });

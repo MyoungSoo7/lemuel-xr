@@ -8,6 +8,7 @@ import {
   type JosephStartResponse,
 } from "@/lib/api/game";
 import {
+  allRefs,
   scene1Dream,
   scene2Monologues,
   scene3Outcomes,
@@ -18,7 +19,9 @@ import {
   type Scene3Pattern,
   type Scene4Choice,
 } from "@/lib/content/joseph-monologues";
-import { NarrationAudioButton } from "@/components/NarrationAudioButton";
+import type { Monologue } from "@/lib/content/scripture-quote";
+import { useMonologueTexts } from "@/lib/hooks/useMonologueTexts";
+import { MonologueText } from "@/components/MonologueText";
 import { SceneBootState } from "@/components/SceneBootState";
 import { ScenePassage } from "@/components/ScenePassage";
 import { CrisisReminder } from "@/components/CrisisReminder";
@@ -35,7 +38,12 @@ type Scene = JosephStartResponse;
  */
 interface DecisionEcho {
   fromScene: number;
-  text: string;
+  /**
+   * 자구가 아니라 *조각* 을 든다. 성경 인용은 `/api/scripture` 에서 채워지므로
+   * 문자열로 굳혀 두면 이 화면이 다시 사본을 갖게 된다.
+   * backend 의 `responseText` 는 산문 한 덩어리이므로 `[text]` 로 감싸 넣는다.
+   */
+  monologue: Monologue;
 }
 
 export default function JosephPage() {
@@ -75,8 +83,10 @@ export default function JosephPage() {
       // Phase 2-A 마이그레이션 패턴: 점진 전환, frontend fallback 은 backend 가 매칭 못
       // 하는 경우의 안전망 (예: yml 에 monologues 추가 전).
       const localFallback = buildLocalEcho(vars.sceneId, vars.decision);
-      const text = d.responseText ?? localFallback?.text ?? null;
-      if (text) setEcho({ fromScene: vars.sceneId, text });
+      const monologue: Monologue | null = d.responseText
+        ? [d.responseText]
+        : (localFallback?.monologue ?? null);
+      if (monologue) setEcho({ fromScene: vars.sceneId, monologue });
       if (localFallback?.scene3Pattern)
         setScene3Pattern(localFallback.scene3Pattern);
 
@@ -91,12 +101,19 @@ export default function JosephPage() {
   }, [scene, start]);
 
   // Scene 5 (outro) 진입 시 Scene 3 패턴 기반 결말 톤 적용
-  const outroText = useMemo(() => {
+  const outroMonologue = useMemo(() => {
     if (scene?.currentScene !== 5) return null;
     return scene3Pattern
       ? scene5OutroByScene3[scene3Pattern]
       : scene5OutroByScene3.farmer_first; // fallback
   }, [scene?.currentScene, scene3Pattern]);
+
+  /*
+    이 화면의 모놀로그가 인용하는 절 전부를 **한 번에** 연다. `allRefs` 는 모듈
+    상수라서 렌더마다 구독이 새로 서지 않고, queryKey 가 `ScenePassage` 와 같아
+    같은 절은 화면에서 한 번만 받는다.
+  */
+  const monologueTexts = useMonologueTexts(allRefs);
 
   if (!scene) {
     return (
@@ -160,10 +177,11 @@ export default function JosephPage() {
       {/* Decision echo — 직전 결정의 모놀로그 / 아웃컴 */}
       {echo && (
         <section className="max-w-3xl mx-auto w-full mb-4 px-4 py-3 rounded-lg border border-[var(--color-primary)]/40 bg-black/30 italic text-sm text-[var(--color-warm)]/90">
-          <p className="whitespace-pre-line">{echo.text}</p>
-          <div className="mt-2">
-            <NarrationAudioButton text={echo.text} onUnavailable="hide" />
-          </div>
+          <MonologueText
+            monologue={echo.monologue}
+            source={monologueTexts}
+            audioWrapperClassName="mt-2"
+          />
           <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2 text-right">
             * AI 보조 — 본문은 성경 참조 *
           </p>
@@ -236,15 +254,11 @@ export default function JosephPage() {
                 {/* Scene 1 성육/꿈 내레이션 본문 — 캡션만이 아니라 실제 대본을 렌더 */}
                 {scene.currentScene === 1 && (
                   <div className="px-4 py-4 rounded-lg bg-black/20 border border-[var(--color-primary)]/20">
-                    <p className="text-sm text-[var(--color-warm)]/90 whitespace-pre-line leading-relaxed">
-                      {scene1Dream}
-                    </p>
-                    <div className="mt-3">
-                      <NarrationAudioButton
-                        text={scene1Dream}
-                        onUnavailable="hide"
-                      />
-                    </div>
+                    <MonologueText
+                      monologue={scene1Dream}
+                      source={monologueTexts}
+                      className="text-sm text-[var(--color-warm)]/90 leading-relaxed"
+                    />
                   </div>
                 )}
                 <button
@@ -314,9 +328,12 @@ export default function JosephPage() {
 
             {sceneType === "outro" && (
               <div className="text-center space-y-4">
-                <p className="text-base whitespace-pre-line text-[var(--color-warm)]/90 italic max-w-prose mx-auto">
-                  {outroText}
-                </p>
+                <MonologueText
+                  monologue={outroMonologue}
+                  source={monologueTexts}
+                  audio={false}
+                  className="text-base text-[var(--color-warm)]/90 italic max-w-prose mx-auto"
+                />
                 <p className="text-[10px] not-italic text-[var(--color-warm)]/40 mt-2">
                   * AI 보조 — 본문은 성경 참조 *
                 </p>
@@ -361,19 +378,19 @@ export default function JosephPage() {
 function buildLocalEcho(
   fromScene: number,
   decision: unknown,
-): { text: string; scene3Pattern?: Scene3Pattern } | null {
+): { monologue: Monologue; scene3Pattern?: Scene3Pattern } | null {
   if (fromScene === 2 && typeof decision === "string") {
-    const text = scene2Monologues[decision as Scene2Choice];
-    return text ? { text } : null;
+    const monologue = scene2Monologues[decision as Scene2Choice];
+    return monologue ? { monologue } : null;
   }
   if (fromScene === 3) {
     const pattern = scene3DecisionToPattern(decision);
     if (!pattern) return null;
-    return { text: scene3Outcomes[pattern], scene3Pattern: pattern };
+    return { monologue: scene3Outcomes[pattern], scene3Pattern: pattern };
   }
   if (fromScene === 4 && typeof decision === "string") {
-    const text = scene4Reactions[decision as Scene4Choice];
-    return text ? { text } : null;
+    const monologue = scene4Reactions[decision as Scene4Choice];
+    return monologue ? { monologue } : null;
   }
   return null;
 }

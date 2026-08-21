@@ -151,7 +151,11 @@ describe("미션 화면은 scriptureRef 를 실제로 연다", () => {
       // 「화면이 아직 안 떴다」를 재게 된다.
       expect(await screen.findByText("본문이 없는 씬")).toBeInTheDocument();
       expect(screen.queryByTestId("scene-passage")).toBeNull();
-      expect(fetchScripturePassage).not.toHaveBeenCalled();
+      // "한 번도 안 불렸다" 로는 못 잰다 — joseph/david/moses/jesus 는 씬 본문과 별개로
+      // *모놀로그 인용* 을 같은 API 에서 받는다(`useMonologueTexts`). 여기서 재려는 것은
+      // "씬이 참조를 안 줬는데 화면이 참조를 지어내지 않았다" 이므로, 그 참조로 불리지
+      // 않았는지만 본다.
+      expect(fetchScripturePassage).not.toHaveBeenCalledWith(REF);
     },
   );
 

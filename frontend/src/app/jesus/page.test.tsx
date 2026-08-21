@@ -13,12 +13,29 @@ vi.mock("@/lib/api/game", () => ({
   completeMission: vi.fn(),
 }));
 
+/*
+  성경 자구는 `/api/scripture` 에서 온다. 실물 왕복만 막고, 응답은 **시드 SQL 을 그대로
+  읽어** 돌려준다(`src/test/seed-passages.ts`) — 자구 사본을 테스트에 또 적으면 이 변경이
+  없애려던 "두 벌" 이 세 벌이 된다.
+
+  이 모킹이 없으면 `MonologueText` 가 전부 "본문 로드 중..." 으로 남는다. 그때 실패하는
+  것은 모놀로그 단언이므로, 원인이 배선이 아니라 자구 공급이라는 게 바로 보이지 않는다.
+*/
+vi.mock("@/lib/api/content", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/lib/api/content")>()),
+  fetchScripturePassage: vi.fn(),
+}));
+
 import {
   completeMission,
   decideMission,
   startMission,
   type JosephStartResponse,
 } from "@/lib/api/game";
+
+import { fetchScripturePassage } from "@/lib/api/content";
+import { render as renderMonologue, seedPassage } from "@/test/seed-passages";
+import type { Monologue } from "@/lib/content/scripture-quote";
 import {
   scene1Incarnation,
   scene2Beatitudes,
@@ -198,13 +215,32 @@ function deferred<T>() {
  * 일치가 아니라 완전 일치로 잰다.
  */
 const squash = (s: string) => s.replace(/\s+/g, " ").trim();
-const paragraphMatcher =
-  (expected: string) => (_content: string, el: Element | null) =>
-    el?.tagName === "P" && squash(el.textContent ?? "") === squash(expected);
-const findParagraph = (expected: string) =>
+/**
+ * 기대값은 문자열이 아니라 **모놀로그 조각 배열** 이다(`scripture-quote.ts`). 화면에 뜨는
+ * 것은 그 조각에 `/api/scripture` 자구를 채운 결과라, 비교 전에 같은 규칙으로 해석한다 —
+ * 조각 배열끼리 비교하면 인용이 하나도 안 풀려도 기대가 성립한다.
+ * 해석은 매처당 한 번만 한다(매처 함수 자체는 DOM 노드마다 불린다).
+ */
+const paragraphMatcher = (expected: Monologue) => {
+  const text = squash(renderMonologue(expected));
+  return (_content: string, el: Element | null) =>
+    el?.tagName === "P" && squash(el.textContent ?? "") === text;
+};
+const findParagraph = (expected: Monologue) =>
   screen.findByText(paragraphMatcher(expected));
-const queryParagraph = (expected: string) =>
+const queryParagraph = (expected: Monologue) =>
   screen.queryByText(paragraphMatcher(expected));
+
+/**
+ * Scene 4 의 한 문단 = 고른 "나는 ~이다" + 빈 줄 + 공통 가르침. `page.tsx` 의
+ * `[...scene4Iam[iam], "\n\n", ...scene4Teaching]` 과 **같은 방식으로** 이어 붙인다 —
+ * 여기서 문자열로 이어 붙이면 페이지가 조각을 어떻게 합치는지는 검사 밖으로 빠진다.
+ */
+const iamEcho = (iam: Monologue): Monologue => [
+  ...iam,
+  "\n\n",
+  ...scene4Teaching,
+];
 
 function renderPage() {
   const client = new QueryClient({
@@ -235,6 +271,7 @@ Object.defineProperty(window, "location", {
 });
 
 beforeEach(() => {
+  vi.mocked(fetchScripturePassage).mockImplementation(seedPassage);
   navigatedTo = null;
   startMock.mockReset();
   decideMock.mockReset();
@@ -554,7 +591,7 @@ describe("Jesus 미션 화면", () => {
         }),
       ).toBeInTheDocument();
       expect(
-        await findParagraph(`${scene4Iam.the_life}\n\n${scene4Teaching}`),
+        await findParagraph(iamEcho(scene4Iam.the_life)),
       ).toBeInTheDocument();
       expect(decideMock).toHaveBeenCalledWith(
         "jesus",
@@ -592,7 +629,7 @@ describe("Jesus 미션 화면", () => {
       // 화면이 렌더하는 정본 문구(scene7CrisisReminder, 자체가 CRISIS_RESOURCES 파생)를
       // 그대로 기대한다 — 번호가 개정돼도 이 기대는 따라 움직인다.
       // (`scripts/check_frontend_hotline.py`)
-      expect(screen.getByText(scene7CrisisReminder)).toBeInTheDocument();
+      expect(screen.getByText(renderMonologue(scene7CrisisReminder))).toBeInTheDocument();
       // R5 — AI 보조 고지.
       expect(
         screen.getAllByText("* AI 보조 — 본문은 성경 참조 *").length,
@@ -623,7 +660,7 @@ describe("Jesus 미션 화면", () => {
       );
 
       expect(
-        await findParagraph(`${expected}\n\n${scene4Teaching}`),
+        await findParagraph(iamEcho(expected)),
       ).toBeInTheDocument();
     });
 
@@ -643,7 +680,7 @@ describe("Jesus 미션 화면", () => {
       );
 
       expect(
-        await findParagraph(`${scene4Iam.the_way}\n\n${scene4Teaching}`),
+        await findParagraph(iamEcho(scene4Iam.the_way)),
       ).toBeInTheDocument();
     });
   });
@@ -719,7 +756,7 @@ describe("Jesus 미션 화면", () => {
       expect(screen.getByText("최상위 문맥 문장")).toBeInTheDocument();
       await user.click(screen.getByRole("button", { name: "진리로 간다" }));
       expect(
-        await findParagraph(`${scene4Iam.the_truth}\n\n${scene4Teaching}`),
+        await findParagraph(iamEcho(scene4Iam.the_truth)),
       ).toBeInTheDocument();
     });
 

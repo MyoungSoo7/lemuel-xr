@@ -32,19 +32,18 @@
 검사와 런타임 검사를 둘 다 두는 이유이고, 어느 한쪽만으로는 위의 실패 모드를
 못 막았다.
 
-**B축 — 프론트에 손으로 적힌 성경 인용.** 미션 화면들은 성경 본문을 API 로만
-받지 않는다. `frontend/src/lib/content/*-monologues.ts` 안에 성구가 **직접 문자열로**
-박혀 있다(예: david Scene 1 의 시 23:1). 즉 같은 절의 사본이 DB 와 프론트 소스
-두 곳에 산다.
+**B축 — 프론트에 손으로 적힌 성경 인용.** `frontend/src/lib/content/*.ts` **코드**에
+성구가 직접 문자열로 박혀 있으면 실패다. 그러면 같은 절의 사본이 DB 와 프론트 소스
+두 벌이 되고, 한쪽만 고쳐지는 드리프트가 열린다.
 
 이 리포는 지어낸 성구로 한 번 데었다 — `V20260717073355` 의 의역 시드를
 `V20260718004903` 이 되돌렸다.
 
-─────────────── B축이 지금 무엇을 주장하는가 (2026-08-21 개정) ───────────────
+─────────────── B축 이력: 세 빚이 어떻게 갚였나 ───────────────
 
-이 축의 문구는 원래 세 가지를 한꺼번에 주장했다. 그중 둘이 그 뒤에 갚였다.
-게이트 문구가 현실을 잘못 말하면 **그 문구 자체가 결함이다** — 사람은 메시지를 읽고
-무엇이 남았는지 판단하기 때문이다. 그래서 갚인 만큼 걷어낸다.
+이 축의 문구는 원래 세 가지를 한꺼번에 주장했다. 셋 다 갚였다. 게이트 문구가 현실을
+잘못 말하면 **그 문구 자체가 결함이다** — 사람은 메시지를 읽고 무엇이 남았는지
+판단하기 때문이다. 그래서 갚인 만큼 걷어내 왔다.
 
   · ~~"어떤 원문과도 대조되지 않는다"~~ — 2026-08-21(#83) 갚음.
     `scripts/check_monologue_quotes.py` 가 이 네 파일의 인용을 대한성서공회 개역개정
@@ -52,18 +51,30 @@
   · ~~"API 는 KLB 를 내리는데 이쪽은 개역개정이라 한 화면에 두 역본이 뜬다"~~ —
     2026-08-21 갚음. `V20260821030000` 이 rev(개역개정) 92행을 채우고 런타임 기본값을
     `modern` → `rev` 로 옮겼다. 이제 화면 위아래가 같은 역본이다.
-  · **남은 것 — 사본이 둘이라는 사실 자체.** 대조기가 붙었어도 DB 와 프론트에 같은
-    절이 두 벌 있고, 한쪽만 고쳐지는 드리프트는 여전히 가능하다. `ScenePassage` 의
-    원칙 1("본문은 오직 API 응답에서만 온다")을 이 네 파일이 아직 안 지킨다.
+  · ~~"사본이 둘이라는 사실 자체"~~ — 2026-08-21 갚음. 네 모놀로그 모듈에서 자구를
+    걷어내고 `/api/scripture` 응답에서 받게 바꿨다(`scripture-quote.ts`). 소스에
+    남는 것은 참조 + 낱말 인덱스뿐이다.
 
-그래서 B축은 여전히 FAIL 이다 — 다만 이유가 셋에서 하나로 줄었다. 숫자를 여기 손으로
-박지 않고 매 실행마다 센다 — 박아 두면 늙는다.
+─────────────── 그래서 B축은 지금 무엇을 재는가 ───────────────
+
+**회귀만 잰다.** 자구가 다시 코드로 기어들어오면 실패한다. 축이 통과로 넘어간 뒤
+이 검사를 지우면 그 회귀가 조용해지므로, 초록이어도 남겨 둔다.
+
+**주석 안은 통과다.** 신학 근거를 적으려면 자구를 인용해야 하고, 주석은 화면에 안
+뜨므로 사본이 아니다. 대신 그 인용의 자구가 정본과 맞는지는
+`check_monologue_quotes.py` 의 D축이 본다 — 여기서는 위치만 가른다.
+
+주석/코드 판정은 그 파일의 `comment_spans` 를 **빌려 쓴다.** 두 벌로 두면 한쪽만
+문자열 리터럴 안의 `//` 를 오인하는 식으로 어긋나고, 어긋난 쪽이 조용히 통과시킨다.
 """
 from __future__ import annotations
 
 import pathlib
 import re
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from check_monologue_quotes import comment_spans  # noqa: E402  주석 판정을 두 벌 두지 않는다
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 APP = ROOT / "frontend/src/app"
@@ -148,22 +159,35 @@ def check_runtime_test() -> tuple[str, str]:
 
 
 def check_hardcoded_quotes() -> tuple[str, str]:
+    """코드에 박힌 성구를 센다. 주석 안의 인용은 사본이 아니라 근거라 통과."""
     hits: list[tuple[str, int]] = []
+    in_comment = 0
     for f in sorted(CONTENT.glob("*.ts")):
         if f.name.endswith(".test.ts"):
             continue
-        n = len(QUOTE_CITE_RE.findall(f.read_text(encoding="utf-8")))
-        if n:
-            hits.append((f.name, n))
+        src = f.read_text(encoding="utf-8")
+        spans = comment_spans(src)
+        code = [
+            m
+            for m in QUOTE_CITE_RE.finditer(src)
+            if not any(a <= m.start() < b for a, b in spans)
+        ]
+        in_comment += len(QUOTE_CITE_RE.findall(src)) - len(code)
+        if code:
+            hits.append((f.name, len(code)))
     total = sum(n for _, n in hits)
     if not total:
-        return "PASS", "frontend-quotes — 프론트에 손으로 적힌 성경 인용이 없다"
+        return "PASS", (
+            "frontend-quotes — 코드에 박힌 성경 자구가 없다"
+            f" (주석 안의 근거 인용 {in_comment}건은 check_monologue_quotes.py 가 정본 대조)"
+        )
     where = ", ".join(f"{f}:{n}" for f, n in hits)
     return "FAIL", (
-        f"frontend-quotes — 성경 본문의 사본이 프론트 문자열에 {total}건 남아 있다"
-        f" ({where}). 자구는 scripts/check_monologue_quotes.py 가 개역개정 정본표로 대조하고"
-        " 화면 역본도 rev 로 통일됐다(2026-08-21) — 남은 빚은 사본이 DB 와 프론트 두 벌이라는"
-        " 것뿐이다. ScenePassage 원칙 1(본문은 API 응답에서만 온다)을 이 파일들이 아직 안 지킨다"
+        f"frontend-quotes — 성경 자구가 코드에 {total}건 박혀 있다 ({where})."
+        " 사본이 DB 와 프론트 두 벌이 되고 한쪽만 고쳐지는 드리프트가 열린다 —"
+        " ScenePassage 원칙 1(본문은 오직 API 응답에서만 온다). 자구 대신 참조를 두고"
+        " q(\"창 45:5\", [\"gen-45:5\", 0, 6]) 형태로 /api/scripture 에서 받아라"
+        " (frontend/src/lib/content/scripture-quote.ts)"
     )
 
 
