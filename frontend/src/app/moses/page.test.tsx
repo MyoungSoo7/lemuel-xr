@@ -100,14 +100,18 @@ const SCENE3_PAYLOAD = {
   extras: {
     anchor: "자기방어·고백",
     cards: [
-      { id: "who_am_i", label: "제가 누구이기에", scripture: "ex-3:11" },
+      { id: "who_am_i", label: "내가 누구이기에", scripture: "ex-3:11" },
       {
         id: "who_sent_me",
-        label: "이름이 무엇이냐 물으면",
+        label: "그의 이름이 무엇이냐",
         scripture: "ex-3:13",
       },
-      { id: "trust_me", label: "믿지 않으면", scripture: "ex-4:1" },
-      { id: "cant_speak", label: "말이 둔하니", scripture: "ex-4:10" },
+      {
+        id: "trust_me",
+        label: "그들이 나를 믿지 아니하며",
+        scripture: "ex-4:1",
+      },
+      { id: "cant_speak", label: "혀가 둔한 자니이다", scripture: "ex-4:10" },
       {
         id: "send_other",
         label: "보낼 만한 자를 보내소서",
@@ -484,7 +488,7 @@ describe("Moses Scene 3 — 다섯 변명의 카드 (distribute)", () => {
     await bootAt(3, "다섯 변명의 카드");
 
     expect(screen.getByText("ex-4:10")).toBeInTheDocument();
-    expect(screen.getByText("말이 둔하니")).toBeInTheDocument();
+    expect(screen.getByText("혀가 둔한 자니이다")).toBeInTheDocument();
   });
 
   it("cards 가 비어 있어도 화면이 비지 않는다", async () => {

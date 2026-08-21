@@ -58,12 +58,18 @@ scenes:
     narration_id: moses.scene3.narration
     extras:
       anchor: 자기방어·고백
+      # 라벨은 `scripture` 가 가리키는 절의 **개역개정 자구를 그대로 잘라 쓴다**(의역 금지).
+      # 같은 다섯 카드의 전문(全文)은 `content/moses/scene3.yml` card_1~5 `text_ko` 에 있고,
+      # 여기 라벨은 그 전문을 UI 폭에 맞게 끊은 조각이다 — 두 파일이 어긋나면 안 된다.
+      # 2026-08-21 이전에는 넷이 의역이었다("제가 누구이기에" / 출 3:11 은 "내가 누구이기에").
+      # `scripture:` 딱지가 붙은 문자열이 정본과 다르면 화면은 성경을 인용한다고 말하면서
+      # 성경이 아닌 문장을 보여 준다. scripts/check_monologue_quotes.py E축이 이제 막는다.
       cards:
-        - { id: who_am_i,     label: "제가 누구이기에",      scripture: ex-3:11 }
-        - { id: who_sent_me,  label: "이름이 무엇이냐 물으면", scripture: ex-3:13 }
-        - { id: trust_me,     label: "믿지 않으면",          scripture: ex-4:1 }
-        - { id: cant_speak,   label: "말이 둔하니",          scripture: ex-4:10 }
-        - { id: send_other,   label: "보낼 만한 자를 보내소서", scripture: ex-4:13 }
+        - { id: who_am_i,     label: "내가 누구이기에",        scripture: ex-3:11 }
+        - { id: who_sent_me,  label: "그의 이름이 무엇이냐",    scripture: ex-3:13 }
+        - { id: trust_me,     label: "그들이 나를 믿지 아니하며", scripture: ex-4:1 }
+        - { id: cant_speak,   label: "혀가 둔한 자니이다",      scripture: ex-4:10 }
+        - { id: send_other,   label: "보낼 만한 자를 보내소서",  scripture: ex-4:13 }
       slots: ["throw", "heart"]   # 던지기 vs 가슴에 가져가기
       monologue_cache_keys:
         all_throw:  moses.s3.outcome.all_throw

@@ -82,7 +82,7 @@ narration_blocks:
     note: "Scene 진입 — 카드 출현 전 짧은 정적"
   - id: nb_s3_card_1_appear
     speaker: card_text
-    text_ko: "내가 누구이기에 바로에게 가며 이스라엘 자손을 인도하여 내겠나이까 (출 3:11)"
+    text_ko: "내가 누구이기에 바로에게 가며 이스라엘 자손을 애굽에서 인도하여 내리이까 (출 3:11)"
     text_ko_label_small: "정체성 결핍 — '나는 이 일을 할 자격이 없다' | 차원: 영성 (누구 앞에 서는가의 인식)"
     audio_clip_id: null
     start_at_seconds: 3.0
