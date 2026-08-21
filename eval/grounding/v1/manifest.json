@@ -8,7 +8,19 @@
     "embeddingModel": "gemini-embedding-001",
     "dimensions": 3072,
     "tunedAt": "2026-07-19",
-    "note": "아래 pinnedPolicy 는 signed_off 픽스처 5개(n=5)에 맞춰 튜닝한 값이다. 임베딩 모델이 바뀌면 재튜닝 대상."
+    "note": "아래 pinnedPolicy 는 signed_off 픽스처 5개(n=5)에 맞춰 튜닝한 값이다. 임베딩 모델이 바뀌면 재튜닝 대상.",
+    "acknowledgedMismatch": {
+      "runtimeDimensions": 1536,
+      "since": "2026-08-12",
+      "sinceCommit": "167cea5",
+      "measuredAt": "2026-08-22",
+      "decision": "defer-retune",
+      "reviewBy": "2026-11-30",
+      "why": "런타임은 2026-08-12 #37 이후 1536(MRL 절단 + L2 정규화)을 쓴다. scripture_embeddings.embedding vector(1536) 과 pgvector HNSW 의 2000 차원 상한 때문에 그 변경 자체는 옳고, 되돌리려면 스키마 마이그레이션이 함께 가야 한다. 그렇다고 1536 에서 지금 재튜닝하면 이진 지표의 분모가 signed_off 11건뿐이라 인샘플 조정이 된다(같은 함정에 빠진 사례가 GoldenSetTokenLintCrossCheckTest 의 인샘플 7/7 대 아웃오브샘플 0/27 이다). 게이트는 현재 shadow(grounding.eval.enabled=false 기본)라 급히 재고정할 실익도 없다. 그래서 순서를 뒤집지 않는다 — **표본을 목표치까지 채운 뒤 1536 에서 재튜닝한다.**",
+      "impact": "2026-08-22 두 공간 동시 실측. 고정정책 0.62/0.3 에서 P3 오탐률 3072 0.143 → 1536 0.222, precision 0.857 → 0.778, recall 0.857 → 1.000. 문장 154 쌍 중 137 개(89%)의 유사도가 내려갔고 올라간 것은 0 개(평균 -0.0288). 문장 단위 AUC 는 0.8485 → 0.8528 로 사실상 불변 — 판별력이 변한 게 아니라 축이 통째로 내려앉았다는 뜻이다. 각 공간의 최적 F1 임계치도 같은 폭만큼 이동한다(0.64 → 0.60).",
+      "blockedOn": "targets.minPerClassSignedOff 를 채우려면 draft 21건의 3단 사람 사인오프가 필요하다(gnostic 5 · newage 7 · orthodox 4 · suffering-justification 5). draft 재고 35건으로 충분하다. 승격되면 이진 지표의 분모가 11 → 32 가 된다.",
+      "enforcedBy": "GoldenSetTuningContractTest — 이 블록이 있어야 위 dimensions 불일치가 초록불이 된다. runtimeDimensions 가 실제 설정과 어긋나면(=차원이 또 바뀌면) 다시 빨간불이고, reviewBy 가 지나도 빨간불이다. 유예를 조용히 늙게 두지 않기 위한 것이다."
+    }
   },
   "pinnedPolicy": {
     "similarityThreshold": 0.62,

@@ -61,7 +61,34 @@ object GoldenSet {
     data class ClassSpec(val id: String = "", val expectedStatus: String = "", val note: String = "")
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    data class TunedAgainst(val embeddingModel: String = "", val dimensions: Int = 0, val tunedAt: String = "")
+    data class TunedAgainst(
+        val embeddingModel: String = "",
+        val dimensions: Int = 0,
+        val tunedAt: String = "",
+        /**
+         * 튜닝 공간과 런타임이 어긋나 있음을 **사람이 알고 남겨 둔** 기록. null 이면 어긋난 적이 없다는 뜻이다.
+         *
+         * 이게 없으면 선택지가 "빨간불로 방치" 아니면 "조용히 재베이스라인" 둘뿐인데, 전자는 모두가
+         * 빨간불을 무시하게 만들고 후자는 신호 자체를 지운다. 유예를 *명시적이고 만료되는 형태*로
+         * 적어 두는 쪽이 낫다 — 검사는 초록불이되, 차원이 또 바뀌거나 기한이 지나면 다시 빨간불이다.
+         */
+        val acknowledgedMismatch: AcknowledgedMismatch? = null,
+    )
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class AcknowledgedMismatch(
+        /** 이 유예를 적을 당시 런타임이 실제로 쓰던 차원. 지금 설정과 다르면 *새* 드리프트다. */
+        val runtimeDimensions: Int = 0,
+        val since: String = "",
+        val sinceCommit: String = "",
+        val measuredAt: String = "",
+        val decision: String = "",
+        /** `yyyy-MM-dd`. 이 날짜가 지나면 검사가 실패한다. 유예가 조용히 늙는 것을 막는다. */
+        val reviewBy: String = "",
+        val why: String = "",
+        val impact: String = "",
+        val blockedOn: String = "",
+    )
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class PinnedPolicy(val similarityThreshold: Double = 0.0, val maxUnsupportedRate: Double = 0.0) {
