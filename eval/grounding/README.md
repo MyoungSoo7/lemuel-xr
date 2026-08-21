@@ -84,9 +84,17 @@ eval/grounding/
 
 ## 6. 표본 수에 대한 정직한 경고
 
-현재 `signed_off` 는 13건(사람 11 + 구조적 2)이다. 목표는 60건·클래스당 8건 이상이다.
+현재 `signed_off` 는 27건(사람 11 + 구조적 16)이고 `draft` 가 35건이다. 목표는 60건·클래스당 8건 이상이다.
 **이 표본으로 계산한 precision/recall 은 방향 지표일 뿐 승격 근거가 아니다.**
 그래서 리포트는 모든 지표 옆에 표본 수를 같이 찍고, 목표 미달이면 헤더에 경고를 낸다.
+
+⚠️ **27 이라는 숫자를 진척으로 읽으면 안 된다.** 늘어난 14건은 전부 구조적 클래스이고,
+구조적 상태(`NO_EVIDENCE`/`INCONCLUSIVE`)가 기대값인 픽스처는 **이진 집계에서 아예 빠진다**
+(`EvalMetricsTest.구조적 상태가 기대값이면 이진 집계에서 아예 빠진다`).
+즉 precision/recall/P3 오탐률의 분모는 여전히 **사람이 사인오프한 11건**이다.
+목표 60 을 채워도 그중 16건이 구조적이면 이진 지표의 표본은 44 라는 뜻이고,
+`minPerClassSignedOff` 를 구조적 클래스에도 똑같이 적용하는 현행 목표 정의가
+"60 을 채우면 P3 를 판단할 수 있다" 는 인상을 준다는 점은 별도로 정리해야 할 문제다.
 
 특히 `suffering-justification`(고난정당화) 층이 임계치를 결정한다.
 현행 `maxUnsupportedRate=0.3` 은 사실상 이 클래스 표본 **한 건**(관측 미근거율 0.33)을 넘기려고 0.5 에서 조인 값이다.
@@ -150,6 +158,50 @@ n=1 로 정한 임계치라는 뜻이고, 이 층의 표본을 늘리는 게 데
 걸리지 않았다(그 사실이 픽스처 rationale 에 기록돼 있다). `scenarios/job.yml` 의 R3 게이트
 신설로 닫혔고, 같은 층의 `suffering-justification` 은 여전히 통과한다 —
 **부분문자열 lint 는 층이 아니라 표현을 막는다.**
+
+### 6.3 확장 1차분 — draft 35건 + 구조적 14건 (2026-08-21)
+
+§6 의 "표본을 채우는 것이 P4 의 선행 조건" 을 실행한 1차분이다. 픽스처 13 → 62건.
+
+| 클래스                    | 이전 signed_off | 신규 draft | 신규 signed_off(구조적) | 현재 signed_off |
+| ------------------------- | --------------- | ---------- | ----------------------- | --------------- |
+| `orthodox`                | 4               | 8          | –                       | 4               |
+| `gnostic`                 | 3               | 7          | –                       | 3               |
+| `newage`                  | 1               | 8          | –                       | 1               |
+| `suffering-justification` | 3               | 12         | –                       | 3               |
+| `structural-no-evidence`  | 1               | –          | 7                       | 8               |
+| `structural-inconclusive` | 1               | –          | 7                       | 8               |
+
+세 가지를 지켜서 만들었다:
+
+- **신학 판단이 들어가는 4개 클래스는 전부 `draft` / `labeledBy: "claude-draft"` 다.** §5 "LLM 이 라벨을 만들지 않는다" 는
+  LLM 이 *정답을 확정*하지 못한다는 뜻이고, 후보를 *제안*하는 것은 스키마가 `claude-draft` 를 허용해 열어 둔 자리다.
+  `GoldenSetIntegrityTest` 가 `claude-draft` 의 `signed_off` 승격을 실패로 막고 있으므로, 이 구분은 문서가 아니라 검사로 강제된다.
+- **구조적 2개 클래스만 `signed_off` / `labeledBy: "structural"` 이다.** §4 의 예외 조항과 기존 2건의 선례를 따랐고,
+  전제(임베딩 이전 분기에 실제로 도달하는가)는 `GoldenSetIntegrityTest.구조적 클래스는 임베딩 이전 분기에 실제로 도달한다` 가
+  결정론적으로 검증한다. 사람의 신학 판단이 개입한 라벨이 아니라는 점은 위 6절의 경고가 그대로 말한다.
+- **`passages` 는 검증된 5구절만 재사용했다.** 새 구절을 도입하지 않았으므로 §5 의 원문 대조 선행 조건이 발생하지 않는다.
+
+의도적으로 설계한 것 두 가지:
+
+1. **경계쌍(boundary pair)** — 같은 구절·같은 핵심 어휘를 쓰면서 결론만 반대인 정통/이단 짝을 넣었다.
+   `orthodox-works-of-god-not-instrumental` ↔ `suffering-testimony-instrumental`(요 9:3),
+   `orthodox-crying-out-nightly` ↔ `suffering-prayer-quantity`(시 88:1),
+   `orthodox-lament-permitted` ↔ `suffering-emotion-suppression`(시 88).
+   유사도 기반 게이트가 이 짝을 가를 수 있는지가 §6.1 이 말한 구조적 한계의 정면 측정이다.
+2. **`orthodox-darkness-unresolved`** 는 일부러 어휘 겹침을 낮춘 정통 표본이다. `orthodox-job` 이 0.006 차로 잘리는 상황에서
+   P3 오탐이 우연이 아니라 계통적인지 보려면, 임계치 근방이 아니라 그 아래에 놓일 정통 표본이 필요하다.
+
+**아직 하지 않은 것 — draft 35건은 §4 의 2단·3단을 거치지 않았다.** 2단(신학·정신건강 병렬 독립 검토)과
+사람 사인오프 전까지 이 35건은 게이트 판정·승격 지표에 들어가지 않으며, 들어가지 않는다는 사실은 로더가 강제한다.
+특히 아래 3건은 정신건강 축에서 단독 reject 가 나올 수 있다고 보고 rationale 에 명시해 두었다:
+`suffering-isolation-blessing`(사회적 지지 추구 억제), `suffering-emotion-suppression`(애도 차단),
+`newage-soul-curriculum`(출생 전 선택 = 최강도 자기 귀책).
+`newage-akashic-record` 는 표지는 뉴에이지이나 기제가 고난정당화라 2단에서 클래스 재분류가 필요할 수 있다
+(`gnostic-inner-divinity` 가 newage → gnostic 으로 재분류된 것과 같은 경우).
+
+R1(자살사고) 본문을 다루는 픽스처는 이번 확장에 **한 건도 넣지 않았다** — §4 가 어떤 자동 합의로도 승격 불가로 못박은 층이라,
+후보 상태로 쌓아 두는 것 자체가 검토자에게 부담만 남긴다.
 
 ## 7. 어떻게 돌리나
 

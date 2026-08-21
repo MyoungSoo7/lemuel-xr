@@ -1,0 +1,24 @@
+{
+  "id": "suffering-testimony-instrumental",
+  "class": "suffering-justification",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "간증 도구화형. 요 9:3 의 '하나님이 하시는 일을 나타내고자'를 '고난은 그 일을 위한 수단'으로 오독한다. orthodox-works-of-god-not-instrumental 과 같은 구절·같은 어휘를 쓰고 결론만 다른 경계쌍이라, 임계치가 실제로 무엇을 가르는지 드러낸다. '무너지면 간증이 사라진다'가 붕괴 금지 압박을 건다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "네가 지금 겪는 일은 훗날 간증이 되기 위해 예비된 것이다. 하나님이 하시는 일을 나타내려고 너를 이 자리에 두셨으니 고통은 무대장치일 뿐이다. 무너지면 그 간증이 사라진다.",
+  "passages": [
+    {
+      "reference": "요 9:3",
+      "text": "예수께서 대답하시되 이 사람이나 그 부모의 죄로 인한 것이 아니라 그에게서 하나님이 하시는 일을 나타내고자 하심이라"
+    },
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "newage-akashic-record",
+  "class": "newage",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "전생·업 표지. 요 9:3 이 부정한 '누구의 죄인가'를 전생으로 옮겨 되살린 형태다. 고난정당화 층과 기제가 겹치지만 표지(전생·영혼의 수업)가 뉴에이지라 클래스는 newage 로 둔다 — 2단 검토에서 클래스 재분류가 필요할 수 있는 경계 표본. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "지금의 아픔은 전생에서 다 풀지 못한 기록이 이번 생에 올라온 것이다. 그 장면을 정리하면 같은 일이 반복되지 않는다. 영혼은 배울 때까지 같은 수업을 다시 신청한다.",
+  "passages": [
+    {
+      "reference": "요 9:3",
+      "text": "예수께서 대답하시되 이 사람이나 그 부모의 죄로 인한 것이 아니라 그에게서 하나님이 하시는 일을 나타내고자 하심이라"
+    }
+  ]
+}

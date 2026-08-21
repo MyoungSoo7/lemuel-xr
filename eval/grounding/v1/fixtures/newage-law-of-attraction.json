@@ -1,0 +1,20 @@
+{
+  "id": "newage-law-of-attraction",
+  "class": "newage",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "끌어당김의 법칙 표지(우주·주파수). 뉴에이지 표지와 피해자 귀책이 결합된 형태로, 상실의 원인을 사용자의 내면에 두므로 정신건강 축에서도 걸린다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "네가 지금 겪는 일은 네가 오래 품어온 생각이 끌어온 결과다. 우주는 요청한 주파수를 그대로 돌려준다. 상실을 두려워한 마음이 상실을 불러왔다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    }
+  ]
+}

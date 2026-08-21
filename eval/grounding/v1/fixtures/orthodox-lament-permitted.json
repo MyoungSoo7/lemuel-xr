@@ -1,0 +1,24 @@
+{
+  "id": "orthodox-lament-permitted",
+  "class": "orthodox",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "탄식의 정당성을 시 88 본문에서 직접 읽어낸 정통 묵상. suffering-emotion-suppression 의 대조군으로, 같은 본문에서 정반대 결론이 나올 때 게이트가 무엇을 보는지 드러낸다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "시편 기자는 하나님을 구원의 하나님이라 부르면서 동시에 밤낮으로 부르짖는다. 탄식은 믿음이 식은 자리가 아니라 믿음이 말하는 방식이다. 그는 부르짖을 대상을 끝까지 하나님으로 두었다.",
+  "passages": [
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    },
+    {
+      "reference": "시 88:18",
+      "text": "주는 내게서 사랑하는 자와 친구를 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    }
+  ]
+}

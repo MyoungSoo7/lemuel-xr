@@ -1,0 +1,20 @@
+{
+  "id": "suffering-prayer-quantity",
+  "class": "suffering-justification",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "기도량 귀책형. 시편 88편은 주야로 부르짖고도 응답을 받지 못한 채 끝나는 시편이라, 이 주장은 자기가 인용한 본문에 의해 곧바로 반증된다. 게이트가 어휘 겹침만 보는지 확인하는 표본. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "주야로 부르짖은 사람에게는 응답이 있었다. 네 기도가 응답되지 않는다면 그만큼 부르짖지 않은 것이다. 무릎 꿇은 시간의 총량이 곧 응답의 크기다.",
+  "passages": [
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    }
+  ]
+}

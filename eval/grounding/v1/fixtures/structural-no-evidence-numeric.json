@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-numeric",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "숫자·소수점이 섞인 입력. 종결부호 뒤 공백을 경계로 삼는 규칙상 소수점은 문장을 끊지 않아야 한다. 분리기가 마침표만 보고 자르도록 바뀌면 문장 수가 달라지지만 기대 상태는 그대로 NO_EVIDENCE 여야 한다."
+  },
+  "meditationText": "잃은 것 셋, 남은 것 하나. 오늘의 기도 제목은 그 하나다. 3.14 같은 숫자는 문장을 끊지 않는다.",
+  "passages": []
+}

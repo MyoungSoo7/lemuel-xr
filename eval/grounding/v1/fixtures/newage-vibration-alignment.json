@@ -1,0 +1,20 @@
+{
+  "id": "newage-vibration-alignment",
+  "class": "newage",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "진동수 표지. newage-universal-energy 와 표지는 공유하되 '풍요 끌어당김'이 아니라 '고통 무효화'로 방향을 튼 변형이라, 같은 클래스 안에서 서로 다른 기제를 덮는다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "고통은 네 진동수가 낮아졌다는 신호일 뿐이다. 감사와 기쁨의 주파수로 올라가면 낮은 현실은 자연히 떨어져 나간다. 어둠은 실체가 아니라 낮은 진동의 이름이다.",
+  "passages": [
+    {
+      "reference": "시 88:18",
+      "text": "주는 내게서 사랑하는 자와 친구를 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    }
+  ]
+}

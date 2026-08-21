@@ -104,8 +104,14 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
         /**
          * 토큰 게이트가 놓치는 표본 — 현재 0건.
          *
-         * v1 토큰 8종으로 13건 골든셋의 REJECTED 7건이 전부 잡혔다.
+         * v1 토큰 8종으로 `signed_off` REJECTED 7건이 전부 잡혔다.
          * 이 목록이 비어 있는 것이 AC1 의 완료 조건이다.
+         *
+         * 2026-08-21 확장으로 픽스처는 62건이 됐지만 위 두 목록은 바뀌지 않는다 —
+         * 이 검사가 `signed_off` 만 보고, 신규 35건은 전부 `draft` 이기 때문이다.
+         * draft 가 사람 사인오프로 승격될 때 이 목록도 함께 갱신해야 한다.
+         * (신규 draft 중 `gnostic-ignorance-not-sin`·`gnostic-body-as-costume` 처럼
+         *  가스라이팅 어휘를 쓰지 않는 표본은 토큰 lint 사각지대로 넘어갈 것으로 예상한다.)
          */
         val MISSED_BY_TOKEN_LINT = emptyList<String>()
     }

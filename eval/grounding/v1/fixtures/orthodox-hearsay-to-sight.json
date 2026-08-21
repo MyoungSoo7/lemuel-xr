@@ -1,0 +1,20 @@
+{
+  "id": "orthodox-hearsay-to-sight",
+  "class": "orthodox",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "욥 42:5 의 전환을 인격적 만남으로 읽는 정통 묵상. 고난을 만남의 필요조건으로 승격시키지 않는다는 점에서 suffering-refining-necessity 와 구분된다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "욥은 귀로 듣기만 하였다가 이제는 눈으로 뵈옵는다고 말한다. 고난이 그에게 새 교리를 준 것이 아니라 알던 분을 만나게 했다. 아는 것과 뵙는 것 사이의 거리를 그는 고난의 자리에서 건넜다.",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

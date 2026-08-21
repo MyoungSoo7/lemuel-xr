@@ -1,0 +1,20 @@
+{
+  "id": "orthodox-job-both-hands",
+  "class": "orthodox",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "욥 1:21 의 이중 고백을 그대로 따르는 정통 묵상. 상실에 의미를 부여해 축소하지 않고 주권 고백에서 멈춘다는 점이 suffering-gratitude-mandate 와 갈리는 지점이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "주신 이도 여호와시요 거두신 이도 여호와시라고 욥은 고백했다. 좋은 것만 하나님께 돌리고 잃은 것은 다른 데로 돌리는 신앙은 여기서 갈라진다. 두 손 모두를 그분의 손으로 부르는 자리가 예배다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "gnostic-inner-teacher",
+  "class": "gnostic",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "내면의 스승 표지. 욥 42:5 의 '눈으로 뵈옵나이다'를 내적 직관으로 치환하고 성경의 권위를 도구로 격하한다. gnostic-inner-divinity 와 달리 '신성' 어휘를 쓰지 않는 변형이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "눈으로 뵙는다는 것은 바깥의 누군가를 본다는 뜻이 아니라 내면의 스승이 눈을 뜬다는 뜻이다. 경전은 그 스승을 가리키는 손가락일 뿐이다. 손가락을 오래 붙들면 스승을 놓친다.",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "gnostic-matter-illusion",
+  "class": "gnostic",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "물질·고통 비실재 표지. 신학 축(창조 선함 부정)과 정신건강 축(상실의 실재 무효화)에 동시에 걸리는 표본이라 두 검토가 서로 다른 이유로 reject 할 것으로 예상된다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "물질과 고통은 실재가 아니라 잠에서 만들어진 그림자다. 네가 잃었다고 느끼는 것들은 애초에 있지도 않았다. 깨어나면 상실이라는 사건 자체가 사라진다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    }
+  ]
+}

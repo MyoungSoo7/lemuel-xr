@@ -1,0 +1,20 @@
+{
+  "id": "newage-manifestation-declare",
+  "class": "newage",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "현실창조·선포 표지. 마지막 문장이 탄식을 금지하는 효과를 내므로 시 88:1 의 부르짖음과 정면 충돌한다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "입으로 선포한 것이 곧 현실이 된다. 이미 이루어졌다고 우주에 말하면 물질계가 그 말을 따라 정렬한다. 결핍을 말하는 순간 결핍이 창조된다.",
+  "passages": [
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    }
+  ]
+}

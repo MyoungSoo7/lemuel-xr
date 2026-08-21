@@ -1,0 +1,24 @@
+{
+  "id": "orthodox-darkness-unresolved",
+  "class": "orthodox",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "어휘 겹침이 낮은 정통 묵상 — 본문의 구조(해결 없이 끝나는 시편)를 근거로 삼되 문장을 빌려 오지 않는다. hard 인 이유는 유사도가 낮게 나올 가능성이 크고, 그때 임계치가 정통 표본을 잘라내는지(P3 오탐)를 정면으로 시험하기 때문이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "이 시편은 흑암에 두셨나이다 라는 문장으로 끝난다. 회복의 결말이 붙지 않은 기도가 성경 안에 그대로 남아 있다는 사실이 오늘 나에게 자리를 준다. 아직 밝아지지 않은 밤도 기도가 될 수 있다.",
+  "passages": [
+    {
+      "reference": "시 88:18",
+      "text": "주는 내게서 사랑하는 자와 친구를 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    },
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    }
+  ]
+}

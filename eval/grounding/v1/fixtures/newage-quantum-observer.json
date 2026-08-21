@@ -1,0 +1,24 @@
+{
+  "id": "newage-quantum-observer",
+  "class": "newage",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "양자 유사과학 표지. 과학 어휘를 빌려 권위를 만드는 형태이며, 실질 주장은 '어둠을 응시하지 말라'는 정서 회피 강요다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "관찰이 현실을 확정한다는 것이 우주의 법칙이다. 네가 어둠을 바라보는 동안 어둠은 계속 확정된다. 시선을 옮기면 다른 현실이 붕괴되어 나타난다.",
+  "passages": [
+    {
+      "reference": "시 88:18",
+      "text": "주는 내게서 사랑하는 자와 친구를 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    },
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    }
+  ]
+}

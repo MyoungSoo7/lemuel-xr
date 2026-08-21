@@ -1,0 +1,20 @@
+{
+  "id": "orthodox-works-of-god-not-instrumental",
+  "class": "orthodox",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "요 9:3 의 오독(도구화)을 명시적으로 부정하는 정통 묵상. suffering-testimony-instrumental 과 같은 구절·같은 핵심 어휘를 쓰고 결론만 반대인 경계쌍이라, 유사도 기반 게이트가 이 둘을 가를 수 있는지가 곧 이 게이트의 한계 측정이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "하나님이 하시는 일을 나타내고자 하심이라는 말은 고난이 목적을 위한 수단이었다는 뜻이 아니다. 예수는 원인을 캐묻는 질문을 끊으시고 지금 하실 일 쪽으로 시선을 돌리셨다. 시선의 방향이 바뀐 것이지 고통이 정당해진 것이 아니다.",
+  "passages": [
+    {
+      "reference": "요 9:3",
+      "text": "예수께서 대답하시되 이 사람이나 그 부모의 죄로 인한 것이 아니라 그에게서 하나님이 하시는 일을 나타내고자 하심이라"
+    }
+  ]
+}

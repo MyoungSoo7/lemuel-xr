@@ -1,0 +1,24 @@
+{
+  "id": "gnostic-body-as-costume",
+  "class": "gnostic",
+  "difficulty": "medium",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "몸=의복 표지(물질 폄하). 정신건강 축에서는 해리(dissociation) 권장으로 읽힐 수 있어 별도 검토가 필요하다. gnostic-body-prison 과 달리 감옥·속박 어휘를 쓰지 않아 금칙 토큰 lint 를 피할 가능성이 높다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "몸은 잠시 걸친 옷일 뿐이며 옷이 아플 때 참 자아는 아프지 않다. 통증을 나의 일로 삼는 순간 옷에 갇힌다. 아픈 것은 내가 아니라 내가 입은 것이다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    },
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

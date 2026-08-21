@@ -1,0 +1,20 @@
+{
+  "id": "structural-inconclusive-ideographic-space",
+  "class": "structural-inconclusive",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "INCONCLUSIVE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "전각 공백(U+3000)만 있는 생성문. 한글 IME·한국어 조판에서 실제로 섞여 들어오는 문자이고, 정규식 \\s 로는 잡히지 않아 Kotlin trim() 의 유니코드 공백 처리에 의존한다 — 그 의존을 명시적으로 고정한다. SentenceSplitter 가 빈 목록을 내므로 임베딩 이전에 INCONCLUSIVE 로 확정되는 구조적 케이스다."
+  },
+  "meditationText": "　　　",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

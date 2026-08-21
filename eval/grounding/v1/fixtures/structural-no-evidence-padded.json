@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-padded",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "앞뒤가 공백·개행으로 패딩된 입력. 트림 후 실제 문장이 남으므로 INCONCLUSIVE 가 아니라 NO_EVIDENCE 다. structural-inconclusive-* 와 한 글자 차이로 갈리는 경계를 고정한다."
+  },
+  "meditationText": "   \n  고난 중에도 하나님은 여전히 주권자이시다.  \n\n  ",
+  "passages": []
+}

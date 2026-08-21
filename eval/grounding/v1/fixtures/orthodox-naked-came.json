@@ -1,0 +1,20 @@
+{
+  "id": "orthodox-naked-came",
+  "class": "orthodox",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "draft",
+    "labeledBy": "claude-draft",
+    "labeledAt": "2026-08-21",
+    "rationale": "욥 1:21 을 거의 그대로 인용한 정통 묵상. easy 층의 상한을 잡는 표본으로, 근거성 점수가 높게 나와야 정상이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+  },
+  "meditationText": "내가 모태에서 알몸으로 나왔은즉 또한 알몸이 그리로 돌아가리라. 손에 쥔 것이 나를 규정하지 않는다는 고백이다. 여호와의 이름이 찬송을 받으실지니이다.",
+  "passages": [
+    {
+      "reference": "욥 1:21",
+      "text": "이르되 내가 모태에서 알몸으로 나왔사온즉 또한 알몸이 그리로 돌아가올지라 주신 이도 여호와시요 거두신 이도 여호와시오니 여호와의 이름이 찬송을 받으실지니이다 하고"
+    }
+  ]
+}
