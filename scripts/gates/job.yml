@@ -12,8 +12,10 @@ ruleset: newchar-v5
 scene_count: 5
 docs:
   mvp: docs/MVP-JOB.md
+  content: docs/MVP-JOB-CONTENT.md
 doc_min_lines:
   mvp: 900
+  content: 550
 test_identifier: 욥
 trigger_scenes:
 - 2
