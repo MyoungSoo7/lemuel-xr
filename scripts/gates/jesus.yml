@@ -1,10 +1,17 @@
 # jesus — 게이트 신설 2026-08-22.
 #
-# 이 인물은 **저작 계층이 없다.** `content/jesus/scene*.yml` 도, `docs/MVP-JESUS-CONTENT.md`
-# 도 없이 `Character.JESUS` 와 `scenarios/jesus.yml` 만으로 열려 있다. 그래서 이 설정이
-# 켜는 게이트 대부분은 PASS 가 아니라 **BLOCKED(판정 불가)** 로 나온다. 그게 이 파일의
-# 목적이다 — 지금까지 예수는 `scripts/gates/` 에 이름조차 없어서 `ContentSafetyGateEnforcementTest`
-# 의 인물 명부(T1 커버리지)에서도 **통째로 빠져 있었다.** 침묵은 통과가 아니다.
+# 신설 당시 이 인물은 **저작 계층이 없었다** — `content/jesus/scene*.yml` 도,
+# `docs/MVP-JESUS-CONTENT.md` 도 없이 `Character.JESUS` 와 `scenarios/jesus.yml` 만으로
+# 열려 있었고, 그래서 게이트 대부분이 PASS 가 아니라 **BLOCKED(판정 불가)** 로 나왔다.
+# 그게 이 파일의 목적이었다 — 그때까지 예수는 `scripts/gates/` 에 이름조차 없어서
+# `ContentSafetyGateEnforcementTest` 의 인물 명부(T1 커버리지)에서도 **통째로 빠져
+# 있었다.** 침묵은 통과가 아니다.
+#
+# 2026-08-22: 저작 계층 7 Scene + `docs/MVP-JESUS-CONTENT.md` 를 채워
+# 단계 역전을 해소했다. BLOCKED 27 → 7. 남은 7건은 아래 네 항목
+# (`exclusions` · `token_examples` · `polite_evasive` · `latch_contract`)이 비어 있어서다.
+# 같은 날 `theology_axis: {status: exempt}` 를 걷었다 — content 가 T1 축을 선언했으므로
+# 그 면제가 스스로 적어 둔 해소 조건이 충족됐다. 면제를 남겨 두면 G5t 가 FAIL 한다.
 #
 # legacy-baseline 을 쓰지 않는다. 그 면제는 joseph·moses·david 세 인물의 것이고, 그들은
 # 적어도 저작 계층을 갖고 있다. 예수의 부채는 그보다 크므로 면제로 덮지 않고
@@ -18,8 +25,10 @@ ruleset: newchar-v5
 scene_count: 7
 docs:
   mvp: docs/MVP-JESUS.md
+  content: docs/MVP-JESUS-CONTENT.md
 doc_min_lines:
   mvp: 400
+  content: 550
 test_identifier: 예수
 trigger_scenes:
 - 5
@@ -81,7 +90,3 @@ forbidden:
 - 무덤에서 나오셔야 해
 - 무덤에서 나오셔야 합
 - 무덤에서 나오셔야죠
-theology_axis:
-  status: exempt
-  reason: 신학 게이트 v1 미도입. scenarios/jesus.yml 이 선언한 축은 R3(부활 압박 금지) 하나뿐이고 T1_ 접두 축은 0건이다. 저작 계층(content/jesus/)이
-    생기는 시점에 T1 축을 세우는 것이 이 면제의 해소 조건이며, 그때까지 이 등재는 판정 유보지 통과가 아니다.

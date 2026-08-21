@@ -1,0 +1,143 @@
+# Scene 3 — 만짐 · 병자를 고치심 (90초, 제스처 시퀀스)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 scenarios/jesus.yml scene 3 의 `steps[].label` ·
+#    `steps[].note` 원문이다. 새로 쓴 것은 XR 무대뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 이 Scene 은 안전 축(토큰 lint)을 선언하지 않는다. 축은 위반이 일어나는 자리에만 둔다.
+#    다만 이 Scene 에는 축과 별개의 위험이 하나 있다 — *치유의 즉효를 약속하는 것* 이다.
+#    런타임 note 가 그것을 이미 금지하고 있고, 아래 게이트가 그 문장을 옮겨 적는다.
+
+scene_id: jesus_scene3
+scene_name: the_touch
+mission_id: jesus
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: galilee_roadside_edge
+  background_model: env_galilee_road_edge
+  lighting:
+    type: midday_soft_diffuse
+    color_temperature_kelvin: 5400
+  ambient_sound:
+    - id: crowd_receding_footsteps
+      gain_db: -28
+      spatial: true
+      note: "군중이 *물러나는* 소리. 이 Scene 의 배경은 접근이 아니라 회피다."
+    - id: road_dust_settle
+      gain_db: -34
+      spatial: false
+  user_position: [0.0, 1.55, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jesus_reaching
+    voice_id: jesus_v1
+    position: [0.0, 1.60, 1.6]
+  - id: person_with_illness
+    voice_id: null
+    position: [0.6, 1.10, 1.9]
+    note: >-
+      질환의 시각 묘사를 하지 않는다. 나병의 피부 병변을 렌더하지 않는다 —
+      만성질환·피부질환 당사자에게 불필요한 자극이고, 이 Scene 의 요점은 병의 외양이
+      아니라 *군중이 물러난 자리에 예수가 들어가신다* 는 사실이다.
+
+narration_blocks:
+  - id: nb_s3_step_approach
+    speaker: narrator
+    text_ko: "군중이 피하던 나병 환자에게 예수는 오히려 다가가셨습니다."
+    audio_clip_id: aud_s3_step_approach_ko
+    start_at_seconds: 8.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    source_of_record: "scenarios/jesus.yml :: scenes[id=3].extras.steps[id=approach].note"
+  - id: nb_s3_step_reach_out
+    speaker: narrator
+    text_ko: "'내가 원하노니 깨끗함을 받으라' — 말보다 먼저 손이 닿았습니다."
+    audio_clip_id: aud_s3_step_reach_out_ko
+    start_at_seconds: 34.0
+    duration_seconds: 14.0
+    hidden_until_event: step_approach_done
+    source_of_record: "scenarios/jesus.yml :: scenes[id=3].extras.steps[id=reach_out].note"
+  - id: nb_s3_scripture_mk141
+    speaker: scripture_caption
+    text_ko: "예수께서 불쌍히 여기사 손을 내밀어 그에게 대시며 이르시되 내가 원하노니 깨끗함을 받으라 하시니 (막 1:41)"
+    audio_clip_id: aud_s3_scripture_mk141_ko
+    start_at_seconds: 56.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    scripture_ref: mk-1:41
+
+interactions:
+  - id: ix_s3_gesture_sequence
+    type: gesture_sequence
+    target_assets: [socket_step_approach, socket_step_reach_out]
+    gesture: hand_reach
+    steps:
+      - id: approach
+        label_ko: "다가간다"
+        emits_event: step_approach_done
+      - id: reach_out
+        label_ko: "손을 내민다"
+        emits_event: step_reach_out_done
+    haptic:
+      intensity: 0.35
+      pattern: PULSE_SOFT
+      channel: BOTH
+      fallback_audio_cue_id: touch-warm
+    presentation:
+      no_progress_indicator: true
+      no_failure_state: true # 손을 뻗지 않아도 실패가 아니다
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 45
+        on_timeout: auto_advance
+        description: "제스처를 하지 않아도 나레이션은 진행된다. 손을 뻗지 못하는 상태도 이 미션이 다루는 상태다."
+      - rule: track_micro_signals
+        records: [steps_completed, time_to_reach_seconds]
+
+branches: []
+
+safety_gates:
+  - id: no_instant_healing_promise
+    enforced_at: always
+    description: "이 Scene 은 *치유의 즉효* 를 약속하지 않는다. 예수의 *접촉하시는 성품* 을 체험하는 자리다. 사용자의 질병·통증이 이 미션으로 나아진다는 서술 금지."
+    source_of_record: "scenarios/jesus.yml :: scenes[id=3].extras.note"
+    enforcement: reviewer_only
+    note: >-
+      집행 수단 없음. '나아질 것' 을 말하는 표층형은 무한하고 이 리포에 그것을 판정하는
+      기계 검사가 없다. 사람 검토가 볼 자리로 남긴다. 현재 근거로 남길 수 있는 사실만:
+      이 파일의 사용자 노출 문장 3건은 전부 본문 인용·서사 진술이고 사용자 2인칭 약속이 0건이다.
+  - id: illness_visual_exclusion
+    enforced_at: always
+    description: "질환의 시각 묘사(피부 병변 등) 배제. 병의 외양이 아니라 접촉이 이 Scene 의 내용이다."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "전부 정적 본문 낭독 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jesus_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: JS3_candidate
+    source: "마가복음 1:40~45 나병환자 정결 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "정결법상 부정한 자를 만지면 만진 쪽이 부정해지는 방향이 뒤집힌다는 것이 이 본문의 구조다."
+    anchor_block: nb_s3_scripture_mk141
+  - disputed_points:
+      - "막 1:41 의 이문(異文) — '불쌍히 여기사'(σπλαγχνισθείς) 대 '노하사'(ὀργισθείς) 로 사본이 갈린다."
+    handling: >-
+      개역개정 본문('불쌍히 여기사')을 인용하고 이문을 무대에 올리지 않는다.
+      다만 이견이 존재한다는 사실 자체는 여기 적어 둔다 — 없는 것처럼 적지 않는다.
