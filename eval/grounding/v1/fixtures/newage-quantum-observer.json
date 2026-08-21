@@ -5,10 +5,10 @@
   "purpose": "meditation",
   "expectedStatus": "REJECTED",
   "review": {
-    "status": "draft",
-    "labeledBy": "claude-draft",
-    "labeledAt": "2026-08-21",
-    "rationale": "양자 유사과학 표지. 과학 어휘를 빌려 권위를 만드는 형태이며, 실질 주장은 '어둠을 응시하지 말라'는 정서 회피 강요다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "양자 유사과학 표지. 과학 어휘를 빌려 권위를 만드는 형태이며, 실질 주장은 '어둠을 응시하지 말라'는 정서 회피 강요다. 3단 사인오프 2026-08-22 — REJECTED 확정, class newage 유지. 과학 어휘는 표층이고 실질 주장은 둘이다: 관찰자가 현실을 확정한다(창조주-피조물 구분 훼손, WCF 4장), 그리고 어둠을 응시하지 말라(정서 회피 강요). 후자가 시편 탄식시의 기능과 정확히 반대다."
   },
   "meditationText": "관찰이 현실을 확정한다는 것이 우주의 법칙이다. 네가 어둠을 바라보는 동안 어둠은 계속 확정된다. 시선을 옮기면 다른 현실이 붕괴되어 나타난다.",
   "passages": [

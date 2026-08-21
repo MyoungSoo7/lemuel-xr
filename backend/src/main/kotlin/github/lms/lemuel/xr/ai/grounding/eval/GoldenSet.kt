@@ -98,6 +98,34 @@ object GoldenSet {
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class Targets(val minSignedOff: Int = 0, val minPerClassSignedOff: Int = 0)
 
+    /** §4 3단(사람 사인오프)의 주체와 판단 기준. 누가 무슨 기준으로 라벨을 확정했는지의 단일 출처. */
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class SignOff(
+        val standard: String = "",
+        val authority: String = "",
+        /** 사인오프 권한자의 핸들. `labeledBy` 문자열을 이 값으로 조립하므로 임의 표기가 못 들어온다. */
+        val authorityHandle: String = "",
+        /**
+         * 권한자가 3단을 대리에게 맡긴 기록. null 이면 위임이 없었다는 뜻이고, 그때는 `labeledBy` 에
+         * `human`/`structural` 외의 값이 올 수 없다. 위임을 *지우는* 게 아니라 *적는* 이유는
+         * rules 1번(라벨은 사람이 확정한다)이 실제로 언제 예외 처리됐는지가 남아야 하기 때문이다.
+         */
+        val delegation: Delegation? = null,
+    ) {
+        /** 위임 사인오프 픽스처의 `review.labeledBy` 가 가져야 하는 정확한 값. */
+        val delegatedLabeledBy: String?
+            get() = delegation?.let { "delegated($authorityHandle->${it.delegatedTo})" }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    data class Delegation(
+        val date: String = "",
+        val delegatedTo: String = "",
+        val scope: String = "",
+        val record: String = "",
+        val notDelegated: String = "",
+    )
+
     @JsonIgnoreProperties(ignoreUnknown = true)
     data class Manifest(
         val dataset: String = "",
@@ -105,6 +133,7 @@ object GoldenSet {
         val tunedAgainst: TunedAgainst = TunedAgainst(),
         val pinnedPolicy: PinnedPolicy = PinnedPolicy(),
         val classes: List<ClassSpec> = emptyList(),
+        val signOff: SignOff = SignOff(),
         val targets: Targets = Targets(),
     )
 

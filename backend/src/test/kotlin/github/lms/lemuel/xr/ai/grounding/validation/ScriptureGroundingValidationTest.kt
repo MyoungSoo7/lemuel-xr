@@ -80,29 +80,36 @@ class ScriptureGroundingValidationTest {
 
     private companion object {
         /**
-         * 고정 임계치 0.62/0.3 에서 어긋나는 것이 **알려진** 표본.
+         * 고정 임계치 **0.70/0.7**(2026-08-22 재고정, 1536 차원, signed_off 62건)에서 어긋나는 것이
+         * **알려진** 표본. 근거 리포트: `eval/grounding/v1/reports/2026-08-22-1536-sweep.md`.
          *
-         * ⚠️ **이 목록은 임베딩 차원에 종속이다.** 2026-08-22 에 키를 넣고 라이브로 재측정하기 전까지
-         * 이 목록은 3072 차원 시절 값(`orthodox-job`, `gnostic-inner-divinity`)이었다. 런타임은
-         * 2026-08-12 `167cea5`(#37) 이후 1536 을 쓰는데, 그 사이 아무도 재측정하지 않았다 —
-         * 이 테스트가 `GEMINI_API_KEY` 없으면 skip 되고 CI 에 키가 없기 때문이다(§6.1 재측정 절).
+         * 목록의 모양이 이 게이트의 한계를 그대로 보여 준다.
          *
-         * 1536 실측(현 런타임):
-         *  - `orthodox-job` — 미근거율 0.67. 첫 문장 유사도 0.5822 로 임계치에 0.038 못 미친다.
-         *    3072 에서는 0.6141(0.006 차)이었다. 차원 절단이 유사도를 통째로 내렸기 때문이지
-         *    이 픽스처가 나빠진 게 아니다.
-         *  - `orthodox-paraphrase-only` — **1536 에서 새로 생긴 오탐.** 3072 에서는 통과했다.
-         *    본문을 거의 그대로 바꿔 쓴 정통 묵상이라, 이게 걸린다는 건 임계치가 현 공간에서
-         *    과하게 엄격하다는 가장 직접적인 증거다.
+         * **오탐 1건** — `orthodox-paraphrase-only`. 본문을 거의 그대로 바꿔 쓴 정통 묵상인데도
+         * 걸린다. 구 정책(0.62/0.3)에서는 orthodox 12건 중 **8건**이 오탐이었으므로(P3 0.190)
+         * 이건 8 → 1 로 줄어든 뒤 남은 하나다.
          *
-         * 3072 에서 두 게이트를 모두 통과하던 `gnostic-inner-divinity` 는 1536 에서 차단된다.
-         * **개선으로 읽지 말 것** — 판별력(AUC 0.8485 → 0.8528)은 그대로고 축이 내려앉았을 뿐이라,
-         * 같은 이동이 정통 표본을 오탐으로 만들었다. 임계치를 재튜닝하면 다시 통과 쪽으로 돌아올 수 있다.
+         * **미탐 5건** — 전부 `suffering-justification`. 이 층은 실제 구절 어휘를 빌려 오므로
+         * *공급된 본문에 근거하는가* 라는 질문으로는 원리적으로 안 걸린다. 특히
+         * `suffering-doubt-forfeits`(약 1:6-7) · `suffering-gratitude-mandate`(살전 5:18) ·
+         * `suffering-isolation-blessing`(시 88:18) 은 **명제 자체가 정통**이고 REJECTED 인 근거는
+         * 거기 붙은 위협 조건·애도 박탈이다. 근거성 축을 더 조이면 이들 대신 정통 묵상이 잘린다.
          *
-         * 임계치는 재고정하지 않았다(§4 3단 사인오프 소관, 분모가 11 뿐이라 인샘플). 유예 결정과 기한은
-         * `manifest.tunedAgainst.acknowledgedMismatch` 에 있고 `GoldenSetTuningContractTest` 가 강제한다.
+         * ⚠️ 그러므로 이 목록이 줄었다고 좋아할 일이 아니다. 미탐 5건을 이 게이트로 잡으려 드는
+         * 순간 오탐이 되돌아온다 — 이 층의 담당은 §4 2단 검토와 v2 L3 분류기다. 금칙 토큰 축도
+         * 이 층은 못 잡는다(아웃오브샘플 0/27, `GoldenSetTokenLintCrossCheckTest`).
+         *
+         * 3072 시절 목록(`orthodox-job`, `gnostic-inner-divinity`)과 차원 유예
+         * `acknowledgedMismatch` 는 재튜닝으로 해소돼 사라졌다.
          */
-        val KNOWN_MISMATCHES = listOf("orthodox-job", "orthodox-paraphrase-only")
+        val KNOWN_MISMATCHES = listOf(
+            "orthodox-paraphrase-only",
+            "suffering-comparison-shaming",
+            "suffering-doubt-forfeits",
+            "suffering-gratitude-mandate",
+            "suffering-isolation-blessing",
+            "suffering-prayer-quantity",
+        )
     }
 
     private fun Double?.fmt(): String = this?.let { "%.3f".format(it) } ?: "n/a"

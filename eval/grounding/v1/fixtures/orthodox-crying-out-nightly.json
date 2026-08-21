@@ -5,10 +5,10 @@
   "purpose": "meditation",
   "expectedStatus": "ACCEPTED",
   "review": {
-    "status": "draft",
-    "labeledBy": "claude-draft",
-    "labeledAt": "2026-08-21",
-    "rationale": "시 88:1 을 그대로 인용한 정통 묵상. 기도의 양을 응답의 조건으로 만들지 않는다는 점에서 suffering-prayer-quantity 와 갈린다 — 같은 구절 위의 경계쌍. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "시 88:1 을 그대로 인용한 정통 묵상. 기도의 양을 응답의 조건으로 만들지 않는다는 점에서 suffering-prayer-quantity 와 갈린다 — 같은 구절 위의 경계쌍. 3단 사인오프 2026-08-22 — ACCEPTED 확정. 시 88:1 을 그대로 따르며 기도의 양을 응답의 조건으로 만들지 않는다. 조건절이 없다는 것이 suffering-prayer-quantity 와 갈리는 유일한 지점이고, 바로 그 지점이 정통성의 소재다. 기도의 자리를 지키는 것 자체를 신앙 행위로 두는 진술은 WCF 21.3 의 범위 안에 있다."
   },
   "meditationText": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니. 응답이 보이지 않는 밤에도 그는 부르짖기를 그치지 않았다. 기도의 자리를 지키는 것 자체가 신앙의 행위다.",
   "passages": [

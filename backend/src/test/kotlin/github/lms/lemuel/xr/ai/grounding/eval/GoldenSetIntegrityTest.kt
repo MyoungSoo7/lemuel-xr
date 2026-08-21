@@ -66,8 +66,27 @@ class GoldenSetIntegrityTest {
             .describedAs("claude-draft 라벨이 signed_off 로 승격됐다 — 사람 사인오프가 필요하다")
             .isEmpty()
         // signed_off 는 사람이거나, 코드 분기가 라벨을 확정하는 구조적 케이스여야 한다.
+        //
+        // 세 번째 값(위임 사인오프)은 **매니페스트가 허락할 때만** 존재한다. 문자열을 여기에
+        // 하드코딩해 두면 다음 사람이 아무 표기나 덧붙여도 통과하므로, 허용값을
+        // `manifest.signOff` 에서 *조립*한다 — 위임 기록을 지우는 순간 이 검사가 빨간불이 되고,
+        // 표기를 바꾸려면 매니페스트의 권한자·수임자를 바꿔야 한다.
+        val signOff = dataset.manifest.signOff
+        val allowed = listOfNotNull("human", "structural", signOff.delegatedLabeledBy)
         assertThat(dataset.signedOff.map { it.review.labeledBy }.distinct())
-            .isSubsetOf(listOf("human", "structural"))
+            .describedAs(
+                "signed_off 의 labeledBy 는 사람·구조적 케이스이거나, manifest.signOff.delegation 이 " +
+                    "명시한 위임 표기('${signOff.delegatedLabeledBy}')여야 한다",
+            )
+            .isSubsetOf(allowed)
+        // 위임 표기를 쓴 픽스처가 하나라도 있으면 위임 기록의 필수 항목이 비어 있으면 안 된다.
+        // "누가·언제·무엇을" 이 비어 있으면 그 기록은 나중에 아무것도 복원해 주지 못한다.
+        if (dataset.signedOff.any { it.review.labeledBy == signOff.delegatedLabeledBy }) {
+            val d = requireNotNull(signOff.delegation)
+            assertThat(listOf(signOff.authorityHandle, d.date, d.delegatedTo, d.scope, d.record))
+                .describedAs("위임 사인오프를 쓰면서 manifest.signOff 의 필수 기록이 비었다")
+                .allSatisfy { assertThat(it).isNotBlank() }
+        }
     }
 
     @Test

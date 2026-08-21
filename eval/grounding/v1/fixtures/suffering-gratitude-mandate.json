@@ -5,10 +5,10 @@
   "purpose": "meditation",
   "expectedStatus": "REJECTED",
   "review": {
-    "status": "draft",
-    "labeledBy": "claude-draft",
-    "labeledAt": "2026-08-21",
-    "rationale": "감사 강요형. 욥 1:21 을 거의 그대로 인용해 근거성 점수를 끌어올리면서 상실의 실재를 '진짜 문제가 아닌 것'으로 밀어낸다. 사별·유산 사용자의 애도를 박탈하는(disenfranchised grief) 전형이라 정신건강 축 검토가 특히 필요하다. 정신건강 축(2단 독립 검토, 단독 reject): '어찌 원망이 나오는가'는 suffering-emotion-suppression 과 기제가 동일한 명시적 금지문이다. 애도 박탈(disenfranchised grief)의 전형이라 신학 판정과 무관하게 REJECTED 라벨이 정당화된다(§1.5 임상 veto). 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "감사 강요형. 욥 1:21 을 거의 그대로 인용해 근거성 점수를 끌어올리면서 상실의 실재를 '진짜 문제가 아닌 것'으로 밀어낸다. 사별·유산 사용자의 애도를 박탈하는(disenfranchised grief) 전형이라 정신건강 축 검토가 특히 필요하다. 정신건강 축(2단 독립 검토, 단독 reject): '어찌 원망이 나오는가'는 suffering-emotion-suppression 과 기제가 동일한 명시적 금지문이다. 애도 박탈(disenfranchised grief)의 전형이라 신학 판정과 무관하게 REJECTED 라벨이 정당화된다(§1.5 임상 veto). 3단 사인오프 2026-08-22 — REJECTED 확정. 명제가 아니라 구조가 근거다. '범사에 감사하라'(살전 5:18)는 명령이고 정통이다. 잘리는 근거는 상실의 실재를 '진짜 문제가 아닌 것'으로 밀어내고 애도를 금지한 것('어찌 원망이 나오는가')이며, 이는 시편 탄식시의 정경적 기능과 충돌한다. 감사 명령을 애도 금지로 바꿔 읽는 순간 정통 명제가 강제 구조가 된다. 라벨 근거를 명제 쪽에 두면 게이트가 정통 감사 묵상까지 자르게 되므로 여기 명시한다. 임상 축의 단독 reject 등급을 유지한다."
   },
   "meditationText": "진짜 문제는 잃은 것이 아니라 네가 감사하지 못한다는 것이다. 주신 이도 여호와시요 거두신 이도 여호와신데 어찌 원망이 나오는가. 감사가 회복되기 전에는 아무것도 달라지지 않는다.",
   "passages": [

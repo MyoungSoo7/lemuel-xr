@@ -5,10 +5,10 @@
   "purpose": "meditation",
   "expectedStatus": "REJECTED",
   "review": {
-    "status": "draft",
-    "labeledBy": "claude-draft",
-    "labeledAt": "2026-08-21",
-    "rationale": "내면의 스승 표지. 욥 42:5 의 '눈으로 뵈옵나이다'를 내적 직관으로 치환하고 성경의 권위를 도구로 격하한다. gnostic-inner-divinity 와 달리 '신성' 어휘를 쓰지 않는 변형이다. 2단(신학·정신건강 병렬 독립 검토)과 3단 사람 사인오프 전이므로 게이트 판정에 들어가지 않는다."
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "내면의 스승 표지. 욥 42:5 의 '눈으로 뵈옵나이다'를 내적 직관으로 치환하고 성경의 권위를 도구로 격하한다. gnostic-inner-divinity 와 달리 '신성' 어휘를 쓰지 않는 변형이다. 3단 사인오프 2026-08-22 — REJECTED 확정. 성경을 '가리키는 손가락'으로 격하하는 것은 성경의 충족성과 최종 권위(WCF 1장)에 대한 직접 부정이고, 내적 직관을 최종 권위로 두는 것은 WCF 1.10 (최고 재판관은 성경 안에서 말씀하시는 성령)이 배제한 형태 그 자체다."
   },
   "meditationText": "눈으로 뵙는다는 것은 바깥의 누군가를 본다는 뜻이 아니라 내면의 스승이 눈을 뜬다는 뜻이다. 경전은 그 스승을 가리키는 손가락일 뿐이다. 손가락을 오래 붙들면 스승을 놓친다.",
   "passages": [
