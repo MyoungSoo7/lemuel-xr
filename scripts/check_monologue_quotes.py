@@ -35,6 +35,15 @@
     D. 하드코딩   소스에 `"자구"(참조)` 형태의 성경 자구가 다시 박히지 않았는가.
                   **주석 안은 허용** 이고(신학 근거를 적는 자리다) 정본 대조만 한다.
                   코드 안이면 실패다 — 두 벌 상태로 되돌아간 것이기 때문이다.
+    E. yml        시나리오·XR 콘텐츠 yml 이 **성경이라고 딱지 붙여 보여 주는 문자열** 이
+                  정본과 같은가. 두 형태를 본다.
+                    E1 라벨   `{ label: "…", scripture: ex-3:11 }` — 라벨이 그 절의 자구인가.
+                    E2 인용   `"…" (출 3:12)` — 따옴표 인용 + 참조.
+                  2026-08-21 이전에는 둘 다 아무도 안 쟀고, `moses.yml` 카드 라벨 5장 중
+                  넷이 의역이었다("제가 누구이기에" / 출 3:11 은 "내가 누구이기에").
+                  화면은 `scripture:` 딱지로 "이건 성경이다" 라고 말하면서 성경이 아닌
+                  문장을 보여 주고 있었다. 같은 날 `david.yml`·`jesus.yml`·`joseph.yml` 의
+                  인용 5건, `content/moses/scene3.yml` 카드 1장도 같은 이유로 고쳤다.
 
 C 가 `scripture_text_check.py` 와 겹치는 것에 대하여
     겹친다. 그쪽은 시드 201행 전체를 KRV/KLB 해시와 대조한다. 여기는 모놀로그가 여는
@@ -71,9 +80,19 @@ C 가 `scripture_text_check.py` 와 겹치는 것에 대하여
       문맥상 엉뚱한 절을 끌어다 쓴 것은 사람의 몫이다.
     - **인용부호 없이 본문에 녹인 성경 자구.** 참조도 따옴표도 없으면 D 의 추출 대상
       밖이다. 그건 `verse_lines_check.py` 계열의 몫이다.
-    - **시나리오 yml 의 카드 라벨.** `moses.yml` 의 `label:` 은 참조를 달지만 따옴표
-      인용 형식이 아니라 여기 안 걸린다. 2026-08-21 현재 "제가 누구이기에"
-      (출 3:11 은 "내가 누구이기에") 처럼 의역 라벨이 남아 있다 — 알고 남긴 것이다.
+    - **`content/**/*.yml` 의 낭독 자막 179건.** XR 낭독판은 `text_ko: "<절 전문> (창 12:1)"`
+      형태로 성경을 통째로 싣는다. E2 는 *따옴표로 감싼 인용* 만 잡으므로 이 형태는
+      밖이다. 2026-08-21 에 손으로 전수 대조한 결과 **179건 중 32건이 개역개정과
+      다르다** (자구 변형 20 · 무표시 절단 5 · 구두점 7). 대표적으로
+      `david/scene3.yml:96` 사울 대사는 개역한글 자구이고(개역개정은 "네가 가서 저
+      블레셋 사람과 싸울 수 없으리니"), `david/scene5.yml:119` 는 삼상 17:45 에서
+      "네가 모욕하는 이스라엘 군대의" 를 표시 없이 들어냈다 — 모놀로그에서 고쳤던
+      바로 그 절단이 낭독판에 그대로 남아 있다. **미완화 노출로 여기 적어 둔다.**
+      게이트를 넓히려면 그 32건을 먼저 정리해야 한다. 지금 넓히면 즉시 빨강이고,
+      빨강을 baseline 으로 덮으면 이 게이트가 2026-08-21 에 고친 그 거짓 초록이 된다.
+    - **인용과 참조가 떨어져 있는 문장.** `jesus.yml` 의 `context_line` 은
+      `'…알겠사옵나이까' 하는 도마에게 (요 14:5)` 라 따옴표와 참조 사이에 산문이 낀다.
+      E2 의 추출 대상 밖이다(그 한 건은 같은 날 손으로 대조해 고쳤다).
     - **정본 표 자체의 오류.** 표는 bskorea HTML 을 기계 파싱해 만든다. 그 파싱이
       틀리면 게이트는 틀린 기준으로 초록을 낸다. `--refresh` 로 재생성해 diff 가
       비는지가 유일한 확인 수단이다.
@@ -99,11 +118,15 @@ import unicodedata
 import urllib.request
 from pathlib import Path
 
+import yaml
+
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scripture_text_check import seeded_rows  # noqa: E402  시드 파서를 두 벌 두지 않는다
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC_DIR = ROOT / "frontend/src/lib/content"
+SCEN_DIR = ROOT / "backend/src/main/resources/scenarios"
+CONTENT_DIR = ROOT / "content"
 CANON = ROOT / "docs/verses-monologues-gae.txt"
 
 # 화면이 읽는 역본. `frontend/src/lib/api/content.ts` 의 기본값과 같아야 한다.
@@ -140,6 +163,13 @@ PUNCT = ",.!?;:·…‥、。~-–—"
 
 CITE_RE = re.compile(r"^([가-힣]+)\s?(\d+):(\d+)(?:[-~](\d+))?$")
 
+# E1 은 `cards:` 아래 항목만 본다. 같은 `scripture:` 키가 두 계약을 지고 있기 때문이다.
+#   cards   — "이 라벨이 곧 그 절의 자구" (moses.yml 다섯 변명 카드)
+#   options — "이 선택지가 그 절과 관련" (jesus.yml 의 "길 — 어디로 가야 할지 모를 때",
+#             `scripture: jn-14:6` 은 씬 전체가 여는 절이고 라벨은 설명문이다)
+# 후자를 자구로 재면 설계상 인용이 아닌 문자열을 인용으로 몰아 실패시킨다.
+CARDS_KEY = "cards"
+
 
 def sources() -> list[Path]:
     """콘텐츠 모듈 전부. `*-monologues.ts` 로 좁히지 않는다.
@@ -149,6 +179,68 @@ def sources() -> list[Path]:
     넓혀도 셈이 늘지 않는다 — 주석 속 사용 예시는 아래에서 걸러낸다.
     """
     return sorted(p for p in SRC_DIR.glob("*.ts") if not p.name.endswith(".test.ts"))
+
+
+def yml_sources() -> list[Path]:
+    """E 축 대상 — 미션 시나리오 yml + XR 낭독 콘텐츠 yml.
+
+    둘을 한 셈에 넣는 이유는 같은 카드가 두 파일에 나뉘어 살기 때문이다.
+    `moses.yml` 의 라벨은 `content/moses/scene3.yml` 카드 전문(全文)을 UI 폭에 맞게
+    끊은 조각이라, 한쪽만 재면 두 파일이 어긋나는 것을 못 본다.
+    """
+    return sorted(SCEN_DIR.glob("*.yml")) + sorted(CONTENT_DIR.rglob("*.yml"))
+
+
+def walk_cards(node) -> list[dict]:
+    """문서 어디에 있든 `cards:` 리스트의 매핑 항목을 전부 모은다."""
+    found: list[dict] = []
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key == CARDS_KEY and isinstance(value, list):
+                found += [x for x in value if isinstance(x, dict)]
+            found += walk_cards(value)
+    elif isinstance(node, list):
+        for item in node:
+            found += walk_cards(item)
+    return found
+
+
+def parse_yml(raw: str) -> list[dict]:
+    """yml 한 파일에서 E1 라벨·E2 인용을 뽑는다.
+
+    yml 주석(`#`)도 대상에 넣는다. TS 쪽과 달리 여기서는 주석을 봐주지 않는다 —
+    시나리오 파일의 머리 주석("핵심 메시지: …")은 저자가 읽고 베껴 쓰는 자리라
+    거기 틀린 자구가 있으면 아래 payload 로 번진다. 실제로 `david.yml` 은
+    머리 주석과 `victory_note` 가 같은 오자를 나눠 갖고 있었다.
+    """
+    out: list[dict] = []
+    for card in walk_cards(yaml.safe_load(raw)):
+        label, ref = card.get("label"), card.get("scripture")
+        if not isinstance(label, str) or not isinstance(ref, str):
+            continue
+        at = raw.find(f'"{label}"')
+        out.append(
+            {
+                "kind": "label",
+                "text": label,
+                "ref": ref,
+                "pos": at if at >= 0 else 0,
+            }
+        )
+    prepared, idx = prepare(raw)
+    for m in QUOTED.finditer(prepared):
+        out.append(
+            {
+                "kind": "quote",
+                "text": m.group("text"),
+                "book": m.group(2),
+                "chapter": int(m.group(3)),
+                "verse": int(m.group(4)),
+                "end": int(m.group(5)) if m.group(5) else None,
+                "pos": idx[m.start()],
+            }
+        )
+    return out
 
 
 def comment_spans(src: str) -> list[tuple[int, int]]:
@@ -499,6 +591,22 @@ def needed_refs() -> set[tuple[str, int, int]]:
             last = lit["end"] if lit["end"] and lit["end"] >= lit["verse"] else lit["verse"]
             for v in range(lit["verse"], last + 1):
                 need.add((lit["book"], lit["chapter"], v))
+    for f in yml_sources():
+        for item in parse_yml(f.read_text(encoding="utf-8")):
+            if item["kind"] == "label":
+                parsed = split_ref(item["ref"])
+                if parsed is None:
+                    unknown.add(item["ref"])
+                else:
+                    need.add(parsed)
+            else:
+                last = (
+                    item["end"]
+                    if item["end"] and item["end"] >= item["verse"]
+                    else item["verse"]
+                )
+                for v in range(item["verse"], last + 1):
+                    need.add((item["book"], item["chapter"], v))
     if unknown:
         raise SystemExit(
             f"[판정불가] 모르는 책 코드: {', '.join(sorted(unknown))} — BOOK_KO 에 추가하라"
@@ -529,9 +637,14 @@ def refresh() -> int:
         "# docs/verses-monologues-gae.txt — 프론트 모놀로그 인용 대조 정본 (개역개정)",
         "#",
         "# 무엇인가",
-        "#   frontend/src/lib/content/*-monologues.ts 의 인용이 여는 절의 개역개정 본문이다.",
-        "#   소스에는 자구가 없고 참조 + 낱말 인덱스만 있다(scripture-quote.ts) — 자구는",
-        "#   시드에서 온다. scripts/check_monologue_quotes.py 가 그 시드를 이 표에 대고 잰다.",
+        "#   scripts/check_monologue_quotes.py 가 대조 기준으로 삼는 절들의 개역개정 본문이다.",
+        "#   두 갈래가 들어온다.",
+        "#     · frontend/src/lib/content/*.ts 의 q() 클립이 여는 참조 (A~D 축)",
+        "#       소스에는 자구가 없고 참조 + 낱말 인덱스만 있다(scripture-quote.ts) — 자구는",
+        "#       시드에서 온다. 이 표는 그 *시드* 가 개역개정인지를 재는 데 쓴다.",
+        "#     · 시나리오/XR 콘텐츠 yml 이 성경이라 딱지 붙인 문자열의 참조 (E 축)",
+        "#       카드 라벨(label+scripture)과 따옴표 인용은 자구가 yml 에 직접 들어 있어",
+        "#       이 표와 곧바로 대조한다.",
         "#",
         "# 출처",
         "#   대한성서공회 개역개정 HTML 기계 파싱. 손으로 옮겨 적지 않았다.",
@@ -689,7 +802,52 @@ def main() -> int:
                 f"    → {NOTE[verdict]}"
             )
 
+    # ── E. yml 이 성경이라 딱지 붙인 문자열 ───────────────────────────────
+    e_items: list[dict] = []
+    for f in yml_sources():
+        raw = f.read_text(encoding="utf-8")
+        for item in parse_yml(raw):
+            item["site"] = f"{f.relative_to(ROOT)}:{line_of(raw, item['pos'])}"
+            e_items.append(item)
+    e_tally: dict[str, int] = {}
+    for item in e_items:
+        if item["kind"] == "label":
+            parsed = split_ref(item["ref"])
+            if parsed is None:
+                fails.append(f"✗ [E 라벨] {item['site']}  모르는 책 코드 {item['ref']}")
+                continue
+            book, chapter, verse, end = *parsed, None
+            where = f"{item['ref']}"
+        else:
+            book, chapter, verse, end = (
+                item["book"],
+                item["chapter"],
+                item["verse"],
+                item["end"],
+            )
+            where = f"{book} {chapter}:{verse}"
+        canon = canon_text(table, book, chapter, verse, end)
+        verdict = "NO_CANON" if canon is None else classify(item["text"], canon)
+        item["verdict"] = verdict
+        e_tally[verdict] = e_tally.get(verdict, 0) + 1
+        if verdict not in PASSING:
+            kind = "라벨" if item["kind"] == "label" else "인용"
+            fails.append(
+                f"✗ [E {kind}] [{verdict}] {where}  {item['site']}\n"
+                f"    문자열 {item['text']}\n"
+                f"    개역개정 {(canon or '')[:140]}\n"
+                f"    → {NOTE[verdict]}"
+                + (
+                    "\n    → `scripture:` 딱지가 붙은 문자열은 그 절의 자구여야 한다"
+                    if item["kind"] == "label"
+                    else ""
+                )
+            )
+
     if args.list:
+        for item in e_items:
+            mark = "  " if item.get("verdict") in PASSING else "✗ "
+            print(f"{mark}[E/{item['kind']}] [{item.get('verdict')}] {item['site']}")
         for entry in quotes:
             mark = "  " if entry.get("text") else "✗ "
             print(f"{mark}[A] {entry['site']}  ({entry['cite']})")
@@ -713,11 +871,17 @@ def main() -> int:
         f" · C 시드↔정본 {len(c_refs)}건 ({c_sum})"
         f" · D 리터럴 {len(literals)}건 (주석 {in_comment_n} · 코드 "
         f"{len(literals) - in_comment_n})"
+        f" · E yml {len(e_items)}건 "
+        f"(라벨 {sum(1 for x in e_items if x['kind'] == 'label')} · "
+        f"인용 {sum(1 for x in e_items if x['kind'] == 'quote')})"
     )
     if fails:
         print(f"실패 {len(fails)}건")
         return 1
-    print("전건 통과 — 프론트에 성경 자구 없음 · 시드가 개역개정 축자 · 표기가 참조를 덮음")
+    print(
+        "전건 통과 — 프론트에 성경 자구 없음 · 시드가 개역개정 축자 · 표기가 참조를 덮음"
+        " · yml 이 성경이라 딱지 붙인 문자열이 정본 자구"
+    )
     return 0
 
 
