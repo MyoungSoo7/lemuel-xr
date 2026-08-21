@@ -149,6 +149,36 @@ SCENES: dict[str, dict[str, str]] = {
         "5": "A plain open courtyard at dawn stripped of all ornament, a single rolled scroll resting on a "
              "bare stone table, gentle warm light, spare and clear.",
     },
+    # 룻 5장 — 이 인물만 오래 배경이 **한 장도 없었다.** `/ruth` 는 단색 그라디언트로
+    # 돌았고, `scene-backgrounds.test.ts` 는 그 사실을 "의도된 제외" 로 적어 두고 있었다.
+    # 그 제외를 걷으려면 먼저 자산이 있어야 하므로 프롬프트를 여기에 올린다.
+    #
+    # 소재는 지어내지 않았다 — 다섯 칸 전부 `backend/src/main/resources/scenarios/ruth.yml`
+    # 의 `extras.anchor` 와 `extras.environment`(time_of_day · camera_rig)에서 옮겼다.
+    # 광원은 그 yml 의 시간대를 그대로 따른다: overcast_noon · high_sun · afternoon ·
+    # night_lighting_only · late_afternoon.
+    #
+    # 🚨 Scene 4(타작 마당의 밤)는 이 미션에서 AR 이 닫혀 있는 이유가 된 씬이다
+    # (docs/RUTH-RUNTIME-SIGNOFF.md · RuntimeExposureSignoffTest). 배경은 VR 용이고,
+    # 프롬프트는 **빈 마당과 곡식 단**까지만 그린다 — 사람도, 잠든 형상도, 두 사람의
+    # 자리도 그리지 않는다. 본문이 서술하지 않는 것을 이미지가 서술하게 두지 않는다.
+    "ruth": {
+        "1": "A dirt track crossing an empty upland plain under flat grey overcast noon light, a single "
+             "weathered boundary stone standing where the road forks, dry grass bending in the wind, "
+             "the two paths receding toward opposite horizons.",
+        "2": "The outskirts of a small stone hill town under high midday sun, an open gateway in a low "
+             "rough wall, barley fields just coming into harvest on the slope beyond, two empty woven "
+             "baskets set down in the dust of the road.",
+        "3": "A wide barley field in mid-harvest in the afternoon, standing grain laid over in waves by the "
+             "wind, cut sheaves bound and leaning together in rows, loose ears of grain scattered along "
+             "the field edge in the foreground.",
+        "4": "A threshing floor at night lit only by moonlight, stacked sheaves of grain heaped around a "
+             "swept circle of packed earth, a winnowing fork leaning against the pile, cool blue shadows, "
+             "completely still and quiet.",
+        "5": "A town gate plaza in the late afternoon, ten worn stone seats arranged in a half circle in "
+             "the shade of the gateway arch, a single worn sandal set on the paving before them, long "
+             "warm light raking across the stones.",
+    },
 }
 
 
