@@ -1,0 +1,65 @@
+# job — 게이트 신설 2026-08-22. 배경은 `scripts/gates/jesus.yml` 머리말과 같다.
+#
+# 욥도 저작 계층이 없다(`content/job/` · `docs/MVP-JOB-CONTENT.md` 부재). 다만 예수와
+# 다른 점이 하나 있다 — `scenarios/job.yml` 이 이미 `T1_no_heterodox_theology` 축을
+# 선언하고 있어서 T1 은 면제가 아니라 **실재하는 축**이다. 그래서 `theology_axis` 를
+# 적지 않는다(적으면 "축이 실재하는데 설정이 exempt" 로 오히려 red 가 된다).
+#
+# `forbidden` 은 `scenarios/job.yml` 에서 기계 추출했다.
+
+character: job
+ruleset: newchar-v5
+scene_count: 5
+docs:
+  mvp: docs/MVP-JOB.md
+doc_min_lines:
+  mvp: 900
+test_identifier: 욥
+trigger_scenes:
+- 2
+crisis_reminder_scenes:
+- 5
+forbidden:
+- 갑절로 갚
+- 갑절로 돌려
+- 갑절로 채워
+- 갑절로 회복
+- 갑절로 주십
+- 배로 갚
+- 배로 돌려
+- 배로 돌아오
+- 갑절로 돌아오
+- 곱절로 돌아오
+- 배로 채워
+- 배로 회복
+- 곱절로 갚
+- 곱절로 돌려
+- 곱절로 채워
+- 잃은 것보다 더 크게
+- 잃은 것보다 더 많이
+- 잃은 것의 갑절
+- 잃은 것을 다 돌려
+- 빼앗긴 것을 다 돌려
+- 믿음의 크기만큼
+- 믿음의 크기가 곧
+- 믿음의 크기대로
+- 회복의 크기는
+- 믿는 만큼 받
+- 믿는 만큼 회복
+- 믿는 만큼 채워
+- 믿음만큼 회복
+- 믿음만큼 받
+- 믿음이 크면 클수록
+- 믿음이 클수록
+- 반드시 회복시켜
+- 반드시 회복됩
+- 반드시 회복하게
+- 언젠가 다 돌려
+- 갇혀 있는 감옥
+- 창조는 실패
+- 나의 신성
+- 감춰진 비밀 지식
+- 영혼의 무덤
+- 우주의 에너지
+- 긍정의 파동
+- 당사자의 실패를 증명
