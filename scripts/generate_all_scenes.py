@@ -42,7 +42,18 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "")
 if not API_KEY:
     sys.exit("ERROR: GEMINI_API_KEY env required")
 
-MODEL = "imagen-4.0-fast-generate-001"
+# 기존 39장은 `imagen-4.0-fast-generate-001` 의 `:predict` 로 뽑았다. 그런데
+# 2026-08-22 실측에서 이 모델이 그 키의 v1beta ListModels 에 **더 이상 없다**
+# (`404 ... is not found for API version v1beta, or is not supported for predict`).
+# 즉 이 스크립트는 --force 로도 기존 39장을 다시 뽑지 못하는 상태였다.
+# 남아 있는 이미지 생성 경로는 `gemini-*-image` 계열의 `:generateContent` 뿐이라
+# 그쪽을 기본으로 바꾼다. imagen 계열 이름을 넣으면 예전 predict 경로로 돌아간다
+# (키에 그 모델이 다시 생기면 쓰라고 남겨둔다).
+#
+# 산출 해상도가 조금 다르다: predict 는 1408x768, generateContent 는 1376x768.
+# 둘 다 16:9 근처이고 화면에서는 `background-size: cover` 로 꽉 채우므로 섞여도
+# 보이는 차이가 없다.
+MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-3.1-flash-image")
 OUT_ROOT = Path(__file__).parent.parent / "frontend" / "public" / "images" / "scenes"
 
 # 모든 프롬프트에 공통으로 붙는 화풍 고정 문구.
@@ -149,6 +160,36 @@ SCENES: dict[str, dict[str, str]] = {
         "5": "A plain open courtyard at dawn stripped of all ornament, a single rolled scroll resting on a "
              "bare stone table, gentle warm light, spare and clear.",
     },
+    # 룻 5장 — 이 인물만 오래 배경이 **한 장도 없었다.** `/ruth` 는 단색 그라디언트로
+    # 돌았고, `scene-backgrounds.test.ts` 는 그 사실을 "의도된 제외" 로 적어 두고 있었다.
+    # 그 제외를 걷으려면 먼저 자산이 있어야 하므로 프롬프트를 여기에 올린다.
+    #
+    # 소재는 지어내지 않았다 — 다섯 칸 전부 `backend/src/main/resources/scenarios/ruth.yml`
+    # 의 `extras.anchor` 와 `extras.environment`(time_of_day · camera_rig)에서 옮겼다.
+    # 광원은 그 yml 의 시간대를 그대로 따른다: overcast_noon · high_sun · afternoon ·
+    # night_lighting_only · late_afternoon.
+    #
+    # 🚨 Scene 4(타작 마당의 밤)는 이 미션에서 AR 이 닫혀 있는 이유가 된 씬이다
+    # (docs/RUTH-RUNTIME-SIGNOFF.md · RuntimeExposureSignoffTest). 배경은 VR 용이고,
+    # 프롬프트는 **빈 마당과 곡식 단**까지만 그린다 — 사람도, 잠든 형상도, 두 사람의
+    # 자리도 그리지 않는다. 본문이 서술하지 않는 것을 이미지가 서술하게 두지 않는다.
+    "ruth": {
+        "1": "A dirt track crossing an empty upland plain under flat grey overcast noon light, a single "
+             "weathered boundary stone standing where the road forks, dry grass bending in the wind, "
+             "the two paths receding toward opposite horizons.",
+        "2": "The outskirts of a small stone hill town under high midday sun, an open gateway in a low "
+             "rough wall, barley fields just coming into harvest on the slope beyond, two empty woven "
+             "baskets set down in the dust of the road.",
+        "3": "A wide barley field in mid-harvest in the afternoon, standing grain laid over in waves by the "
+             "wind, cut sheaves bound and leaning together in rows, loose ears of grain scattered along "
+             "the field edge in the foreground.",
+        "4": "A threshing floor at night lit only by moonlight, stacked sheaves of grain heaped around a "
+             "swept circle of packed earth, a winnowing fork leaning against the pile, cool blue shadows, "
+             "completely still and quiet.",
+        "5": "A town gate plaza in the late afternoon, ten worn stone seats arranged in a half circle in "
+             "the shade of the gateway arch, a single worn sandal set on the paving before them, long "
+             "warm light raking across the stones.",
+    },
 }
 
 
@@ -197,11 +238,22 @@ def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
             "no captions, no subtitles, no watermark, no signature. ",
         )
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:predict?key={API_KEY}"
-    body = {
-        "instances": [{"prompt": prompt + style}],
-        "parameters": {"sampleCount": 1, "aspectRatio": "16:9"},
-    }
+    predict = MODEL.startswith("imagen")
+    verb = "predict" if predict else "generateContent"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:{verb}?key={API_KEY}"
+    if predict:
+        body = {
+            "instances": [{"prompt": prompt + style}],
+            "parameters": {"sampleCount": 1, "aspectRatio": "16:9"},
+        }
+    else:
+        body = {
+            "contents": [{"parts": [{"text": prompt + style}]}],
+            "generationConfig": {
+                "responseModalities": ["IMAGE"],
+                "imageConfig": {"aspectRatio": "16:9"},
+            },
+        }
     req = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
@@ -209,18 +261,33 @@ def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        # generateContent 쪽이 predict 보다 눈에 띄게 느리다 (실측 한 장 40~90초).
+        with urllib.request.urlopen(req, timeout=300) as r:
             data = json.loads(r.read())
     except urllib.error.HTTPError as e:
         return f"[{character}/{scene_id}] HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"
 
-    preds = data.get("predictions", [])
-    if not preds:
-        # 안전필터에 걸리면 predictions 가 통째로 비어서 온다 — 원문을 남겨야 원인을 안다.
-        return f"[{character}/{scene_id}] FAIL no predictions: {json.dumps(data)[:200]}"
-    b64 = preds[0].get("bytesBase64Encoded")
-    if not b64:
-        return f"[{character}/{scene_id}] FAIL no bytes: keys={list(preds[0].keys())}"
+    if predict:
+        preds = data.get("predictions", [])
+        if not preds:
+            # 안전필터에 걸리면 predictions 가 통째로 비어서 온다 — 원문을 남겨야 원인을 안다.
+            return f"[{character}/{scene_id}] FAIL no predictions: {json.dumps(data)[:200]}"
+        b64 = preds[0].get("bytesBase64Encoded")
+        if not b64:
+            return f"[{character}/{scene_id}] FAIL no bytes: keys={list(preds[0].keys())}"
+    else:
+        # generateContent 는 파트 배열로 온다. 안전필터에 걸리면 이미지 파트 없이
+        # 텍스트 파트만(또는 finishReason 만) 온다 — predict 와 마찬가지로 원문을 남긴다.
+        b64 = ""
+        for cand in data.get("candidates", []):
+            for part in cand.get("content", {}).get("parts", []):
+                if "inlineData" in part:
+                    b64 = part["inlineData"]["data"]
+                    break
+            if b64:
+                break
+        if not b64:
+            return f"[{character}/{scene_id}] FAIL no image part: {json.dumps(data)[:300]}"
 
     img = base64.b64decode(b64)
     return to_webp(img, out, f"{character}/{scene_id}")

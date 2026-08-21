@@ -271,8 +271,21 @@ export default function RuthPage() {
       {/* Scene 5 가 씬 안에 직접 둔 위기 안내. 서버가 번호를 치환해서 보낸 문자열이다. */}
       <CrisisReminder text={field<string>("crisis_reminder")} />
 
-      <section className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 bg-gradient-to-b from-stone-900 via-stone-950 to-black">
-        <div className="p-5">
+      {/* Scene 배경 이미지 */}
+      <section
+        className="flex-1 max-w-3xl mx-auto w-full rounded-xl border border-[var(--color-primary)]/20 overflow-hidden mb-4 relative bg-cover bg-center bg-black"
+        style={{
+          backgroundImage: `url(/images/scenes/ruth/${scene.currentScene}.webp)`,
+        }}
+      >
+        {/*
+          오버레이 색은 이 자리에 있던 단색 그라디언트(stone-900 → stone-950 → black)를
+          그대로 쓴다. 솔로몬 쪽 amber 계열을 가져오면 Scene 4(달빛 타작 마당)의 푸른
+          색조와 부딪힌다 — 룻 다섯 장은 흐린 낮·한낮·오후·밤·석양으로 색온도가 크게
+          갈리므로, 중립한 stone 계열이라야 다섯 장 모두에서 본문이 읽힌다.
+        */}
+        <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-950/85 to-black/90" />
+        <div className="relative z-10 p-5">
           {ended ? (
             <p className="text-sm text-[var(--color-warm)]/85 leading-relaxed">
               여기서 마쳤습니다. 남은 장면은 열지 않았습니다.
