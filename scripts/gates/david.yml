@@ -1,3 +1,7 @@
+# 이 설정에 forbidden·token_examples·exclusions·test_identifier 가 없는 이유와,
+# 그로 인한 BLOCKED 25건을 판정 가능하게 만드는 절차는 scripts/gates/README.md
+# 의 "legacy-baseline 3인물의 BLOCKED 75건" 절에 실측과 함께 적혀 있다.
+# 빈 목록을 채워 BLOCKED 를 없애는 것은 순회 0회를 초록으로 바꾸는 것일 뿐이다.
 # david — 토큰 규약(§5(a))·5-Scene 규약(§8-2)·상시 R1 리스너(§4 R1) **도입 이전**에 머지된 인물.
 # 그래서 ruleset: legacy-baseline. 이 값은 스크립트 소스의 LEGACY_BASELINE 집합에
 # 이름이 있어야만 허용된다(G0cfg). 신규 인물은 이 줄을 써도 즉시 FAIL 한다.

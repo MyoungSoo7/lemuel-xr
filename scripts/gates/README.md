@@ -214,6 +214,70 @@ zsh 에서 안 일어난다(⑬). 전부 셸 이식성 함정이고, **순수 py
 `token_examples_declared` `polite_evasive` `trigger_scenes` `crisis_reminder_scenes`
 `test_identifier` `application_yml` `forbidden_token_test`.
 
+## `legacy-baseline` 3인물의 BLOCKED 75건 — 원인은 하나다 (2026-08-22 실측)
+
+`ci_gates.py` 의 BLOCKED 117 중 **75 건이 `david`·`joseph`·`moses` 세 인물**이다
+(인물당 `PASS 3 / FAIL 1 / BLOCKED 25`, 재현: `python3 scripts/newchar_gates.py --character david`).
+숫자가 크니 "게이트가 셋을 통째로 못 본다" 로 읽기 쉬운데, 실측하면 **원인 하나**로 모인다.
+
+`content/{인물}/scene*.yml` 을 파서로 순회해 `lint_forbidden_tokens` 를 모은 결과:
+
+| 인물      | ruleset         | scene | 선언된 금지 토큰 |
+| --------- | --------------- | ----- | ---------------- |
+| `david`   | legacy-baseline | 6     | **0 종**         |
+| `joseph`  | legacy-baseline | 5     | **0 종**         |
+| `moses`   | legacy-baseline | 6     | **0 종**         |
+| `solomon` | newchar-v5      | 5     | 22 종            |
+| `elijah`  | newchar-v5      | 5     | 45 종            |
+| `ruth`    | newchar-v5      | 5     | 22 종            |
+| `rahab`   | newchar-v5      | 5     | 25 종            |
+
+세 인물은 **토큰 규약보다 먼저 저작됐다.** 안전 장치가 없는 게 아니다 — 같은 파일들에
+`safety_gates` · `consent_card_id`/`consent_card_ref` · `crisis_resource_ref` ·
+`skip_alternative_scene_id` 는 다 있다. 없는 것은 _금지 토큰의 표층형 목록_ 하나고,
+newchar-v5 게이트 대부분이 그 목록을 입력으로 받기 때문에 **입력이 0이면 순회가 0회**가
+되고, 순회 0회는 PASS 가 아니라 BLOCKED 다(위 "BLOCKED 는 PASS 가 아니다" 참조).
+
+그래서 `scripts/gates/{david,joseph,moses}.yml` 에는 `forbidden` `token_examples`
+`token_examples_declared` `exclusions` `test_identifier` `polite_evasive`
+`trigger_scenes` 가 **전부 미정의**다. 25건의 내역도 그대로 갈린다 —
+17건은 `ruleset: legacy-baseline` 유보(`--strict` 로 부채가 보인다), 나머지는
+`G5b`/`G6` "`forbidden` 원소 0개", `G9` "`exclusions` 미정의", `G5c` "`test_identifier`
+미정의", `G5t` "T1 축 0건(면제 등재됨)".
+
+### 여기서 하면 안 되는 것
+
+- **빈 `forbidden: []` 를 채워 넣어 BLOCKED 를 없애는 것.** 순회 0회가 초록으로
+  바뀔 뿐이고, 이 리포가 통째로 피하려는 그 모양이다.
+- **`test_identifier` 만 주는 것.** `g5c()` 는 `test_identifier` _와_ `forbidden` 을
+  둘 다 요구한다(`newchar_gates.py`). 하나만 주면 BLOCKED 사유만 바뀐다.
+- **`ruleset` 을 `newchar-v5` 로 올려 두는 것.** 입력이 없는 채 유보만 풀리면
+  BLOCKED 가 FAIL 로 바뀔 뿐, 판정 가능해지지 않는다.
+
+### 판정 가능하게 만들려면 (인물당)
+
+전부 **저작 작업**이고, 신학·안전 검토를 통과해야 한다. 설정만으로 닫히지 않는다.
+
+1. 그 인물의 서사에서 실제로 금지할 표층형 목록 확정 → `content/{인물}/scene*.yml` 의
+   해당 leaf 에 `lint_forbidden_tokens` 로 선언.
+2. `scripts/gates/{인물}.yml` 에 `forbidden` + `token_examples`(1:1) +
+   `token_examples_declared`(개수 대조) 기입 — ㉞ 의 줄임표 함정을 다시 밟지 말 것.
+3. `exclusions` 를 `value`/`scope`/`expect` 세 칸 다 채워 정의(㉝ — 스코프까지가 정의다).
+4. `test_identifier` 와 대응하는 백엔드 테스트를 연결.
+5. `polite_evasive` · `trigger_scenes` 확정.
+6. `ruleset` 을 `newchar-v5` 로 올리고, `BASELINE.json` 을 다시 잰다.
+
+`theology_axis.status: exempt` 도 그때 같이 재검토한다 — 지금은 `T1_` 축이 0건인 채
+면제로 등재돼 있다.
+
+### 별건: `G3 위기 자원 하드코딩`
+
+세 인물의 `FAIL 1` 은 위와 다른 원인이다 — `docs/MVP-{DAVID,JOSEPH,MOSES}-CONTENT.md`
+에 위기 자원 번호가 직접 박혀 있다(david 9 · joseph 6 · moses 5, 합 20건).
+토큰 목록과 무관하고 문서 수정으로 닫히지만, 사용자에게 보이는 안전 문구이자
+`BASELINE.json` 에 등재된 값이라 **고치는 순간 baseline 이 바뀌고 CI 가 선다.**
+따로 다뤄야 하는 항목이다.
+
 ## 게이트 자신의 테스트
 
 `scripts/gates/tests/run.sh` — **RED 픽스처가 없는 게이트는 받지 않는다.**
