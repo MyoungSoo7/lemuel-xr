@@ -70,7 +70,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s1_book_pages
     speaker: book_text
-    text_ko: "일곱 살찐 소는 일곱 해의 풍년이요\n일곱 마른 소는 일곱 해의 흉년이라\n(창세기 41:26~27)"
+    text_ko: "일곱 살찐 소는 일곱 해의 풍년이요\n일곱 마른 소는 일곱 해의 흉년이라\n(창 41:26~27)"
     audio_clip_id: null
     start_at_seconds: 30.0
     duration_seconds: 18.0

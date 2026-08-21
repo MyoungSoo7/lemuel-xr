@@ -49,28 +49,28 @@ npcs:
 narration_blocks:
   - id: nb_s4_glory
     speaker: narrator
-    text_ko: "솔로몬 왕의 재산과 지혜가 세상의 그 어느 왕보다 큰지라 (열왕기상 10:23)"
+    text_ko: "솔로몬 왕의 재산과 지혜가 세상의 그 어느 왕보다 큰지라 (왕상 10:23)"
     audio_clip_id: aud_s4_glory_ko
     start_at_seconds: 0.0
     duration_seconds: 9.0
     hidden_until_event: null
   - id: nb_s4_accumulation
     speaker: solomon_old_inner
-    text_ko: "나는 은을 돌 같이 흔하게 하였다. 집들을 짓고, 포도원을 일구고, 못을 팠다. (열왕기상 10:27; 전도서 2:4~6, 요약)"
+    text_ko: "나는 은을 돌 같이 흔하게 하였다. 집들을 짓고, 포도원을 일구고, 못을 팠다. (왕상 10:27; 전도서 2:4~6, 요약)"
     audio_clip_id: aud_s4_accumulation_ko
     start_at_seconds: 12.0
     duration_seconds: 12.0
     hidden_until_event: null
   - id: nb_s4_denied_nothing
     speaker: solomon_old_inner
-    text_ko: "무엇이든지 내 눈이 원하는 것을 내가 금하지 아니하며 무엇이든지 내 마음이 즐거워하는 것을 내가 막지 아니하였으니 (전도서 2:10)"
+    text_ko: "무엇이든지 내 눈이 원하는 것을 내가 금하지 아니하며 무엇이든지 내 마음이 즐거워하는 것을 내가 막지 아니하였으니 (전 2:10)"
     audio_clip_id: aud_s4_denied_nothing_ko
     start_at_seconds: 27.0
     duration_seconds: 11.0
     hidden_until_event: null
   - id: nb_s4_hevel_turn
     speaker: solomon_old_inner
-    text_ko: "그 후에 내가 생각해 본즉 내 손으로 한 모든 일과 내가 수고한 모든 것이 다 헛되어 바람을 잡는 것이며 해 아래에서 무익한 것이로다 (전도서 2:11)"
+    text_ko: "그 후에 내가 생각해 본즉 내 손으로 한 모든 일과 내가 수고한 모든 것이 다 헛되어 바람을 잡는 것이며 해 아래에서 무익한 것이로다 (전 2:11)"
     verbatim_note: "개역개정 원문 대조 완료(2026-07-22, 대한성서공회) — '돌이켜'는 전 2:12 어휘라 혼용 교정."
     audio_clip_id: aud_s4_hevel_turn_ko
     audio_clip_id_low: aud_s4_hevel_turn_ko_low
@@ -80,7 +80,7 @@ narration_blocks:
     intensity_aware: true
   - id: nb_s4_hevel_refrain
     speaker: scripture_caption
-    text_ko: "헛되고 헛되며 헛되고 헛되니 모든 것이 헛되도다 (전도서 1:2)"
+    text_ko: "헛되고 헛되며 헛되고 헛되니 모든 것이 헛되도다 (전 1:2)"
     audio_clip_id: aud_s4_hevel_refrain_ko
     audio_clip_id_low: aud_s4_hevel_refrain_ko_low
     start_at_seconds: 55.0

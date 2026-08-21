@@ -47,7 +47,7 @@ npcs:
 narration_blocks:
   - id: nb_s3_rooster
     speaker: narrator
-    text_ko: "닭이 곧 울더라 (누가복음 22:60 반복 — 전환 SFX)"
+    text_ko: "닭이 곧 울더라 (눅 22:60 반복 — 전환 SFX)"
     audio_clip_id: aud_s3_rooster_ko
     start_at_seconds: 0.0
     duration_seconds: 4.0
@@ -55,7 +55,7 @@ narration_blocks:
 
   - id: nb_s3_lord_turned
     speaker: narrator
-    text_ko: "주께서 돌이켜 베드로를 보시니 베드로가 주의 말씀 곧 오늘 닭 울기 전에 네가 세 번 나를 부인하리라 하심이 생각나서 (누가복음 22:61)"
+    text_ko: "주께서 돌이켜 베드로를 보시니 베드로가 주의 말씀 곧 오늘 닭 울기 전에 네가 세 번 나를 부인하리라 하심이 생각나서 (눅 22:61)"
     audio_clip_id: aud_s3_turned_ko
     start_at_seconds: 5.0
     duration_seconds: 14.0
@@ -64,7 +64,7 @@ narration_blocks:
 
   - id: nb_s3_weeping
     speaker: narrator
-    text_ko: "밖에 나가서 심히 통곡하니라 (누가복음 22:62)"
+    text_ko: "밖에 나가서 심히 통곡하니라 (눅 22:62)"
     audio_clip_id: aud_s3_weeping_ko
     start_at_seconds: 20.0
     duration_seconds: 10.0

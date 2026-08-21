@@ -66,7 +66,7 @@ npcs:
 narration_blocks:
   - id: nb_s4_covenant_name
     speaker: voice_of_yhwh_v1
-    text_ko: "아브람이 구십구 세 때에 여호와께서 아브람에게 나타나서 그에게 이르시되 나는 전능한 하나님이라 너는 내 앞에서 행하여 완전하라 (창세기 17:1)"
+    text_ko: "아브람이 구십구 세 때에 여호와께서 아브람에게 나타나서 그에게 이르시되 나는 전능한 하나님이라 너는 내 앞에서 행하여 완전하라 (창 17:1)"
     citation_id: A_gen17_1
     audio_clip_id: aud_s4_covenant_name_ko
     start_at_seconds: 0.0
@@ -74,7 +74,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s4_rename
     speaker: voice_of_yhwh_v1
-    text_ko: "이제 후로는 네 이름을 아브람이라 하지 아니하고 아브라함이라 하리니 이는 내가 너를 여러 민족의 아버지가 되게 함이니라 (창세기 17:5)"
+    text_ko: "이제 후로는 네 이름을 아브람이라 하지 아니하고 아브라함이라 하리니 이는 내가 너를 여러 민족의 아버지가 되게 함이니라 (창 17:5)"
     citation_id: A_gen17_5
     audio_clip_id: aud_s4_rename_ko
     start_at_seconds: 13.0
@@ -84,7 +84,7 @@ narration_blocks:
   - id: nb_s4_abraham_laughs
     speaker: abraham_inner
     voice_id: abraham_v1
-    text_ko: "아브라함이 엎드려 웃으며 마음속으로 이르되 백 세 된 사람이 어찌 자식을 낳을까 사라는 구십 세니 어찌 출산하리요 하고 (창세기 17:17)"
+    text_ko: "아브라함이 엎드려 웃으며 마음속으로 이르되 백 세 된 사람이 어찌 자식을 낳을까 사라는 구십 세니 어찌 출산하리요 하고 (창 17:17)"
     citation_id: A_gen17_17
     audio_clip_id: aud_s4_abraham_laughs_ko
     start_at_seconds: 26.0
@@ -93,7 +93,7 @@ narration_blocks:
     note: "책망 없음 — 대화가 그대로 이어진다. 18:12-15(사라의 웃음)와의 비대칭을 이 지점에서 미리 설명·완화하지 않는다(비교는 사용자 몫으로 남긴다)."
   - id: nb_s4_sarah_laughter_block
     speaker: narrator_v1
-    text_ko: "사라가 속으로 웃고 이르되 내가 노쇠하였고 내 주인도 늙었으니 내게 무슨 즐거움이 있으리요 (창세기 18:12) 여호와께서 아브라함에게 이르시되 사라가 왜 웃으며 이르기를 내가 늙었거늘 어떻게 아들을 낳으리요 하느냐 (18:13) 여호와께 능하지 못한 일이 있겠느냐 기한이 이를 때에 내가 네게로 돌아오리니 사라에게 아들이 있으리라 (18:14) 사라가 두려워서 부인하여 이르되 내가 웃지 아니하였나이다 이르시되 아니라 네가 웃었느니라 (18:15)"
+    text_ko: "사라가 속으로 웃고 이르되 내가 노쇠하였고 내 주인도 늙었으니 내게 무슨 즐거움이 있으리요 (창 18:12) 여호와께서 아브라함에게 이르시되 사라가 왜 웃으며 이르기를 내가 늙었거늘 어떻게 아들을 낳으리요 하느냐 (18:13) 여호와께 능하지 못한 일이 있겠느냐 기한이 이를 때에 내가 네게로 돌아오리니 사라에게 아들이 있으리라 (18:14) 사라가 두려워서 부인하여 이르되 내가 웃지 아니하였나이다 이르시되 아니라 네가 웃었느니라 (18:15)"
     verbatim_note: "개역개정 원문 대조 완료 — 어미 변경 없는 verbatim."
     citation_id: A_gen18_12_15
     audio_clip_id: aud_s4_sarah_laughter_block_ko

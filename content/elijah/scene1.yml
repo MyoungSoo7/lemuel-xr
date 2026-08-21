@@ -47,7 +47,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s1_fire_response
     speaker: scripture_caption
-    text_ko: "이에 여호와의 불이 내려서 번제물과 나무와 돌과 흙을 태우고 또 도랑의 물을 핥은지라 (열왕기상 18:38)"
+    text_ko: "이에 여호와의 불이 내려서 번제물과 나무와 돌과 흙을 태우고 또 도랑의 물을 핥은지라 (왕상 18:38)"
     audio_clip_id: aud_s1_fire_caption_ko
     start_at_seconds: 40.0
     duration_seconds: 10.0

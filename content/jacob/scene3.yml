@@ -44,21 +44,21 @@ narration_blocks:
     note: "seed §4-1 — 라반 20년 서사(재산·품삯 분쟁 등)를 서술하지 않는다. 인과관계·교훈화 언급 절대 금지."
   - id: nb_s3_prayer_open
     speaker: jacob_inner
-    text_ko: "내 조부 아브라함의 하나님, 내 아버지 이삭의 하나님 여호와여 주께서 전에 내게 명하시기를 네 고향, 네 족속에게로 돌아가라 내가 네게 은혜를 베풀리라 하셨나이다 (창세기 32:9)"
+    text_ko: "내 조부 아브라함의 하나님, 내 아버지 이삭의 하나님 여호와여 주께서 전에 내게 명하시기를 네 고향, 네 족속에게로 돌아가라 내가 네게 은혜를 베풀리라 하셨나이다 (창 32:9)"
     audio_clip_id: aud_s3_prayer_open_ko
     start_at_seconds: 6.0
     duration_seconds: 12.0
     hidden_until_event: null
   - id: nb_s3_unworthy
     speaker: jacob_inner
-    text_ko: "나는 주께서 주의 종에게 베푸신 모든 은총과 모든 진실하심을 조금도 감당할 수 없사오나 내가 내 지팡이만 가지고 이 요단을 건넜더니 지금은 두 떼나 이루었나이다 (창세기 32:10)"
+    text_ko: "나는 주께서 주의 종에게 베푸신 모든 은총과 모든 진실하심을 조금도 감당할 수 없사오나 내가 내 지팡이만 가지고 이 요단을 건넜더니 지금은 두 떼나 이루었나이다 (창 32:10)"
     audio_clip_id: aud_s3_unworthy_ko
     start_at_seconds: 19.0
     duration_seconds: 13.0
     hidden_until_event: null
   - id: nb_s3_deliver_fear
     speaker: jacob_inner
-    text_ko: "내가 주께 간구하오니 내 형의 손에서, 에서의 손에서 나를 건져내시옵소서 내가 그를 두려워함은 그가 와서 나와 내 처자들을 칠까 겁이 나기 때문이니이다 (창세기 32:11)"
+    text_ko: "내가 주께 간구하오니 내 형의 손에서, 에서의 손에서 나를 건져내시옵소서 내가 그를 두려워함은 그가 와서 나와 내 처자들을 칠까 겁이 나기 때문이니이다 (창 32:11)"
     audio_clip_id: aud_s3_deliver_fear_ko
     start_at_seconds: 33.0
     duration_seconds: 14.0

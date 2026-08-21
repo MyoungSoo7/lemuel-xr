@@ -42,7 +42,7 @@ npcs:
 narration_blocks:
   - id: nb_s4_return_to_sea
     speaker: narrator
-    text_ko: "그 후에 예수께서 디베랴 호수에서 또 제자들에게 자기를 나타내셨으니 나타내신 일은 이러하니라 (요한복음 21:1)"
+    text_ko: "그 후에 예수께서 디베랴 호수에서 또 제자들에게 자기를 나타내셨으니 나타내신 일은 이러하니라 (요 21:1)"
     audio_clip_id: aud_s4_return_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0
@@ -50,7 +50,7 @@ narration_blocks:
 
   - id: nb_s4_group_list
     speaker: narrator
-    text_ko: "시몬 베드로와 디두모라 하는 도마와 갈릴리 가나 사람 나다나엘과 세베대의 아들들과 또 다른 제자 둘이 함께 있더니 (요한복음 21:2)"
+    text_ko: "시몬 베드로와 디두모라 하는 도마와 갈릴리 가나 사람 나다나엘과 세베대의 아들들과 또 다른 제자 둘이 함께 있더니 (요 21:2)"
     audio_clip_id: aud_s4_group_ko
     start_at_seconds: 11.0
     duration_seconds: 10.0
@@ -58,7 +58,7 @@ narration_blocks:
 
   - id: nb_s4_go_fishing
     speaker: peter_self
-    text_ko: "시몬 베드로가 나는 물고기 잡으러 가노라 하니 그들이 우리도 함께 가겠다 하고 나가서 배에 올랐으나 그 날 밤에 아무 것도 잡지 못하였더니 (요한복음 21:3)"
+    text_ko: "시몬 베드로가 나는 물고기 잡으러 가노라 하니 그들이 우리도 함께 가겠다 하고 나가서 배에 올랐으나 그 날 밤에 아무 것도 잡지 못하였더니 (요 21:3)"
     audio_clip_id: aud_s4_gofishing_ko
     start_at_seconds: 22.0
     duration_seconds: 12.0
@@ -67,7 +67,7 @@ narration_blocks:
 
   - id: nb_s4_stranger_calls
     speaker: jesus_shore_distant
-    text_ko: "날이 새어갈 때에 예수께서 바닷가에 서셨으나 제자들이 예수이신 줄 알지 못하는지라 예수께서 이르시되 얘들아 너희에게 고기가 있느냐 대답하되 없나이다 (요한복음 21:4-5)"
+    text_ko: "날이 새어갈 때에 예수께서 바닷가에 서셨으나 제자들이 예수이신 줄 알지 못하는지라 예수께서 이르시되 얘들아 너희에게 고기가 있느냐 대답하되 없나이다 (요 21:4-5)"
     audio_clip_id: aud_s4_stranger_ko
     start_at_seconds: 35.0
     duration_seconds: 12.0
@@ -75,7 +75,7 @@ narration_blocks:
 
   - id: nb_s4_cast_instruction
     speaker: jesus_shore_distant
-    text_ko: "이르시되 그물을 배 오른편에 던지라 그리하면 잡으리라 하시니 이에 던졌더니 물고기가 많아 그물을 들 수 없더라 (요한복음 21:6)"
+    text_ko: "이르시되 그물을 배 오른편에 던지라 그리하면 잡으리라 하시니 이에 던졌더니 물고기가 많아 그물을 들 수 없더라 (요 21:6)"
     audio_clip_id: aud_s4_cast_ko
     start_at_seconds: 48.0
     duration_seconds: 14.0

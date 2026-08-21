@@ -43,14 +43,14 @@ npcs:
 narration_blocks:
   - id: nb_s1_sift_warning
     speaker: jesus_present
-    text_ko: "시몬아, 시몬아, 보라 사탄이 너희를 밀 까부르듯 하려고 요구하였으나 (누가복음 22:31)"
+    text_ko: "시몬아, 시몬아, 보라 사탄이 너희를 밀 까부르듯 하려고 요구하였으나 (눅 22:31)"
     audio_clip_id: aud_s1_sift_ko
     start_at_seconds: 0.0
     duration_seconds: 10.0
     hidden_until_event: null
   - id: nb_s1_intercession
     speaker: jesus_present
-    text_ko: "그러나 내가 너를 위하여 네 믿음이 떨어지지 않기를 기도하였노니 너는 돌이킨 후에 네 형제를 굳게 하라 (누가복음 22:32)"
+    text_ko: "그러나 내가 너를 위하여 네 믿음이 떨어지지 않기를 기도하였노니 너는 돌이킨 후에 네 형제를 굳게 하라 (눅 22:32)"
     audio_clip_id: aud_s1_intercession_ko
     start_at_seconds: 12.0
     duration_seconds: 12.0
@@ -58,7 +58,7 @@ narration_blocks:
     note: "R2 핵심 — 실패(22:34 예고)보다 중보(22:31-32)가 먼저 온다. 이 순서를 뒤집지 않는다."
   - id: nb_s1_peter_vow
     speaker: peter_self
-    text_ko: "그가 말하되 주여 내가 주와 함께 옥에도, 죽는 데에도 가기를 각오하였나이다 (누가복음 22:33)"
+    text_ko: "그가 말하되 주여 내가 주와 함께 옥에도, 죽는 데에도 가기를 각오하였나이다 (눅 22:33)"
     audio_clip_id: aud_s1_vow_ko
     start_at_seconds: 26.0
     duration_seconds: 10.0
@@ -66,7 +66,7 @@ narration_blocks:
     note: "v1 오류 정정 확인 — '주와 함께 죽기까지'가 아니라 '옥에도, 죽는 데에도 가기를 각오'가 정문(개역개정)."
   - id: nb_s1_prediction
     speaker: jesus_present
-    text_ko: "이르시되 베드로야 내가 네게 말하노니 오늘 닭 울기 전에 네가 세 번 나를 모른다고 부인하리라 하시니라 (누가복음 22:34)"
+    text_ko: "이르시되 베드로야 내가 네게 말하노니 오늘 닭 울기 전에 네가 세 번 나를 모른다고 부인하리라 하시니라 (눅 22:34)"
     audio_clip_id: aud_s1_prediction_ko
     start_at_seconds: 38.0
     duration_seconds: 12.0

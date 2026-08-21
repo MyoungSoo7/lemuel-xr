@@ -198,7 +198,7 @@ scenes:
     scripture_ref: jn-14:6
     extras:
       anchor: 방향·신뢰·핵심 통찰
-      context_line: "'주여 주께서 어디로 가시는지 우리가 알지 못하거늘 그 길을 어찌 알겠사옵나이까' 하는 도마에게 (요 14:5)"
+      context_line: "'주여 주께서 어디로 가시는지 우리가 알지 못하거늘 그 길을 어찌 알겠사옵나이까' (요 14:5) 하는 도마에게"
       options:
         - {
             id: the_way,

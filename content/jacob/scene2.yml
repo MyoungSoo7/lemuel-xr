@@ -40,7 +40,7 @@ npcs:
 narration_blocks:
   - id: nb_s2_esau_cry
     speaker: esau_npc
-    text_ko: "내 아버지여 내게 축복하소서 내게도 그리하소서 (창세기 27:34)"
+    text_ko: "내 아버지여 내게 축복하소서 내게도 그리하소서 (창 27:34)"
     audio_clip_id: aud_s2_esau_cry_ko
     audio_clip_id_caption_only_variant: null # entry_mode_variant=caption_only_no_audio 일 때 재생하지 않음
     start_at_seconds: 3.0
@@ -48,14 +48,14 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s2_esau_second_theft
     speaker: esau_npc
-    text_ko: "그의 이름을 야곱이라 함이 합당하지 아니하니이까 그가 나를 속임이 이것이 두 번째니이다 전에는 나의 장자의 명분을 빼앗고 이제는 내 복을 빼앗았나이다 (창세기 27:36)"
+    text_ko: "그의 이름을 야곱이라 함이 합당하지 아니하니이까 그가 나를 속임이 이것이 두 번째니이다 전에는 나의 장자의 명분을 빼앗고 이제는 내 복을 빼앗았나이다 (창 27:36)"
     audio_clip_id: aud_s2_esau_second_theft_ko
     start_at_seconds: 17.0
     duration_seconds: 14.0
     hidden_until_event: null
   - id: nb_s2_esau_hatred_intent
     speaker: scripture_caption # 위협 연출 배제 — 음성·연기 없이 자막 전용
-    text_ko: "그의 아버지가 야곱에게 축복한 그 축복으로 말미암아 에서가 야곱을 미워하여 심중에 이르기를 아버지를 곡할 때가 가까웠은즉 내가 내 아우 야곱을 죽이리라 하였더니 (창세기 27:41)"
+    text_ko: "그의 아버지가 야곱에게 축복한 그 축복으로 말미암아 에서가 야곱을 미워하여 심중에 이르기를 아버지를 곡할 때가 가까웠은즉 내가 내 아우 야곱을 죽이리라 하였더니 (창 27:41)"
     audio_clip_id: null
     start_at_seconds: 38.0
     duration_seconds: 10.0

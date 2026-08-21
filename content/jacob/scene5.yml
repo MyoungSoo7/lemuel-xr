@@ -48,21 +48,21 @@ npcs:
 narration_blocks:
   - id: nb_s5_v33_1
     speaker: jacob_inner
-    text_ko: "야곱이 눈을 들어 보니 에서가 사백 명의 장정을 거느리고 오고 있는지라 그의 자식들을 나누어 레아와 라헬과 두 여종에게 맡기고 (창세기 33:1)"
+    text_ko: "야곱이 눈을 들어 보니 에서가 사백 명의 장정을 거느리고 오고 있는지라 그의 자식들을 나누어 레아와 라헬과 두 여종에게 맡기고 (창 33:1)"
     audio_clip_id: aud_s5_v33_1_ko
     start_at_seconds: 0.0
     duration_seconds: 12.0
     hidden_until_event: null
   - id: nb_s5_v33_3
     speaker: narrator
-    text_ko: "자기는 그들 앞에서 나아가되 몸을 일곱 번 땅에 굽히며 그의 형 에서에게 가까이 가니 (창세기 33:3)"
+    text_ko: "자기는 그들 앞에서 나아가되 몸을 일곱 번 땅에 굽히며 그의 형 에서에게 가까이 가니 (창 33:3)"
     audio_clip_id: aud_s5_v33_3_ko
     start_at_seconds: 13.0
     duration_seconds: 10.0
     hidden_until_event: null
   - id: nb_s5_v33_4
     speaker: narrator
-    text_ko: "에서가 달려와서 그를 맞이하여 안고 목을 어긋맞추어 그와 입맞추고 서로 우니라 (창세기 33:4)"
+    text_ko: "에서가 달려와서 그를 맞이하여 안고 목을 어긋맞추어 그와 입맞추고 서로 우니라 (창 33:4)"
     audio_clip_id: aud_s5_v33_4_ko
     start_at_seconds: 24.0
     duration_seconds: 10.0
@@ -70,21 +70,21 @@ narration_blocks:
     note: "재회 자체는 사용자 선택 이전에 이미 본문 그대로 일어난다 — 사용자가 재회 여부를 결정하지 않는다(재회 이후의 예물 응대만 결정)."
   - id: nb_s5_v33_8_q
     speaker: esau_npc
-    text_ko: "내가 만난 바 이 모든 떼는 무슨 까닭이냐 (창세기 33:8)"
+    text_ko: "내가 만난 바 이 모든 떼는 무슨 까닭이냐 (창 33:8)"
     audio_clip_id: aud_s5_v33_8_q_ko
     start_at_seconds: 35.0
     duration_seconds: 5.0
     hidden_until_event: null
   - id: nb_s5_v33_8_a
     speaker: jacob_inner
-    text_ko: "내 주께 은혜를 입으려 함이니이다 (창세기 33:8)"
+    text_ko: "내 주께 은혜를 입으려 함이니이다 (창 33:8)"
     audio_clip_id: aud_s5_v33_8_a_ko
     start_at_seconds: 41.0
     duration_seconds: 5.0
     hidden_until_event: null
   - id: nb_s5_v33_9
     speaker: esau_npc
-    text_ko: "내 동생아 내게 있는 것이 족하니 네 소유는 네게 두라 (창세기 33:9)"
+    text_ko: "내 동생아 내게 있는 것이 족하니 네 소유는 네게 두라 (창 33:9)"
     audio_clip_id: aud_s5_v33_9_ko
     start_at_seconds: 47.0
     duration_seconds: 7.0
@@ -92,7 +92,7 @@ narration_blocks:
     note: "ix_jacob_gift.decision_point_verse — 이 절 직후 사용자 결정 지점(내민다/거둔다)."
   - id: nb_s5_v33_10
     speaker: jacob_inner
-    text_ko: "그렇지 아니하니이다 내가 형님의 눈앞에서 은혜를 입었사오면 청하건대 내 손에서 이 예물을 받으소서 내가 형님의 얼굴을 뵈온즉 하나님의 얼굴을 본 것 같사오며 형님도 나를 기뻐하심이니이다 (창세기 33:10)"
+    text_ko: "그렇지 아니하니이다 내가 형님의 눈앞에서 은혜를 입었사오면 청하건대 내 손에서 이 예물을 받으소서 내가 형님의 얼굴을 뵈온즉 하나님의 얼굴을 본 것 같사오며 형님도 나를 기뻐하심이니이다 (창 33:10)"
     audio_clip_id: aud_s5_v33_10_ko
     start_at_seconds: null # rt_offer_again 선택 시에만 재생 — ix_jacob_gift.routes[rt_offer_again].plays_verses 참조
     duration_seconds: 14.0
@@ -100,7 +100,7 @@ narration_blocks:
     note: "disputed #3 — '형님의 얼굴을 뵈온즉 하나님의 얼굴을 본 것 같사오며'는 신현(神現) 표현인지 관용적 존중 표현인지 신학검토자 승인 대기. 이 미션은 이 절을 보조 자막으로만 노출하고, br_s5_closing_message 의 마무리 10문에는 이 표현을 사용하지 않는다(확정된 해석처럼 쓰지 않는다)."
   - id: nb_s5_v33_11
     speaker: narrator
-    text_ko: "하나님이 내게 은혜를 베푸셨고 내 소유도 족하오니 청하건대 내가 형님께 드리는 예물을 받으소서 하고 그에게 강권하매 받으니라 (창세기 33:11)"
+    text_ko: "하나님이 내게 은혜를 베푸셨고 내 소유도 족하오니 청하건대 내가 형님께 드리는 예물을 받으소서 하고 그에게 강권하매 받으니라 (창 33:11)"
     audio_clip_id: aud_s5_v33_11_ko
     start_at_seconds: null
     duration_seconds: 10.0
@@ -168,7 +168,7 @@ alt_routes:
     triggered_by: consent_card_skip # cc_jacob_confrontation 스킵 시
     entry_mode: closing_only
     presentation_mode: caption_only_no_enactment
-    summary_text_ko: "하나님이 내게 은혜를 베푸셨고 내 소유도 족하오니 청하건대 내가 형님께 드리는 예물을 받으소서 하고 그에게 강권하매 받으니라 (창세기 33:11)"
+    summary_text_ko: "하나님이 내게 은혜를 베푸셨고 내 소유도 족하오니 청하건대 내가 형님께 드리는 예물을 받으소서 하고 그에게 강권하매 받으니라 (창 33:11)"
     environment_disabled: true
     npc_disabled: true
     interactions_disabled: true

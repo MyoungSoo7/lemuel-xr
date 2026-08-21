@@ -47,14 +47,14 @@ npcs:
 narration_blocks:
   - id: nb_s4_wrestle_begin
     speaker: narrator
-    text_ko: "야곱은 홀로 남았더니 어떤 사람이 날이 새도록 야곱과 씨름하다가 (창세기 32:24)"
+    text_ko: "야곱은 홀로 남았더니 어떤 사람이 날이 새도록 야곱과 씨름하다가 (창 32:24)"
     audio_clip_id: aud_s4_wrestle_begin_ko
     start_at_seconds: 0.0
     duration_seconds: 8.0
     hidden_until_event: null
   - id: nb_s4_hip_wrench
     speaker: narrator
-    text_ko: "자기가 야곱을 이기지 못함을 보고 그가 야곱의 허벅지 관절을 치매 야곱의 허벅지 관절이 그 사람과 씨름할 때에 어긋났더라 (창세기 32:25)"
+    text_ko: "자기가 야곱을 이기지 못함을 보고 그가 야곱의 허벅지 관절을 치매 야곱의 허벅지 관절이 그 사람과 씨름할 때에 어긋났더라 (창 32:25)"
     audio_clip_id: aud_s4_hip_wrench_ko
     start_at_seconds: 10.0
     duration_seconds: 10.0
@@ -62,35 +62,35 @@ narration_blocks:
     note: "'환도뼈' 사용 금지 — 개역개정 표현 '허벅지 관절'만 사용(COMMON §2)."
   - id: nb_s4_hold_on_wrestler
     speaker: wrestler_npc
-    text_ko: "그가 이르되 날이 새려하니 나로 가게 하라 (창세기 32:26)"
+    text_ko: "그가 이르되 날이 새려하니 나로 가게 하라 (창 32:26)"
     audio_clip_id: aud_s4_hold_on_wrestler_ko
     start_at_seconds: 22.0
     duration_seconds: 6.0
     hidden_until_event: null
   - id: nb_s4_hold_on_jacob
     speaker: jacob_inner
-    text_ko: "야곱이 이르되 당신이 내게 축복하지 아니하면 가게 하지 아니하겠나이다 (창세기 32:26)"
+    text_ko: "야곱이 이르되 당신이 내게 축복하지 아니하면 가게 하지 아니하겠나이다 (창 32:26)"
     audio_clip_id: aud_s4_hold_on_jacob_ko
     start_at_seconds: 29.0
     duration_seconds: 6.0
     hidden_until_event: hold_completed # ix_s4_hold_and_wrestle 의 지속 그립 완료 이벤트로만 재생
   - id: nb_s4_name_q
     speaker: wrestler_npc
-    text_ko: "그 사람이 그에게 이르되 네 이름이 무엇이냐 (창세기 32:27)"
+    text_ko: "그 사람이 그에게 이르되 네 이름이 무엇이냐 (창 32:27)"
     audio_clip_id: aud_s4_name_q_ko
     start_at_seconds: 36.0
     duration_seconds: 5.0
     hidden_until_event: hold_completed
   - id: nb_s4_name_a
     speaker: jacob_inner
-    text_ko: "그가 이르되 야곱이니이다 (창세기 32:27)"
+    text_ko: "그가 이르되 야곱이니이다 (창 32:27)"
     audio_clip_id: aud_s4_name_a_ko
     start_at_seconds: 42.0
     duration_seconds: 4.0
     hidden_until_event: name_response_given
   - id: nb_s4_rename
     speaker: wrestler_npc
-    text_ko: "그가 이르되 네 이름을 다시는 야곱이라 부를 것이 아니요 이스라엘이라 부를 것이니 이는 네가 하나님과 및 사람들과 겨루어 이겼음이니라 (창세기 32:28)"
+    text_ko: "그가 이르되 네 이름을 다시는 야곱이라 부를 것이 아니요 이스라엘이라 부를 것이니 이는 네가 하나님과 및 사람들과 겨루어 이겼음이니라 (창 32:28)"
     audio_clip_id: aud_s4_rename_ko
     start_at_seconds: 47.0
     duration_seconds: 11.0
@@ -98,7 +98,7 @@ narration_blocks:
     note: "이 개명은 이야기 속 야곱의 것이다 — 사용자 실명 개명 연출에 사용 금지(절대 규칙 6)."
   - id: nb_s4_peniel
     speaker: narrator
-    text_ko: "그러므로 야곱이 그 곳 이름을 브니엘이라 하였으니 그가 이르기를 내가 하나님과 대면하여 보았으나 내 생명이 보전되었다 함이더라 (창세기 32:30)"
+    text_ko: "그러므로 야곱이 그 곳 이름을 브니엘이라 하였으니 그가 이르기를 내가 하나님과 대면하여 보았으나 내 생명이 보전되었다 함이더라 (창 32:30)"
     audio_clip_id: aud_s4_peniel_ko
     start_at_seconds: 60.0
     duration_seconds: 12.0
@@ -106,7 +106,7 @@ narration_blocks:
     note: "'하나님과 대면하여'는 성경 본문 자체의 인용이다 — 이 인용을 넘어서는 정체 확정 코멘트를 추가하지 않는다(disputed #1)."
   - id: nb_s4_limp
     speaker: narrator
-    text_ko: "그가 브니엘을 지날 때에 해가 돋았고 그의 허벅다리로 말미암아 절었더라 (창세기 32:31)"
+    text_ko: "그가 브니엘을 지날 때에 해가 돋았고 그의 허벅다리로 말미암아 절었더라 (창 32:31)"
     audio_clip_id: aud_s4_limp_ko
     start_at_seconds: 74.0
     duration_seconds: 10.0

@@ -63,7 +63,7 @@ npcs:
 narration_blocks:
   - id: nb_s5_v9
     speaker: narrator
-    text_ko: "육지에 올라보니 숯불이 있는데 그 위에 생선이 놓였고 떡도 있더라 (요한복음 21:9)"
+    text_ko: "육지에 올라보니 숯불이 있는데 그 위에 생선이 놓였고 떡도 있더라 (요 21:9)"
     audio_clip_id: aud_s5_09_ko
     start_at_seconds: 0.0
     duration_seconds: 8.0
@@ -71,7 +71,7 @@ narration_blocks:
 
   - id: nb_s5_v10
     speaker: jesus_shore
-    text_ko: "예수께서 이르시되 지금 잡은 생선을 좀 가져오라 하시니 (요한복음 21:10)"
+    text_ko: "예수께서 이르시되 지금 잡은 생선을 좀 가져오라 하시니 (요 21:10)"
     audio_clip_id: aud_s5_10_ko
     start_at_seconds: 8.0
     duration_seconds: 6.0
@@ -79,7 +79,7 @@ narration_blocks:
 
   - id: nb_s5_v11
     speaker: peter_self
-    text_ko: "시몬 베드로가 올라가서 그물을 육지에 끌어 올리니 가득히 찬 큰 물고기가 백쉰세 마리라 이같이 많으나 그물이 찢어지지 아니하였더라 (요한복음 21:11)"
+    text_ko: "시몬 베드로가 올라가서 그물을 육지에 끌어 올리니 가득히 찬 큰 물고기가 백쉰세 마리라 이같이 많으나 그물이 찢어지지 아니하였더라 (요 21:11)"
     audio_clip_id: aud_s5_11_ko
     start_at_seconds: 14.0
     duration_seconds: 10.0
@@ -87,7 +87,7 @@ narration_blocks:
 
   - id: nb_s5_v12
     speaker: jesus_shore
-    text_ko: "예수께서 이르시되 와서 조반을 먹으라 하시니 제자들이 주님이신 줄 아는 고로 당신이 누구냐 감히 묻는 자가 없더라 (요한복음 21:12)"
+    text_ko: "예수께서 이르시되 와서 조반을 먹으라 하시니 제자들이 주님이신 줄 아는 고로 당신이 누구냐 감히 묻는 자가 없더라 (요 21:12)"
     audio_clip_id: aud_s5_12_ko
     start_at_seconds: 24.0
     duration_seconds: 10.0
@@ -95,7 +95,7 @@ narration_blocks:
 
   - id: nb_s5_v13
     speaker: narrator
-    text_ko: "예수께서 가셔서 떡을 가져다가 그들에게 주시고 생선도 그와 같이 하시니라 (요한복음 21:13)"
+    text_ko: "예수께서 가셔서 떡을 가져다가 그들에게 주시고 생선도 그와 같이 하시니라 (요 21:13)"
     audio_clip_id: aud_s5_13_ko
     start_at_seconds: 34.0
     duration_seconds: 8.0
@@ -103,7 +103,7 @@ narration_blocks:
 
   - id: nb_s5_v14
     speaker: narrator
-    text_ko: "이것은 예수께서 죽은 자 가운데서 살아나신 후에 세 번째로 제자들에게 나타나신 것이라 (요한복음 21:14)"
+    text_ko: "이것은 예수께서 죽은 자 가운데서 살아나신 후에 세 번째로 제자들에게 나타나신 것이라 (요 21:14)"
     audio_clip_id: aud_s5_14_ko
     start_at_seconds: 42.0
     duration_seconds: 8.0
@@ -111,7 +111,7 @@ narration_blocks:
 
   - id: nb_s5_v15
     speaker: jesus_shore
-    text_ko: "그들이 조반 먹은 후에 예수께서 시몬 베드로에게 이르시되 요한의 아들 시몬아 네가 이 사람들보다 나를 더 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 어린 양을 먹이라 하시고 (요한복음 21:15)"
+    text_ko: "그들이 조반 먹은 후에 예수께서 시몬 베드로에게 이르시되 요한의 아들 시몬아 네가 이 사람들보다 나를 더 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 어린 양을 먹이라 하시고 (요 21:15)"
     audio_clip_id: aud_s5_15_ko
     start_at_seconds: 50.0
     duration_seconds: 16.0
@@ -120,7 +120,7 @@ narration_blocks:
 
   - id: nb_s5_v16
     speaker: jesus_shore
-    text_ko: "또 두 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 양을 치라 하시고 (요한복음 21:16)"
+    text_ko: "또 두 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 양을 치라 하시고 (요 21:16)"
     audio_clip_id: aud_s5_16_ko
     start_at_seconds: 66.0
     duration_seconds: 14.0
@@ -128,7 +128,7 @@ narration_blocks:
 
   - id: nb_s5_v17
     speaker: jesus_shore
-    text_ko: "세 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 주께서 세 번째 네가 나를 사랑하느냐 하시므로 베드로가 근심하여 이르되 주님 모든 것을 아시오매 내가 주님을 사랑하는 줄을 주님께서 아시나이다 예수께서 이르시되 내 양을 먹이라 (요한복음 21:17)"
+    text_ko: "세 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 주께서 세 번째 네가 나를 사랑하느냐 하시므로 베드로가 근심하여 이르되 주님 모든 것을 아시오매 내가 주님을 사랑하는 줄을 주님께서 아시나이다 예수께서 이르시되 내 양을 먹이라 (요 21:17)"
     audio_clip_id: aud_s5_17_ko
     start_at_seconds: 80.0
     duration_seconds: 10.0

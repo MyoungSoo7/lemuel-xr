@@ -62,7 +62,7 @@ npcs:
 narration_blocks:
   - id: nb_s5_birth_21_2
     speaker: narrator_v1
-    text_ko: "여호와께서 말씀하신 대로 사라를 돌보셨고 여호와께서 말씀하신 대로 사라에게 행하셨으므로 (창세기 21:1) 사라가 임신하고 하나님이 말씀하신 시기가 되어 노년의 아브라함에게 아들을 낳으니 (21:2) 아브라함이 그의 아들 이삭이 그에게 태어날 때에 백 세라 (21:5)"
+    text_ko: "여호와께서 말씀하신 대로 사라를 돌보셨고 여호와께서 말씀하신 대로 사라에게 행하셨으므로 (창 21:1) 사라가 임신하고 하나님이 말씀하신 시기가 되어 노년의 아브라함에게 아들을 낳으니 (21:2) 아브라함이 그의 아들 이삭이 그에게 태어날 때에 백 세라 (21:5)"
     citation_id: A_gen21_1_2_5
     audio_clip_id: aud_s5_birth_21_2_ko
     start_at_seconds: 5.0
@@ -71,7 +71,7 @@ narration_blocks:
     note: "'백 세라'(21:5)는 정보로만 제시 — 격려·비교 수치로 쓰지 않는다. R4 skip 시 미렌더(affected_blocks)."
   - id: nb_s5_laughter_21_6
     speaker: sarah_v1
-    text_ko: "사라가 이르되 하나님이 나를 웃게 하시니 듣는 자가 다 나와 함께 웃으리로다 (창세기 21:6)"
+    text_ko: "사라가 이르되 하나님이 나를 웃게 하시니 듣는 자가 다 나와 함께 웃으리로다 (창 21:6)"
     citation_id: A_gen21_6
     audio_clip_id: aud_s5_laughter_21_6_ko
     start_at_seconds: 25.0
@@ -80,7 +80,7 @@ narration_blocks:
     note: "R4 skip 시에도 이 블록만은 자막 한 장으로 노출된다(skip_state_note 참조) — 웃음이 되돌아오는 절이므로 생략하지 않는다."
   - id: nb_s5_nursing_21_7
     speaker: sarah_v1
-    text_ko: "또 이르되 사라가 자식들을 젖먹이겠다고 누가 아브라함에게 말하였으리요마는 아브라함의 노경에 내가 아들을 낳았도다 하니라 (창세기 21:7)"
+    text_ko: "또 이르되 사라가 자식들을 젖먹이겠다고 누가 아브라함에게 말하였으리요마는 아브라함의 노경에 내가 아들을 낳았도다 하니라 (창 21:7)"
     citation_id: A_gen21_7
     audio_clip_id: aud_s5_nursing_21_7_ko
     start_at_seconds: 36.0

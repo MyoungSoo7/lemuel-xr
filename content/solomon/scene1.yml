@@ -41,7 +41,7 @@ npcs:
 narration_blocks:
   - id: nb_s1_intro
     speaker: narrator
-    text_ko: "다윗의 아들, 젊은 왕이 기브온 산당에 올라 일천 번제를 드렸다. (열왕기상 3:4, 요약)"
+    text_ko: "다윗의 아들, 젊은 왕이 기브온 산당에 올라 일천 번제를 드렸다. (왕상 3:4, 요약)"
     audio_clip_id: aud_s1_intro_ko
     start_at_seconds: 0.0
     duration_seconds: 9.0
@@ -56,7 +56,7 @@ narration_blocks:
     note: "왕관 = 부담의 상징 오브젝트. Scene 5 내려놓기 후보 #1 (결정 A — 어느 경로든 등장)."
   - id: nb_s1_small_child
     speaker: solomon_inner
-    text_ko: "종은 작은 아이라 출입할 줄을 알지 못하나이다 (열왕기상 3:7, 발췌·요약)"
+    text_ko: "종은 작은 아이라 출입할 줄을 알지 못하나이다 (왕상 3:7, 발췌·요약)"
     adaptation_note: "원문 어미는 '알지 못하고' — 독백 종결 어미로 각색, 표기로 명시 (T4)."
     audio_clip_id: aud_s1_small_child_ko
     start_at_seconds: 30.0
@@ -64,7 +64,7 @@ narration_blocks:
     hidden_until_event: null
   - id: nb_s1_request
     speaker: solomon_inner
-    text_ko: "듣는 마음을 종에게 주사 주의 백성을 재판하여 선악을 분별하게 하옵소서 (열왕기상 3:9)"
+    text_ko: "듣는 마음을 종에게 주사 주의 백성을 재판하여 선악을 분별하게 하옵소서 (왕상 3:9)"
     audio_clip_id: aud_s1_request_ko
     start_at_seconds: 44.0
     duration_seconds: 10.0

@@ -94,7 +94,7 @@ const SCENE2_PAYLOAD = {
 const SCENE3_CRISIS_LINE = `지금 힘드시면: ${CRISIS_DEFAULT.tel} (${CRISIS_DEFAULT.label})`;
 
 const SCENE3_CONSENT_KO = [
-  "다음 장면은 성경에서 가장 유명한 재판(열왕기상 3:16~28)을 다룹니다.",
+  "다음 장면은 성경에서 가장 유명한 재판(왕상 3:16~28)을 다룹니다.",
   "· 갓난아기를 잃은 어머니의 이야기가 대사로 언급됩니다. (시각적 묘사는 없습니다)",
   "건너뛰어도 이야기는 온전히 이어집니다.",
   "계속하시겠어요?",

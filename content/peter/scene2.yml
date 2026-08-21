@@ -85,7 +85,7 @@ npcs:
 narration_blocks:
   - id: nb_s2_setup_54
     speaker: narrator
-    text_ko: "예수를 잡아 끌고 대제사장의 집으로 들어갈새 베드로가 멀찍이 따라가니라 (누가복음 22:54)"
+    text_ko: "예수를 잡아 끌고 대제사장의 집으로 들어갈새 베드로가 멀찍이 따라가니라 (눅 22:54)"
     audio_clip_id: aud_s2_54_ko
     start_at_seconds: 0.0
     duration_seconds: 8.0
@@ -93,7 +93,7 @@ narration_blocks:
 
   - id: nb_s2_setup_55
     speaker: narrator
-    text_ko: "사람들이 뜰 가운데 불을 피우고 함께 앉았는지라 베드로도 그 가운데 앉았더니 (누가복음 22:55)"
+    text_ko: "사람들이 뜰 가운데 불을 피우고 함께 앉았는지라 베드로도 그 가운데 앉았더니 (눅 22:55)"
     audio_clip_id: aud_s2_55_ko
     start_at_seconds: 8.0
     duration_seconds: 8.0
@@ -101,7 +101,7 @@ narration_blocks:
 
   - id: nb_s2_setup_jhn18_18
     speaker: narrator
-    text_ko: "그 때가 추운 고로 종과 아랫사람들이 불을 피우고 서서 쬐니 베드로도 함께 서서 쬐더라 (요한복음 18:18)"
+    text_ko: "그 때가 추운 고로 종과 아랫사람들이 불을 피우고 서서 쬐니 베드로도 함께 서서 쬐더라 (요 18:18)"
     audio_clip_id: aud_s2_jhn1818_ko
     start_at_seconds: 16.0
     duration_seconds: 8.0
@@ -109,7 +109,7 @@ narration_blocks:
 
   - id: nb_s2_c1_accusation
     speaker: servant_girl
-    text_ko: "한 여종이 베드로의 불빛을 향하여 앉은 것을 보고 주목하여 이르되 이 사람도 그와 함께 있었느니라 하니 (누가복음 22:56)"
+    text_ko: "한 여종이 베드로의 불빛을 향하여 앉은 것을 보고 주목하여 이르되 이 사람도 그와 함께 있었느니라 하니 (눅 22:56)"
     audio_clip_id: aud_s2_56_ko
     start_at_seconds: 24.0
     duration_seconds: 8.0
@@ -117,7 +117,7 @@ narration_blocks:
 
   - id: nb_s2_c1_denial
     speaker: peter_self
-    text_ko: "베드로가 부인하여 이르되 이 여자여 내가 그를 알지 못하노라 하더라 (누가복음 22:57)"
+    text_ko: "베드로가 부인하여 이르되 이 여자여 내가 그를 알지 못하노라 하더라 (눅 22:57)"
     audio_clip_id: aud_s2_57_ko
     start_at_seconds: 32.0
     duration_seconds: 8.0
@@ -125,7 +125,7 @@ narration_blocks:
 
   - id: nb_s2_c2_accusation_and_denial
     speaker: bystander_v1
-    text_ko: "조금 후에 다른 사람이 보고 이르되 너도 그 도당이라 하거늘 베드로가 이르되 이 사람아 나는 아니로라 하더라 (누가복음 22:58)"
+    text_ko: "조금 후에 다른 사람이 보고 이르되 너도 그 도당이라 하거늘 베드로가 이르되 이 사람아 나는 아니로라 하더라 (눅 22:58)"
     audio_clip_id: aud_s2_58_ko
     start_at_seconds: 40.0
     duration_seconds: 10.0
@@ -133,7 +133,7 @@ narration_blocks:
 
   - id: nb_s2_c3_accusation
     speaker: bystander_v2
-    text_ko: "한 시간쯤 있다가 또 한 사람이 장담하여 이르되 이는 갈릴리 사람이니 참으로 그와 함께 있었느니라 (누가복음 22:59)"
+    text_ko: "한 시간쯤 있다가 또 한 사람이 장담하여 이르되 이는 갈릴리 사람이니 참으로 그와 함께 있었느니라 (눅 22:59)"
     audio_clip_id: aud_s2_59_ko
     start_at_seconds: 50.0
     duration_seconds: 8.0
@@ -141,7 +141,7 @@ narration_blocks:
 
   - id: nb_s2_c3_denial_and_rooster
     speaker: peter_self
-    text_ko: "베드로가 이르되 이 사람아 나는 네가 하는 말을 알지 못하노라고 아직 말하고 있을 때에 닭이 곧 울더라 (누가복음 22:60)"
+    text_ko: "베드로가 이르되 이 사람아 나는 네가 하는 말을 알지 못하노라고 아직 말하고 있을 때에 닭이 곧 울더라 (눅 22:60)"
     audio_clip_id: aud_s2_60_ko
     start_at_seconds: 58.0
     duration_seconds: 14.0
