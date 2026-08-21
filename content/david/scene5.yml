@@ -240,10 +240,10 @@ theology_footer_refs:
     anchor_block: ix_s5_sling_two_handed_throw
   - scripture_refs:
       - ref: "사무엘상 17:43~44"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_goliath_third_shout
       - ref: "사무엘상 17:45"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_scripture_caption
   - disputed_points:
       - "밧세바 사건 후 시 51 회개 본문 — MVP 범위 밖 (Phase 2 로 이월, MVP-DAVID.md 와 일관). 본 미션은 17 장 골리앗 사건만 다룸 — 영웅 다윗 / 죄인 다윗 두 측면 중 전자만 명시 (디스클레이머)."

@@ -231,13 +231,13 @@ theology_footer_refs:
     anchor_block: nb_s5_god_response
   - scripture_refs:
       - ref: "열왕기상 19:15~16"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_god_response
       - ref: "열왕기상 19:18"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_god_response
       - ref: "열왕기상 19:19"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_mantle_caption
   - disputed_points:
       - "재사명(왕상 19:15~16)이 '회복 후 즉시 복귀 압박'으로 읽힐 위험."

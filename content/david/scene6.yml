@@ -129,10 +129,10 @@ theology_footer_refs:
     anchor_block: nb_s6_recovery_phrase
   - scripture_refs:
       - ref: "사무엘상 17:46~47"
-        translation: krv
+        translation: rev
         anchor_block: nb_s6_scripture_centered
       - ref: "시편 27:14"
-        translation: krv
+        translation: rev
         anchor_block: ai_optout_branch
         note_ko: "R5 AI opt-out 사용자용 정적 폴백 — 신학 사전 검증 통과한 본문"
   - disputed_points:

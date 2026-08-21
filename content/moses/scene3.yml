@@ -413,9 +413,9 @@ theology_footer_refs:
     handling: "단일 입장 채택 없이 분쟁 지점 footer 로 노출"
   - scripture_refs:
       - ref: "출애굽기 3:11~4:13"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_card_1_appear
       - ref: "시편 103:14"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_comfort_card_4
         note: "Christian 자원 — Self-Compassion mettā 어휘와 *함께* 표현"

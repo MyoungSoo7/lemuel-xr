@@ -179,7 +179,7 @@ branches:
   - id: br_s2_c1_deny_knowing
     selectable: true
     denial_card_id: deny_knowing
-    scripture_ref: "누가복음 22:57"
+    verse_ref: "눅 22:57"
     card_text_ko: "나는 그 사람을 모릅니다."
     static_text_ko: "나는 그 사람을 모릅니다."
     next_event: branch_c1_resolved
@@ -188,7 +188,7 @@ branches:
   - id: br_s2_c2_deny_belonging
     selectable: true
     denial_card_id: deny_belonging
-    scripture_ref: "누가복음 22:58"
+    verse_ref: "눅 22:58"
     card_text_ko: "나는 그 사람들 중 하나가 아닙니다."
     static_text_ko: "나는 그 사람들 중 하나가 아닙니다."
     next_event: branch_c2_resolved
@@ -198,7 +198,7 @@ branches:
     selectable: false
     auto_advance: true
     denial_card_id: deny_understanding
-    scripture_ref: "누가복음 22:60"
+    verse_ref: "눅 22:60"
     card_text_ko: "나는 무슨 말인지 모르겠습니다."
     static_text_ko: "나는 무슨 말인지 모르겠습니다."
     next_event: branch_c3_resolved
@@ -362,13 +362,13 @@ transition:
 theology_footer_refs:
   - scripture_refs:
       - ref: "누가복음 22:54-58"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_c2_accusation_and_denial
       - ref: "요한복음 18:18"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_setup_jhn18_18
       - ref: "누가복음 22:59-60"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_c3_denial_and_rooster
   - disputed_points: []
     handling: "부인 3회 카드 텍스트는 §3-1 확정 전문 그대로이며 자기정죄·자기멸시 어휘 0회, 명령형·권유형 0회, 결과 약속 0회(seed §3-1 하드 제약)."

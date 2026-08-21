@@ -131,7 +131,7 @@ Response: {
 ### 2.4 콘텐츠 — 트랙 A
 
 ```
-GET /api/content/psalm/{ref}?translation=krv
+GET /api/content/psalm/{ref}?translation=rev   # 'rev'=개역개정 · 'modern'=현대인의 성경 (기본값 rev)
 Response: {
   "reference": "ps-23",
   "verses": [

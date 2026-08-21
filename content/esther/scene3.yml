@@ -400,13 +400,13 @@ theology_footer_refs:
     anchor_block: nb_s3_mordecai_reply_4_14
   - scripture_refs:
       - ref: "에스더 4:11"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_esther_reply_4_11
       - ref: "에스더 4:13"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_mordecai_reply_4_13
       - ref: "에스더 4:14"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_mordecai_reply_4_14
   - disputed_points:
       - "DP2 — 4:14 '누가 알겠느냐'를 확정된 소명 선언으로 읽을 것인가, 열린 물음으로 남길

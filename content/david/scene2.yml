@@ -199,13 +199,13 @@ theology_footer_refs:
     anchor_block: nb_s2_eliab_rebuke
   - scripture_refs:
       - ref: "사무엘상 17:17~18"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_arrival
       - ref: "사무엘상 17:28"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_eliab_rebuke
       - ref: "사무엘상 17:29"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_post_reaction_A
   - disputed_points:
       - "엘리압의 동기 해석 — 단순 형의 권위 vs 다윗 기름부음(삼상 16) 인식 후 질투"

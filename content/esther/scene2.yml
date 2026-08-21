@@ -154,13 +154,13 @@ theology_footer_refs:
     anchor_block: nb_s2_city_mourning
   - scripture_refs:
       - ref: "에스더 4:1"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_mordecai_mourning
       - ref: "에스더 4:3"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_city_mourning
       - ref: "에스더 4:8"
-        translation: krv
+        translation: rev
         anchor_block: nb_s2_hatach_delivers
   - disputed_points:
       - "DP1 — 하나님이 본문에 등장하지 않는다. 통곡 장면에서도 신적 개입을 서술하지 않는다."
