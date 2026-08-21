@@ -48,8 +48,22 @@ class GroundingThresholdSweepReport {
         val model = System.getenv("GROUNDING_EMBEDDING_MODEL")
             ?: dataset.manifest.tunedAgainst.embeddingModel.ifBlank { "gemini-embedding-001" }
 
+        // 차원도 모델과 같은 방식으로 덮어쓸 수 있어야 한다. README §6.1 의 유사도 수치는
+        // 3072 차원(어댑터 기본값이던 시절)에서 잰 것이고, 2026-08-12 #37 이후 런타임은 1536 이다.
+        // 옛 수치와 대조하려면 같은 공간에서 다시 재는 길이 있어야 한다 —
+        // 없으면 "코드가 바뀐 탓" 과 "모델이 바뀐 탓" 을 영영 못 가른다.
+        val dimensionOverride = System.getenv("GROUNDING_EMBEDDING_DIMENSIONS")?.toInt()
+
         val embeddings = MemoizingEmbeddingPort(
-            GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = model),
+            if (dimensionOverride == null) {
+                GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = model)
+            } else {
+                GeminiEmbeddingAdapter(
+                    apiKey = System.getenv("GEMINI_API_KEY"),
+                    model = model,
+                    outputDimensionality = dimensionOverride,
+                )
+            },
         )
         val useCase = EvaluateGroundingUseCase(embeddings, NOOP_METRICS)
 
