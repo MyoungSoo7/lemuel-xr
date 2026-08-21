@@ -211,6 +211,40 @@ const LEVEL_LABEL: Record<string, string> = {
 */
 const UI_INSTRUCTION_LINE = /^(?:\[[^\]]*\]\s*)+$/;
 
+/**
+ * 동의 카드 정본에서 **두 문의 이름** 을 꺼낸다.
+ *
+ * 카드마다 문 이름이 다르다 — 「사별 장면은 건너뛴다」(룻 S1) · 「여기서 마친다」
+ * (룻 S3) · 「건너뛰기 — 성문 장면으로 이동」(룻 S4) · 「건너뛰기」(베드로 S2).
+ * 이건 문구 취향이 아니라 **그 문이 무엇을 하는지에 대한 설명** 이라, 공용 기본값
+ * ("이 장면은 건너뛸게요 →")으로 덮으면 룻 Scene 3 에서는 거짓말이 된다.
+ *
+ * 파싱에 실패하면 undefined 를 준다 — 게이트 기본 라벨로 돌아가고, 문 자체는 남는다.
+ * 라벨을 못 읽었다고 나갈 문을 없애는 쪽이 훨씬 나쁘다.
+ *
+ * 「음성/자막 강도: [ 자막만 ] …」 줄은 대괄호로 *시작하지 않으므로* 여기 안 걸린다.
+ *
+ * 이 함수는 원래 `app/ruth/page.tsx` 에 있었다. 2026-08-22 베드로 화면이 두 번째
+ * 사용자가 되면서 이리로 옮겼다 — 정본 라벨을 쓰는 화면이 늘어날 때 각자 베끼면
+ * 위 `readTriggerWarning` 이 없던 시절과 똑같은 갈래가 다시 생긴다.
+ */
+export function cardDoors(
+  consentCardKo?: string,
+): { continueLabel: string; skipLabel: string } | undefined {
+  const line = (consentCardKo ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => UI_INSTRUCTION_LINE.test(l));
+  if (!line) return undefined;
+
+  const doors = Array.from(line.matchAll(/\[([^\]]*)\]/g))
+    .map((m) => m[1].trim())
+    .filter((t) => t.length > 0);
+  if (doors.length < 2) return undefined;
+
+  return { continueLabel: doors[0], skipLabel: doors[1] };
+}
+
 export function TriggerWarningGate({
   warning,
   fallbackProse,

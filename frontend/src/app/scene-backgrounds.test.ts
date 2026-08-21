@@ -37,6 +37,7 @@ const CHARACTERS = [
   "job",
   "joseph",
   "moses",
+  "peter",
   "ruth",
   "solomon",
 ];

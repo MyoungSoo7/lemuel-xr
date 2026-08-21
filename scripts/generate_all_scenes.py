@@ -190,6 +190,27 @@ SCENES: dict[str, dict[str, str]] = {
              "the shade of the gateway arch, a single worn sandal set on the paving before them, long "
              "warm light raking across the stones.",
     },
+    # 베드로 — 2026-08-22. 다섯 장의 색온도가 크게 갈린다(등불 실내 → 밤 불빛 →
+    # 밤 → 여명 → 아침). 그래서 1·5 의 불은 같은 소재(숯불)로 두되 광원 방향을
+    # 반대로 잡는다: 2 는 사람이 둘러선 안쪽을 비추고, 5 는 빈 바닷가를 향해 열려 있다.
+    # 그 대비가 이 미션의 축(같은 불 앞에서 부인했고, 같은 불 앞에서 이름이 불렸다)이다.
+    "peter": {
+        "1": "A stone upper room at night after a meal has ended, a long low table with emptied clay "
+             "cups and torn bread left on it, one small oil lamp burning at the table's end, deep warm "
+             "shadows gathering in the corners of the room.",
+        "2": "A high-walled courtyard of a large stone house at night, a charcoal fire burning low in an "
+             "open brazier at the centre of the packed earth, empty worn benches drawn up around it, "
+             "cold darkness pressing in beyond the ring of firelight.",
+        "3": "The same stone courtyard seen toward its open gateway in the last hour of night, the "
+             "charcoal fire reduced to embers behind, the archway standing open onto an empty dark "
+             "street, first faint grey showing low in the sky.",
+        "4": "The wooden deck of a small fishing boat on a wide still lake in the last dark before dawn, "
+             "a heavy wet net heaped and empty along the gunwale, oars shipped, flat grey water "
+             "stretching to a low shoreline barely separating from the sky.",
+        "5": "A quiet lake shore at sunrise, a charcoal fire already burning on the sand with fish laid "
+             "across it and flat loaves of bread set beside, a fishing boat drawn up empty at the "
+             "water's edge, low golden light coming in level across the water.",
+    },
 }
 
 

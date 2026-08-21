@@ -86,6 +86,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "무자격자가 속하게 되는 것 — 속하게 한 것은 내가 한 일이 아니다",
     active: true,
   },
+  {
+    href: "/peter",
+    name: "Peter",
+    korean: "베드로",
+    tagline: "부인한 뒤에도 이름은 그대로였다 — 회복의 조건은 자격이 아니다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -257,6 +264,7 @@ export default function HomePage() {
                       "job",
                       "elijah",
                       "ruth",
+                      "peter",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`

@@ -10,6 +10,7 @@ import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
+  cardDoors,
 } from "@/components/TriggerWarningGate";
 import {
   startMission,
@@ -88,38 +89,13 @@ interface ClosingScreen {
   closing_caption?: { ref?: string; text_ko?: string };
 }
 
-/** 카드 정본의 UI 지시줄 — `[계속한다]  [여기서 마친다]` 처럼 줄 전체가 대괄호다. */
-const DOOR_LINE = /^(?:\[[^\]]*\]\s*)+$/;
-
-/**
- * 동의 카드 정본에서 **두 문의 이름** 을 꺼낸다.
- *
- * 세 카드가 서로 다른 이름을 쓴다 — 「사별 장면은 건너뛴다」(Scene 1) · 「여기서
- * 마친다」(Scene 3) · 「건너뛰기 — 성문 장면으로 이동」(Scene 4). 이건 문구 취향이
- * 아니라 **그 문이 무엇을 하는지에 대한 설명** 이라, 공용 기본값("이 장면은
- * 건너뛸게요 →")으로 덮으면 Scene 3 에서는 거짓말이 된다.
- *
- * 파싱에 실패하면 undefined 를 준다 — 게이트 기본 라벨로 돌아가고, 문 자체는 남는다.
- * 라벨을 못 읽었다고 나갈 문을 없애는 쪽이 훨씬 나쁘다.
- *
- * 「음성/자막 강도: [ 자막만 ] …」 줄은 대괄호로 *시작하지 않으므로* 여기 안 걸린다.
- */
-export function cardDoors(
-  consentCardKo?: string,
-): { continueLabel: string; skipLabel: string } | undefined {
-  const line = (consentCardKo ?? "")
-    .split("\n")
-    .map((l) => l.trim())
-    .find((l) => DOOR_LINE.test(l));
-  if (!line) return undefined;
-
-  const doors = Array.from(line.matchAll(/\[([^\]]*)\]/g))
-    .map((m) => m[1].trim())
-    .filter((t) => t.length > 0);
-  if (doors.length < 2) return undefined;
-
-  return { continueLabel: doors[0], skipLabel: doors[1] };
-}
+/*
+  카드 정본에서 두 문의 이름을 꺼내는 `cardDoors` 는 2026-08-22 에 공용 게이트
+  (`@/components/TriggerWarningGate`) 로 옮겼다 — 베드로 화면이 두 번째 사용자가
+  되면서, 각 화면이 같은 파서를 베끼면 정본 라벨이 화면마다 갈라질 자리가 생긴다.
+  이 화면의 테스트가 `./page` 에서 가져다 쓰므로 이름은 여기서 그대로 내보낸다.
+*/
+export { cardDoors };
 
 export default function RuthPage() {
   const [scene, setScene] = useState<Scene | null>(null);
