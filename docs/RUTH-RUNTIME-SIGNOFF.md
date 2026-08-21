@@ -101,9 +101,12 @@ AR 시드 15개(3기기 × 5씬)를 지웠다.** 되살리려면 목록 복구 +
   없어 API 로만 도달했다 — 그동안 화면 쪽 검사기 두 개(`check_frontend_trigger_warning.py` ·
   `mission-tap-targets.spec.ts`)는 룻을 **건너뛰고 있었다.** 지금은 둘 다 룻을 잰다.
   다만 화면이 생겼다고 노출 결정의 범위가 넓어진 것이지 검토가 늘어난 것은 아니다.
-- 씬 배경 이미지가 한 장도 없다(`public/images/scenes/ruth` 부재). `/ruth` 는 단색
-  그라디언트로 돈다. `scene-backgrounds.test.ts` 는 그래서 룻을 의도적으로 제외한다 —
-  제외 사유를 그 파일에 적어 뒀다. 강도 조절 토글도, F66 진입 상태 게이트도 없다.
+- 씬 배경 이미지는 2026-08-22 에 다섯 장이 생겼다(`public/images/scenes/ruth/{1..5}.webp`).
+  `/ruth` 는 더 이상 단색 그라디언트가 아니고, `scene-backgrounds.test.ts` 의 제외도
+  풀렸다. **다만 이 다섯 장은 사람이 보지 않았다.** 프롬프트는 `scenarios/ruth.yml` 의
+  `extras.anchor` 에서 뽑았고 생성·검수 모두 기계가 했다. 특히 Scene 4(달빛 타작 마당)는
+  AR 을 닫게 만든 바로 그 장면이라 사람 형상이 없어야 하는데, 지금은 "없다"는 것이
+  기계의 확인뿐이다. 강도 조절 토글도, F66 진입 상태 게이트도 없다.
 - 거절(`declined_route: closing`)한 사용자는 저작된 마감 화면을 못 받는다.
   `SceneSkipResolver.Skip.Closing` 이 `{"type": "end"}` 만 실어 보내서, `closing_screen.reached_by`
   가 `consent_declined_sentinel` 을 포함하는데도 그 화면이 payload 에 안 실린다.

@@ -42,7 +42,18 @@ API_KEY = os.environ.get("GEMINI_API_KEY", "")
 if not API_KEY:
     sys.exit("ERROR: GEMINI_API_KEY env required")
 
-MODEL = "imagen-4.0-fast-generate-001"
+# 기존 39장은 `imagen-4.0-fast-generate-001` 의 `:predict` 로 뽑았다. 그런데
+# 2026-08-22 실측에서 이 모델이 그 키의 v1beta ListModels 에 **더 이상 없다**
+# (`404 ... is not found for API version v1beta, or is not supported for predict`).
+# 즉 이 스크립트는 --force 로도 기존 39장을 다시 뽑지 못하는 상태였다.
+# 남아 있는 이미지 생성 경로는 `gemini-*-image` 계열의 `:generateContent` 뿐이라
+# 그쪽을 기본으로 바꾼다. imagen 계열 이름을 넣으면 예전 predict 경로로 돌아간다
+# (키에 그 모델이 다시 생기면 쓰라고 남겨둔다).
+#
+# 산출 해상도가 조금 다르다: predict 는 1408x768, generateContent 는 1376x768.
+# 둘 다 16:9 근처이고 화면에서는 `background-size: cover` 로 꽉 채우므로 섞여도
+# 보이는 차이가 없다.
+MODEL = os.environ.get("GEMINI_IMAGE_MODEL", "gemini-3.1-flash-image")
 OUT_ROOT = Path(__file__).parent.parent / "frontend" / "public" / "images" / "scenes"
 
 # 모든 프롬프트에 공통으로 붙는 화풍 고정 문구.
@@ -227,11 +238,22 @@ def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
             "no captions, no subtitles, no watermark, no signature. ",
         )
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:predict?key={API_KEY}"
-    body = {
-        "instances": [{"prompt": prompt + style}],
-        "parameters": {"sampleCount": 1, "aspectRatio": "16:9"},
-    }
+    predict = MODEL.startswith("imagen")
+    verb = "predict" if predict else "generateContent"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:{verb}?key={API_KEY}"
+    if predict:
+        body = {
+            "instances": [{"prompt": prompt + style}],
+            "parameters": {"sampleCount": 1, "aspectRatio": "16:9"},
+        }
+    else:
+        body = {
+            "contents": [{"parts": [{"text": prompt + style}]}],
+            "generationConfig": {
+                "responseModalities": ["IMAGE"],
+                "imageConfig": {"aspectRatio": "16:9"},
+            },
+        }
     req = urllib.request.Request(
         url,
         data=json.dumps(body).encode(),
@@ -239,18 +261,33 @@ def gen(character: str, scene_id: str, prompt: str, force: bool) -> str:
         method="POST",
     )
     try:
-        with urllib.request.urlopen(req, timeout=120) as r:
+        # generateContent 쪽이 predict 보다 눈에 띄게 느리다 (실측 한 장 40~90초).
+        with urllib.request.urlopen(req, timeout=300) as r:
             data = json.loads(r.read())
     except urllib.error.HTTPError as e:
         return f"[{character}/{scene_id}] HTTP {e.code}: {e.read()[:200].decode(errors='replace')}"
 
-    preds = data.get("predictions", [])
-    if not preds:
-        # 안전필터에 걸리면 predictions 가 통째로 비어서 온다 — 원문을 남겨야 원인을 안다.
-        return f"[{character}/{scene_id}] FAIL no predictions: {json.dumps(data)[:200]}"
-    b64 = preds[0].get("bytesBase64Encoded")
-    if not b64:
-        return f"[{character}/{scene_id}] FAIL no bytes: keys={list(preds[0].keys())}"
+    if predict:
+        preds = data.get("predictions", [])
+        if not preds:
+            # 안전필터에 걸리면 predictions 가 통째로 비어서 온다 — 원문을 남겨야 원인을 안다.
+            return f"[{character}/{scene_id}] FAIL no predictions: {json.dumps(data)[:200]}"
+        b64 = preds[0].get("bytesBase64Encoded")
+        if not b64:
+            return f"[{character}/{scene_id}] FAIL no bytes: keys={list(preds[0].keys())}"
+    else:
+        # generateContent 는 파트 배열로 온다. 안전필터에 걸리면 이미지 파트 없이
+        # 텍스트 파트만(또는 finishReason 만) 온다 — predict 와 마찬가지로 원문을 남긴다.
+        b64 = ""
+        for cand in data.get("candidates", []):
+            for part in cand.get("content", {}).get("parts", []):
+                if "inlineData" in part:
+                    b64 = part["inlineData"]["data"]
+                    break
+            if b64:
+                break
+        if not b64:
+            return f"[{character}/{scene_id}] FAIL no image part: {json.dumps(data)[:300]}"
 
     img = base64.b64decode(b64)
     return to_webp(img, out, f"{character}/{scene_id}")
