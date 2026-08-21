@@ -1,0 +1,126 @@
+# Scene 1 — 침묵의 7일 (60초, 함께 앉음 / 말 없는 동행)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관 (자산은 manifests/{device}/scene1-v1.0.0.json 참조).
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — **없던 대본을 지어낸 것이 아니다.** 사용자에게 노출되는 문장은 이미 배포되어
+#    나가는 값(backend/src/main/resources/scenarios/job.yml scene 1 의 `static_text`)을
+#    저작 정본에 옮겨 적은 것이고, 새로 쓴 것은 그 문장을 XR 로 세우는 무대 지시
+#    (environment · npcs · interactions · transition)뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 시각 배제: 욥의 신체 종기(욥 2:7) 근접 묘사 미포함 — 실루엣과 잿더미까지만.
+# ⚠️ 미션 범위: 이 미션의 대상은 recovery 사용자다. 급성 위기 사용자는 EmotionController 의
+#    CrisisLockout 이 진입 자체를 차단한다 — 이 Scene 의 게이트가 그 역할을 대신하지 않는다.
+
+scene_id: job_scene1
+scene_name: seven_days_of_silence
+mission_id: job
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: uz_ash_heap_dusk
+  background_model: env_uz_ashes_dusk
+  lighting:
+    type: overcast_dusk_after_storm
+    color_temperature_kelvin: 4200
+    flat_shadowless_emphasis: true # 그림자를 죽여 '드라마' 를 뺀다 — 비탄을 연출하지 않는다
+  ambient_sound:
+    - id: low_wind_open_ground
+      gain_db: -22
+      spatial: true
+    - id: distant_livestock_absent_silence # 있던 소리가 사라진 자리 — 무음 구간을 의도적으로 남긴다
+      gain_db: -34
+      spatial: false
+  user_position: [0.0, 1.20, 0.0] # 앉은 눈높이 — 서 있는 사람이 내려다보는 구도를 피한다
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: job_self
+    voice_id: job_v1
+    position: [0.0, 1.20, 0.0]
+    note: "사용자가 욥 — first-person. Scene 1 에서 욥은 말하지 않는다(욥 2:13)."
+  - id: three_friends_silhouette
+    voice_id: null
+    position: [1.4, 1.20, 1.2]
+    note: "친구 셋 — 실루엣·무음. Scene 3 에서야 말을 한다. 여기서는 '있음' 만 표현."
+
+narration_blocks:
+  - id: nb_s1_seven_days
+    speaker: narrator
+    text_ko: "친구 세 명이 욥의 슬픔이 너무 큰 것을 보고 *말없이* 7일 밤낮 함께 앉았습니다. 말이 필요 없는 자리가 있습니다."
+    audio_clip_id: aud_s1_seven_days_ko
+    start_at_seconds: 6.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    source_of_record: "backend/src/main/resources/scenarios/job.yml :: scenes[id=1].extras.static_text"
+    note: "런타임에 이미 나가는 문장. 저작층에서 각색하지 않는다 — 표기만 옮겼다."
+  - id: nb_s1_silence_hold
+    speaker: system
+    text_ko: ""
+    audio_clip_id: null
+    start_at_seconds: 20.0
+    duration_seconds: 25.0
+    hidden_until_event: null
+    default_path: static_curation
+    note: >-
+      의도된 무음 구간 25초. 자막·음성·프롬프트 전부 없음. 이 Scene 의 인터랙션은
+      '아무것도 하지 않아도 된다' 이며, 그것을 게이지·타이머로 시각화하지 않는다.
+
+interactions:
+  - id: ix_s1_sit_with
+    type: dwell_presence
+    target_assets: [socket_ash_ground, model_friends_silhouette]
+    gesture: none
+    presentation:
+      no_progress_indicator: true # 진행 게이지 없음 — 침묵을 '수행' 으로 만들지 않는다
+      implementation_optional: false
+    haptic:
+      intensity: 0.0
+      duration_ms: 0
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 45
+        on_timeout: treat_as_complete
+        description: "45초 경과 시 완주 처리. 재촉 프롬프트 0건 — 침묵 대기만."
+      - rule: track_micro_signals
+        records: [time_before_skip_seconds]
+        note: "기록만 — 서사 분기·평가에 사용하지 않는다."
+
+branches: [] # Scene 1 분기 없음 — 함께 있음의 체험만.
+
+skippable_after_seconds: 5 # 런타임 `skippable_after_sec: 5` 미러 — 조용한 도입이 버거운 사용자 보호
+
+safety_gates:
+  - id: R4_pre_scene0_consent_required
+    enforced_at: before_scene_enter
+    description: "Pre-Scene 0 미션 동의 게이트 — 상실·비탄·죽음 갈구 인접 언어(Scene 2) 포함 사전 고지 + 위기 자원 {{crisis_resources.default}}"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "자해·자살 발화 감지 시 게임 로직보다 우선. safety_alerts 원문 미저장(해시만), category=suicidal_ideation_semantic."
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "이 Scene 은 전부 결정론적 본문 — opt-out 영향 없음. 욥 미션은 Stage 1 전체가 정적 큐레이션이다."
+  - id: body_affliction_visual_exclusion
+    enforced_at: always
+    description: "욥 2:7 종기의 근접 묘사 배제 — 실루엣·잿더미까지만. 신체 훼손 시각 트리거 회피."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: job_scene2
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.2
+  fade_in_seconds: 1.6
+
+theology_footer_refs:
+  - citation_id: J1_candidate
+    source: "욥기 2:11~13 친구들의 동행 — 확정 서지 미확보(드릴다운 필요)"
+    note: "친구들이 옳았던 유일한 구간이 이 7일이다. 말을 시작한 순간부터 틀렸다(욥 42:7) — Scene 3 의 복선."
+    anchor_block: nb_s1_seven_days
+  - disputed_points:
+      - "욥기 1~2 장의 천상 회의(사탄의 시험 허락) — 신정론 논쟁의 핵심. 본 미션은 이 장면을 무대에 올리지 않는다."
+    handling: "범위 제외는 은폐가 아니라 정직한 scoping — 고난의 원인을 무대에 올리면 그 자체가 '원인 설명' 이 된다. 이 미션은 원인이 아니라 동석을 다룬다."
