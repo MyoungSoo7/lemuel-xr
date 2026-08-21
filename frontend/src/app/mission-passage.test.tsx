@@ -44,6 +44,7 @@ vi.mock("@/lib/api/content", () => ({
 import { startMission, startJoseph } from "@/lib/api/game";
 import { fetchScripturePassage } from "@/lib/api/content";
 
+import DanielPage from "./daniel/page";
 import DavidPage from "./david/page";
 import ElijahPage from "./elijah/page";
 import JesusPage from "./jesus/page";
@@ -106,6 +107,7 @@ const WITHOUT_REF = scene({
 });
 
 const PAGES: Array<[string, () => React.ReactElement]> = [
+  ["daniel", () => <DanielPage />],
   ["david", () => <DavidPage />],
   ["elijah", () => <ElijahPage />],
   ["jesus", () => <JesusPage />],

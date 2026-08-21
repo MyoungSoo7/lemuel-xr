@@ -189,6 +189,12 @@ const CONTENT_LABEL: Record<string, string> = {
   emptiness: "공허",
   existential_despair: "삶의 의미를 잃은 절망",
   self_harm: "자해",
+  // daniel.yml Scene 4·5 (2026-08-22). 세 태그 다 이 인물이 처음 쓴다 —
+  // 등재하지 않으면 동의 카드에 `religious_persecution` 이 영문 그대로 뜬다.
+  // 그건 *모르는* 태그를 위한 안전망이지, 방금 배포한 태그의 자리가 아니다.
+  religious_persecution: "신앙을 이유로 한 박해",
+  death_threat: "죽음의 위협",
+  confinement: "갇힌 공간",
 };
 
 const LEVEL_LABEL: Record<string, string> = {

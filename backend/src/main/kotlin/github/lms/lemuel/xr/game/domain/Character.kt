@@ -26,6 +26,14 @@ import github.lms.lemuel.xr.common.ErrorCode
  * `docs/PETER-RUNTIME-SIGNOFF.md` 에 있다 — 신학·정신건강 전문 검토는 **없다**.
  * AR 은 룻과 같은 이유로 닫아 둔다(부인의 밤을 사용자의 실제 방에 놓는 판단이 없다).
  *
+ * 2026-08-22 DANIEL 추가 — 같은 조건으로 연다. 근거·범위·남은 빚은
+ * `docs/DANIEL-RUNTIME-SIGNOFF.md`. 이 인물은 앞의 둘과 **구조가 하나 다르다**:
+ * R4 동의 트리거가 2개이고 서로를 상속하지 않는다(Scene 4 금령 고지 / Scene 5 집행).
+ * 그래서 건너뛰기 목적지도 두 모양이다 — Scene 4 는 정수(다음 씬 점프),
+ * Scene 5 는 마지막 씬이라 문자열(같은 씬의 conditional_blocks 축약본).
+ * 저작(`content/daniel/README.md`)이 건 **인간 안전검토자 사인오프는 없다** —
+ * 해제하지 않고 대장에 미해소 부채로 등재한 채 연다.
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -39,7 +47,8 @@ enum class Character(val dbValue: String) {
     JESUS("jesus"),
     SOLOMON("solomon"),
     RUTH("ruth"),
-    PETER("peter");
+    PETER("peter"),
+    DANIEL("daniel");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */

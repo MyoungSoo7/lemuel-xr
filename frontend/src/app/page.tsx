@@ -93,6 +93,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "부인한 뒤에도 이름은 그대로였다 — 회복의 조건은 자격이 아니다",
     active: true,
   },
+  {
+    href: "/daniel",
+    name: "Daniel",
+    korean: "다니엘",
+    tagline: "어디까지 맞추고 어디서 멈추는가 — 정체성은 물러남이 아니다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -265,6 +272,7 @@ export default function HomePage() {
                       "elijah",
                       "ruth",
                       "peter",
+                      "daniel",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
