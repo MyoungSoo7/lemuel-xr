@@ -121,15 +121,30 @@ AR 시드 15개(3기기 × 5씬)를 지웠다.** 되살리려면 목록 복구 +
   다만 화면이 생겼다고 노출 결정의 범위가 넓어진 것이지 검토가 늘어난 것은 아니다.
 - 씬 배경 이미지는 2026-08-22 에 다섯 장이 생겼다(`public/images/scenes/ruth/{1..5}.webp`).
   `/ruth` 는 더 이상 단색 그라디언트가 아니고, `scene-backgrounds.test.ts` 의 제외도
-  풀렸다. **다만 이 다섯 장은 사람이 보지 않았다.** 프롬프트는 `scenarios/ruth.yml` 의
-  `extras.anchor` 에서 뽑았고 생성·검수 모두 기계가 했다. 특히 Scene 4(달빛 타작 마당)는
-  AR 을 닫게 만든 바로 그 장면이라 사람 형상이 없어야 하는데, 지금은 "없다"는 것이
-  기계의 확인뿐이다. 강도 조절 토글도, F66 진입 상태 게이트도 없다.
-- 거절(`declined_route: closing`)한 사용자는 저작된 마감 화면을 못 받는다.
-  `SceneSkipResolver.Skip.Closing` 이 `{"type": "end"}` 만 실어 보내서, `closing_screen.reached_by`
-  가 `consent_declined_sentinel` 을 포함하는데도 그 화면이 payload 에 안 실린다.
-  룻 Scene 3 이 리포 전체에서 유일한 `declined_route` 라 영향 범위는 좁지만, 고치려면
-  payload 규약을 바꾸는 결정이 필요해 여기 남긴다.
+  풀렸다. 프롬프트는 `scenarios/ruth.yml` 의 `extras.anchor` 에서 뽑았고 생성은 기계가 했다.
+  **사람 검수는 받았다** — 2026-08-22, LIM MYOUNGSOO 가 다섯 장을 실제로 보고 승인했다
+  (Scene 4 달빛 타작 마당 포함. AR 을 닫게 만든 장면이라 사람 형상 부재를 따로 확인했다).
+  ⚠️ 승인의 범위는 **그림 자체**다. 이 확인이 신학 검토나 정신건강 검토를 대신하지 않는다 —
+  이 대장의 나머지가 말하는 "전문 검토 없음" 은 그대로다. 강도 조절 토글도, F66 진입
+  상태 게이트도 여전히 없다.
+- ~~거절(`declined_route: closing`)한 사용자는 저작된 마감 화면을 못 받는다.~~
+  **2026-08-22 고쳤다.** `Skip.Closing` 이 `{"type": "end"}` 만 보내서, `closing_screen.reached_by`
+  가 `consent_declined_sentinel` 을 포함하는데도 그 화면이 payload 에 안 실렸다. 빠진 것은
+  자막이 아니라 그 화면의 `ui_overlays` — `[suffering_disclaimer, crisis_reminder, exit_button]`
+  이다. **카드를 거절한 사용자에게만** 위기 안내도 나가기 버튼도 안 갔다.
+  이제 `DecideSceneUseCase.closingPayload` 가 종결 화면과 위기 안내를 **저작된 이름 그대로**
+  싣고, `/ruth` 의 종결 화면이 그 자막을 띄운다.
+  - 통째로 넘기지 않고 **허용목록**(`closing_screen` · `crisis_reminder`)으로 고른다.
+    중간 카드의 `covers_scenes` 가 `[3, 5]` 라 거절은 Scene 5 의 내용까지 거절한 것이고,
+    Scene 5 payload 를 통째로 넘기면 성문 낭독 자막이 딸려 간다. 기본값이 "안 실림" 이라야
+    새 키가 저작될 때 이 실수가 재발하지 않는다.
+  - **아직 미해소** — 마감 한 줄(`closing_lines`)을 거절 경로에도 줄지는 저작이 답하지
+    않았다. 건너뛰기 경로에는 `renders: [closing_lines, closing_screen]` 로 명시돼 있는데
+    거절 경로에는 `reached_by` 센티널뿐이다. 지어내지 않고 뺐다. 사람이 정할 일이다.
+  - 검사: `DeclinedRouteClosingScreenTest`(실제 yml 에 대고 정적) ·
+    `DecideSceneUseCaseTest`(허용목록·중첩 깊이·토큰 치환) · `ruth/page.test.tsx`(화면).
+    고치기 전 백엔드·프론트 테스트 **둘 다 빈 `{"type":"end"}` 를 정답으로 못박고 있었다** —
+    초록이었지만 저작과 반대였다.
 
 ## 이 대장이 보증하지 않는 것
 

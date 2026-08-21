@@ -194,11 +194,13 @@ export default function RuthPage() {
   };
 
   /*
-    카드를 거절하면 백엔드는 `{ type: "end" }` 만 돌려준다(DecideSceneUseCase 의
-    Skip.Closing). ruth.yml 의 `closing_screen.reached_by` 는 `consent_declined_sentinel`
-    을 포함하지만 **그 화면은 이 경로로 오지 않는다** — 저작된 종결 자막(SR-1)이
-    payload 에 실리지 않는다. 여기서 문구를 지어내면 리포 어디에도 없는 마지막 문장이
-    생기므로, 마쳤다는 사실만 알리고 나가는 문을 준다. 남은 구멍은 백엔드 쪽이다.
+    카드를 거절하면 백엔드는 `type: "end"` 와 함께 **저작된 종결 화면**을 보낸다
+    (DecideSceneUseCase 의 Skip.Closing). 2026-08-22 이전에는 `{ type: "end" }` 만 와서,
+    `closing_screen.reached_by` 가 `consent_declined_sentinel` 을 포함하는데도 그 화면이
+    이 경로로 오지 않았다 — 거절한 사용자에게만 종결 자막(SR-1)도, 위기 안내도 없었다.
+
+    지금도 프론트가 문구를 지어내지는 않는다. 종결 자막이 실려 오면 그것을 띄우고,
+    안 실려 오면 마쳤다는 사실만 알리고 나가는 문을 준다.
   */
   const ended = payload.type === "end";
 
@@ -287,9 +289,28 @@ export default function RuthPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-950/85 to-black/90" />
         <div className="relative z-10 p-5">
           {ended ? (
-            <p className="text-sm text-[var(--color-warm)]/85 leading-relaxed">
-              여기서 마쳤습니다. 남은 장면은 열지 않았습니다.
-            </p>
+            <div className="space-y-3">
+              <p className="text-sm text-[var(--color-warm)]/85 leading-relaxed">
+                여기서 마쳤습니다. 남은 장면은 열지 않았습니다.
+              </p>
+              {/*
+                저작된 종결 자막(SR-1). 카드를 거절하고 온 사용자가 여기 도달한다 —
+                `closing_screen.reached_by` 가 `consent_declined_sentinel` 을 포함한다.
+                없으면 위 한 줄로만 마친다. 없는 문장을 프론트가 지어내지 않는다.
+              */}
+              {closingScreen?.closing_caption?.text_ko && (
+                <div className="space-y-1 px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 bg-black/30">
+                  <p className="text-sm text-[var(--color-warm)]/90 leading-relaxed">
+                    {closingScreen.closing_caption.text_ko}
+                  </p>
+                  {closingScreen.closing_caption.ref && (
+                    <p className="text-[10px] text-[var(--color-warm)]/40">
+                      ({closingScreen.closing_caption.ref})
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ) : needsConsent ? (
             <TriggerWarningGate
               warning={warning!}

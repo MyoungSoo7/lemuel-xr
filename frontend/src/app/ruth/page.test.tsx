@@ -73,6 +73,10 @@ const BRIDGE =
 
 const CRISIS_REMINDER = `${CRISIS_DEFAULT.label} ${CRISIS_DEFAULT.tel}.`;
 
+/** SR-1 — 종결 자막은 리포 전체에 한 벌만 존재한다(`ruth.yml` closing_screen). */
+const CLOSING_CAPTION =
+  "이스라엘의 하나님 여호와께서 그의 날개 아래에 보호를 받으러 온 네게";
+
 function scene(currentScene: number, scenePayload: Record<string, unknown>) {
   return {
     sessionId: SESSION,
@@ -386,8 +390,28 @@ describe("룻 미션 — 두 문은 다른 문이다", () => {
   it("Scene 3 둘째 문은 거절 — decline 을 보내고 종결로 간다", async () => {
     const user = userEvent.setup();
     vi.mocked(startMission).mockResolvedValue(SCENE3);
+    /*
+      백엔드 Skip.Closing 이 돌려주는 payload 그대로 — 허용목록 3키다
+      (`type` · `closing_screen` · `crisis_reminder`). 거절은 Scene 5 의 내용까지
+      거절한 것이라(중간 카드 `covers_scenes: [3, 5]`) 성문 낭독 자막은 오지 않는다.
+
+      ⚠️ 이 픽스처는 2026-08-22 이전에 `{ type: "end" }` 였다. 백엔드가 실제로 그것만
+      보냈고, 그래서 거절한 사용자에게는 종결 자막도 위기 안내도 가지 않았다.
+    */
     vi.mocked(decideMission).mockResolvedValue(
-      scene(3, { type: "end" }), // 백엔드 Skip.Closing 이 돌려주는 payload 그대로
+      scene(3, {
+        type: "end",
+        closing_screen: {
+          entry_mode: "closing_only",
+          ui_overlays: [
+            "suffering_disclaimer",
+            "crisis_reminder",
+            "exit_button",
+          ],
+          closing_caption: { ref: "룻 2:12 중", text_ko: CLOSING_CAPTION },
+        },
+        crisis_reminder: CRISIS_REMINDER,
+      }),
     );
     renderPage();
 
@@ -400,6 +424,21 @@ describe("룻 미션 — 두 문은 다른 문이다", () => {
       value: "decline",
     });
     expect(await screen.findByText(/여기서 마쳤습니다/)).toBeInTheDocument();
+
+    /*
+      거절한 사용자도 저작된 종결 자막(SR-1)을 받는다 — ruth.yml 이 「세 경로가 모두
+      이 블록에 착지한다. 덜 본 사람에게 덜한 결말을 주지 않는다」고 적어 둔 그것이다.
+    */
+    expect(screen.getByText(CLOSING_CAPTION)).toBeInTheDocument();
+    /*
+      그 화면의 `ui_overlays` 는 `[suffering_disclaimer, crisis_reminder, exit_button]`
+      이다. 빠졌던 것은 자막이 아니라 **위기 안내와 나가기 버튼**이었고, 카드를 거절한
+      사용자야말로 그 셋이 필요한 쪽이다.
+    */
+    expect(
+      screen.getByText(new RegExp(CRISIS_DEFAULT.tel)),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "← 홈" })).toBeInTheDocument();
 
     // 마쳤다고 고른 사람에게 다음 씬의 손잡이가 남아 있으면 안 된다.
     expect(screen.queryByRole("button", { name: "계속 →" })).toBeNull();
