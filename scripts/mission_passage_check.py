@@ -6,7 +6,7 @@
 2026-08-20 까지, 성경 참조를 두고 **초록이던 검사가 둘** 있었다.
 
   · `scripture_ref_check.py`  — 시나리오의 참조 60개가 `scripture_passages` 행과
-    맞느냐. 8인물 PASS.
+    맞느냐. 인물 전부 PASS.
   · `scripture_text_check.py` — 그 92행의 자구가 `translation` 라벨(KLB/개역개정)과
     맞느냐. 92행 PASS. 이걸 맞추느라 마이그레이션 한 벌(`V20260820113000`)을 썼다.
 
@@ -21,14 +21,14 @@
 
 ─────────────── 두 축 ───────────────
 
-**A축 — 배선(인물 8).** 각 미션 화면이 (1) `ScenePassage` 를 들여오고 (2) payload
+**A축 — 배선(인물 전체).** 각 미션 화면이 (1) `ScenePassage` 를 들여오고 (2) payload
 최상위에서 `scriptureRef` 를 뽑고 (3) 그 값으로 렌더하고 (4) 그 렌더 자리가
 `TriggerWarningGate` **뒤** 인지. (4)는 동의 게이트 안쪽 배치의 *근사* 다 — R4 씬에서
 본문이 게이트 바깥에 놓이면 동의 전에 자극 본문이 노출된다.
 
 ⚠️ A축의 주장 범위: 소스에 그 배선이 **적혀 있다** 까지다. 배선이 있는데도 렌더가
 안 되는 경우(조건이 늘 거짓이라든가)는 여기서 안 잡힌다 — 그건
-`frontend/src/app/mission-passage.test.tsx` 가 8화면을 실제로 렌더해서 잰다. 구조
+`frontend/src/app/mission-passage.test.tsx` 가 화면 전부를 실제로 렌더해서 잰다. 구조
 검사와 런타임 검사를 둘 다 두는 이유이고, 어느 한쪽만으로는 위의 실패 모드를
 못 막았다.
 
@@ -147,7 +147,7 @@ def check_wiring(name: str) -> tuple[str, str]:
 
 
 def check_runtime_test() -> tuple[str, str]:
-    """런타임 검사가 **존재하고 8인물을 다 걸고 있는지.** 구조 검사만 남고 런타임
+    """런타임 검사가 **존재하고 인물을 다 걸고 있는지.** 구조 검사만 남고 런타임
     검사가 조용히 지워지면, 배선은 있는데 렌더가 안 되는 상태가 다시 초록이 된다."""
     if not RUNTIME_TEST.exists():
         return "FAIL", f"runtime-test — {RUNTIME_TEST.relative_to(ROOT)} 가 없다"

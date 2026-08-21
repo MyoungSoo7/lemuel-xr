@@ -21,6 +21,11 @@ import github.lms.lemuel.xr.common.ErrorCode
  * `RuntimeExposureSignoffTest` 가 그걸 집행한다 — 결정 기록 + **AR 폐쇄**.
  * 룻만 AR 이 닫혀 있는 것은 저작이 덜 된 게 아니라 판단이 없어서 내린 결정이다.
  *
+ * 2026-08-22 PETER 추가 — 룻과 같은 조건으로 연다. 저작(content/peter/scene1~5.yml)은
+ * 완성돼 있었고 여기 한 줄이 없어서 닫혀 있었다. 근거·범위·남은 빚은
+ * `docs/PETER-RUNTIME-SIGNOFF.md` 에 있다 — 신학·정신건강 전문 검토는 **없다**.
+ * AR 은 룻과 같은 이유로 닫아 둔다(부인의 밤을 사용자의 실제 방에 놓는 판단이 없다).
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -33,7 +38,8 @@ enum class Character(val dbValue: String) {
     JOSEPH("joseph"),
     JESUS("jesus"),
     SOLOMON("solomon"),
-    RUTH("ruth");
+    RUTH("ruth"),
+    PETER("peter");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */

@@ -1,0 +1,392 @@
+# 베드로 — 「부인한 뒤에도 이름은 그대로였다」
+#
+# 핵심 메시지: **회복의 조건은 자격도, 다짐도, 수치의 소멸도 아니다.**
+#   중보(눅 22:31-32)가 실패(눅 22:34)보다 **먼저** 왔고, 아침 바닷가에서 불린 것은
+#   어떤 상태가 아니라 「요한의 아들 시몬」이라는 한 사람의 이름이었다(요 21:15-17).
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️ 이 파일은 2026-08-22 부터 **실제로 로드된다.**
+#   ScenarioYamlLoader.loadAll() 은 `Character.entries` 를 순회한다 — 디렉터리가 아니다.
+#   그래서 `Character` enum 의 PETER("peter") 한 줄이 곧 사용자 노출이다.
+#   근거·범위·남은 빚은 docs/PETER-RUNTIME-SIGNOFF.md 에 있고
+#   RuntimeExposureSignoffTest 의 «룻 이후 열리는 인물은 노출 대장 없이 열리지 않는다» 가 집행한다.
+#   · 전문 신학 검토 없음 · 전문 정신건강 검토 없음. 그 사실은 대장에 남아 있다.
+#   · docs/MVP-PETER.md §0/§13 은 「§8 ①~⑨ 전건 통과 전 프로덕션 반영 금지」라는
+#     **룻보다 강한 전제**를 걸어 두었다. 그 전건은 아직 통과하지 않았다 —
+#     지우지 않고 대장에 미해소 부채로 적었다. 초록이 아니라 등재다.
+#   · AR 은 닫혀 있다(VR 전용). 패스스루가 Scene 2(부인의 밤)를 사용자의 실제 방에
+#     놓는 것에 답할 사람이 없다 — 룻과 같은 이유, 같은 결정.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 상류 문서 (이 파일은 이들의 하류다 — 자구를 여기서 발명하지 않는다)
+#   설계        docs/MVP-PETER.md
+#   런타임대본  docs/MVP-PETER-CONTENT.md
+#   저작        content/peter/scene1~5.yml
+#   성구 시드   db/migration/V20260822120000__seed_newchar_passages_gae.sql (개역개정 실측)
+#
+# 이 파일의 자막은 **저작 트리의 text_ko 를 옮긴 것**이고, 그 자구는 개역개정이다.
+# 옮기는 것 외의 작문을 하지 않았다 — 새 문장을 쓰면 그것은 아무도 검토하지 않은 본문이 된다.
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준).
+#
+# 배제 (이 파일에서 직접 집행되는 것)
+#   · 요 21:18-19(순교 예고) — 미션 범위 밖. 인용·연출·암시 0건.
+#     사유 전문은 docs/MVP-PETER.md disputed_points 5번, 저작 선언은
+#     content/peter/scene5.yml 의 `excluded_passages_note` 한 줄이 유일한 자리다.
+#     여기서 그 자구를 재인용하지 않는다 — extras 는 payload 로 통째 복사된다.
+#   · 요 21:7-8 — Scene 4 범위 밖. 자막 없음.
+#   · 「자만 → 벌」 인과 구성 — Scene 1 의 자막 순서 자체가 이것을 막는다.
+#     중보(22:31-32)가 확언(22:33)보다, 확언이 예고(22:34)보다 먼저다. 뒤집지 않는다.
+#
+# 안전선
+#   R1 자해 발화 리스너 5/5 Scene 상시. 정서적 정점인 Scene 3 과 마감 Scene 5 에
+#      위기 자원을 카드로 함께 노출한다.
+#   R4 Scene 2 진입에 동의 카드 1장. 덮는 범위는 Scene 2·3 이고 건너뛰기 목적지는 Scene 4 다.
+#      Scene 3 은 자기 카드를 띄우지 않고 그 카드에 덮인다 — `consent_coverage` 로 명시한다.
+#      비워 두면 「카드 없음」과 「덮임」이 파일에서 구별되지 않는다.
+#   R5 기본 경로는 LLM 호출 0회로 완주된다. 묵상만 opt-in 이며 기본값은 off.
+#
+# ⚠️ 위기 연락처를 이 파일에 숫자로 적지 말 것.
+#   `{{crisis_resources.default}}` 토큰만 쓴다 — ScenePayloadAssembler → CrisisTokenResolver
+#   가 정본으로 치환하고 ScenarioHotlineRatchetTest 가 이를 강제한다.
+
+character: peter
+title: 숯불 앞에서 다시 불린 이름
+
+target_user: 돌이킬 수 없는 실패 뒤에 스스로를 정죄하고 있는 사람
+
+ai_assist_footer: AI 보조 — 본문은 성경 참조 — storyteller 역할. 위기 시 {{crisis_resources.default}}.
+
+# ── 금칙 토큰: 이 파일에 사본을 두지 않는다 ──────────────────────────────────
+# 이 미션의 금칙 토큰 정본은 content/peter/scene1~5.yml 의 같은 id 게이트다(123종, 5개
+# Scene 동일). 같은 목록을 scripts/gates/peter.yml 이 전량 복제하고 있고, 여기까지 옮기면
+# **세 벌**이 된다. 세 벌은 반드시 갈라지고, 갈라진 순간 어느 쪽이 정본인지 아무도 모른다.
+#
+# 대신 집행 경로를 지목한다. 런타임 차단은 application.yml 의
+# safety.forbidden-tokens.list 가 하고(세 출구 전부: responseText · scenePayload ·
+# valuePrompt), 저작 목록이 그 전역 목록의 부분집합인지는 아래 verified_by 가 매 빌드
+# 확인한다. 부분집합이 깨지면 그 테스트가 빨개진다 — 산문이 아니라 검사다.
+safety_gates:
+  - id: R2_R3_forbidden_tokens_lint
+    scenes: [1, 2, 3, 4, 5]
+    axis: 실패에 신적 의도 부여 금지 · 재발 방지 다짐 요구 금지 · 감정 정리 재촉 금지 · 조건부 회복 금지
+    enforcement: structural
+    structural_check: >-
+      금칙 토큰 목록을 이 파일에 복제하지 않고 저작 정본(content/peter/scene1~5.yml)에 둔다.
+      런타임 집행은 application.yml 의 전역 목록이 하며, 저작 목록이 그 전역 목록의
+      부분집합임을 아래 verified_by 가 매 빌드 확인한다. 부분집합이 깨지면 빌드가 실패한다.
+    verified_by: 저작 게이트의 금칙 토큰이 런타임 목록에 전부 반영돼 있다
+
+scenes:
+  # ── Scene 1 ────────────────────────────────────────────────────────────────
+  # 순서가 곧 게이트다. 중보(22:31-32) → 확언(22:33) → 예고(22:34).
+  - id: 1
+    title: 실패보다 먼저 온 기도
+    type: cinematic
+    duration_sec: 60
+    scripture_ref: lk-22:31
+    next: 2
+    exposure_grade: B
+    extras:
+      anchor: 만찬이 끝나가는 다락방. 등불 하나.
+      additional_refs: ["lk-22:32", "lk-22:33", "lk-22:34"]
+      environment:
+        camera_rig: fixed_seated_at_table
+        time_of_day: warm_lamp_interior
+        ambient: [낮은 웅성임, 그릇 놓이는 소리]
+        ui_overlays: [ai_assist_footer, exit_button]
+      npcs:
+        - { name_ko: 예수, framing: backlit_silhouette_no_face }
+      npc_note: >-
+        얼굴을 렌더하지 않는다. 역광 실루엣과 손만. 실사 얼굴 아바타도, 완전 추상 광휘도 쓰지 않는다.
+      # 자동 진행 타임라인을 쓰지 않는다. 이 프로젝트의 자막은 전부 사용자 페이스다
+      # (content/ruth/scene1.yml §4-5, scenarios/ruth.yml 5/5). 여기만 timeline 으로
+      # 두면 두 가지가 동시에 어긋난다 — 화면은 실제로 「다음」을 눌러야 넘어가므로
+      # payload 의 선언이 거짓이 되고, 넘어가는 속도를 이야기가 정하게 된다.
+      # 이 Scene 이 다루는 것은 실패 예고이고, 그 앞에 얼마나 머물지는 읽는 사람 몫이다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 예수
+          text_ko: "시몬아, 시몬아, 보라 사탄이 너희를 밀 까부르듯 하려고 요구하였으나 (눅 22:31)"
+        - speaker_ko: 예수
+          text_ko: "그러나 내가 너를 위하여 네 믿음이 떨어지지 않기를 기도하였노니 너는 돌이킨 후에 네 형제를 굳게 하라 (눅 22:32)"
+        - speaker_ko: 베드로
+          text_ko: "그가 말하되 주여 내가 주와 함께 옥에도, 죽는 데에도 가기를 각오하였나이다 (눅 22:33)"
+        - speaker_ko: 예수
+          text_ko: "이르시되 베드로야 내가 네게 말하노니 오늘 닭 울기 전에 네가 세 번 나를 모른다고 부인하리라 하시니라 (눅 22:34)"
+      order_note: >-
+        이 네 자막의 순서를 바꾸지 않는다. 예고를 앞으로 옮기면 이야기는 즉시
+        「자만했으므로 넘어졌다」가 되고, 이 미션이 하려던 말은 사라진다.
+      interactions: []
+      branches: []
+
+  # ── Scene 2 ────────────────────────────────────────────────────────────────
+  - id: 2
+    title: 불 곁에서, 세 번
+    type: interaction
+    interaction: pick_one
+    duration_sec: 90
+    scripture_ref: lk-22:54
+    next: 3
+    exposure_grade: A
+    trigger_warning:
+      level: mid
+      content:
+        - 배신
+        - 수치
+        - 자기정죄
+      consent_card_id: peter_s2_consent
+      covers_scenes: [2, 3]
+      skip_alternative_scene_id: 4
+      consent_card_ko: |-
+        다음 장면에는 예수를 안다고 하지 않은 밤과, 그 뒤에 남은 마음이 나옵니다.
+        · 건너뛰어도 이야기는 끝까지 이어집니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        [이어서 보기]  [건너뛰기]
+        지금 힘드시면: {{crisis_resources.default}}
+      skip_bridge_narration_ko: |-
+        그 밤, 베드로는 멀찍이 따라갔습니다.
+        불 곁에서 세 번, 예수를 안다고 하지 않았습니다.
+        닭이 울었고, 예수께서 돌이켜 그를 보셨습니다.
+        그리고 그는 밖으로 나갔습니다.
+    extras:
+      anchor: 대제사장의 뜰. 숯불 하나와 둘러선 사람들.
+      additional_refs:
+        [
+          "lk-22:55",
+          "jn-18:18",
+          "lk-22:56",
+          "lk-22:57",
+          "lk-22:58",
+          "lk-22:59",
+          "lk-22:60",
+        ]
+      environment:
+        camera_rig: fixed_standing_by_fire
+        time_of_day: firelight_low_key_night
+        ambient: [뜰의 웅성임, 숯불 타는 소리]
+        ui_overlays: [ai_assist_footer, crisis_reminder, exit_button]
+      npcs:
+        - { name_ko: 여종, framing: firelit_silhouette }
+        - { name_ko: 곁에 선 사람, framing: firelit_silhouette }
+      npc_note: >-
+        여종의 말은 비난조가 아니라 확인조다. 적대적 연기·울먹임·자책 억양을 쓰지 않는다.
+      asset_note: >-
+        숯불 애셋의 근거는 요 18:18 이다. 눅 22:55 는 「불」이며 숯불 대칭은 요한복음
+        안에서만 성립한다 — 두 절을 결합한 표기를 어디에도 쓰지 않는다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 해설
+          text_ko: "예수를 잡아 끌고 대제사장의 집으로 들어갈새 베드로가 멀찍이 따라가니라 (눅 22:54)"
+        - speaker_ko: 해설
+          text_ko: "사람들이 뜰 가운데 불을 피우고 함께 앉았는지라 베드로도 그 가운데 앉았더니 (눅 22:55)"
+        - speaker_ko: 해설
+          text_ko: "그 때가 추운 고로 종과 아랫사람들이 불을 피우고 서서 쬐니 베드로도 함께 서서 쬐더라 (요 18:18)"
+        - speaker_ko: 여종
+          text_ko: "한 여종이 베드로의 불빛을 향하여 앉은 것을 보고 주목하여 이르되 이 사람도 그와 함께 있었느니라 하니 (눅 22:56)"
+        - speaker_ko: 베드로
+          text_ko: "베드로가 부인하여 이르되 이 여자여 내가 그를 알지 못하노라 하더라 (눅 22:57)"
+        - speaker_ko: 곁에 선 사람
+          text_ko: "조금 후에 다른 사람이 보고 이르되 너도 그 도당이라 하거늘 베드로가 이르되 이 사람아 나는 아니로라 하더라 (눅 22:58)"
+        - speaker_ko: 곁에 선 사람
+          text_ko: "한 시간쯤 있다가 또 한 사람이 장담하여 이르되 이는 갈릴리 사람이니 참으로 그와 함께 있었느니라 (눅 22:59)"
+        - speaker_ko: 베드로
+          text_ko: "베드로가 이르되 이 사람아 나는 네가 하는 말을 알지 못하노라고 아직 말하고 있을 때에 닭이 곧 울더라 (눅 22:60)"
+      # 카드 문구는 본문의 세 부인에 1:1 로 고정돼 있다. 선택형 발명이 아니다.
+      # 세 번째는 선택지로 제시되지 않는다 — 고를 수 있는 것처럼 두면 「고르지 않을 수도
+      # 있었다」가 되고, 그건 본문에도 없고 이 미션의 축에도 반대다.
+      options:
+        - id: deny_knowing
+          ref: 눅 22:57
+          label_ko: 나는 그 사람을 모릅니다.
+          selectable: true
+        - id: deny_belonging
+          ref: 눅 22:58
+          label_ko: 나는 그 사람들 중 하나가 아닙니다.
+          selectable: true
+        - id: deny_understanding
+          ref: 눅 22:60
+          label_ko: 나는 무슨 말인지 모르겠습니다.
+          selectable: false
+          auto_advance: true
+      options_note: >-
+        이 세 값은 결정으로 기록하지 않고 Scene 5 의 라벨과 상관시키지 않는다.
+        틀린 답이 없다 — 세 카드 모두 본문이다.
+      branches: []
+
+  # ── Scene 3 ────────────────────────────────────────────────────────────────
+  - id: 3
+    title: 돌이켜 보시니
+    type: interaction
+    interaction: contemplative
+    duration_sec: 45
+    scripture_ref: lk-22:61
+    next: 4
+    exposure_grade: A
+    # 자기 카드를 띄우지 않는다 — Scene 2 의 카드(covers_scenes: [2, 3])에 덮인다.
+    # 키를 비워 두면 「카드 없음」과 「덮임」이 구별되지 않고, 건너뛴 사용자가 여기로 들어온다.
+    consent_coverage:
+      inherited: true
+      consent_card_id: peter_s2_consent
+      covered_by_scene: 2
+      skip_alternative_scene_id: 4
+    extras:
+      anchor: 같은 뜰. 시선이 마주치는 짧은 순간.
+      additional_refs: ["lk-22:62"]
+      environment:
+        camera_rig: fixed_standing_by_fire
+        time_of_day: firelight_low_key_night
+        ambient: [멀어지는 발소리]
+        ui_overlays: [ai_assist_footer, crisis_reminder, exit_button]
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 해설
+          text_ko: "주께서 돌이켜 베드로를 보시니 베드로가 주의 말씀 곧 오늘 닭 울기 전에 네가 세 번 나를 부인하리라 하심이 생각나서 (눅 22:61)"
+        - speaker_ko: 해설
+          text_ko: "밖에 나가서 심히 통곡하니라 (눅 22:62)"
+      dwell:
+        min_seconds: 3
+        on_timeout: auto_proceed_after_seconds_15
+        note_ko: 머무는 시간에 정답이 없습니다. 먼저 나가셔도 됩니다.
+      # 이 미션에서 정서 부담이 가장 큰 자리다. 위기 자원을 여기서 함께 띄운다.
+      crisis_reminder: 지금 마음이 힘들다면, 이야기를 들어줄 곳이 있습니다. {{crisis_resources.default}}
+      interpretation_note: >-
+        이 시선에 뜻을 붙이지 않는다. 본문은 그 눈빛이 무엇이었는지 말하지 않으며,
+        해설이 그것을 채우는 순간 사용자는 자기가 받은 눈빛을 그 해설로 읽게 된다.
+      interactions: []
+      branches: []
+
+  # ── Scene 4 ────────────────────────────────────────────────────────────────
+  - id: 4
+    title: 다시 던진 그물
+    type: interaction
+    interaction: grab_and_place
+    duration_sec: 75
+    scripture_ref: jn-21:1
+    next: 5
+    exposure_grade: B
+    extras:
+      anchor: 디베랴 호수. 밤이 새어 가는 배 위.
+      additional_refs: ["jn-21:2", "jn-21:3", "jn-21:4", "jn-21:5", "jn-21:6"]
+      environment:
+        camera_rig: fixed_on_boat_deck
+        time_of_day: pre_dawn_to_dawn
+        ambient: [물결, 그물 끌리는 소리]
+        ui_overlays: [ai_assist_footer, exit_button]
+      npcs:
+        - { name_ko: 함께 있던 제자들, framing: silhouette_group_distant }
+        - { name_ko: 바닷가에 선 이, framing: distant_shore_silhouette_no_face }
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 해설
+          text_ko: "그 후에 예수께서 디베랴 호수에서 또 제자들에게 자기를 나타내셨으니 나타내신 일은 이러하니라 (요 21:1)"
+        - speaker_ko: 해설
+          text_ko: "시몬 베드로와 디두모라 하는 도마와 갈릴리 가나 사람 나다나엘과 세베대의 아들들과 또 다른 제자 둘이 함께 있더니 (요 21:2)"
+        - speaker_ko: 베드로
+          text_ko: "시몬 베드로가 나는 물고기 잡으러 가노라 하니 그들이 우리도 함께 가겠다 하고 나가서 배에 올랐으나 그 날 밤에 아무 것도 잡지 못하였더니 (요 21:3)"
+        - speaker_ko: 해설
+          text_ko: "날이 새어갈 때에 예수께서 바닷가에 서셨으나 제자들이 예수이신 줄 알지 못하는지라 (요 21:4)"
+        - speaker_ko: 해설
+          text_ko: "예수께서 이르시되 얘들아 너희에게 고기가 있느냐 대답하되 없나이다 (요 21:5)"
+        - speaker_ko: 해설
+          text_ko: "이르시되 그물을 배 오른편에 던지라 그리하면 잡으리라 하시니 이에 던졌더니 물고기가 많아 그물을 들 수 없더라 (요 21:6)"
+      gesture:
+        id: net_cast
+        throw_side: right_fixed
+        throw_window_seconds: 4
+        haul_hold_seconds: { min: 5, max: 7 }
+        on_timeout: treat_as_complete
+        on_timeout_caption_ref: 요 21:6
+      framing_note: >-
+        고기잡이로 돌아간 것을 도피나 배교로 연출하지 않는다. 본문은 그렇게 말하지 않는다 —
+        익숙한 노동으로 돌아간 것이고, 그 자리로 아침이 찾아왔다.
+      scope_note: >-
+        요 21:7-8 은 이 Scene 의 범위 밖이다. 자막·연출·암시 어느 쪽으로도 쓰지 않는다.
+      branches: []
+
+  # ── Scene 5 ────────────────────────────────────────────────────────────────
+  - id: 5
+    title: 숯불 앞의 아침
+    type: outro
+    duration_sec: 90
+    scripture_ref: jn-21:9
+    next: null
+    exposure_grade: B
+    linked_values: [6, 4, 1] # 마음(수치와 두려움) · 시편(비탄) · 일기(솔직함)
+    value_prompt: 오늘 한 가지만 — 스스로에게 붙인 이름 말고, 불린 이름을 한 번 떠올려 보는 것.
+    extras:
+      anchor: 갈릴리 바닷가. 이미 피워져 있던 숯불.
+      additional_refs:
+        [
+          "jn-21:10",
+          "jn-21:11",
+          "jn-21:12",
+          "jn-21:13",
+          "jn-21:14",
+          "jn-21:15",
+          "jn-21:16",
+          "jn-21:17",
+        ]
+      environment:
+        camera_rig: fixed_on_shore
+        time_of_day: dawn
+        ambient: [잔물결, 숯불 타는 소리]
+        ui_overlays: [ai_assist_footer, crisis_reminder, exit_button]
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 해설
+          text_ko: "육지에 올라보니 숯불이 있는데 그 위에 생선이 놓였고 떡도 있더라 (요 21:9)"
+        - speaker_ko: 예수
+          text_ko: "예수께서 이르시되 지금 잡은 생선을 좀 가져오라 하시니 (요 21:10)"
+        - speaker_ko: 해설
+          text_ko: "시몬 베드로가 올라가서 그물을 육지에 끌어 올리니 가득히 찬 큰 물고기가 백쉰세 마리라 이같이 많으나 그물이 찢어지지 아니하였더라 (요 21:11)"
+        - speaker_ko: 해설
+          text_ko: "예수께서 이르시되 와서 조반을 먹으라 하시니 제자들이 주님이신 줄 아는 고로 당신이 누구냐 감히 묻는 자가 없더라 (요 21:12)"
+        - speaker_ko: 해설
+          text_ko: "예수께서 가셔서 떡을 가져다가 그들에게 주시고 생선도 그와 같이 하시니라 (요 21:13)"
+        - speaker_ko: 해설
+          text_ko: "이것은 예수께서 죽은 자 가운데서 살아나신 후에 세 번째로 제자들에게 나타나신 것이라 (요 21:14)"
+        - speaker_ko: 예수
+          text_ko: "그들이 조반 먹은 후에 예수께서 시몬 베드로에게 이르시되 요한의 아들 시몬아 네가 이 사람들보다 나를 더 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 어린 양을 먹이라 하시고 (요 21:15)"
+        - speaker_ko: 예수
+          text_ko: "또 두 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 이르되 주님 그러하나이다 내가 주님을 사랑하는 줄 주님께서 아시나이다 이르시되 내 양을 치라 하시고 (요 21:16)"
+        - speaker_ko: 예수
+          text_ko: "세 번째 이르시되 요한의 아들 시몬아 네가 나를 사랑하느냐 하시니 주께서 세 번째 네가 나를 사랑하느냐 하시므로 베드로가 근심하여 이르되 주님 모든 것을 아시오매 내가 주님을 사랑하는 줄을 주님께서 아시나이다 예수께서 이르시되 내 양을 먹이라 (요 21:17)"
+      # 세 번째 문답(요 21:17) 직전에 뜬다. 셋 다 정당하고, 고르지 않는 것도 정당하다.
+      # 무응답은 실패가 아니라 정상 경로다 — 그때 라벨은 없는 채로 마감 문구가 나간다.
+      options:
+        - { id: unforgivable, label_ko: 돌이킬 수 없다 }
+        - { id: unworthy, label_ko: 자격이 없다 }
+        - { id: afraid_again, label_ko: 또 그럴까 두렵다 }
+      options_note: 무응답도 정상 경로다. 선택은 강제되지 않으며 고르지 않으면 default 를 쓴다.
+      # 라벨 3 × 톤 3 + 라벨 없음 3. 자구는 저작 정본에서 그대로 옮긴 것이다.
+      recovery_texts:
+        unforgivable:
+          strong: 세 번 부인한 그 밤은 지워지지 않았습니다. 그런데 그 밤을 다 알고 계신 주님이, 아침 바닷가에 먼저 불을 피워 놓고 계셨습니다.
+          balanced: 그 밤에 있었던 일은 없던 일이 되지 않았습니다. 그리고 그 일을 가장 정확히 아는 분이 아침 바닷가에 있었다는 것도, 같이 남아 있습니다.
+          soft: 돌이킬 수 없는 밤이 있었습니다. 그 다음 날 아침에도 바닷가에는 불이 피워져 있었고, 이름을 부르는 목소리가 있었습니다.
+        unworthy:
+          strong: 세 번째 물음 앞에서 베드로는 근심했습니다. 주님은 그 근심을 걷어내지 않으신 채로, 그 물음 안에서 그를 「요한의 아들 시몬」이라고 부르셨습니다.
+          balanced: 그 아침에 자격을 묻는 말은 없었습니다. 세 번째 물음까지도, 묻는 분이 그를 부르는 이름은 계속 「요한의 아들 시몬」이었습니다.
+          soft: 자격을 확인하는 절차는 없었습니다. 세 번 다 같은 이름으로 불렸을 뿐입니다.
+        afraid_again:
+          strong: 또 그럴까 하는 두려움은 쉽게 사라지지 않습니다. 그 밤이 오기 전에 주님은 이미 「네 믿음이 떨어지지 않기를 기도하였노니」라고 말씀하셨습니다.
+          balanced: 또 그럴까 하는 두려움이 남아 있습니다. 그 두려움이 생기기 전에, 너를 위하여 기도했다고 말한 분이 먼저 있었습니다.
+          soft: 또 그럴까 하는 두려움이 남아 있습니다. 그런데 그 밤보다 먼저 있었던 말이 하나 있었고, 그것은 무너지지 않기를 바라는 기도였습니다.
+        default:
+          strong: 무엇이라고 이름 붙이지 않아도 괜찮습니다. 그 아침 바닷가에서 주님이 부르신 것은 어떤 상태가 아니라 「요한의 아들 시몬」이라는 한 사람이었습니다.
+          balanced: 무엇이라고 이름 붙이지 않아도 괜찮습니다. 그 아침에 이름을 부른 분이 부른 것은 어떤 상태가 아니라 한 사람의 이름이었습니다.
+          soft: 무엇이라고 이름 붙이지 않아도 괜찮습니다. 그 아침 바닷가에서 불린 것은 어떤 상태가 아니라 한 사람의 이름이었습니다.
+      crisis_reminder: 미션이 끝난 뒤에도 이야기를 들어줄 곳이 있습니다. {{crisis_resources.default}}
+      # 배제 자구를 값으로 적지 않는다. extras 는 payload 로 통째 복사되므로, 잘라낸
+      # 문자열을 여기 적으면 잘라낸 그 문장이 화면으로 나간다. 사유는 문서 경로로만 가리킨다.
+      scope_note: 이 Scene 은 요한복음 21:17 에서 끝난다. 그 이후 절의 배제 사유는 docs/MVP-PETER.md 참조.
+      timeline_note: >-
+        회복에 시간표를 붙이지 않는다. 이 아침 뒤에도 베드로의 두려움이 사라졌다고
+        본문은 말하지 않으며, 이 미션도 그렇게 말하지 않는다.
+      next_scene_suggestion: 시편 51 — 자기를 아는 자리에서 드리는 기도
