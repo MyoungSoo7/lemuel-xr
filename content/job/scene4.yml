@@ -1,0 +1,120 @@
+# Scene 4 — 폭풍 가운데서 하나님의 응답 (90초, 설명이 아니라 임재)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 backend/src/main/resources/scenarios/job.yml scene 4 의
+#    `static_text` · `reflection_prompt` 원문이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 폭풍 연출 강도 토글 필수 — 큰 소리·저주파·시야 흔들림은 트라우마·전정기관 양쪽에 걸린다.
+#    기본값은 '약' 이다. 강한 연출을 기본으로 두면 그것을 끄는 일이 사용자 부담이 된다.
+
+scene_id: job_scene4
+scene_name: answer_from_the_whirlwind
+mission_id: job
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: uz_open_sky_whirlwind
+  background_model: env_uz_whirlwind_sky
+  lighting:
+    type: storm_break_shafts
+    color_temperature_kelvin: 6500
+    volumetric_shafts: true
+  ambient_sound:
+    - id: whirlwind_low_roll
+      gain_db: -20
+      spatial: true
+      intensity_toggle_ref: whirlwind_intensity_toggle
+    - id: wide_air_openness
+      gain_db: -28
+      spatial: false
+  user_position: [0.0, 1.20, 0.0]
+  user_facing: [0.0, 0.3, 1.0] # 시선을 약간 위로 — 광활함이 위에서 열린다
+  camera_locomotion: disabled
+
+npcs: [] # 이 Scene 에 등장 인물은 없다. 응답은 얼굴이 아니라 규모로 온다.
+
+narration_blocks:
+  - id: nb_s4_no_explanation
+    speaker: narrator
+    text_ko: "신은 욥의 *질문에 답하지 않으셨습니다*. 대신 *우주의 광활함* 을 보여주셨습니다. 답이 *설명* 이 아니라 *함께 있음* 이라는 것."
+    audio_clip_id: aud_s4_no_explanation_ko
+    start_at_seconds: 8.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=4].extras.static_text"
+  - id: nb_s4_scripture_whirlwind
+    speaker: scripture_caption
+    text_ko: "그 때에 여호와께서 폭풍우 가운데에서 욥에게 말씀하여 이르시되 (욥 38:1)"
+    audio_clip_id: aud_s4_scripture_whirlwind_ko
+    start_at_seconds: 26.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    scripture_ref: job-38:1
+  - id: nb_s4_reflection
+    speaker: system
+    text_ko: "당신의 *지금* 의 무게를 설명할 수 있는 사람은 없을지도 모릅니다. 하지만 *함께 있을* 수 있는 사람이 한 명 있다면 — 그 자리를 부탁해 보는 것도 회복의 한 걸음입니다."
+    audio_clip_id: aud_s4_reflection_ko
+    start_at_seconds: 58.0
+    duration_seconds: 18.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=4].extras.reflection_prompt"
+    note: "'부탁해 보는 것도' — 권유이지 과제가 아니다. 이 어미를 강하게 고치지 말 것."
+
+interactions:
+  - id: ix_s4_look_up
+    type: gaze_open
+    target_assets: [env_uz_whirlwind_sky]
+    gesture: head_look
+    presentation:
+      no_target_reticle: true # 조준점 없음 — 찾아야 할 대상이 없다
+      no_progress_indicator: true
+    haptic:
+      intensity: 0.15
+      duration_ms: 400
+      pattern: SLOW_SWELL
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 40
+        on_timeout: treat_as_complete
+        description: "올려다보지 않아도 진행된다."
+      - rule: track_micro_signals
+        records: [upward_gaze_seconds]
+
+branches: []
+
+safety_gates:
+  - id: whirlwind_intensity_toggle
+    enforced_at: scene_enter
+    description: "폭풍 소리·시야 흔들림 강도 토글 (off/약/강). **기본값 약** — 큰 소리·저주파 민감 사용자와 전정기관 불편 양쪽 보호."
+    options: [off, low, high]
+    default: low
+  - id: no_explanation_promised
+    enforced_at: always
+    description: "이 Scene 은 고난의 이유를 설명하지 않는다. 폭풍 응답을 '결국 답을 주셨다' 로 재해석하는 서술 금지 — 본문에서 하나님은 질문에 답하지 않으신다."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "전부 정적 본문 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: job_scene5
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.0
+  fade_in_seconds: 1.4
+
+theology_footer_refs:
+  - citation_id: J4_candidate
+    source: "욥기 38~41 하나님의 응답 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "응답의 내용은 창조 세계에 대한 질문의 연속이다. 즉 하나님의 응답 자체가 *또 다른 질문* 이며, 이것이 '설명이 아니라 임재' 의 본문 근거다."
+    anchor_block: nb_s4_no_explanation
+  - disputed_points:
+      - "베헤못·리워야단(욥 40~41)의 정체 — 실재 동물/신화적 혼돈 세력/은유 사이에 해석 차가 있다. 본 미션은 이 본문을 무대에 올리지 않는다."
+    handling: "광활함의 체험만 남기고 특정 해석을 택하지 않는다. 택하는 순간 그 해석이 미션의 신학 주장이 된다."
