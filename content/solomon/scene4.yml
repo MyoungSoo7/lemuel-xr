@@ -239,10 +239,10 @@ theology_footer_refs:
     anchor_block: nb_s4_hevel_refrain
   - scripture_refs:
       - ref: "열왕기상 10:14~29 (요약)"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_glory
       - ref: "전도서 1:2; 2:4~11"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_hevel_turn
   - disputed_points:
       - "전도서 저작 — 솔로몬 저작설 vs 후대 저작설. 콘텐츠는 전통 귀속(솔로몬 화자)을 따르되 논쟁 정직 명시."

@@ -180,8 +180,8 @@ theology_footer_refs:
     handling: "단일 입장 채택 없음"
   - scripture_refs:
       - ref: "창세기 45:5"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_common_gen_45_5
       - ref: "욥기 2:13"
-        translation: krv
+        translation: rev
         anchor_block: ix_s4_choose_response.options.C

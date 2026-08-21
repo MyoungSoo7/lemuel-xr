@@ -259,7 +259,7 @@ theology_footer_refs:
     anchor_block: nb_s5_conclusion
   - scripture_refs:
       - ref: "전도서 12:13"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_conclusion
   - disputed_points:
       - "솔로몬 말년 타락(왕상 11)과 구원 여부 논쟁 — 본 미션 범위 제외를 정직하게 scoping. 미션은 왕상 3·10 + 전도서 성찰 축만 다루며, 말년 서사를 미화·은폐하지 않고 '다루지 않음'을 명시."

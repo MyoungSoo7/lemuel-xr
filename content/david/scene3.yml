@@ -227,19 +227,19 @@ theology_footer_refs:
     anchor_block: nb_s3_david_decision
   - scripture_refs:
       - ref: "사무엘상 17:8"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_goliath_shout
       - ref: "사무엘상 17:33"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_saul_approach
       - ref: "사무엘상 17:36"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_david_inner_lion_bear
       - ref: "사무엘상 17:38~39"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_armor_caption
       - ref: "시편 139:14"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_david_decision
         note_ko: "'내가 정의하는 나'와 '하나님이 정의하시는 나' 균형의 보조 텍스트"
   - disputed_points:

@@ -349,34 +349,34 @@ theology_footer_refs:
     anchor_block: nb_s5_first_question_5_3
   - scripture_refs:
       - ref: "에스더 5:1"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_enter_court
       - ref: "에스더 5:2"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_scepter_extended
       - ref: "에스더 5:3"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_first_question_5_3
       - ref: "에스더 5:4"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_first_delay_5_4
       - ref: "에스더 5:6"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_second_question_5_6
       - ref: "에스더 5:8"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_second_delay_5_8
       - ref: "에스더 7:2"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_third_question_7_2
       - ref: "에스더 7:3-4"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_disclosure_7_3_4
       - ref: "에스더 7:6"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_haman_named_7_6
       - ref: "에스더 8:6"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_closing_scripture_8_6
   - disputed_points:
       - "DP1-ext — (seed §9 DP1 의 Scene 5 적용) 왕의 '변덕'을 우연의 연속으로 읽을 것인가,

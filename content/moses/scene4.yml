@@ -292,5 +292,5 @@ theology_footer_refs:
     handling: "단일 입장 선택 + 근거 명시"
   - scripture_refs:
       - ref: "출애굽기 4:2~7"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_bush_question_staff

@@ -391,7 +391,10 @@ CREATE TABLE scripture_passages (
     verse_end       SMALLINT,  -- 'ps-23:1-6' 처럼 범위인 경우
 
     -- 다중 번역 — translation 컬럼으로 분리
-    translation     VARCHAR(20) NOT NULL,  -- 'krv' (개역개정) | 'nlt-ko' (현대인의 성경) | 'esv' | 'niv'
+    translation     VARCHAR(20) NOT NULL,  -- 'rev' (개역개정) | 'modern' (현대인의 성경)
+    -- ⚠️ 코드 정본은 `V1__init_schema.sql:46` 의 DDL 주석이다. 이 문서가 2026-08-22 까지
+    --    'krv'·'nlt-ko' 로 적어 두었으나 그런 값을 가진 행은 시드에 하나도 없다
+    --    (시드 201행 = rev 109 · modern 92). API 기본값도 'rev' 다 — ScriptureController:42.
     text            TEXT NOT NULL,
 
     -- 메타데이터
