@@ -69,9 +69,13 @@
 **라합(20)은 저작 전 단계에 착수**했다 — `docs/SEED-RAHAB.md`(rev.15) · `docs/VERSES-RAHAB-GAE.md` ·
 `docs/verses-rahab.txt`(USED 24/EXCLUDED 31) · `docs/THEOLOGY-REFERENCES.md` §12 까지다.
 🚨 **`docs/MVP-RAHAB.md` 는 c091d8c 부터 있다(955줄) — 저자 검토 전 초안이다.** 이 문단은 rev.10
-시점 상태를 두 판 동안 그대로 들고 있었다(seed rev.14 정정 AN). `content/rahab/` 은 아직 없다.
-seed 독립 채점이 0.8 을 넘기 전에는 designer 를 투입하지 않는 규약이고 rev.14 채점은 **0.37** 이라,
-라합을 "저작 착수"로 세지 않는다.
+시점 상태를 두 판 동안 그대로 들고 있었다(seed rev.14 정정 AN).
+🔻 **정정 (2026-08-22)** — 이 자리에 "`content/rahab/` 은 아직 없다" 가 적혀 있었는데
+`#69`(2a5cffd, SEED-RAHAB rev.16)가 Scene 1~5 를 올려 **지금은 5파일 있다.** 같은 문단이
+세 번째로 낡은 현황을 들고 있었던 셈이다 — 인물 현황을 문단으로 관리하는 한 또 낡는다.
+`python3 scripts/track_b_readiness.py` 가 이 어긋남을 세므로 그 출력을 정본으로 볼 것.
+아래 0.37 은 그 이전(rev.14) 채점값이다.
+seed 독립 채점이 0.8 을 넘기 전에는 designer 를 투입하지 않는 규약이고 rev.14 채점은 **0.37** 이었다.
 🚨 **rev.15 에서 라합의 종류가 바뀌었다(저자 결정 2026-08-11)** — 선택 분기가 있는 미션이
 아니라 **낭독 트랙**으로 만든다. 축은 신의 섭리와 은혜이고, 약 2:25 의 행함은 강조점에서
 뺀다(부정하지는 않는다). ⚠️ **그래서 위 0.37 은 미션 기준으로 매긴 옛 값이다** — 낭독
@@ -81,16 +85,24 @@ seed 독립 채점이 0.8 을 넘기 전에는 designer 를 투입하지 않는 
 2026-08-05 사용자 결정으로 **전부 해소**되었다(SERIES-GRACE.md §7) — 배제선 조정은 "이번만 예외"가
 아니라 시리즈 안전 정책으로 문서화된 것이며, 시리즈 밖으로 자동 확장되지 않는다(§7.1).
 
-⚠️ **룻도 플레이할 수는 없다.** 아래 런타임 고지가 룻에도 그대로 걸린다 — `Character` enum 과
-`backend/src/main/resources/scenarios/ruth.yml` 이 없어 저작만 끝난 상태다(MVP-RUTH.md §9).
+✅ **룻은 2026-08-20 에 열렸다.** `Character.RUTH` · `scenarios/ruth.yml` ·
+`frontend/src/app/ruth/page.tsx` 가 모두 있고 `https://xr.lemuel.co.kr/ruth` 가 200 이다.
+(이 자리에는 "룻도 플레이할 수는 없다" 가 적혀 있었다.) 여는 조건과 그 집행은
+`docs/RUTH-RUNTIME-SIGNOFF.md` · `RuntimeExposureSignoffTest` 에 있고, **AR 은 닫은 채로**
+연 것이라 그 한 가지는 여전히 참이다 — 저작이 덜 된 게 아니라 판단이 없어서 내린 결정이다.
 
 → Theme 12-18 은 기존 4 유형(경제·정치·외세·영적)에 없는 _5-11번째 구원 카테고리_ 다.
 트랙 A 대응 — 엘리야: Theme 4·5 (시편·고통, MVP-ELIJAH.md §11) / 솔로몬: Theme 3 (전도서와 인생, MVP-SOLOMON.md §11).
 
 ⚠️ **런타임 탑재 현황은 이 표와 다르다.** `backend/.../game/domain/Character.kt` 의 `Character` enum 에
-실린 인물은 JOB·ELIJAH·MOSES·DAVID·JOSEPH·JESUS·SOLOMON **7개뿐**이며, Theme 14~18(베드로·다니엘·
-에스더·아브라함·야곱)은 `docs/` + `content/` + `scripts/gates/` 만 있고 **플레이할 수 없다.**
+실린 인물은 JOB·ELIJAH·MOSES·DAVID·JOSEPH·JESUS·SOLOMON·RUTH **8개**이며(2026-08-22 실측 —
+이 줄은 룻이 들어온 뒤에도 "7개뿐" 이라고 적혀 있었다), 베드로·다니엘·에스더·아브라함·야곱·
+라합 6명은 `docs/` + `content/` + `scripts/gates/` 만 있고 **플레이할 수 없다.**
 표에 행이 있다는 것과 앱에서 돌아간다는 것은 다른 사실이다 — 섞어 보고하지 않는다.
+
+**이 문단을 손으로 세지 말 것.** 위 숫자는 세 번 낡았다(룻 7→8 · 라합 content 없음→5파일 ·
+룻 "플레이 불가"). 정본은 `python3 scripts/track_b_readiness.py` 의
+`놀 수 있음 / API 로만 도달 / 저작은 끝났으나 못 놂` 세 줄이다.
 
 → 마치 _매슬로 욕구 5단계_ 와 유사한 _구원 카테고리화_. 사용자 위기 종류별 맞춤 서사.
 
@@ -189,6 +201,13 @@ seed 독립 채점이 0.8 을 넘기 전에는 designer 를 투입하지 않는 
 ---
 
 ## 7. MVP 로드맵
+
+> 🔻 **이 절과 §8 은 착수 전 계획이다 (2026-08-22 주석).** 실제 경로는 여기서 갈라졌다 —
+> 2026-05-20 결정으로 트랙 B(요셉)를 먼저 냈고, 나온 것은 XR 이 아니라 **웹**이며,
+> 트랙 A 도 "Phase 2 이월" 이 아니라 `/topics` 로 함께 서비스 중이다. Unity 클라이언트는
+> 미착수다. **두 절은 당시 계획의 기록으로 남긴다** — 현재 상태는 `README.md` 의
+> "현재 단계" 표와 `scripts/ci_gates.py` 출력을 볼 것. §8 의 "다음 액션 5개" 도 지금의
+> 다음 액션이 아니다.
 
 ### V1.0 — Minimum Lovable Product (3개월)
 
