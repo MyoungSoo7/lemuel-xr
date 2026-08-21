@@ -5,7 +5,7 @@
 > **타겟 디바이스**: Quest 3 (기준) / Quest Pro / Vision Pro / Galaxy XR — capabilities-min: 6DoF + hand tracking + spatial audio. eye tracking 은 optional.
 > **세션 길이**: 6분 ± 1분. *5분 안에 종료 가능한 short path* 와 *7분 안에 종료 가능한 deep path* 분기.
 > **포지셔닝**: *영적 비상 대비 교육 콘텐츠* (큐티 + 민방위 metaphor). *임상/의료 도구 아님 — 누구나 대상*.
-> **신학·안전 톤**: `lemuel-xr-theology-tone` 사전 가이드 적용 — disputed_points 명시, R1 (109) 유지 + R2~R5 원리는 일반 사용자 보호선으로 잔류, *AI 보조 — 본문은 성경 참조 — storyteller 역할* footer 자동. 출판 전 *운영자 self-review + R1 통과* 가 검수 게이트.
+> **신학·안전 톤**: `lemuel-xr-theology-tone` 사전 가이드 적용 — disputed_points 명시, R1 ({{crisis_resources.default}}) 유지 + R2~R5 원리는 일반 사용자 보호선으로 잔류, *AI 보조 — 본문은 성경 참조 — storyteller 역할* footer 자동. 출판 전 *운영자 self-review + R1 통과* 가 검수 게이트.
 > **근거 인용**: `THEOLOGY-REFERENCES.md` 의 D1 (장석정 2022, 다윗과 골리앗 — *개념성·속도* 중심 재해석) 을 핵심 인용. D2 (시편 신학) · D3 (한국 구약학 흐름) 보조.
 
 ---
@@ -28,7 +28,7 @@
 │  [지금 시작]  [건너뛰기 — 다른 미션 보기]                    │
 │  ─────────────────────────────────────────────────────   │
 │  위기 시: {{crisis_resources.default}}                   │
-│  (109 자살예방상담 · 24시간 · R1 게이트)                  │
+│  (자살예방상담 · 24시간 · R1 게이트)                      │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -72,10 +72,10 @@
 화면 좌하단 (UI 안전 영역) 에 작은 글씨로 *영구* 노출:
 
 ```
-AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 109
+AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}
 ```
 
-→ R5 + theology-tone 7번 + R1 (109) 항상 충족. *AI 는 치료자/자살예방 전문가 아닌 이야기 안내자 — 위기 영역은 외부 자원으로 즉시 연결*.
+→ R5 + theology-tone 7번 + R1 ({{crisis_resources.default}}) 항상 충족. *AI 는 치료자/자살예방 전문가 아닌 이야기 안내자 — 위기 영역은 외부 자원으로 즉시 연결*.
 
 ### 0.6 다윗 미션 *전체* 에 걸친 톤 정책 (R2/R3 사전 가드)
 
@@ -452,7 +452,7 @@ XR 인터랙션 (Multi-Socket):
 
 - 모든 회복 문구는 *"지금 회복하지 못해도 괜찮다"* 톤 (R3)
 - *"하나님이 너를 도구로 쓰셨다"* 같은 *도구화* 표현 차단 — *"너의 결정이 의미를 가졌다"* 처럼 *주체성 인정* 톤
-- 화면 좌하단 영구 footer: *"AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 109"*
+- 화면 좌하단 영구 footer: *"AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"*
 
 ---
 
@@ -582,7 +582,7 @@ scenes:
 
 ## 10. 안전 게이트 — 실 동작 예
 
-> *본 절은 임상 위기 개입이 아닌 **storyteller 의 안전 매너** 다. AI 는 *치료자/자살예방 전문가* 가 아니라 *이야기 안내자*. 위기 영역은 *외부 자원 (109 등)* 으로 즉시 연결.*
+> *본 절은 임상 위기 개입이 아닌 **storyteller 의 안전 매너** 다. AI 는 *치료자/자살예방 전문가* 가 아니라 *이야기 안내자*. 위기 영역은 *외부 자원 ({{crisis_resources.default}} 등)* 으로 즉시 연결.*
 
 ### 10.1 R1 시뮬레이션 — 사용자 발화에 자해 키워드
 
@@ -593,7 +593,7 @@ Scene 4 의 *돌 선택* 단계에서 사용자가 *음성 입력* 으로 *"나�
 3. 위기 자원 카드 노출:
    > *"잠시 멈추겠습니다.*
    > *지금 힘드시면 함께할 자원이 있어요.*
-   > *[109 자살예방상담 — 24시간] [지금 닫고 메인으로]"*
+   > *[{{crisis_resources.default}} 자살예방상담 — 24시간] [지금 닫고 메인으로]"*
 4. 사용자가 *"메인으로"* 누르거나 30초 대기 → 미션 종료, 메인 화면 복귀. `game_sessions.abandoned_at` 기록.
 5. `safety_alerts` row 생성 (severity=high, source=game, raw_excerpt_hash 만 — 원문 미저장, category='suicidal_ideation_semantic').
 6. *"내가 너무 작아"* 단독은 severity=medium → 위기 자원 카드 *동반 노출* 하되 흐름 차단 없이 Scene 4 계속. *"이 게임은 *작은 자* 를 위한 이야기입니다"* 한 줄 reframing 추가.
@@ -648,7 +648,7 @@ Scene 3 진입 직전에 동의 카드 (§3.2). 사용자 *옵션*:
 | 디바이스별 capabilities_min + 폴백 (Web) 정의 | ✅ |
 | Coqui XTTS-v2 사전 캐시 (david/eliab/saul/goliath 4 voice) | ✅ |
 
-→ 출판 전 **운영자 self-review + R1 (109) 통과** 가 검수 게이트. *2-of-2 임상/신학 approve 요건은 폐기* — 본 콘텐츠는 *영적 비상 대비 교육* (큐티 + 민방위) 으로 *누구나* 대상이며 *임상 자문 불필요*. 신학 톤 점검은 `lemuel-xr-theology-tone` 사전 가이드 + 운영자 review 로 충분.
+→ 출판 전 **운영자 self-review + R1 ({{crisis_resources.default}}) 통과** 가 검수 게이트. *2-of-2 임상/신학 approve 요건은 폐기* — 본 콘텐츠는 *영적 비상 대비 교육* (큐티 + 민방위) 으로 *누구나* 대상이며 *임상 자문 불필요*. 신학 톤 점검은 `lemuel-xr-theology-tone` 사전 가이드 + 운영자 review 로 충분.
 
 ---
 
@@ -665,5 +665,5 @@ Scene 3 진입 직전에 동의 카드 (§3.2). 사용자 *옵션*:
 
 ---
 
-*이 문서는 lemuel-xr Phase 2 의 David MVP XR 실 콘텐츠 — *영적 비상 대비 교육* (큐티 + 민방위 metaphor), *누구나* 대상, *임상/의료 도구 아님*. 작성 시 `lemuel-xr-theology-tone` 사전 가이드 적용 + R2~R5 원리는 일반 사용자 보호선으로 잔류. 출판 전 *운영자 self-review + R1 (109) 통과* 가 검수 게이트. AI 의 역할은 *치료자/전문가 아닌 storyteller*.*
+*이 문서는 lemuel-xr Phase 2 의 David MVP XR 실 콘텐츠 — *영적 비상 대비 교육* (큐티 + 민방위 metaphor), *누구나* 대상, *임상/의료 도구 아님*. 작성 시 `lemuel-xr-theology-tone` 사전 가이드 적용 + R2~R5 원리는 일반 사용자 보호선으로 잔류. 출판 전 *운영자 self-review + R1 ({{crisis_resources.default}}) 통과* 가 검수 게이트. AI 의 역할은 *치료자/전문가 아닌 storyteller*.*
 *핵심 통찰 — 5 개의 돌은 5 개의 감정이다. 다윗은 두려움을 *부정하지 않고* 주머니에 넣은 자였다. (D1 장석정 2022 — *속도 vs 무게* / 믿음 + 능력의 균형)*

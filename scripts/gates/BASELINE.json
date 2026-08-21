@@ -37,8 +37,8 @@
     "gates:david": {
       "rc": 1,
       "tally": [
-        3,
-        1,
+        4,
+        0,
         25
       ],
       "items": [
@@ -51,7 +51,6 @@
         "G1b:BLOCKED",
         "G2:BLOCKED",
         "G2v:BLOCKED",
-        "G3:FAIL",
         "G3b:BLOCKED",
         "G3c:BLOCKED",
         "G3d:BLOCKED",
@@ -121,8 +120,8 @@
     "gates:joseph": {
       "rc": 1,
       "tally": [
-        3,
-        1,
+        4,
+        0,
         25
       ],
       "items": [
@@ -135,7 +134,6 @@
         "G1b:BLOCKED",
         "G2:BLOCKED",
         "G2v:BLOCKED",
-        "G3:FAIL",
         "G3b:BLOCKED",
         "G3c:BLOCKED",
         "G3d:BLOCKED",
@@ -157,8 +155,8 @@
     "gates:moses": {
       "rc": 1,
       "tally": [
-        3,
-        1,
+        4,
+        0,
         25
       ],
       "items": [
@@ -171,7 +169,6 @@
         "G1b:BLOCKED",
         "G2:BLOCKED",
         "G2v:BLOCKED",
-        "G3:FAIL",
         "G3b:BLOCKED",
         "G3c:BLOCKED",
         "G3d:BLOCKED",
