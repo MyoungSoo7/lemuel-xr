@@ -112,11 +112,18 @@ const DIRECT_MISSIONS: Array<{
   // 주소를 직접 쳐야만 들어갈 수 있었다. 아래 추천 그리드의 ACTIVE 와 **둘 다** 넣어야
   // 한다 — 한쪽만 넣으면 반쪽 입구다. scripts/track_b_readiness.py 의 `입구` 단계가
   // 이 어긋남을 잰다.
+  //
+  // 그 구멍을 #103 과 #104 가 같은 날 따로 메웠고, 삽입 위치가 달라 git 이 충돌로
+  // 보지 않아 main 에 카드가 **두 장** 남았다. 아래 한 장이 그 둘을 합친 자리다.
   {
     href: "/abraham",
     name: "Abraham",
     korean: "아브라함",
-    tagline: "별을 세던 밤과 사백 년 — 기다림은 아무 일도 없는 시간이 아니다",
+    // #103 의 문안은 "기다림은 아무 일도 없는 시간이 아니다" 였다. 뜻은 같은
+    // 방향이지만, 이 미션의 축이 「지연 정당화 금지 · 기다림 성과 압박 금지」라
+    // 기다림에 내용을 부여하는 쪽으로 읽힐 여지가 있다(abraham.yml safety_gates
+    // R2_R3). 그래서 시나리오 제목을 그대로 쓴 #104 쪽 문안을 남긴다.
+    tagline: "다 알지 못한 채 가는 걸음 — 기다림에 이유를 붙이지 않는다",
     active: true,
   },
   {
@@ -124,13 +131,6 @@ const DIRECT_MISSIONS: Array<{
     name: "Jacob",
     korean: "야곱",
     tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
-    active: true,
-  },
-  {
-    href: "/abraham",
-    name: "Abraham",
-    korean: "아브라함",
-    tagline: "다 알지 못한 채 가는 걸음 — 기다림에 이유를 붙이지 않는다",
     active: true,
   },
 ];
@@ -309,7 +309,6 @@ export default function HomePage() {
                       "esther",
                       "abraham",
                       "jacob",
-                      "abraham",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
