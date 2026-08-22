@@ -127,9 +127,22 @@ class ScenarioYamlLoaderTest {
                         .doesNotContain(raw)
                 } else {
                     /*
-                      문자열 목적지는 다음 씬이 없는 마지막 씬의 *축약 경로* 다 — 같은 씬에
-                      머물며 conditional_blocks 의 같은 id 를 쓴다(ruth.yml 머리 주석의 계약).
+                      문자열 목적지는 *축약 경로* 다 — 씬을 옮기지 않고 같은 씬에 머물며
+                      conditional_blocks 의 같은 id 로 payload 를 덮는다(ruth.yml 머리 주석의 계약).
                       짝이 없으면 [SceneSkipResolver] 가 런타임에 던지므로, 여기서 먼저 잡는다.
+
+                      2026-08-22 까지 여기 두 번째 단언은 `scene.next isNull` 이었다 —
+                      「축약 블록 목적지는 마지막 씬에서만 쓴다」. 룻·야곱은 실제로 마지막
+                      씬에서만 썼기 때문에 그 형태가 성립했다. 라합이 그 전제를 깬다:
+                      Scene 1·3·4 의 카드는 「이 장면은 건너뛴다」가 아니라 **「이 줄들은
+                      건너뛴다」** 이고, 카드 문안이 「장면은 이어집니다」라고 사용자에게
+                      약속한다. 그 약속을 지키는 유일한 형태가 next 가 살아 있는 축약 경로다.
+
+                      그래서 검사할 것을 바꾼다. 중간 씬에서 쓰이는 축약 블록은 **무엇을
+                      대신 재생하는지 선언해야 한다**(`renders` 비어 있지 않음). 이것이
+                      없으면 [DecideSceneUseCase] 가 덮을 대상을 알지 못한 채 지나가고,
+                      「건너뛰기 버튼은 있는데 아무것도 달라지지 않는」 빈 통제가 된다 —
+                      마지막 씬을 강제하던 옛 단언이 실제로 막고 있던 것이 그것이다.
                     */
                     val blockId = raw.toString()
                     assertThat(conditionalBlockIdsOf(scene))
@@ -138,9 +151,16 @@ class ScenarioYamlLoaderTest {
                             c, scene.id, blockId,
                         )
                         .contains(blockId)
-                    assertThat(scene.next)
-                        .describedAs("%s scene %d — 축약 블록 목적지는 마지막 씬에서만 쓴다", c, scene.id)
-                        .isNull()
+
+                    if (scene.next != null) {
+                        assertThat(rendersOf(scene, blockId))
+                            .describedAs(
+                                "%s scene %d — 중간 씬의 축약 블록 '%s' 이 renders 를 선언하지 않는다. " +
+                                    "무엇을 대신 재생하는지 적히지 않은 건너뛰기는 빈 통제다",
+                                c, scene.id, blockId,
+                            )
+                            .isNotEmpty()
+                    }
                 }
             }
         }
@@ -418,4 +438,18 @@ class ScenarioYamlLoaderTest {
             .flatMap { (it["conditional_blocks"] as? List<*>).orEmpty() }
             .filterIsInstance<Map<*, *>>()
             .mapNotNull { it["id"]?.toString() }
+
+    /**
+     * 축약 블록이 "이건 남는다" 고 약속한 키들. [SceneSkipResolver] 가 `Skip.AltBlock.renders`
+     * 로 실어 나르고 [DecideSceneUseCase.altBlockPayload] 가 없으면 던지는 그 목록이다.
+     * 여기서 먼저 재는 이유는 그 예외가 **건너뛴 사용자에게만** 터지기 때문이다 —
+     * 정본 경로만 눌러 본 사람에게는 끝까지 안 보인다.
+     */
+    private fun rendersOf(scene: Scenario.Scene, blockId: String): List<String> =
+        extrasRootsOf(scene)
+            .flatMap { (it["conditional_blocks"] as? List<*>).orEmpty() }
+            .filterIsInstance<Map<*, *>>()
+            .firstOrNull { it["id"]?.toString() == blockId }
+            ?.let { (it["renders"] as? List<*>).orEmpty().map(Any?::toString) }
+            .orEmpty()
 }

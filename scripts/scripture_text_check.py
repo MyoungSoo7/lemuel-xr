@@ -95,6 +95,7 @@ UPDATE_RE = re.compile(
 # book_code -> BibleGateway 책 이름 · 절 span 클래스 접두
 BOOKS = {
     "gen": ("Genesis", "Gen"), "ex": ("Exodus", "Exod"), "num": ("Numbers", "Num"),
+    "jos": ("Joshua", "Josh"), "jas": ("James", "Jas"),
     "ruth": ("Ruth", "Ruth"), "1sam": ("1 Samuel", "1Sam"), "1kgs": ("1 Kings", "1Kgs"),
     "ps": ("Psalm", "Ps"), "prov": ("Proverbs", "Prov"), "eccl": ("Ecclesiastes", "Eccl"),
     "isa": ("Isaiah", "Isa"), "job": ("Job", "Job"), "matt": ("Matthew", "Matt"),
@@ -163,7 +164,8 @@ def seeded_rows() -> list[dict]:
 # 판정만으로는 고칠 방향이 안 나온다 — 개역개정과 대조해 보고서야 이 코퍼스가
 # **어느 번역본도 아닌 혼합** 이라는 것이 드러났다(§ 머리말).
 KRV_BOOKS = {
-    "gen": "gen", "ex": "exo", "num": "num", "ruth": "rut", "1sam": "1sa",
+    "gen": "gen", "ex": "exo", "num": "num", "jos": "jos", "jas": "jas",
+    "ruth": "rut", "1sam": "1sa",
     "1kgs": "1ki", "ps": "psa", "prov": "pro", "eccl": "ecc", "isa": "isa",
     "job": "job", "matt": "mat", "mk": "mrk", "lk": "luk", "jn": "jhn",
     "est": "est", "dan": "dan",

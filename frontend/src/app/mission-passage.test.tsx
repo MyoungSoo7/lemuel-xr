@@ -55,6 +55,7 @@ import JobPage from "./job/page";
 import JosephPage from "./joseph/page";
 import MosesPage from "./moses/page";
 import PeterPage from "./peter/page";
+import RahabPage from "./rahab/page";
 import RuthPage from "./ruth/page";
 import SolomonPage from "./solomon/page";
 
@@ -124,6 +125,10 @@ const PAGES: Array<[string, () => React.ReactElement]> = [
   ["joseph", () => <JosephPage />],
   ["moses", () => <MosesPage />],
   ["peter", () => <PeterPage />],
+  // 라합은 아직 `Character` enum 에 없어 화면이 열리지 않는다. 그래도 여기 두는 이유는
+  // 아브라함 줄이 말하는 그 구멍 때문이다 — 열리는 날 목록에 넣는 것으로 하면 그날
+  // 아무도 안 넣는다. 이 화면은 지금도 렌더되고, 렌더되면 이 검사가 잰다.
+  ["rahab", () => <RahabPage />],
   ["ruth", () => <RuthPage />],
   ["solomon", () => <SolomonPage />],
 ];
