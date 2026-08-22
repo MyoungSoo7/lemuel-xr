@@ -1,0 +1,177 @@
+# Scene 3 — 친구들의 위로 · 정답이 아닌 것 (90초, 거짓 위로 인식) ★ 핵심 인터랙션
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장(친구들의 말, 세 선택지와 각 응답)은
+#    backend/src/main/resources/scenarios/job.yml scene 3 의 `static_text` · `options[].response`
+#    를 그대로 옮긴 것이다. lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+#
+# ⚠️ 이 Scene 이 이 미션에서 안전 축 두 개를 짊어진다. 욥의 친구들이 하는 말이 바로
+#    R2(고난 가스라이팅)와 T1(번영신학 고난귀책)의 교과서적 표본이기 때문이다.
+#    그래서 축의 금칙 토큰을 여기에 둔다 — 위반이 일어날 자리에 게이트를 두는 것이다.
+#
+# ⚠️ 토큰 출처: 아래 두 목록은 이미 런타임 전역 목록
+#    (backend/src/main/resources/application.yml :: safety.forbidden-tokens.list, 688종)에
+#    있는 표층형만 골랐다. 저작층에서 새 토큰을 발명하지 않았다 — 발명하면 저작에만 있고
+#    런타임 방어는 0인 상태가 된다(ContentSafetyGateEnforcementTest 가 그 상태를 막는다).
+
+scene_id: job_scene3
+scene_name: friends_false_comfort
+mission_id: job
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: uz_ash_heap_morning
+  background_model: env_uz_ashes_morning
+  lighting:
+    type: flat_morning_overcast
+    color_temperature_kelvin: 5600
+    flat_shadowless_emphasis: true
+  ambient_sound:
+    - id: low_wind_open_ground
+      gain_db: -26
+      spatial: true
+  user_position: [0.0, 1.20, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: three_friends
+    voice_id: friends_v1
+    position: [1.4, 1.20, 1.2]
+    note: "Scene 1 의 실루엣이 여기서 얼굴과 목소리를 얻는다. 톤은 악의가 아니라 *확신* 이다 — 그게 이 장면의 요점이다."
+  - id: job_self
+    voice_id: job_v1
+    position: [0.0, 1.20, 0.0]
+
+narration_blocks:
+  - id: nb_s3_friends_speak
+    speaker: narrator
+    text_ko: "친구들은 *답을 가지고* 왔습니다. ''네가 죄가 있어서다'', ''곧 회복될 거다''. 신은 마지막에 친구들을 책망하셨습니다 (욥 42:7). *거짓 위로* 가 *침묵* 보다 해롭다는 것."
+    audio_clip_id: aud_s3_friends_speak_ko
+    start_at_seconds: 4.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=3].extras.static_text"
+    note: "친구들의 말은 *인용* 으로만 등장한다. 이 대사를 확장하거나 그럴듯하게 다듬지 않는다 — 다듬을수록 설득력이 생기고, 그건 이 Scene 이 막으려는 것이다."
+  - id: nb_s3_scripture_rebuke
+    speaker: scripture_caption
+    text_ko: "여호와께서 욥에게 이 말씀을 하신 후에 여호와께서 데만 사람 엘리바스에게 이르시되 내가 너와 네 두 친구에게 노하나니 이는 너희가 나를 가리켜 말한 것이 내 종 욥의 말 같이 옳지 못함이니라 (욥 42:7)"
+    audio_clip_id: aud_s3_scripture_rebuke_ko
+    start_at_seconds: 24.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    scripture_ref: job-42:7
+    note: "본문 인용은 앞당겨 놓는다. 친구들의 말이 틀렸다는 판정을 사용자에게 맡기지 않고 본문이 먼저 말하게 한다."
+
+interactions:
+  - id: ix_s3_pick_one
+    type: pick_one
+    target_assets: [ui_card_heard_it_before, ui_card_said_it_before, ui_card_not_sure]
+    gesture: gaze_dwell_or_pinch
+    presentation:
+      options_order_fixed: true # 무작위 배열 금지 — '잘 모르겠다' 가 항상 마지막에 온다
+      no_correct_answer_marker: true # 정답 표시·점수·성취 뱃지 없음
+    haptic:
+      intensity: 0.2
+      duration_ms: 120
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 40
+        on_timeout: auto_advance
+        voice_prompt_id: null
+        description: "선택하지 않아도 진행된다. 재촉 음성 프롬프트 없음."
+      - rule: track_micro_signals
+        records: [option_selected, time_to_select_seconds]
+        note: "기록만 — 어느 선택도 서사적 우열이 없다."
+
+branches:
+  - id: br_s3_recognition
+    triggered_by_event: [option_selected, branch_timeout]
+    decision_key: recognition_key
+    default_path: static_curation # R5 — 욥 미션 Stage 1 은 LLM 분기 없음. 전 응답 사전 큐레이션.
+    llm_optin_only: false
+    llm_disabled_reason: "신·임상 양쪽 검토 전이라 LLM 분기를 열지 않는다(런타임 job.yml 헤더의 결정). opt-in 스위치조차 두지 않는다."
+    routes:
+      - when: { recognition_key: heard_it_before }
+        option_label_ko: "나도 이런 말 들어본 적 있다"
+        response_text_ko: "당신만이 아닙니다. 그 말을 들으셨을 때 느꼈던 외로움은 정당한 감정입니다."
+      - when: { recognition_key: said_it_before }
+        option_label_ko: "내가 다른 사람에게 이런 말 했을지도 모른다"
+        response_text_ko: "그 자각이 욥의 친구들이 끝까지 못 한 것입니다. 다음에 누군가 곁에 있을 때, *침묵* 의 선택지가 있다는 것을 기억해주세요."
+      - when: { recognition_key: not_sure }
+        option_label_ko: "잘 모르겠다"
+        response_text_ko: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다."
+      - when: { recognition_key: null }
+        response_text_ko: "괜찮습니다. 욥기는 답이 아닌 *질문* 의 책입니다."
+        note: "미선택·타임아웃 경로 — '잘 모르겠다' 와 같은 문구로 동일하게 완결한다. 선택하지 않은 것이 손해가 되지 않는다."
+    note: "세 선택지의 응답은 전부 런타임 job.yml options[].response 원문이다. 우열·점수·정답 개념 없음."
+
+safety_gates:
+  - id: R2_no_suffering_gaslighting
+    enforced_at: always
+    description: "고난 의미화·정당화 금지 — 고난을 뜻·훈련·시험·연단으로 설명해 사용자에게 감내를 요구하는 서사. 욥의 친구들이 한 말이 정확히 이 부류이며, 본문은 그것을 책망한다(욥 42:7)."
+    # 토큰은 전부 런타임 전역 목록(application.yml)에 이미 있는 표층형이다.
+    # 저작층은 '이 인물 서사에서 이 축이 어디서 깨지는가' 를 기록할 뿐, 새 표층형을 발명하지 않는다.
+    #
+    # ⚠️ 주장 범위: 표층형 lint 다. 유의어 재작성("이 시간이 당신을 빚고 있습니다")은 못 막는다.
+    #    초록은 「선언된 표층형이 없다」까지이며 'R2 위반 0건' 이 아니다.
+    lint_forbidden_tokens:
+      - "고난에는 뜻이"
+      - "고난에도 뜻이"
+      - "고난은 믿음의 증거"
+      - "고난은 시험입니"
+      - "고난은 훈련입니"
+      - "이 고난은 뜻이"
+      - "이 고난은 의미가"
+      - "이 고난은 이유가"
+      - "이유 없는 고난은 없"
+      - "연단하시려고"
+      - "당신을 시험하시는 중"
+      - "당신을 시험하시려"
+      - "믿음이 부족"
+  - id: T1_no_heterodox_theology
+    enforced_at: always
+    description: "이단 신학 표층형 금지 — 영지주의 이원론(육체=감옥·비밀 지식)·뉴에이지(우주 에너지·파동)·번영신학 역방향(고난을 당사자의 실패로 귀책). 런타임 scenarios/job.yml 의 T1 축과 같은 8종이다."
+    axis_note: "T1 은 R1~R5(정신건강)와 별개 이름공간이다. 신학 정통성 축이며, 이 미션의 기준은 합신/웨스트민스터/개혁주의다."
+    # ⚠️ 주장 범위: 표층형 8종. 동의어 재작성은 못 막는다 — 의미 분석이 아니다.
+    #    특히 그리스도론 이단(양자론·가현설 등)은 이 목록에 없다. 그건 이 8종이 다루는 범위가 아니다.
+    lint_forbidden_tokens:
+      - "갇혀 있는 감옥"
+      - "창조는 실패"
+      - "나의 신성"
+      - "감춰진 비밀 지식"
+      - "영혼의 무덤"
+      - "우주의 에너지"
+      - "긍정의 파동"
+      - "당사자의 실패를 증명"
+  - id: retribution_theology_excluded
+    enforced_at: always
+    description: "고난의 원인을 당사자의 죄로 단정하는 인과응보 서술은 어느 분기에서도 금지. 하나님이 직접 책망하신 것이다(욥 42:7). 친구들의 말은 *인용* 으로만 등장하며, 어떤 경로에서도 서사가 그 편을 들지 않는다."
+    source_of_record: "scenarios/job.yml :: scenes[id=3].extras.theology_note"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: br_s3_recognition
+    description: "LLM 경로 자체가 없다(llm_optin_only: false + llm_disabled_reason). 기본 경로 = 사전 큐레이션 4종. opt-out 사용자도 동일 서사 완결."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: job_scene4
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: J3_candidate
+    source: "욥기 42:7 친구 책망 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "욥기의 신학적 핵심 반전. 옳은 말을 많이 한 쪽이 책망받고, 항의한 쪽이 '옳게 말했다' 는 판정을 받는다."
+    anchor_block: nb_s3_scripture_rebuke
+  - disputed_points:
+      - "엘리후(욥 32~37)의 위치 — 친구 셋과 함께 책망받았는지 여부에 해석 차가 있다. 본 미션은 엘리후를 무대에 올리지 않으므로 판정하지 않는다."
+    handling: "다루지 않는 것을 다룬 것처럼 적지 않는다. Scene 3 의 '친구들' 은 엘리바스·빌닷·소발 셋이다."

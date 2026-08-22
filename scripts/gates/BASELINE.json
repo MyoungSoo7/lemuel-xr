@@ -250,16 +250,13 @@
       ]
     },
     "track-b:readiness": {
-      "rc": 1,
+      "rc": 0,
       "tally": [
-        12,
-        2,
+        14,
+        0,
         0
       ],
-      "items": [
-        "jesus:FAIL — 런타임에 올라와 있는데 앞 단계가 없다: 저작 · 런타임대본 (자체통제 게이트 1·토큰 55)",
-        "job:FAIL — 런타임에 올라와 있는데 앞 단계가 없다: 저작 · 런타임대본 (자체통제 게이트 2·토큰 43)"
-      ]
+      "items": []
     },
     "captions:ruth": {
       "rc": 0,
@@ -321,33 +318,16 @@
     "gates:jesus": {
       "rc": 1,
       "tally": [
-        5,
+        22,
         0,
-        24
+        7
       ],
       "items": [
-        "G0a:BLOCKED",
         "G0b:BLOCKED",
         "G0c:BLOCKED",
         "G0d:BLOCKED",
         "G0e:BLOCKED",
-        "G11:BLOCKED",
-        "G1b:BLOCKED",
-        "G2:BLOCKED",
         "G2v:BLOCKED",
-        "G3:BLOCKED",
-        "G3b:BLOCKED",
-        "G3c:BLOCKED",
-        "G3d:BLOCKED",
-        "G4:BLOCKED",
-        "G5a-i:BLOCKED",
-        "G5a-ii:BLOCKED",
-        "G5d:BLOCKED",
-        "G5e:BLOCKED",
-        "G5t:BLOCKED",
-        "G6:BLOCKED",
-        "G7:BLOCKED",
-        "G8:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]
@@ -355,33 +335,16 @@
     "gates:job": {
       "rc": 1,
       "tally": [
-        5,
+        22,
         0,
-        24
+        7
       ],
       "items": [
-        "G0a:BLOCKED",
         "G0b:BLOCKED",
         "G0c:BLOCKED",
         "G0d:BLOCKED",
         "G0e:BLOCKED",
-        "G11:BLOCKED",
-        "G1b:BLOCKED",
-        "G2:BLOCKED",
         "G2v:BLOCKED",
-        "G3:BLOCKED",
-        "G3b:BLOCKED",
-        "G3c:BLOCKED",
-        "G3d:BLOCKED",
-        "G4:BLOCKED",
-        "G5a-i:BLOCKED",
-        "G5a-ii:BLOCKED",
-        "G5d:BLOCKED",
-        "G5e:BLOCKED",
-        "G5t:BLOCKED",
-        "G6:BLOCKED",
-        "G7:BLOCKED",
-        "G8:BLOCKED",
         "G9:BLOCKED",
         "G9d:BLOCKED"
       ]

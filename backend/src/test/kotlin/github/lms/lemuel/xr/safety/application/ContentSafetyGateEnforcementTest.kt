@@ -369,6 +369,71 @@ class ContentSafetyGateEnforcementTest {
             .isEmpty()
     }
 
+    @Test
+    fun `structural 선언은 실제 파일 구조로 뒷받침된다 — jesus 트리거·푸터·배제·무보상`() {
+        // jesus 저작 계층의 structural 게이트 4건이 지목하는 검사다. 이 테스트가 없으면
+        // 그 4건은 `structural_check` 산문만 가진 채 래칫 둘을 통과한다 — elijah scene4 와 같은 이유로
+        // 선언과 같은 내용을 여기서 기계로 확인한다.
+        val s5 = repoRoot().resolve("content/jesus/scene5.yml").toFile()
+        val s7 = repoRoot().resolve("content/jesus/scene7.yml").toFile()
+
+        @Suppress("UNCHECKED_CAST")
+        val r5 = s5.reader(StandardCharsets.UTF_8).use { Yaml().load<Any?>(it) } as Map<String, Any?>
+        @Suppress("UNCHECKED_CAST")
+        val r7 = s7.reader(StandardCharsets.UTF_8).use { Yaml().load<Any?>(it) } as Map<String, Any?>
+
+        // (a) R4_pre_scene0_consent_required — 트리거 Scene 은 동의 카드 뒤에만 열리고,
+        //     거절해도 미션이 끊기지 않는다(대체 목적지 Scene 6).
+        assertThat(gatesOf(s5).single { it["id"] == "R4_pre_scene0_consent_required" }["enforcement"])
+            .isEqualTo("structural")
+        @Suppress("UNCHECKED_CAST")
+        val tw = r5["trigger_warning"] as Map<String, Any?>
+        assertThat(tw["consent_card_id"].toString())
+            .describedAs("동의 카드 id 가 비면 R4 는 '동의를 받았다' 를 주장할 수단이 없다")
+            .isNotBlank()
+        assertThat(tw["skip_alternative_scene_id"])
+            .describedAs("거절 시 목적지가 없으면 건너뛰기는 미션 종료가 된다")
+            .isEqualTo(6)
+
+        // (b) passion_visual_exclusion — 십자가 신체·유혈 묘사 배제. 목록이 비면 전칭명제가 공허해진다.
+        assertThat(gatesOf(s5).single { it["id"] == "passion_visual_exclusion" }["enforcement"])
+            .isEqualTo("structural")
+        @Suppress("UNCHECKED_CAST")
+        val exclusions = r5["visual_exclusions"] as List<Map<String, Any?>>
+        assertThat(exclusions).describedAs("배제 목록이 비었다 — 빈 목록에 대한 전칭명제는 항상 참이다").isNotEmpty()
+        assertThat(exclusions).allSatisfy { e ->
+            assertThat(e["excluded"]).isEqualTo(true)
+            assertThat(e["reason"].toString()).isNotBlank()
+        }
+
+        // (c) suffering_footer_required — 고난 푸터가 Scene 내내 상주한다. 동의는 1회지만 푸터는 사라지지 않는다.
+        assertThat(gatesOf(s5).single { it["id"] == "suffering_footer_required" }["enforcement"])
+            .isEqualTo("structural")
+        @Suppress("UNCHECKED_CAST")
+        val footer = (r5["footers"] as List<Map<String, Any?>>).single { it["id"] == "suffering_footer" }
+        assertThat(footer["persistent_during_scene"]).isEqualTo(true)
+        assertThat(footer["text_ko"].toString()).isNotBlank()
+
+        // (d) no_completion_reward — 마지막 Scene 에 보상이 붙으면 미션이 과제가 된다.
+        assertThat(gatesOf(s7).single { it["id"] == "no_completion_reward" }["enforcement"])
+            .isEqualTo("structural")
+        @Suppress("UNCHECKED_CAST")
+        val interactions = r7["interactions"] as List<Map<String, Any?>>
+        assertThat(interactions).isNotEmpty()
+        assertThat(interactions).allSatisfy { ix ->
+            @Suppress("UNCHECKED_CAST")
+            val pres = ix["presentation"] as Map<String, Any?>
+            assertThat(pres["no_completion_reward"]).isEqualTo(true)
+        }
+        // 점수·정답 개념이 인터랙션 서브트리에 들어오면 (d) 의 선언과 모순이다.
+        val scoring = interactions.flatMap { collectAll(it).map { p -> p.first } }.filter { path ->
+            path.split('.').any { SCORING_KEY.containsMatchIn(it.substringBefore('[')) }
+        }
+        assertThat(scoring)
+            .describedAs("마지막 Scene 인터랙션에 점수·정답 개념이 들어왔다 — 무보상 선언이 깨진다")
+            .isEmpty()
+    }
+
     // ── helpers ────────────────────────────────────────────────────────────────
 
     /** 토큰 → 선언 위치(파일:게이트id). 같은 토큰이 여러 곳이면 첫 위치만 보고한다. */

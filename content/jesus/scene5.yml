@@ -1,0 +1,173 @@
+# Scene 5 — 겟세마네와 십자가 · 뜻대로 마옵시고 (120초, 관조) ★ 트리거 Scene
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 scenarios/jesus.yml scene 5 의 `static_monologue` ·
+#    `cross_line` · `suffering_footer` 원문이다. 새로 쓴 것은 XR 무대뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+#
+# ⚠️ 이 미션에서 유일한 트리거 Scene 이다(런타임 trigger_scenes=[5]).
+#    동의 카드 뒤에만 진입하고, 건너뛰면 Scene 6 으로 간다 — 미션이 끊기지 않는다.
+# ⚠️ 안전 축: R2(고난 가스라이팅 금지) 를 여기 둔다. 고난을 정면으로 다루는 유일한 Scene 이고,
+#    "당신의 고난에도 뜻이 있다" 류가 나온다면 정확히 이 자리다. 축은 위반이 일어나는 자리에만 둔다.
+
+scene_id: jesus_scene5
+scene_name: gethsemane_and_cross
+mission_id: jesus
+version: 1.0.0
+duration_seconds_target: 120
+
+trigger_warning:
+  level: medium
+  content: [suffering, death]
+  consent_card_id: jesus_scene5_passion_warning
+  skip_alternative_scene_id: 6
+  source_of_record: "scenarios/jesus.yml :: scenes[id=5].trigger_warning"
+  presentation_note: >-
+    건너뛰기가 2차 선택지로 밀리지 않는다. 두 버튼을 같은 크기·같은 위계로 두고
+    기본 포커스는 어느 쪽에도 두지 않는다. 진입이 기본값이 되면 동의가 아니라 관성이 된다.
+
+environment:
+  space_id: gethsemane_olive_night
+  background_model: env_gethsemane_night
+  lighting:
+    type: moonlight_low_no_key
+    color_temperature_kelvin: 4100
+    note: >-
+      십자가를 극적으로 비추지 않는다. 고통을 시각적으로 연출할수록 그것은 볼거리가 되고,
+      볼거리가 된 고통은 견디라는 요구로 읽힌다.
+  ambient_sound:
+    - id: olive_leaves_night_wind
+      gain_db: -30
+      spatial: true
+  user_position: [0.0, 1.20, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jesus_praying
+    voice_id: jesus_v1
+    position: [0.0, 1.05, 2.2]
+    note: "무릎 꿇은 자세. 사용자보다 낮다 — 이 Scene 에서 그리스도는 위에서 내려다보지 않으신다."
+
+visual_exclusions:
+  - id: crucifixion_body_render
+    excluded: true
+    reason: "십자가 처형의 신체 묘사를 렌더하지 않는다. 'medium' 등급 동의 카드가 감당하는 범위를 넘는다."
+  - id: blood_and_wounds
+    excluded: true
+    reason: "상흔·유혈 배제. 자해 이력이 있는 사용자에게 직접 자극이 된다."
+
+narration_blocks:
+  - id: nb_s5_gethsemane
+    speaker: narrator
+    text_ko: "'아버지여 만일 아버지의 뜻이거든 이 잔을 내게서 옮기시옵소서 그러나 내 원대로 마시옵고 아버지의 원대로 되기를 원하나이다.' 사람이 되신 그리스도께서 그 잔이 옮겨지기를 구하셨습니다. 고통 앞에서 흔들리는 것은 믿음의 결함이 아닙니다."
+    audio_clip_id: aud_s5_gethsemane_ko
+    start_at_seconds: 6.0
+    duration_seconds: 32.0
+    hidden_until_event: null
+    scripture_ref: lk-22:42
+    source_of_record: "scenarios/jesus.yml :: scenes[id=5].extras.static_monologue"
+  - id: nb_s5_cross_line
+    speaker: narrator
+    text_ko: "'다 이루었다' (요 19:30) — 그리스도께서 죄의 형벌을 대신 다 치르셨습니다. 이것은 당신이 이루어야 할 숙제가 아니라, 이미 이루어진 선물입니다."
+    audio_clip_id: aud_s5_cross_line_ko
+    start_at_seconds: 48.0
+    duration_seconds: 24.0
+    hidden_until_event: null
+    source_of_record: "scenarios/jesus.yml :: scenes[id=5].extras.cross_line"
+    note: >-
+      이 미션의 속죄론이 한 문장으로 서는 자리다(형벌 대속). '숙제가 아니라 선물' 이라는
+      대비가 R2 축이 막으려는 것과 정확히 같은 방향이다 — 사용자에게 부과하지 않는다.
+
+contemplation:
+  id: cx_s5_silence
+  seconds: 15
+  start_at_seconds: 78.0
+  source_of_record: "scenarios/jesus.yml :: scenes[id=5].extras.contemplation_sec"
+  presentation:
+    no_countdown_ring: true
+    no_prompt_text: true
+    skippable: true
+  note: "15초 침묵. 카운트다운 링을 띄우지 않는다 — 남은 시간을 세는 순간 침묵이 과제가 된다."
+
+interactions: []
+branches: []
+
+footers:
+  - id: suffering_footer
+    persistent_during_scene: true
+    text_ko: "이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요."
+    source_of_record: "scenarios/jesus.yml :: scenes[id=5].extras.suffering_footer"
+
+safety_gates:
+  - id: R2_no_suffering_gaslighting
+    enforced_at: always
+    description: "사용자의 고난에 뜻·훈련·시험·연단의 의미를 부여하는 문장 금지. 겟세마네는 *그리스도께서* 흔들리신 자리이지 사용자에게 견딤을 요구하는 자리가 아니다."
+    lint_scope: [narration_blocks, footers, contemplation]
+    lint_forbidden_tokens:
+        - "고난에는 뜻이"
+        - "고난에도 뜻이"
+        - "고난은 믿음의 증거"
+        - "고난은 시험입니"
+        - "고난은 훈련입니"
+        - "이 고난은 뜻이"
+        - "이 고난은 의미가"
+        - "이 고난은 이유가"
+        - "이유 없는 고난은 없"
+        - "연단하시려고"
+        - "당신을 시험하시는 중"
+        - "당신을 시험하시려"
+        - "믿음이 부족"
+    measured: "이 파일의 사용자 노출 문장 3건 대조 — 적중 0건. 13종 전부 런타임 금지 목록(application.yml)에 이미 존재한다."
+  - id: suffering_footer_required
+    enforced_at: always
+    description: "고난 푸터가 Scene 내내 상주한다. 동의 카드는 진입 시 1회지만 푸터는 사라지지 않는다."
+    enforcement: structural
+    structural_check: "footers[id=suffering_footer].persistent_during_scene == true"
+    verified_by: "structural 선언은 실제 파일 구조로 뒷받침된다 — jesus 트리거·푸터·배제·무보상"
+    note: >-
+      축 접두를 달지 않는다. 이것은 *존재 요구* 게이트이고, 축 접두를 달면 토큰 목록을
+      요구받아 같은 lint 를 두 번 선언하게 된다 — 초록만 둘로 늘고 집행은 그대로다.
+  - id: passion_visual_exclusion
+    enforced_at: always
+    description: "십자가 처형 신체·유혈 묘사 배제. visual_exclusions 두 항목이 그 목록이다."
+    enforcement: structural
+    structural_check: "visual_exclusions[*].excluded == true"
+    verified_by: "structural 선언은 실제 파일 구조로 뒷받침된다 — jesus 트리거·푸터·배제·무보상"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+    note: "관조 15초 동안에도 계속 듣는다. 침묵 구간에서 꺼지면 가장 필요한 순간에 없는 것이 된다."
+  - id: R4_pre_scene0_consent_required
+    enforced_at: scene_enter
+    description: "trigger_warning 동의 카드 통과 전에는 이 Scene 이 로드되지 않는다. 거절 시 Scene 6."
+    enforcement: structural
+    structural_check: "trigger_warning.consent_card_id != null and trigger_warning.skip_alternative_scene_id == 6"
+    verified_by: "structural 선언은 실제 파일 구조로 뒷받침된다 — jesus 트리거·푸터·배제·무보상"
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "전부 정적 본문 낭독 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jesus_scene6
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.5
+  fade_in_seconds: 2.0
+  note: "다음이 부활이므로 페이드를 길게 잡는다. 십자가에서 빈 무덤으로 즉시 넘어가면 토요일이 없어진다."
+
+theology_footer_refs:
+  - citation_id: JS5_candidate
+    source: "웨스트민스터 신앙고백 8장(중보자 그리스도) — 판본·조항 확정 미완(드릴다운 필요)"
+    note: "형벌 대속(penal substitution)을 이 미션의 속죄론으로 명시한 것은 scenarios/jesus.yml 머리말 §신학 기준이다."
+    anchor_block: nb_s5_cross_line
+  - disputed_points:
+      - "속죄의 범위(제한속죄 대 보편속죄)는 개혁주의 안팎에서 갈린다."
+      - "겟세마네의 '잔' 이 육체적 죽음인지 진노의 잔인지도 주해가 갈린다."
+    handling: >-
+      이 미션은 머리말이 선언한 형벌 대속을 따르되, 갈리는 지점을 무대에서 판정하지 않는다.
+      두 이견 모두 사용자에게 노출되는 문장에는 등장하지 않는다.

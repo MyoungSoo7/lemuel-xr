@@ -1,0 +1,184 @@
+# Scene 7 — 승천과 생명의 강 · 보내신 성령 (60초, 아웃트로) ★ 마지막 Scene
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 scenarios/jesus.yml scene 7 의 `static_monologue` ·
+#    `value_prompt` · `crisis_reminder` 원문이다. 새로 쓴 것은 XR 무대뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+#
+# ⚠️ 안전 축: T1(이단 신학 금지) 를 여기 둔다. 런타임의 spirit_framing_note 자체가
+#    '뉴에이지 에너지/차크라 프레임 금지' 를 명시한다 — '우주의 에너지'·'긍정의 파동' 이
+#    실제로 나올 수 있는 자리는 성령·생명의 강을 말하는 이 Scene 이다.
+#    (Scene 1 에도 같은 축을 둔다. 성육신은 영지주의가 부정하는 바로 그 지점이므로.)
+# ⚠️ 마지막 Scene 이다. 미선택 폴백 경로 · 위기 리마인더 · 정적 큐레이션 기본값이
+#    전부 여기 있어야 한다.
+
+scene_id: jesus_scene7
+scene_name: ascension_river_of_life
+mission_id: jesus
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: bethany_hillside_open_sky
+  background_model: env_bethany_ascension
+  lighting:
+    type: open_sky_high_diffuse
+    color_temperature_kelvin: 5800
+  ambient_sound:
+    - id: water_flow_distant
+      gain_db: -30
+      spatial: true
+      note: "물소리는 *멀리서* 흐른다. 사용자를 물에 담그지 않는다 — 체험 연출이 은사 체험 암시로 읽히지 않게."
+  user_position: [0.0, 1.55, 0.0]
+  user_facing: [0.0, 0.1, 1.0]
+  camera_locomotion: disabled
+
+npcs: []
+
+visual_exclusions:
+  - id: energy_aura_vfx
+    excluded: true
+    reason: "성령을 빛무리·오라·파동 이펙트로 그리지 않는다. 그 시각 문법이 곧 뉴에이지 프레임이다."
+  - id: glossolalia_depiction
+    excluded: true
+    reason: "방언·예언·치유 현상을 연출하지 않는다(합신 은사중지론)."
+
+narration_blocks:
+  - id: nb_s7_ascension
+    speaker: narrator
+    text_ko: "예수는 승천하시며 홀로 두지 않겠다 하셨습니다 (요 14:18). 약속하신 성령이 오셨고 (요 7:39 가 가리키는 오순절), 생명의 강은 지금도 흐릅니다 (계 22:1). 요셉의 곳간, 모세의 지팡이, 다윗의 돌 — 그 모든 구원 위로 *영적 구원* 의 강이 흐릅니다."
+    audio_clip_id: aud_s7_ascension_ko
+    start_at_seconds: 4.0
+    duration_seconds: 26.0
+    hidden_until_event: null
+    scripture_ref: jn-7:38
+    source_of_record: "scenarios/jesus.yml :: scenes[id=7].extras.static_monologue"
+  - id: nb_s7_value_prompt
+    speaker: system
+    text_ko: "예수는 떠나시며 '생수의 강' 을 약속하셨습니다 (요 7:38, 계 22:1). 오늘 *1분 호흡 + 마음 한 줄 기록* — 강물처럼 흐르는 작은 회복 하나를 받아 보세요."
+    audio_clip_id: aud_s7_value_prompt_ko
+    start_at_seconds: 34.0
+    duration_seconds: 18.0
+    hidden_until_event: null
+    source_of_record: "scenarios/jesus.yml :: scenes[id=7].value_prompt"
+    linked_values: [6, 4, 7, 3]
+
+crisis_reminder:
+  persistent: true
+  dismissible: true
+  text_ko: "{{crisis_resources.default}}."
+  source_of_record: "scenarios/jesus.yml :: scenes[id=7].extras.crisis_reminder"
+  note: "리터럴 번호를 쓰지 않는다. CrisisTokenResolver 가 배포 지역에 맞게 푼다."
+
+interactions:
+  - id: ix_s7_recovery_pick
+    type: pick_one
+    target_assets: [ui_recovery_anxious, ui_recovery_lonely, ui_recovery_exhausted, ui_recovery_sad, ui_recovery_confused]
+    gesture: gaze_dwell_or_pinch
+    presentation:
+      options_order_fixed: true
+      no_correct_answer_marker: true
+      no_completion_reward: true
+    validation_rules:
+      - rule: required_optional
+        timeout_seconds: 40
+        on_timeout: auto_advance
+        description: "고르지 않아도 끝난다. 마지막 Scene 에서 선택을 요구하면 그것은 완주 조건이 된다."
+
+branches:
+  - id: br_s7_recovery
+    triggered_by_event: [option_selected, branch_timeout]
+    decision_key: recovery_key
+    default_path: static_curation
+    llm_optin_only: true
+    routes:
+      - when: { recovery_key: ANXIOUS }
+        monologue_cache_key: jesus.recovery.gethsemane_trembling
+      - when: { recovery_key: LONELY }
+        monologue_cache_key: jesus.recovery.i_am_with_you
+      - when: { recovery_key: EXHAUSTED }
+        monologue_cache_key: jesus.recovery.living_water
+      - when: { recovery_key: SAD }
+        monologue_cache_key: jesus.recovery.he_wept
+      - when: { recovery_key: CONFUSED }
+        monologue_cache_key: jesus.recovery.the_way
+      - when: { recovery_key: null }
+        monologue_cache_key: jesus.recovery.i_am_with_you
+        response_text_ko: "고르지 않으셔도 됩니다. 떠나시며 하신 말씀은 '내가 너희를 고아와 같이 버려두지 아니하고' 였습니다 (요 14:18)."
+        note: >-
+          미선택·타임아웃 폴백. 되묻지 않는다. 폴백을 LONELY 로 둔 것은 이 Scene 의 본문이
+          '홀로 두지 않겠다' 이기 때문이다 — 임의 선택이 아니라 본문이다.
+    source_of_record: "scenarios/jesus.yml :: scenes[id=7].extras.recovery_keys"
+
+next_scene_suggestion:
+  text_ko: "트랙 A — 시편 22 (버림받음의 부르짖음) 또는 1번 일기·묵상"
+  source_of_record: "scenarios/jesus.yml :: scenes[id=7].extras.next_scene_suggestion"
+  presentation:
+    no_autoplay: true
+    note: "자동 재생하지 않는다. 다음 콘텐츠로 밀어 넣는 종료는 회복이 아니라 체류시간이다."
+
+safety_gates:
+  - id: T1_no_heterodox_theology
+    enforced_at: always
+    description: >-
+      영지주의·뉴에이지·범신론 어휘 금지. 성령과 생명의 강을 구속사적 임재(중생·성화·
+      그리스도께로 인도)로만 표현한다. 은사 체험(방언·예언·치유 현상) 연출도 배제한다.
+    lint_scope: [narration_blocks, branches, next_scene_suggestion]
+    lint_forbidden_tokens:
+        - "갇혀 있는 감옥"
+        - "창조는 실패"
+        - "나의 신성"
+        - "감춰진 비밀 지식"
+        - "영혼의 무덤"
+        - "우주의 에너지"
+        - "긍정의 파동"
+        - "당사자의 실패를 증명"
+    measured: "8종. 이 파일의 사용자 노출 문장 3건 대조 — 적중 0건. 8종 전부 런타임 금지 목록(application.yml)에 이미 존재한다."
+    known_gap: >-
+      은사지속론·개방신론·번영복음은 이 8종에 **없다**. 런타임 머리말의 배제 목록은 9항목인데
+      토큰으로 옮겨진 것은 그중 영지주의·뉴에이지 계열뿐이다. 이 게이트의 초록은
+      '배제 목록 전부를 막았다' 가 아니라 '그 두 계열의 표층형 8개가 없다' 이다.
+  - id: spirit_framing_note
+    enforced_at: always
+    description: "성령 표현을 구속사적 임재로 제한. 뉴에이지 에너지/차크라 프레임 금지 (합신 은사중지론, MVP-JESUS §4.3-3)."
+    source_of_record: "scenarios/jesus.yml :: scenes[id=7].extras.spirit_framing_note"
+    enforcement: reviewer_only
+    note: >-
+      T1 8종이 어휘를 막지만 *프레임* 은 못 막는다 — 금지어 없이도 성령을 개인의 내적
+      에너지로 그릴 수 있다. 그 판정은 사람 검토다. visual_exclusions 두 항목이
+      시각 문법 쪽 절반을 구조로 막는 것이 현재 가진 전부다.
+  - id: no_completion_reward
+    enforced_at: always
+    description: "완주 배지·점수·연속 기록 없음. 마지막 Scene 에 보상을 붙이면 미션이 과제가 된다."
+    enforcement: structural
+    structural_check: "interactions[*].presentation.no_completion_reward == true"
+    verified_by: "structural 선언은 실제 파일 구조로 뒷받침된다 — jesus 트리거·푸터·배제·무보상"
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: br_s7_recovery
+    description: "5종 회복 캐시가 전부 사전 존재. opt-out 사용자도 동일하게 종료 — 실시간 생성만 opt-in."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null
+transition:
+  type: fade_to_black
+  fade_out_seconds: 2.0
+  fade_in_seconds: 0.0
+
+theology_footer_refs:
+  - citation_id: JS7_candidate
+    source: "요한복음 7:37~39 / 요한계시록 22:1 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "요 7:39 가 성령 강림을 가리킨다는 것은 본문 자체의 해설절이다."
+    anchor_block: nb_s7_ascension
+  - disputed_points:
+      - "은사중지론 대 은사지속론은 개혁주의 안에서도 갈린다. 이 미션은 합신 입장(중지론)을 택했다."
+      - "계 22:1 의 생명수 강을 현재적 실재로 읽을지 종말론적 성취로만 읽을지도 갈린다."
+    handling: >-
+      전자는 미션이 *택한* 입장이므로 택했다고 적는다 — 유일한 정설인 것처럼 적지 않는다.
+      후자는 무대에 올리지 않는다.
