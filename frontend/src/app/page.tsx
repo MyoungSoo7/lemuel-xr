@@ -129,6 +129,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
     active: true,
   },
+  {
+    href: "/rahab",
+    name: "Rahab",
+    korean: "라합",
+    tagline: "먼저 있었던 일 — 호칭은 본문에 남고, 씻어 주지 않는다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -305,6 +312,7 @@ export default function HomePage() {
                       "esther",
                       "abraham",
                       "jacob",
+                      "rahab",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`

@@ -68,6 +68,16 @@ import github.lms.lemuel.xr.common.ErrorCode
  * `available_at: [scene1..scene5]` 가 오히려 이 모양에서 성립한다.
  * 저작이 건 인간 안전검토자 사인오프는 앞의 넷과 같이 **없다** — 등재한 채로 연다.
  *
+ * 2026-08-22 RAHAB 추가 — 근거·범위·남은 빚은 `docs/RAHAB-RUNTIME-SIGNOFF.md`.
+ * 앞의 다섯과 **종류가 다르다**: 이 인물은 미션이 아니라 **낭독 트랙**이다
+ * (`docs/SEED-RAHAB.md` rev.15 D1). 다섯 Scene 전부 `interactions: []` · `branches: []`
+ * 이고 되감기도 막혀 있다. 본문에서 손이 하는 일이 전부 라합의 행위라, 사용자에게
+ * 넘기면 본문이 라합에게 돌린 행위를 사용자가 가로챈다는 저작 판단이다.
+ * 그 대가로 **동의 카드와 상시 이탈이 유일한 통제**가 된다 — 중간에 빠져나갈 손잡이가
+ * 선택지 쪽에는 하나도 없다. 이 인물의 카드가 코퍼스 최다인 것은 그 대가다.
+ * 낭독 트랙을 재는 채점 축(DP-R19)은 **없다**. 전문 검토 사인오프도 **없다**(AC-11=2).
+ * 둘 다 대장 문서에 미해소로 등재한 채로 연다.
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -85,7 +95,8 @@ enum class Character(val dbValue: String) {
     DANIEL("daniel"),
     ESTHER("esther"),
     ABRAHAM("abraham"),
-    JACOB("jacob");
+    JACOB("jacob"),
+    RAHAB("rahab");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */
