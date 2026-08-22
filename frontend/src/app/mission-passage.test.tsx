@@ -44,6 +44,7 @@ vi.mock("@/lib/api/content", () => ({
 import { startMission, startJoseph } from "@/lib/api/game";
 import { fetchScripturePassage } from "@/lib/api/content";
 
+import AbrahamPage from "./abraham/page";
 import DanielPage from "./daniel/page";
 import DavidPage from "./david/page";
 import ElijahPage from "./elijah/page";
@@ -109,6 +110,10 @@ const WITHOUT_REF = scene({
 });
 
 const PAGES: Array<[string, () => React.ReactElement]> = [
+  // 아브라함은 #100 에서 `Character` enum 에 들어가며 열렸는데 이 목록에는 안 들어와서,
+  // `mission_passage_check.py` 의 runtime-test 가 그때부터 빨갛다(main 기준). 화면은
+  // 있는데 아무도 렌더해 보지 않는 상태였다 — 여기 한 줄이 그 구멍이다.
+  ["abraham", () => <AbrahamPage />],
   ["daniel", () => <DanielPage />],
   ["david", () => <DavidPage />],
   ["elijah", () => <ElijahPage />],

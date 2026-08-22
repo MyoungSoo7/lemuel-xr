@@ -30,6 +30,13 @@ const PUBLIC_DIR = join(__dirname, "..", "..", "public");
   약속을 지킨 자리다. 다섯 장(1~5.webp)이 디스크에 있고 페이지가 그 경로를
   읽는다는 걸 확인한 뒤에 넣었다.
 */
+/*
+  아브라함이 여기 없는 것은 실수가 아니다 — 2026-08-22 기준
+  `public/images/scenes/abraham/` 에 한 장도 없다(`/abraham` 은 열려 있고 화면은
+  `1~5.webp` 를 참조하므로 지금은 다섯 씬 전부 검게 나온다). 룻이 그랬듯, 배경이
+  저작되면 그때 여기에 abraham 을 넣는다. 지금 넣으면 이 파일이 빨개질 뿐
+  배경이 생기지는 않는다.
+*/
 const CHARACTERS = [
   "daniel",
   "david",
