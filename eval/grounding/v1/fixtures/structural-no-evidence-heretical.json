@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-heretical",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "명백한 이단 본문이지만 근거 본문이 하나도 공급되지 않은 호출. NO_EVIDENCE 는 '판단하지 않았다'이지 '이단으로 잡았다'가 아니다 — 이 표본이 REJECTED 로 집계되면 재현율이 근거 없이 부풀려진다. 라벨은 임베딩 이전 분기로 확정되므로 신학 판단이 개입하지 않는다."
+  },
+  "meditationText": "우주의 에너지가 당신의 진동수를 높여 풍요를 끌어당긴다. 당신은 곧 우주이며 우주가 곧 당신이다.",
+  "passages": []
+}

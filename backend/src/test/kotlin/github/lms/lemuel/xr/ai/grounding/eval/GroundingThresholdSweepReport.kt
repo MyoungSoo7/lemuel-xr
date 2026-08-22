@@ -48,8 +48,22 @@ class GroundingThresholdSweepReport {
         val model = System.getenv("GROUNDING_EMBEDDING_MODEL")
             ?: dataset.manifest.tunedAgainst.embeddingModel.ifBlank { "gemini-embedding-001" }
 
+        // 차원도 모델과 같은 방식으로 덮어쓸 수 있어야 한다. README §6.1 의 유사도 수치는
+        // 3072 차원(어댑터 기본값이던 시절)에서 잰 것이고, 2026-08-12 #37 이후 런타임은 1536 이다.
+        // 옛 수치와 대조하려면 같은 공간에서 다시 재는 길이 있어야 한다 —
+        // 없으면 "코드가 바뀐 탓" 과 "모델이 바뀐 탓" 을 영영 못 가른다.
+        val dimensionOverride = System.getenv("GROUNDING_EMBEDDING_DIMENSIONS")?.toInt()
+
         val embeddings = MemoizingEmbeddingPort(
-            GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = model),
+            if (dimensionOverride == null) {
+                GeminiEmbeddingAdapter(apiKey = System.getenv("GEMINI_API_KEY"), model = model)
+            } else {
+                GeminiEmbeddingAdapter(
+                    apiKey = System.getenv("GEMINI_API_KEY"),
+                    model = model,
+                    outputDimensionality = dimensionOverride,
+                )
+            },
         )
         val useCase = EvaluateGroundingUseCase(embeddings, NOOP_METRICS)
 
@@ -81,6 +95,38 @@ class GroundingThresholdSweepReport {
             compareBy({ it.signedOff.binary.recall ?: -1.0 }, { it.signedOff.binary.f1 ?: -1.0 }),
         )
         val bestByF1 = cells.maxWithOrNull(compareBy { it.signedOff.binary.f1 ?: -1.0 })
+
+        // ── 홀드아웃 ────────────────────────────────────────────────────────────────
+        // 위 bestUnderP3/bestByF1 은 **인샘플** 값이다. 같은 표본에서 임계치를 고르고 같은 표본으로
+        // 그 임계치를 자랑하면 수치가 반드시 좋아 보인다 — 이 리포에는 이미 그 전례가 있다
+        // (GoldenSetTokenLintCrossCheckTest: 인샘플 7/7 대 아웃오브샘플 0/27).
+        // 그래서 클래스별로 반씩 갈라 fit 에서만 고르고 holdout 에서 잰다. 분할은 id 정렬 후
+        // 짝/홀 — 난수가 아니므로 같은 데이터면 언제 돌려도 같은 분할이 나오고, 분할을 여러 번
+        // 바꿔 가며 좋은 쪽을 고르는 일(그것도 과적합이다)이 애초에 불가능하다.
+        val (fitSet, holdoutSet) = stratifiedHalves(signedOff)
+        val fitCells = grid().map { policy ->
+            policy to EvalMetrics.summarize(score(useCase, fitSet, policy).map { it.toOutcome() })
+        }
+        val fitBestUnderP3 = fitCells
+            .filter { (it.second.binary.p3FalseRejectRate ?: 1.0) <= P3_MAX_FALSE_REJECT }
+            .maxWithOrNull(compareBy({ it.second.binary.recall ?: -1.0 }, { it.second.binary.f1 ?: -1.0 }))
+        val fitBestByF1 = fitCells.maxWithOrNull(compareBy { it.second.binary.f1 ?: -1.0 })
+        fun onHoldout(p: GroundingPolicy?) =
+            p?.let { EvalMetrics.summarize(score(useCase, holdoutSet, it).map { it.toOutcome() }) }
+        val holdout = mapOf(
+            "split" to mapOf(
+                "method" to "클래스별 id 정렬 후 짝수=fit / 홀수=holdout. 결정적이라 재분할로 고르는 과적합이 불가능하다.",
+                "fit" to fitSet.map { it.id }.sorted(),
+                "holdout" to holdoutSet.map { it.id }.sorted(),
+            ),
+            "pinnedOnHoldout" to onHoldout(pinnedPolicy),
+            "fitBestUnderP3" to fitBestUnderP3?.let {
+                mapOf("policy" to policyMap(it.first), "onFit" to it.second, "onHoldout" to onHoldout(it.first))
+            },
+            "fitBestByF1" to fitBestByF1?.let {
+                mapOf("policy" to policyMap(it.first), "onFit" to it.second, "onHoldout" to onHoldout(it.first))
+            },
+        )
 
         val targets = dataset.manifest.targets
         val warnings = buildList {
@@ -123,6 +169,7 @@ class GroundingThresholdSweepReport {
             ),
             "bestUnderP3" to bestUnderP3?.let { cellMap(it) },
             "bestByF1" to bestByF1?.let { cellMap(it) },
+            "holdout" to holdout,
             "sweep" to cells.map { cellMap(it) },
             "perFixture" to pinnedScored.map { s ->
                 mapOf(
@@ -153,6 +200,22 @@ class GroundingThresholdSweepReport {
         writer.writeValue(outDir.resolve("latest.json").toFile(), report)
 
         println(console(dataset, model, warnings, pinnedPolicy, pinnedSignedOff, bestUnderP3, bestByF1, stamped))
+        println(
+            buildString {
+                append("\n-- 홀드아웃(fit ${fitSet.size} / holdout ${holdoutSet.size}, 클래스별 반분) --\n")
+                append("  fit 에서 고른 P3 최적: ${fitBestUnderP3?.first?.let { "sim=%.2f maxUnsup=%.1f".format(it.similarityThreshold, it.maxUnsupportedRate) } ?: "없음"}\n")
+                fitBestUnderP3?.let {
+                    append("    on fit    : ${oneLine(it.second)}\n")
+                    append("    on holdout: ${oneLine(onHoldout(it.first))}\n")
+                }
+                append("  fit 에서 고른 F1 최적: ${fitBestByF1?.first?.let { "sim=%.2f maxUnsup=%.1f".format(it.similarityThreshold, it.maxUnsupportedRate) } ?: "없음"}\n")
+                fitBestByF1?.let {
+                    append("    on fit    : ${oneLine(it.second)}\n")
+                    append("    on holdout: ${oneLine(onHoldout(it.first))}\n")
+                }
+                append("  현행 고정정책 on holdout: ${oneLine(onHoldout(pinnedPolicy))}\n")
+            },
+        )
 
         // 리포트가 스스로 망가지지 않았는지만 검증한다 (수치 하한은 Phase 4).
         assertThat(dimensions).describedAs("임베딩 차원이 0 — 워밍업이 실패했다").isGreaterThan(0)
@@ -236,6 +299,31 @@ class GroundingThresholdSweepReport {
     } ?: "없음"
 
     private fun pct(v: Double?): String = v?.let { "%.1f%%".format(it * 100) } ?: "n/a"
+
+    private fun oneLine(s: EvalMetrics.Summary?): String = s?.let {
+        val b = it.binary
+        "n=%d precision=%s recall=%s F1=%s P3=%s (TP=%d FP=%d FN=%d TN=%d)".format(
+            it.sampleCount, pct(b.precision), pct(b.recall), pct(b.f1), pct(b.p3FalseRejectRate),
+            b.tp, b.fp, b.fn, b.tn,
+        )
+    } ?: "없음"
+
+    /**
+     * 클래스별로 id 를 정렬해 짝수 인덱스를 fit, 홀수를 holdout 으로 가른다.
+     *
+     * 층화(stratified)인 이유: 그냥 반으로 자르면 orthodox 가 한쪽에 몰릴 수 있고, 그러면
+     * P3(오탐률)이 한쪽에서만 정의돼 홀드아웃 수치가 무의미해진다.
+     */
+    private fun stratifiedHalves(
+        fixtures: List<GoldenSet.Fixture>,
+    ): Pair<List<GoldenSet.Fixture>, List<GoldenSet.Fixture>> {
+        val fit = mutableListOf<GoldenSet.Fixture>()
+        val holdout = mutableListOf<GoldenSet.Fixture>()
+        fixtures.groupBy { it.`class` }.toSortedMap().forEach { (_, group) ->
+            group.sortedBy { it.id }.forEachIndexed { i, fx -> (if (i % 2 == 0) fit else holdout).add(fx) }
+        }
+        return fit to holdout
+    }
 
     /** 픽스처를 게이트에 통과시켜 채점 결과로 바꾼다. */
     private fun score(

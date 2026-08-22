@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-no-terminator",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "종결부호가 없는 한 문장. SentenceSplitter 가 한 건을 내므로 INCONCLUSIVE 가 아니라 NO_EVIDENCE 로 가야 한다. 두 구조적 분기가 서로 잡아먹지 않는지 우선순위를 고정하는 표본."
+  },
+  "meditationText": "오늘 나는 아무 말도 만들지 못한 채 그저 앉아 있었다",
+  "passages": []
+}

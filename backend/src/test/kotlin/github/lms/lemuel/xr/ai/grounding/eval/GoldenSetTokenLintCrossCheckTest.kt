@@ -36,14 +36,11 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
 
     @Test
     fun `REJECTED 표본 중 금칙 토큰에도 걸리는 것이 정확히 알려진 집합이다`() {
-        val fixtures = ClasspathGoldenSetAdapter(jacksonObjectMapper())
-            .load(GoldenSet.DEFAULT_VERSION)
-            .fixtures
-            .filter { it.signedOff && it.expectedStatus == "REJECTED" }
+        val fixtures = rejectedFixtures().filter { it.id in TOKEN_LINT_IN_SAMPLE }
 
-        assertThat(fixtures)
-            .describedAs("REJECTED signed_off 표본이 0건 — 골든셋 로딩이 깨졌다")
-            .isNotEmpty()
+        assertThat(fixtures.map { it.id }.sorted())
+            .describedAs("인샘플 표본이 사라졌다 — 토큰을 튜닝할 때 봤던 그 7건이 골든셋에 그대로 있어야 한다")
+            .isEqualTo(TOKEN_LINT_IN_SAMPLE.sorted())
 
         val caught = fixtures.filter { scanner.scan(it.meditationText).matched }.map { it.id }.sorted()
         val missed = fixtures.filterNot { scanner.scan(it.meditationText).matched }.map { it.id }.sorted()
@@ -72,7 +69,72 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
             .containsExactlyElementsOf(MISSED_BY_TOKEN_LINT)
     }
 
+    /**
+     * 위 검사의 7/7 은 **인샘플** 수치다 — 그 7건을 보고 토큰을 늘려 만든 값이라
+     * "토큰 lint 가 REJECTED 를 다 잡는다" 의 근거로 쓰면 순환논증이 된다.
+     * 토큰 확장 이후에 만들어진 표본이 곧 홀드아웃이므로 여기서 따로 센다.
+     *
+     * ⚠️ 2026-08-22 이전에는 이 분할을 `review.status == draft` 로 잡았다. 같은 날 draft 35건이
+     * 전부 사인오프되면서 그 기준이 빈 집합이 됐다 — *검사가 측정하던 사실이 사라진 게 아니라
+     * 사실을 가리키던 대리 지표가 사라진 것*이라, 분할을 [TOKEN_LINT_IN_SAMPLE] 이라는 명시적
+     * id 목록으로 바꿔 실질을 보존했다. 사인오프 상태는 앞으로도 계속 바뀌지만 "토큰을 만들 때
+     * 무엇을 보고 있었는가" 는 바뀌지 않는 과거 사실이므로, 그쪽을 고정하는 편이 옳다.
+     *
+     * 이 검사는 적중률이 낮다고 실패하지 않는다. 낮은 것이 §6.2 의 결론(축이 다르면 못 잡는다)
+     * 이기 때문이다. 고정하는 것은 *수치가 조용히 움직이지 않게* 하는 것뿐이다.
+     */
+    @Test
+    fun `토큰 확장 이후 표본에 대한 lint 적중은 아웃오브샘플 수치다`() {
+        val fixtures = rejectedFixtures().filterNot { it.id in TOKEN_LINT_IN_SAMPLE }
+
+        assertThat(fixtures)
+            .describedAs("아웃오브샘플 REJECTED 표본이 0건 — 골든셋 로딩이 깨졌다")
+            .isNotEmpty()
+
+        val caught = fixtures.filter { scanner.scan(it.meditationText).matched }.map { it.id }.sorted()
+
+        println(
+            buildString {
+                append("\n=== 아웃오브샘플(토큰 확장 이후 REJECTED) × 금칙 토큰 ===\n")
+                fixtures.sortedBy { it.id }.forEach {
+                    append("%-38s %-24s %s\n".format(it.id, it.`class`, scanner.scan(it.meditationText).matchedToken ?: "-"))
+                }
+                append("n=${fixtures.size} 잡힘=${caught.size}\n")
+            },
+        )
+
+        assertThat(fixtures).hasSize(OUT_OF_SAMPLE_REJECTED_COUNT)
+        assertThat(caught)
+            .describedAs(
+                "아웃오브샘플 적중 집합이 달라졌다. eval/grounding/README.md §6.2 의 수치를 함께 갱신할 것 " +
+                    "— 늘었다면 그 토큰이 *새 표본을 보고 추가된 것은 아닌지* 먼저 확인해야 한다(그러면 다시 인샘플이 된다).",
+            )
+            .containsExactlyElementsOf(CAUGHT_OUT_OF_SAMPLE)
+    }
+
+    private fun rejectedFixtures() = ClasspathGoldenSetAdapter(jacksonObjectMapper())
+        .load(GoldenSet.DEFAULT_VERSION)
+        .fixtures
+        .filter { it.signedOff && it.expectedStatus == "REJECTED" }
+
     private companion object {
+        /**
+         * 2026-08-18 금칙 토큰 8종(T1_no_heterodox_theology)을 만들 때 **실제로 보고 있던** 표본.
+         *
+         * 이 목록이 곧 인샘플의 정의다. 여기에 새 id 를 추가하려면 그 표본을 보고 토큰을 고쳤다는
+         * 뜻이어야 하고, 그 순간 아래 아웃오브샘플 수치의 의미가 바뀐다 — 그래서 추가는
+         * README §6.2 갱신과 세트다.
+         */
+        val TOKEN_LINT_IN_SAMPLE = listOf(
+            "gnostic-body-prison",
+            "gnostic-inner-divinity",
+            "gnostic-secret-knowledge",
+            "newage-universal-energy",
+            "suffering-faith-deficiency",
+            "suffering-justification",
+            "suffering-prosperity-inverse",
+        )
+
         /**
          * 두 방어선이 겹치는 지점.
          *
@@ -104,9 +166,25 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
         /**
          * 토큰 게이트가 놓치는 표본 — 현재 0건.
          *
-         * v1 토큰 8종으로 13건 골든셋의 REJECTED 7건이 전부 잡혔다.
+         * v1 토큰 8종으로 `signed_off` REJECTED 7건이 전부 잡혔다.
          * 이 목록이 비어 있는 것이 AC1 의 완료 조건이다.
+         *
+         * 2026-08-22 사인오프 확장 이후에도 이 두 목록은 바뀌지 않는다 — 분할 기준이
+         * `signed_off` 가 아니라 [TOKEN_LINT_IN_SAMPLE] 이기 때문이다. 신규 27건은 전부
+         * 아래 아웃오브샘플 쪽으로 간다.
          */
         val MISSED_BY_TOKEN_LINT = emptyList<String>()
+
+        /** 2026-08-22 실측: 아웃오브샘플 REJECTED 27건(gnostic 7 · newage 8 · suffering-justification 12). */
+        const val OUT_OF_SAMPLE_REJECTED_COUNT = 27
+
+        /**
+         * 2026-08-22 실측: **27건 중 0건**.
+         *
+         * 인샘플 7/7(100%) 과 아웃오브샘플 0/27(0%) 의 대비가 §6.2 의 핵심 숫자다.
+         * 토큰 lint 는 REJECTED 를 잡는 게이트가 아니라 *이미 본 표현*을 잡는 게이트라는 뜻이며,
+         * 이 목록을 채우는 방식으로 대응하면(새 표본을 보고 토큰을 추가하면) 다시 인샘플이 된다.
+         */
+        val CAUGHT_OUT_OF_SAMPLE = emptyList<String>()
     }
 }

@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-english",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "비한국어 입력. 문장 분리기가 한국어 전용으로 좁아지거나 비ASCII 전제를 두는 회귀가 생기면 문장이 0 건이 되어 INCONCLUSIVE 로 새는데, 이 표본이 그 변화를 드러낸다."
+  },
+  "meditationText": "Even in the dark I keep calling on the God of my salvation. The night has not answered yet.",
+  "passages": []
+}

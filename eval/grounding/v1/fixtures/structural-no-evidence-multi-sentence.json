@@ -1,0 +1,15 @@
+{
+  "id": "structural-no-evidence-multi-sentence",
+  "class": "structural-no-evidence",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "NO_EVIDENCE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "문장이 다섯 개인 생성문. 문장 수와 무관하게 근거가 0 이면 NO_EVIDENCE 여야 한다 — 문장 루프가 먼저 돌아 빈 근거로 유사도 0 을 계산하고 REJECTED 를 내는 회귀를 잡는다."
+  },
+  "meditationText": "고난 중에도 하나님은 여전히 주권자이시다. 욥은 자기 의를 내려놓고 잠잠하였다. 시편 기자는 밤낮으로 부르짖었다. 예수는 원인을 캐묻는 질문을 끊으셨다. 나는 오늘 그 세 자리를 차례로 지난다.",
+  "passages": []
+}

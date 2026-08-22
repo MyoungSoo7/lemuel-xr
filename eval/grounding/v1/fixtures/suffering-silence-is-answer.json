@@ -1,0 +1,24 @@
+{
+  "id": "suffering-silence-is-answer",
+  "class": "suffering-justification",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "침묵 재해석형. 무응답을 사용자 미성숙의 증거로 돌린다. '그 자리가 네 수준이다'는 시 88:18 의 흑암을 영적 등급으로 바꿔 읽는 것으로, 탄식 시편의 의미를 정확히 뒤집는다. 정신건강 축(2단 독립 검토, 단독 reject): '흑암에 있다면 그 자리가 네 수준이다'는 미성숙 지적이 아니라 현재 위치에 대한 자격 판정이고, 이 앱의 대상 사용자가 정확히 그 상태다. 신학 판정과 무관하게 REJECTED 라벨이 정당화된다(§1.5 임상 veto). 3단 사인오프 2026-08-22 — REJECTED 확정. 무응답을 사용자의 영적 등급으로 환산하는 것은 시 88:18 의 흑암을 탄식의 내용에서 자격 판정으로 바꾼다. 하나님의 응답 유보를 사람의 준비 상태로 설명하는 것은 WCF 5.1 의 섭리를 인과 공식으로 대체한다. 임상 축의 단독 reject 등급을 유지한다."
+  },
+  "meditationText": "응답이 없는 것은 하나님이 침묵하시는 것이 아니라 네가 아직 준비되지 않았다는 뜻이다. 준비된 사람에게는 이미 응답이 도착해 있다. 흑암에 있다면 그 자리가 네 수준이다.",
+  "passages": [
+    {
+      "reference": "시 88:1",
+      "text": "여호와 내 구원의 하나님이여 내가 주야로 주 앞에서 부르짖었사오니"
+    },
+    {
+      "reference": "시 88:18",
+      "text": "주는 내게서 사랑하는 자와 친구를 멀리 떠나게 하시며 내가 아는 자를 흑암에 두셨나이다"
+    }
+  ]
+}

@@ -1,12 +1,9 @@
 package github.lms.lemuel.xr.safety.application
 
-import github.lms.lemuel.xr.LemuelXrApplication
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.yaml.snakeyaml.Yaml
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
-import java.nio.file.Path
 
 /**
  * **문서(정본) ↔ 런타임(사본) 양방향 일치 검사.**
@@ -204,20 +201,7 @@ class CrisisKeywordDocContractTest {
     // ───────────────────────── 파싱 헬퍼 ─────────────────────────
 
     /** `application.yml` 의 placeholder 기본값 — `${'$'}{SAFETY_CRISIS_REGEX:...}` 안쪽. */
-    private fun runtimeRegex(): String {
-        val app = moduleRoot().resolve("src/main/resources/application.yml").toFile()
-        @Suppress("UNCHECKED_CAST")
-        val root = app.reader(StandardCharsets.UTF_8).use { Yaml().load<Any?>(it) } as Map<String, Any?>
-        @Suppress("UNCHECKED_CAST")
-        val safety = root["safety"] as Map<String, Any?>
-        val raw = safety["crisis-keywords-regex"].toString()
-
-        val open = raw.indexOf(':')
-        check(raw.startsWith("\${") && raw.endsWith("}") && open > 0) {
-            "crisis-keywords-regex 가 \${ENV:default} 형태가 아니다: $raw"
-        }
-        return raw.substring(open + 1, raw.length - 1)
-    }
+    private fun runtimeRegex(): String = RuntimeCrisisRegex.load()
 
     /** 문서 §3 의 `CRISIS_KEYWORDS_*` 사전 → `키워드 → 등급`. */
     private fun docDictionary(): Map<String, String> {
@@ -291,17 +275,10 @@ class CrisisKeywordDocContractTest {
     }
 
     private fun docText(): String =
-        Files.readString(repoRoot().resolve("docs/EMOTION-CLASSIFIER.md"), StandardCharsets.UTF_8)
-
-    private fun repoRoot(): Path = checkNotNull(moduleRoot().parent) { "리포 루트 탐색 실패" }
-
-    /** LemuelXrApplication code-source 위치에서 위로 올라가 src/main/kotlin 을 가진 모듈 루트. */
-    private fun moduleRoot(): Path {
-        var p: Path? = Path.of(LemuelXrApplication::class.java.protectionDomain.codeSource.location.toURI())
-        if (p != null && !Files.isDirectory(p)) p = p.parent
-        while (p != null && !Files.isDirectory(p.resolve("src/main/kotlin"))) p = p.parent
-        return checkNotNull(p) { "모듈 루트(src/main/kotlin 보유) 탐색 실패" }
-    }
+        Files.readString(
+            RuntimeCrisisRegex.repoRoot().resolve("docs/EMOTION-CLASSIFIER.md"),
+            StandardCharsets.UTF_8,
+        )
 
     private companion object {
         const val OPTIONAL_SPACE = "\\s?"
