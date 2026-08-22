@@ -71,11 +71,14 @@ export type MissionCharacter =
   | "ruth"
   | "peter"
   | "daniel"
-  // 아브라함은 여기 있지만 **열려 있지 않다.** 노출을 정하는 것은 백엔드
-  // `Character` enum 이고(`ScenarioYamlLoader.loadAll()` 이 그것만 순회한다),
-  // 거기엔 아직 없다 — `/abraham` 을 열면 E_CHARACTER_UNKNOWN 이 난다.
-  // 이 union 은 화면이 컴파일되게 하는 자리이지 게이트가 아니다.
-  // 게이트는 `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
+  // 에스더는 #98 에서 이 union 에 들어왔는데, 하루 뒤 #99(아브라함) 머지가 같은 줄을
+  // 건드리면서 **조용히 빠졌다.** 백엔드 enum·화면·테스트는 다 남고 이 한 줄만 사라져서
+  // `/esther` 는 열린 채로 `tsc --noEmit` 만 빨개진 상태가 됐다. 되돌려 놓는다.
+  | "esther"
+  // 아브라함은 2026-08-22 에 열렸다 — 백엔드 `Character` enum 에 `ABRAHAM("abraham")` 이
+  // 들어가면서 `ScenarioYamlLoader.loadAll()` 이 abraham.yml 을 싣는다.
+  // 이 union 자체는 게이트가 아니다(화면이 컴파일되게 하는 자리다). 게이트는
+  // `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
   | "abraham";
 
 export async function startMission(

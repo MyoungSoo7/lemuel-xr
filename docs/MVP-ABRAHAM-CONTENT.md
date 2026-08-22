@@ -6,11 +6,12 @@
 > `docs/CONTENT-WORKFLOW.md` 가 말하는 신학·정신건강 검토자 2인 사인오프는 **받지 않았다.**
 > 이 문서 어디에도 "검토를 통과했다" 는 진술이 없다.
 >
-> **2026-08-22 현재 런타임 노출은 열려 있지 않다.** `Character` enum 에
-> `ABRAHAM("abraham")` 이 들어가 있지 않고, `ScenarioYamlLoader.loadAll()` 은
-> `Character.entries` 만 순회하므로 `scenarios/abraham.yml` 은 존재하되 로드되지 않는다.
-> 그 한 줄을 넣는 조건은 `docs/ABRAHAM-RUNTIME-SIGNOFF.md` 의 «노출 결정» 이 사람 이름으로
-> 채워지는 것이고, `RuntimeExposureSignoffTest` 가 그것을 집행한다.
+> **2026-08-22 런타임 노출이 열렸다.** `Character` enum 에 `ABRAHAM("abraham")` 이
+> 들어갔고, `ScenarioYamlLoader.loadAll()` 이 `Character.entries` 를 순회하므로
+> 그 시점부터 `scenarios/abraham.yml` 이 실린다. 그 한 줄을 넣는 조건이었던
+> `docs/ABRAHAM-RUNTIME-SIGNOFF.md` 의 «노출 결정» 은 사람 이름으로 채워졌다
+> (LIM MYOUNGSOO / 2026-08-22, 텔레그램 지시). `RuntimeExposureSignoffTest` 가 그것을
+> 집행한다. **열렸다는 것이 아래 부채가 갚혔다는 뜻은 아니다** — 대장에 등재한 채로 열었다.
 >
 > **다니엘·베드로와 같은 종류의 미해소 부채가 하나 있다.** `content/abraham/README.md`
 > 머리의 초안 고지는 「인간 안전검토자 사인오프 전 프로덕션 반영 금지」를 걸어 두었고
