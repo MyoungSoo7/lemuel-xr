@@ -347,6 +347,50 @@ SCENES: dict[str, dict[str, str]] = {
              "gift left waiting, dew still on the grass, the hills soft and warm in the low sun, "
              "vast quiet space. The plain is empty of people and animals. No lettering.",
     },
+    # 아브라함 — 「언제 끝날지 모르는 기다림」.
+    #
+    # 이 다섯 장에서 조심한 것은 *그리지 않은 것* 쪽이다.
+    #
+    #  · Scene 3 의 자막에는 사백 년(창 15:13)이 나오지만 배경은 별만 그린다.
+    #    압제의 길이를 그림으로 세우면 씬의 `dwell_limit`(그 자막에 12초 이상
+    #    머무르지 않는다)이 무의미해진다 — 자막은 지나가는데 배경이 계속 그것을
+    #    응시하게 만들기 때문이다. 저작이 자막에서 뺀 무게를 배경으로 되돌리지 않는다.
+    #  · Scene 4 에 손님 셋을 세지 않았다. 마므레의 세 사람은 정체가 신학적으로
+    #    갈리는 자리인데, 자리를 셋으로 차려 놓으면 그림이 그 셈을 먼저 해 버린다.
+    #    「손님을 위해 차려 둔 상」 까지만 그린다.
+    #  · Scene 5 는 요람을 놓되 **아기를 명시적으로 배제**한다. 요람은 그 자체로
+    #    아기를 부르는 소재라 STYLE 의 "no people" 만으로는 안 막힌다(빈 요람에
+    #    아이를 그려 넣는 것이 모델의 사전확률이다). infant·baby·child 를 이름으로 막는다.
+    #  · 미션 자체의 배제 — 이삭 결박(창 22)·여종 서사(창 16, 21:8-21)·아내를 누이라
+    #    한 일(창 12:10-20) — 은 다섯 프롬프트 어디에도 소재가 없다. 제단·나무단·칼,
+    #    광야에 버려진 물가죽부대, 이집트 궁정이 한 장도 없는 것은 우연이 아니다.
+    "abraham": {
+        "1": "A dusty road running out from the edge of a walled town of pale mud-brick at first "
+             "light, bundled goods and rolled tent cloth set down on the ground beside the road "
+             "ready to be lifted, one household doorway standing open and dark in the wall behind, "
+             "the road running away unbroken toward a hazy empty horizon, cool dawn haze with low "
+             "warm light just reaching the dust. The road and the doorway are empty. No lettering.",
+        "2": "A single goat-hair tent pitched alone on a broad Canaanite hillside in late afternoon "
+             "amber light, guy ropes drawn taut and wooden pegs driven into dry stony ground, and "
+             "scattered across the slope around it the shallow marks of many earlier campsites — old "
+             "peg holes, ringed patches of flattened grass, cold stone hearths — every one of them "
+             "empty, the hills going on and on beyond. Nobody is present. No lettering.",
+        "3": "A wide open field beneath a moonless night sky filled edge to edge with innumerable "
+             "stars, the band of the Milky Way spilling clear across the whole frame, dry grass in "
+             "the near foreground catching only the faintest starlight, the horizon low and dark and "
+             "unbroken, immense uncountable depth overhead. Empty land, empty of people. No lettering.",
+        "4": "The entrance of a nomadic goat-hair tent at the edge of an oak grove under harsh "
+             "vertical noon light, the heavy flap tied back, a woven mat and a low three-legged stool "
+             "set in the narrow strip of shade just inside the opening, plain bowls of curds and "
+             "bread and a clay jar set out on the mat for guests, bleached white glare outside and "
+             "deep cool shadow within, the air completely still. No people, no silhouettes, no "
+             "figures inside or outside the tent. No lettering.",
+        "5": "The interior of a nomadic tent in soft daylight filtering down through the woven "
+             "goat-hair roof, fine shafts of light falling across a floor of layered rugs, a small "
+             "empty woven reed basket lined with folded white cloth resting on the rugs, a clay water "
+             "jar and a shallow bowl beside it, the air warm and hushed and unhurried. The tent is "
+             "empty of persons — no infant, no baby, no child, no figures, no silhouettes. No lettering.",
+    },
 }
 
 
