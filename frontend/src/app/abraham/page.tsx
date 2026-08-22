@@ -22,13 +22,12 @@ import {
 /**
  * Abraham 미션 — 기다림은 설명되지 않았고, 본문은 그것을 지우지 않았다.
  *
- * ⚠️ **이 화면은 아직 도달 가능한 상태가 아니다.** `Character` enum 에
- * `ABRAHAM("abraham")` 이 없어서 `startMission("abraham")` 은 E_CHARACTER_UNKNOWN 으로
- * 떨어진다. enum 한 줄을 넣는 조건은 `docs/ABRAHAM-RUNTIME-SIGNOFF.md` 의 «노출 결정» 이
- * 사람 이름으로 채워지는 것이고, `RuntimeExposureSignoffTest` 가 그것을 집행한다.
- * 화면을 먼저 만들어 둔 이유는, 화면이 없으면 이 인물이 *덜 노출된* 게 아니라
+ * 이 화면은 2026-08-22 부터 도달 가능하다 — `Character` enum 에 `ABRAHAM("abraham")` 이
+ * 들어가면서 `startMission("abraham")` 이 200 을 받는다. 그 전까지는 enum 한 줄을 비워 둔 채
+ * 화면만 먼저 만들어 두었는데, 화면이 없으면 이 인물이 *덜 노출된* 게 아니라
  * **검사 사정권 밖**이 되기 때문이다 — 프론트 검사기 두 개
  * (`check_frontend_trigger_warning.py` · `mission-tap-targets.spec.ts`)가 화면을 읽는다.
+ * 노출 근거·남은 빚은 `docs/ABRAHAM-RUNTIME-SIGNOFF.md`.
  *
  * abraham.yml 5 Scene:
  *   1 cinematic(떠남) → 2 cinematic(장막) → 3 pick_one(별, 그리고 사백 년) →

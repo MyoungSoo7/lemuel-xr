@@ -44,6 +44,15 @@ import github.lms.lemuel.xr.common.ErrorCode
  * 한 줄도 없다** — 다니엘의 넉 줄(미검토 신작)과 여기가 갈린다.
  * 저작이 건 인간 안전검토자 사인오프는 다니엘과 같이 **없다** — 등재한 채로 연다.
  *
+ * 2026-08-22 ABRAHAM 추가 — 같은 조건으로 연다. 근거·범위·남은 빚은
+ * `docs/ABRAHAM-RUNTIME-SIGNOFF.md`. 축은 **끝을 모르는 기다림**이고,
+ * 이 인물의 최대 위험은 창 18:14 의 「기한」이다 — 그 기한은 사라에게 주어진 것이지
+ * 사용자에게 약속된 것이 아니어서, Scene 3·4 의 마지막 자막 두 줄이 범위를 못 박는다.
+ * **그 두 줄은 기계가 지키지 않는다**(자막 텍스트라 지워도 아무 테스트가 빨개지지 않는다).
+ * 이삭 결박(창 22) · 여종 서사(창 16·21:8-21) · 아내를 누이라 한 일(창 12:10-20) 셋은
+ * 배제했고, 그 배제도 `enforcement: reviewer_only` 다 — 없는 기계 검사를 있다고 적지 않았다.
+ * 저작이 건 인간 안전검토자 사인오프는 앞의 둘과 같이 **없다** — 등재한 채로 연다.
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -59,7 +68,8 @@ enum class Character(val dbValue: String) {
     RUTH("ruth"),
     PETER("peter"),
     DANIEL("daniel"),
-    ESTHER("esther");
+    ESTHER("esther"),
+    ABRAHAM("abraham");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */

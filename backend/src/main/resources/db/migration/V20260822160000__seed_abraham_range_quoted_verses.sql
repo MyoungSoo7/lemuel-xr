@@ -28,8 +28,10 @@
 --
 -- ⚠️ 저작권: 개역개정판 (C) 대한성서공회. 비영리 이용 약관 범위 안에서 쓴다.
 
+-- 컬럼명은 V1__init_schema.sql + V6__scripture_embeddings.sql 의 실제 스키마다
+-- (theme_tags · character_tags). 앞선 시드 V20260822120000 과 같은 목록을 쓴다.
 INSERT INTO scripture_passages
-  (reference, translation, book, book_code, chapter, verse_start, verse_end, text, title, tags)
+  (reference, translation, book, book_code, chapter, verse_start, verse_end, text, theme_tags, character_tags)
 VALUES
 ('gen-18:13', 'rev', 'genesis', 'gen', 18, 13, 13,
  '여호와께서 아브라함에게 이르시되 사라가 왜 웃으며 이르기를 내가 늙었거늘 어떻게 아들을 낳으리요 하느냐', NULL, ARRAY['abraham']),
