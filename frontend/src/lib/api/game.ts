@@ -80,12 +80,7 @@ export type MissionCharacter =
   // 이 union 자체는 게이트가 아니다(화면이 컴파일되게 하는 자리다). 게이트는
   // `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
   | "abraham"
-  // 야곱은 **아직 닫혀 있다.** 이 줄이 union 에 있어도 `/jacob` 은 열리지 않는다 —
-  // 여는 것은 백엔드 `Character` enum 의 `JACOB("jacob")` 한 줄이고, 그 줄은
-  // 사람의 결정(`docs/JACOB-RUNTIME-SIGNOFF.md` 의 노출 결정 줄)을 기다리는 중이다.
-  // 여기 먼저 넣는 이유는 위 에스더 주석의 반대 사고다: 타입이 없으면 화면을
-  // 컴파일할 수 없고, 화면이 없으면 프론트 안전 검사기 두 개가 이 인물을
-  // "화면 없음" 으로 **건너뛴다**. 건너뛴 건 통과가 아니다.
+  // 야곱은 2026-08-22 에 #101 로 열렸다 — `Character` enum 의 `JACOB("jacob")`.
   | "jacob";
 
 export async function startMission(

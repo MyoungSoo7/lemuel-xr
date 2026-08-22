@@ -121,9 +121,16 @@ class JacobReconciliationPressureTest {
         return out
     }
 
-    /** 톤 분기를 가진 라벨만 — `default`(라벨 없음)는 Scene 3 선택지가 아니다. */
+    /**
+     * Scene 3 선택지에 대응하는 라벨만 — `default`(고르지 않은 사람)는 선택지가 아니다.
+     *
+     * `default` 를 *모양* 으로 걸러내면 안 된다. 처음에 "톤 맵이면 라벨" 로 짰다가
+     * 실제 시나리오에서 틀렸다 — `default` 도 맵이고(`all:` 한 문안), 그래서 라벨로
+     * 세어졌다. 이 자리에서 알고 싶은 것은 "고른 값이 닿을 문구가 있는가" 하나이므로
+     * 예약어를 이름으로 뺀다.
+     */
     private fun closingLabels(): List<String> =
-        closingMatrix().filterValues { it is Map<*, *> }.keys.map { it.toString() }
+        closingMatrix().keys.map { it.toString() }.filterNot { it == "default" }
 
     private fun closingMatrix(): Map<String, Any?> {
         val scene5 = scenes().single { it["id"] == 5 }

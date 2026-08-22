@@ -119,6 +119,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "별을 세던 밤과 사백 년 — 기다림은 아무 일도 없는 시간이 아니다",
     active: true,
   },
+  {
+    href: "/jacob",
+    name: "Jacob",
+    korean: "야곱",
+    tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -294,10 +301,7 @@ export default function HomePage() {
                       "daniel",
                       "esther",
                       "abraham",
-                      // 야곱은 **넣지 않는다.** 화면(`/jacob`)은 있지만 백엔드
-                      // `Character` enum 에 아직 없어서, 여기 넣으면 사용자가 눌러
-                      // 시작 API 에서 오류를 받는다. 대장(docs/JACOB-RUNTIME-SIGNOFF.md)의
-                      // 노출 결정 줄에 서명이 들어가고 enum 한 줄이 올라간 뒤에 넣는다.
+                      "jacob",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
