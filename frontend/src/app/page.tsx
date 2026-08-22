@@ -115,6 +115,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
     active: true,
   },
+  {
+    href: "/abraham",
+    name: "Abraham",
+    korean: "아브라함",
+    tagline: "다 알지 못한 채 가는 걸음 — 기다림에 이유를 붙이지 않는다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -290,6 +297,7 @@ export default function HomePage() {
                       "daniel",
                       "esther",
                       "jacob",
+                      "abraham",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`

@@ -1,3 +1,5 @@
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   fireEvent,
@@ -28,12 +30,25 @@ const classifyMock = vi.mocked(classifyEmotion);
  *
  *  (A) 분류를 *거치지 않고도* 콘텐츠에 들어갈 수 있는가.
  *      감정을 적는 것 자체가 부담인 사용자가 있고, 백엔드 분류가 죽어도
- *      8인물·가치빌더로는 들어갈 수 있어야 한다. 이 카드들이 조용히 사라지면
+ *      인물 카드·가치빌더로는 들어갈 수 있어야 한다. 이 카드들이 조용히 사라지면
  *      "글을 써야만 들어갈 수 있는 앱" 이 된다.
  *  (B) 분류 결과가 실제 사용자가 누를 수 있는 링크로 바뀌는가.
  *      미구현 인물은 링크가 "#" 이어야 하고(막다른 404 대신), 신뢰도 표기는
  *      0~1 확률을 % 로 옮긴 값이어야 한다.
  */
+
+/** 인물 목록의 정본. `scripts/mission_passage_check.py` 의 `characters()` 와 같은 곳을 본다. */
+const SCENARIOS = join(
+  __dirname,
+  "..",
+  "..",
+  "..",
+  "backend",
+  "src",
+  "main",
+  "resources",
+  "scenarios",
+);
 
 function renderHome() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -67,28 +82,35 @@ beforeEach(() => {
 });
 
 describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
-  it("8인물 미션 카드가 전부 링크로 있다", () => {
+  it("저작된 인물 전부가 홈 카드로 있다 — 손으로 적은 목록과 대조하지 않는다", () => {
+    // 인물 목록을 여기 손으로 적으면 안 된다. 이 검사는 원래 여덟 개를 나열하고
+    // 있었고, 그래서 peter·daniel·esther·jacob 이 열릴 때도, **아브라함이
+    // 어느 목록에도 안 들어온 채 열렸을 때도** 초록이었다. 나열형 검사는 자기가
+    // 아는 것만 세고, 모르는 인물이 빠진 것은 정의상 못 본다.
+    //
+    // 그래서 `scripts/mission_passage_check.py` 의 `characters()` 와 같은 정본을
+    // 쓴다 — 시나리오 yml 디렉터리다. 미션이 저작돼 런타임에 열렸는데 홈에 입구가
+    // 없으면, 사용자는 주소를 직접 치지 않는 한 그 화면에 도달할 길이 없다.
+    // 실제로 아브라함이 그 상태였다(#100 에서 enum 은 열렸고 홈은 그대로였다).
+    const authored = readdirSync(SCENARIOS)
+      .filter((f) => f.endsWith(".yml"))
+      .map((f) => `/${f.replace(/\.yml$/, "")}`)
+      .sort();
+    expect(authored.length).toBeGreaterThan(0); // 경로가 틀리면 아래가 공허하게 통과한다
+
     renderHome();
     const missions = screen.getByRole("heading", {
       name: /각성의 순간/,
     }).parentElement!;
+    const linked = within(missions)
+      .getAllByRole("link")
+      .map((a) => a.getAttribute("href"))
+      .filter((h): h is string => !!h)
+      .sort();
 
-    for (const [name, href] of [
-      ["Joseph", "/joseph"],
-      ["Moses", "/moses"],
-      ["David", "/david"],
-      ["Jesus", "/jesus"],
-      ["Solomon", "/solomon"],
-      ["Job", "/job"],
-      ["Elijah", "/elijah"],
-      // 룻은 2026-08-20 에 붙었다. 백엔드 enum 이 열린 뒤로도 한동안 이 목록에
-      // 없어서 웹에서 들어갈 입구가 없었다 — 여기 없으면 화면이 있어도 못 간다.
-      ["Ruth", "/ruth"],
-    ]) {
-      expect(
-        within(missions).getByRole("link", { name: new RegExp(name) }),
-      ).toHaveAttribute("href", href);
-    }
+    // 양방향으로 맞춘다. 빠진 쪽은 「들어갈 입구가 없는 화면」이고, 남는 쪽은
+    // 「눌리는데 없는 화면으로 가는 404」다 — 둘 다 사용자에게 보이는 결함이다.
+    expect(linked).toEqual(authored);
   });
 
   it("AR 측 두 입구(가치 빌더 · 7주제 카드)가 있다", () => {
