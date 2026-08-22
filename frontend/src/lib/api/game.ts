@@ -80,6 +80,7 @@ export type MissionCharacter =
   // 이 union 자체는 게이트가 아니다(화면이 컴파일되게 하는 자리다). 게이트는
   // `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
   | "abraham"
+  // 야곱은 2026-08-22 에 #101 로 열렸다 — `Character` enum 의 `JACOB("jacob")`.
   | "jacob";
 
 export async function startMission(

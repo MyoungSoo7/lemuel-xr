@@ -108,6 +108,17 @@ const DIRECT_MISSIONS: Array<{
       "드러낼 것인가, 언제 어떻게 드러낼 것인가 — 말하지 않기로 하는 것도 온전한 선택이다",
     active: true,
   },
+  // 아브라함은 2026-08-22 에 런타임에 열렸는데(#100) *이 목록에 넣는 걸 빠뜨려서*
+  // 주소를 직접 쳐야만 들어갈 수 있었다. 아래 추천 그리드의 ACTIVE 와 **둘 다** 넣어야
+  // 한다 — 한쪽만 넣으면 반쪽 입구다. scripts/track_b_readiness.py 의 `입구` 단계가
+  // 이 어긋남을 잰다.
+  {
+    href: "/abraham",
+    name: "Abraham",
+    korean: "아브라함",
+    tagline: "별을 세던 밤과 사백 년 — 기다림은 아무 일도 없는 시간이 아니다",
+    active: true,
+  },
   {
     href: "/jacob",
     name: "Jacob",
@@ -296,6 +307,7 @@ export default function HomePage() {
                       "peter",
                       "daniel",
                       "esther",
+                      "abraham",
                       "jacob",
                       "abraham",
                     ]);
