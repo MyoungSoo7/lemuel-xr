@@ -10,6 +10,7 @@ import { ScenePassage } from "@/components/ScenePassage";
 import {
   TriggerWarningGate,
   readTriggerWarning,
+  cardDoors,
 } from "@/components/TriggerWarningGate";
 import {
   startMission,
@@ -88,38 +89,13 @@ interface ClosingScreen {
   closing_caption?: { ref?: string; text_ko?: string };
 }
 
-/** 카드 정본의 UI 지시줄 — `[계속한다]  [여기서 마친다]` 처럼 줄 전체가 대괄호다. */
-const DOOR_LINE = /^(?:\[[^\]]*\]\s*)+$/;
-
-/**
- * 동의 카드 정본에서 **두 문의 이름** 을 꺼낸다.
- *
- * 세 카드가 서로 다른 이름을 쓴다 — 「사별 장면은 건너뛴다」(Scene 1) · 「여기서
- * 마친다」(Scene 3) · 「건너뛰기 — 성문 장면으로 이동」(Scene 4). 이건 문구 취향이
- * 아니라 **그 문이 무엇을 하는지에 대한 설명** 이라, 공용 기본값("이 장면은
- * 건너뛸게요 →")으로 덮으면 Scene 3 에서는 거짓말이 된다.
- *
- * 파싱에 실패하면 undefined 를 준다 — 게이트 기본 라벨로 돌아가고, 문 자체는 남는다.
- * 라벨을 못 읽었다고 나갈 문을 없애는 쪽이 훨씬 나쁘다.
- *
- * 「음성/자막 강도: [ 자막만 ] …」 줄은 대괄호로 *시작하지 않으므로* 여기 안 걸린다.
- */
-export function cardDoors(
-  consentCardKo?: string,
-): { continueLabel: string; skipLabel: string } | undefined {
-  const line = (consentCardKo ?? "")
-    .split("\n")
-    .map((l) => l.trim())
-    .find((l) => DOOR_LINE.test(l));
-  if (!line) return undefined;
-
-  const doors = Array.from(line.matchAll(/\[([^\]]*)\]/g))
-    .map((m) => m[1].trim())
-    .filter((t) => t.length > 0);
-  if (doors.length < 2) return undefined;
-
-  return { continueLabel: doors[0], skipLabel: doors[1] };
-}
+/*
+  카드 정본에서 두 문의 이름을 꺼내는 `cardDoors` 는 2026-08-22 에 공용 게이트
+  (`@/components/TriggerWarningGate`) 로 옮겼다 — 베드로 화면이 두 번째 사용자가
+  되면서, 각 화면이 같은 파서를 베끼면 정본 라벨이 화면마다 갈라질 자리가 생긴다.
+  이 화면의 테스트가 `./page` 에서 가져다 쓰므로 이름은 여기서 그대로 내보낸다.
+*/
+export { cardDoors };
 
 export default function RuthPage() {
   const [scene, setScene] = useState<Scene | null>(null);
@@ -194,11 +170,13 @@ export default function RuthPage() {
   };
 
   /*
-    카드를 거절하면 백엔드는 `{ type: "end" }` 만 돌려준다(DecideSceneUseCase 의
-    Skip.Closing). ruth.yml 의 `closing_screen.reached_by` 는 `consent_declined_sentinel`
-    을 포함하지만 **그 화면은 이 경로로 오지 않는다** — 저작된 종결 자막(SR-1)이
-    payload 에 실리지 않는다. 여기서 문구를 지어내면 리포 어디에도 없는 마지막 문장이
-    생기므로, 마쳤다는 사실만 알리고 나가는 문을 준다. 남은 구멍은 백엔드 쪽이다.
+    카드를 거절하면 백엔드는 `type: "end"` 와 함께 **저작된 종결 화면**을 보낸다
+    (DecideSceneUseCase 의 Skip.Closing). 2026-08-22 이전에는 `{ type: "end" }` 만 와서,
+    `closing_screen.reached_by` 가 `consent_declined_sentinel` 을 포함하는데도 그 화면이
+    이 경로로 오지 않았다 — 거절한 사용자에게만 종결 자막(SR-1)도, 위기 안내도 없었다.
+
+    지금도 프론트가 문구를 지어내지는 않는다. 종결 자막이 실려 오면 그것을 띄우고,
+    안 실려 오면 마쳤다는 사실만 알리고 나가는 문을 준다.
   */
   const ended = payload.type === "end";
 
@@ -287,9 +265,28 @@ export default function RuthPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-stone-900/80 via-stone-950/85 to-black/90" />
         <div className="relative z-10 p-5">
           {ended ? (
-            <p className="text-sm text-[var(--color-warm)]/85 leading-relaxed">
-              여기서 마쳤습니다. 남은 장면은 열지 않았습니다.
-            </p>
+            <div className="space-y-3">
+              <p className="text-sm text-[var(--color-warm)]/85 leading-relaxed">
+                여기서 마쳤습니다. 남은 장면은 열지 않았습니다.
+              </p>
+              {/*
+                저작된 종결 자막(SR-1). 카드를 거절하고 온 사용자가 여기 도달한다 —
+                `closing_screen.reached_by` 가 `consent_declined_sentinel` 을 포함한다.
+                없으면 위 한 줄로만 마친다. 없는 문장을 프론트가 지어내지 않는다.
+              */}
+              {closingScreen?.closing_caption?.text_ko && (
+                <div className="space-y-1 px-4 py-4 rounded-lg border border-[var(--color-primary)]/30 bg-black/30">
+                  <p className="text-sm text-[var(--color-warm)]/90 leading-relaxed">
+                    {closingScreen.closing_caption.text_ko}
+                  </p>
+                  {closingScreen.closing_caption.ref && (
+                    <p className="text-[10px] text-[var(--color-warm)]/40">
+                      ({closingScreen.closing_caption.ref})
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
           ) : needsConsent ? (
             <TriggerWarningGate
               warning={warning!}

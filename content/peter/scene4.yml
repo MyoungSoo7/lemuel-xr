@@ -265,7 +265,7 @@ transition:
 theology_footer_refs:
   - scripture_refs:
       - ref: "요한복음 21:1-6"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_cast_instruction
   - disputed_points: []
     handling: "요한복음 21:7-8(요한이 먼저 알아봄, 베드로가 물에 뛰어듦)은 본 Scene 범위 밖 — 인용·연출·암시하지 않는다. Scene 5 는 21:9 부터 재개."

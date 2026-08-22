@@ -52,7 +52,7 @@ export async function completeJoseph(sessionId: string, finalOutcome: string) {
 }
 
 /**
- * B — Joseph 외 인물 ({moses,david,jesus,solomon,elijah,job,ruth}) 의 동일 흐름 generic helper.
+ * B — Joseph 외 인물 ({moses,david,jesus,solomon,elijah,job,ruth,peter,daniel}) 의 동일 흐름 generic helper.
  *
  * 이 union 은 백엔드 `Character` enum 과 손으로 맞추는 자리다. 백엔드에 인물이
  * 등재됐는데 여기 없으면 화면을 만들 수조차 없다 — 룻이 그랬다. enum 에는 있어서
@@ -68,7 +68,9 @@ export type MissionCharacter =
   | "solomon"
   | "elijah"
   | "job"
-  | "ruth";
+  | "ruth"
+  | "peter"
+  | "daniel";
 
 export async function startMission(
   character: MissionCharacter,

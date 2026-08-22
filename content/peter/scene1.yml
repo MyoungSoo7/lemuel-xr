@@ -295,7 +295,7 @@ theology_footer_refs:
     anchor_block: nb_s1_sift_warning
   - scripture_refs:
       - ref: "누가복음 22:31-34"
-        translation: krv
+        translation: rev
         anchor_block: nb_s1_prediction
   - disputed_points: []
     handling: "Scene 1 자체에는 별도 해석 분쟁 없음. 라벨-본문 매핑 관련 분쟁(6번)은 docs/MVP-PETER.md 참조."

@@ -99,6 +99,7 @@ BOOKS = {
     "ps": ("Psalm", "Ps"), "prov": ("Proverbs", "Prov"), "eccl": ("Ecclesiastes", "Eccl"),
     "isa": ("Isaiah", "Isa"), "job": ("Job", "Job"), "matt": ("Matthew", "Matt"),
     "mk": ("Mark", "Mark"), "lk": ("Luke", "Luke"), "jn": ("John", "John"),
+    "est": ("Esther", "Esth"), "dan": ("Daniel", "Dan"),
 }
 
 
@@ -165,6 +166,7 @@ KRV_BOOKS = {
     "gen": "gen", "ex": "exo", "num": "num", "ruth": "rut", "1sam": "1sa",
     "1kgs": "1ki", "ps": "psa", "prov": "pro", "eccl": "ecc", "isa": "isa",
     "job": "job", "matt": "mat", "mk": "mrk", "lk": "luk", "jn": "jhn",
+    "est": "est", "dan": "dan",
 }
 KRV_NUM_RE = re.compile(r'<span class="number">(\d+)(?:&nbsp;|\s)*</span>')
 KRV_TITLE_RE = re.compile(r'<font class="smallTitle">.*?</font>\s*(?:<br\s*/?>)*', re.S)

@@ -68,7 +68,7 @@ class DecideSceneUseCase(
 
                 SceneSkipResolver.Skip.Closing -> Result(
                     sessionId, input.sceneId,
-                    input.sceneId, mapOf("type" to "end"), responseText,
+                    input.sceneId, closingPayload(scenario), responseText,
                 )
             }
         }
@@ -180,6 +180,88 @@ class DecideSceneUseCase(
         return payload
     }
 
+    /**
+     * 동의 카드를 **거절한** 사용자의 종결 payload — 저작된 `closing_screen` 을 실어 보낸다.
+     *
+     * ─────────────────────────── 왜 고쳤나 ───────────────────────────
+     *
+     * 여기는 `mapOf("type" to "end")` 만 내보내고 있었다. 그런데 룻 Scene 5 의
+     * `extras.closing_screen` 은 `reached_by` 에 **`consent_declined_sentinel` 을 명시**하고
+     * 있다 — 저작은 거절한 사용자도 이 화면에 착지시키기로 했고, 그 옆에 이렇게 적어 두었다:
+     * 「세 경로가 모두 이 블록에 착지한다 — **덜 본 사람에게 덜한 결말을 주지 않는다.**」
+     * 코드는 그 약속을 지키지 않았다. 거절한 사람만 빈 `end` 를 받고 끝났다.
+     *
+     * 이게 자막 하나 빠지는 문제가 아닌 이유는 그 블록의 `ui_overlays` 다 —
+     * `[suffering_disclaimer, crisis_reminder, exit_button]`. 즉 **거절한 사용자에게만**
+     * 위기 안내도, 나가기 버튼도, 면책도 안 갔다. 카드를 거절한다는 것은 그 내용을 보지
+     * 않겠다는 뜻이고, 그런 선택을 한 사용자야말로 이 세 가지가 필요한 쪽이다.
+     * 리포 전체에서 `declined_route` 는 룻 하나뿐이라 범위는 좁지만 성격은 안전이다.
+     *
+     * ─────────────────────────── 규약 ───────────────────────────
+     *
+     * `type: "end"` 는 그대로 둔다 — 클라이언트가 "미션이 끝났다" 를 읽는 자리다.
+     * 그 옆에 종결 화면과 위기 안내 문자열을 **저작된 이름 그대로**(`closing_screen` ·
+     * `crisis_reminder`) 싣는다. 프론트가 이미 그 이름으로 읽고 있어서다
+     * (`/ruth` 의 `field()` — `payload.extras[key] ?? payload[key]`). 여기서 camelCase 로
+     * 바꿔 실으면 백엔드는 고친 것처럼 보이고 화면은 그대로 비어 있다.
+     *
+     * ─────────────── 통째로 싣지 않고 **골라** 싣는 이유 ───────────────
+     *
+     * 종결 화면은 Scene 5 안에 산다. 그런데 이 경로로 오는 사용자는 중간 동의 카드를
+     * 거절한 사람이고, 그 카드의 `covers_scenes` 는 **[3, 5]** 다 — Scene 5 의 내용도
+     * 거절한 것이다. Scene 5 payload 를 통째로 넘기면 성문 낭독 자막이 딸려 가서, 안 보겠다고
+     * 고른 사람에게 그 내용을 보여 주게 된다. 그래서 뺄 것을 지우는 대신 **실을 것만 고른다** —
+     * 새 키가 저작되어도 기본값이 "안 실림" 이어야 이 실수가 재발하지 않는다.
+     *
+     * 고르기 전에 [ScenePayloadAssembler] 를 한 번 통과시킨다. `crisis_reminder` 는
+     * `{{crisis_resources.default}}` 토큰이라 치환 없이 실으면 사용자가 중괄호를 본다.
+     *
+     * `closing_screen` 이 없는데 `declined_route: closing` 을 선언한 시나리오는 던진다.
+     * 조용히 `end` 로 흘리면 지금 고친 이 결함이 새 인물에서 그대로 재발하고, 그때도
+     * 아무도 모른다 — 바로 그래서 이 버그가 오래 살았다. 축약 경로가 약속한 키를 못 찾을 때
+     * [altBlockPayload] 가 던지는 것과 같은 이유다. 배포 전에 잡으라고
+     * `DeclinedRouteClosingScreenTest` 가 실제 yml 에 대고 같은 것을 정적으로도 잰다.
+     *
+     * ⚠️ 미해소 — 마감 한 줄(`closing_lines`)을 거절 경로에도 줄지는 **저작이 답하지 않았다.**
+     * 건너뛰기 경로에는 `renders: [closing_lines, closing_screen]` 로 명시돼 있지만
+     * 거절 경로에는 `closing_screen.reached_by` 센티널뿐이다. 여기서 지어내지 않고 뺐다.
+     */
+    private fun closingPayload(scenario: Scenario): Map<String, Any?> {
+        val holder = scenario.scenes.firstOrNull { closingScreenOf(it) != null }
+            ?: throw AppException(
+                ErrorCode.E_VALIDATION,
+                "declined_route: closing 을 선언했는데 어느 Scene 에도 extras.$CLOSING_SCREEN 이 없다 — " +
+                    "거절한 사용자가 받을 화면이 저작되지 않았다",
+            )
+
+        val resolved = payloads.build(scenario, holder.id)
+        val roots: List<Map<*, *>> = listOfNotNull(resolved, resolved["extras"] as? Map<*, *>)
+
+        val out = LinkedHashMap<String, Any?>()
+        out["type"] = "end"
+        CLOSING_KEYS.forEach { key ->
+            roots.firstNotNullOfOrNull { it[key] }?.let { out[key] = it }
+        }
+        return out
+    }
+
+    /**
+     * Scene 에서 종결 화면 블록을 꺼낸다 — **두 겹을 다 본다.**
+     *
+     * 로더가 표준필드만 걷어내므로, yml Scene 이 자기 `extras:` 블록을 명시적으로 쓰면
+     * 그 안의 키들은 `scene.extras["extras"]` 로 **한 겹 더 들어간다.** 룻 Scene 5 가
+     * 정확히 그 모양이라(`scenes[4].extras.closing_screen`), 최상위만 보면 못 찾는다.
+     * [SceneSkipResolver] · [SceneConvergenceResolver] 가 같은 이유로 같은 짓을 한다.
+     *
+     * 처음 이 고침을 쓸 때 최상위만 봤고, 픽스처가 최상위에 두는 바람에 단위 테스트는
+     * 초록이었다. 실제 ruth.yml 에 대고 재는 `DeclinedRouteClosingScreenTest` 가 그걸
+     * 잡았다 — 정적 검사를 함께 둔 이유가 이것이다.
+     */
+    private fun closingScreenOf(scene: Scenario.Scene): Map<*, *>? {
+        val roots = listOfNotNull(scene.extras, scene.extras?.get("extras") as? Map<*, *>)
+        return roots.firstNotNullOfOrNull { it[CLOSING_SCREEN] as? Map<*, *> }
+    }
+
     /** 결정 영속. */
     private fun persistDecision(sessionId: UUID, currentScene: Scenario.Scene, input: Input) {
         decisions.save(
@@ -194,6 +276,23 @@ class DecideSceneUseCase(
     private fun recordProgress(session: GameSession, input: Input) {
         session.recordDecision(input.sceneId, input.decision)
         session.advanceSceneCount(input.sceneId)
+    }
+
+    private companion object {
+        /** 저작이 종결 화면을 두는 자리 — `scenes[].extras.closing_screen`. */
+        const val CLOSING_SCREEN = "closing_screen"
+
+        /**
+         * 거절한 사용자에게 실어 보낼 키 — **허용목록**이다.
+         *
+         * 종결 화면이 사는 Scene 은 그 사용자가 거절한 내용도 함께 갖고 있다. 그래서
+         * "뺄 것" 이 아니라 "실을 것" 을 적는다. 새 키가 저작되면 기본값이 *안 실림* 이고,
+         * 실어야 한다면 그 결정이 이 줄에 남는다.
+         *
+         * `crisis_reminder` 는 화면의 `ui_overlays` 가 요구하는 문자열이다 — 빠지면
+         * 화면은 오되 위기 안내만 조용히 사라진다.
+         */
+        val CLOSING_KEYS = listOf(CLOSING_SCREEN, "crisis_reminder")
     }
 
     data class Input(

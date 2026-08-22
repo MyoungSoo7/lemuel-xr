@@ -125,7 +125,7 @@ theology_footer_refs:
     anchor_block: nb_s6_recovery_phrase
   - scripture_refs:
       - ref: "출애굽기 3:12"
-        translation: krv
+        translation: rev
         anchor_block: nb_s6_scripture_centered
   - faith_tone_branch:
       table: "users.faith_tone (strong | balanced | soft)"

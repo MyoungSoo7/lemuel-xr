@@ -200,10 +200,10 @@ theology_footer_refs:
     anchor_block: nb_s4_still_voice
   - scripture_refs:
       - ref: "열왕기상 19:11~12"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_still_voice
       - ref: "열왕기상 19:13~14"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_second_question
   - disputed_points:
       - "'세미한 소리'(왕상 19:12) 번역 — still small voice(KJV) / gentle whisper(NIV) / sheer silence(NRSV, 히브리어 콜 데마마 다카). 다중 입장."

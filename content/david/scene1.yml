@@ -193,13 +193,13 @@ theology_footer_refs:
     anchor_block: nb_s1_psalm_string_1
   - scripture_refs:
       - ref: "시편 23:1"
-        translation: krv
+        translation: rev
         anchor_block: nb_s1_psalm_string_1
       - ref: "시편 23:2"
-        translation: krv
+        translation: rev
         anchor_block: nb_s1_psalm_string_2
       - ref: "시편 23:4"
-        translation: krv
+        translation: rev
         anchor_block: nb_s1_psalm_string_4
   - disputed_points:
       - "시편 23편 저작권 — 다윗 단독 vs 후대 편집"

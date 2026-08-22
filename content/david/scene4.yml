@@ -282,14 +282,14 @@ theology_footer_refs:
     anchor_block: nb_s4_stone_red_label
   - scripture_refs:
       - ref: "사무엘상 17:40"
-        translation: krv
+        translation: rev
         anchor_block: nb_s4_scripture_caption
       - ref: "잠언 4:23"
-        translation: krv
+        translation: rev
         note_ko: "마음을 지키라 — TRACK-A-6 연결. 5 감정을 주머니에 넣는다 = 경계 형성. 감정에 휘둘림 vs 감정을 가짐의 분별"
         anchor_block: nb_s4_complete_inner
       - ref: "잠언 29:25"
-        translation: krv
+        translation: rev
         note_ko: "두려움 돌 (검정) 메커니즘 보조 — 사람을 두려워하면 올무에 걸리게 되거니와"
         anchor_block: nb_s4_stone_black_label
   - disputed_points:

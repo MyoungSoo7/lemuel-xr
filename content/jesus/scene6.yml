@@ -1,0 +1,199 @@
+# Scene 6 — 부활 · 빈 무덤 (90초, 본문 낭독)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 scenarios/jesus.yml scene 6 의 `lines` ·
+#    `reflection_prompt` 원문이다. 새로 쓴 것은 XR 무대뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+#
+# ⚠️ 안전 축: *부활 압박 금지* 축을 여기 둔다(고난 가스라이팅 축은 Scene 5 담당). 이 미션 전체에서 런타임이 선언한
+#    유일한 축이고(scenarios/jesus.yml scene 6 note), 위반이 일어날 자리는 부활 Scene 하나다.
+# ⚠️ reflection_prompt 의 '부활해 내야' 는 반말 어간이다. 이것을 존댓말로 다듬으면
+#    ('부활해 내셔야 합') 아래 55종 목록에 자기 대본이 걸린다. **고치지 말 것.**
+#    런타임 머리말이 이 한 음절 차이를 이미 측정해 기록해 두었다.
+
+scene_id: jesus_scene6
+scene_name: resurrection_empty_tomb
+mission_id: jesus
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: garden_tomb_dawn
+  background_model: env_garden_tomb_dawn
+  lighting:
+    type: dawn_rising_gradual
+    color_temperature_kelvin: 5000
+    note: >-
+      빛이 *올라오는 중* 이다. 완성된 아침이 아니다. 부활을 이미 끝난 밝음으로 그리면
+      아직 어두운 사용자가 자기만 뒤처졌다고 읽는다.
+  ambient_sound:
+    - id: garden_birds_first_light
+      gain_db: -32
+      spatial: true
+  user_position: [0.0, 1.55, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: mary_magdalene
+    voice_id: mary_v1
+    position: [-0.7, 1.55, 1.5]
+  - id: risen_jesus
+    voice_id: jesus_v1
+    position: [0.8, 1.60, 2.6]
+    note: >-
+      부활하신 그리스도를 정면 클로즈업으로 잡지 않는다. 본문에서 마리아는 처음에
+      동산지기로 알아보지 못했다(요 20:15) — 알아봄은 얼굴이 아니라 이름이 불릴 때 왔다.
+
+narration_blocks:
+  - id: nb_s6_jn2015
+    speaker: scripture_caption
+    text_ko: "예수께서 이르시되 여자여 어찌하여 울며 누구를 찾느냐"
+    audio_clip_id: aud_s6_jn2015_ko
+    start_at_seconds: 8.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    scripture_ref: jn-20:15
+    source_of_record: "scenarios/jesus.yml :: scenes[id=6].extras.lines[ref=jn-20:15]"
+  - id: nb_s6_jn2016
+    speaker: scripture_caption
+    text_ko: "예수께서 마리아야 하시거늘 마리아가 돌이켜 히브리 말로 랍오니 하니 (이는 선생님이라는 말이라)"
+    audio_clip_id: aud_s6_jn2016_ko
+    start_at_seconds: 26.0
+    duration_seconds: 16.0
+    hidden_until_event: null
+    scripture_ref: jn-20:16
+    source_of_record: "scenarios/jesus.yml :: scenes[id=6].extras.lines[ref=jn-20:16]"
+  - id: nb_s6_reflection
+    speaker: system
+    text_ko: "부활은 마리아에게 *이름을 불러 주심* 으로 왔습니다. 이 소망은 당신이 스스로 부활해 내야 하는 과제가 아니라, *당신의 이름이 불린다* 는 약속입니다."
+    audio_clip_id: aud_s6_reflection_ko
+    start_at_seconds: 52.0
+    duration_seconds: 22.0
+    hidden_until_event: null
+    source_of_record: "scenarios/jesus.yml :: scenes[id=6].extras.reflection_prompt"
+    verbatim_locked: true
+    verbatim_lock_reason: >-
+      존댓말로 다듬으면 이 미션 자신의 안전 목록에 걸린다. 어간 절단으로 만든 토큰의
+      대가이고, 그 대가를 문서화한 상태로 유지하는 것이 무단 수정보다 안전하다.
+
+interactions:
+  - id: ix_s6_hear_your_name
+    type: audio_focus
+    presentation:
+      no_text_input: true
+      no_name_capture: true
+    note: >-
+      사용자의 실제 이름을 받아 부르지 않는다. 개인화가 아니라 *약속의 형식* 을 보여 준다 —
+      이름을 입력받으면 그것은 앱이 부르는 것이지 그리스도께서 부르시는 것이 아니다.
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 0
+        on_timeout: auto_advance
+
+branches: []
+
+safety_gates:
+  - id: R3_no_resurrection_pressure
+    enforced_at: always
+    description: >-
+      부활을 사용자가 수행해야 할 과제로 제시하는 문장 금지. 부활은 그리스도의 사역과
+      약속으로만 제시된다. 2인칭 명령·유비·차례 프레임·능력 귀속이 전부 여기 걸린다.
+    lint_scope: [narration_blocks, interactions]
+    lint_forbidden_tokens:
+        - "부활하세요"
+        - "부활하십시"
+        - "부활하시면"
+        - "부활하셔도"
+        - "당신도 부활하셔야 합"
+        - "당신도 부활하셔야죠"
+        - "스스로 부활하세"
+        - "부활해 내셔야 합"
+        - "부활해 내셔야죠"
+        - "부활하셨듯 당신"
+        - "부활하셨듯 여러분"
+        - "부활하셨듯 너"
+        - "부활하셨던 것처럼 당신"
+        - "부활하신 것처럼 당신"
+        - "부활하신 것처럼 여러분"
+        - "살아나셨듯 당신"
+        - "살아나셨듯 여러분"
+        - "일어나셨듯 당신"
+        - "일어나셨듯 여러분"
+        - "당신도 다시 일어서"
+        - "당신도 다시 살아"
+        - "당신도 다시 일어나세"
+        - "당신도 다시 일어나십"
+        - "스스로 일어서세"
+        - "스스로 일어서십"
+        - "스스로 일어서셔야 합"
+        - "스스로 일어서셔야죠"
+        - "스스로 일어서시면 됩"
+        - "부활의 능력으로 회복"
+        - "부활의 능력으로 일어서세"
+        - "부활의 능력으로 일어나세"
+        - "부활의 능력이 당신"
+        - "부활의 능력이 여러분"
+        - "부활의 소망으로 극복"
+        - "부활의 소망으로 이겨"
+        - "부활의 소망으로 이기"
+        - "부활의 소망을 붙들면"
+        - "부활 신앙이 있다면"
+        - "당신의 부활절"
+        - "부활할 차례"
+        - "살아날 차례"
+        - "일어날 차례"
+        - "무덤에서 걸어 나오세"
+        - "무덤에서 걸어 나오십"
+        - "무덤에서 걸어 나오시면"
+        - "무덤에서 걸어 나오셔야 해"
+        - "무덤에서 걸어 나오셔야 합"
+        - "무덤에서 걸어 나오셔야죠"
+        - "무덤에서 나오세"
+        - "무덤에서 나오십"
+        - "무덤에서 나오시면"
+        - "무덤에서 나오셔도"
+        - "무덤에서 나오셔야 해"
+        - "무덤에서 나오셔야 합"
+        - "무덤에서 나오셔야죠"
+    measured: >-
+      55종. scripts/gates/jesus.yml 의 forbidden 과 동일 집합이며 그것은 런타임
+      scenarios/jesus.yml 에서 기계 추출된 것이다. 이 파일의 사용자 노출 문장 3건 대조 — 적중 0건.
+      단 nb_s6_reflection 은 '부활해 내야'(반말)로 통과하는 것이며, 존댓말이면 걸린다.
+    known_misses_ref: "docs/MVP-JESUS-CONTENT.md §8.2 — 측정된 우회 3건"
+    known_misses_note: >-
+      런타임 머리말이 측정해 둔 우회 3건이 존재한다. 그 예문은 여기 적지 않는다 —
+      금지 토큰의 표층형을 렌더 leaf 에 넣으면 G6 가(정당하게) 그것을 위반으로 읽는다.
+      예문은 인용 마커를 달 수 있는 문서 쪽에 둔다. 이 게이트는 *표층형 목록* 이고
+      우회가 존재한다는 사실이 목록과 함께 있어야 초록이 과대 해석되지 않는다.
+  - id: recognition_not_user_task
+    enforced_at: always
+    description: "알아봄을 사용자의 노력으로 그리지 않는다. 마리아는 알아보지 못하다가 이름이 불렸을 때 돌이켰다."
+    enforcement: reviewer_only
+    note: "집행 수단 없음. 사람 검토가 볼 자리로 남긴다."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "전부 정적 본문 낭독 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jesus_scene7
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: JS6_candidate
+    source: "요한복음 20:11~18 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "육체적 부활을 역사적 사건으로 전제한다(합신·웨스트민스터). 상징적·주관적 부활 해석은 이 미션의 배제 목록에 있다."
+    anchor_block: nb_s6_jn2016
+  - disputed_points:
+      - "'나를 붙들지 말라'(요 20:17)의 의미는 주해가 갈린다."
+    handling: "그 구절을 무대에 올리지 않는다. 인용 범위는 20:15~16 이다."

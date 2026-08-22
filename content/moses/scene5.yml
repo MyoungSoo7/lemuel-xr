@@ -184,5 +184,5 @@ theology_footer_refs:
     handling: "footer 에 '본 Scene 은 시간 압축' 명시"
   - scripture_refs:
       - ref: "출애굽기 3:12"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_bush_promise_from_behind

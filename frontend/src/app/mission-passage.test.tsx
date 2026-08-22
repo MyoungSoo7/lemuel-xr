@@ -3,7 +3,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 /*
-  미션 8화면이 `scenePayload.scriptureRef` 를 **실제로 연다** 는 것을 재는 검사.
+  미션 화면 전부가 `scenePayload.scriptureRef` 를 **실제로 연다** 는 것을 재는 검사.
+  (아래 `PAGES` 가 그 전부이고, `scripts/mission_passage_check.py` 의 runtime-test 가
+   인물이 새로 열릴 때마다 이 목록에 그 인물이 들어왔는지 대조한다. 여기 개수를
+   숫자로 적어 두면 인물이 늘 때마다 그 숫자만 조용히 틀려진다.)
 
   ─────────────── 왜 새로 필요했나 ───────────────
 
@@ -18,7 +21,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
   ─────────────── 재는 것 ───────────────
 
-  1) 8화면 전부 — payload 에 `scriptureRef` 가 있으면 **API 응답 본문이 화면에 뜬다**.
+  1) 화면 전부 — payload 에 `scriptureRef` 가 있으면 **API 응답 본문이 화면에 뜬다**.
   2) 참조가 없는 씬에서는 빈 껍데기를 그리지 않는다(본문 없는 씬과 구별돼야 한다).
   3) 본문 텍스트는 프론트 사본이 아니라 `fetchScripturePassage` 응답에서만 온다 —
      그래서 픽스처 문자열은 이 파일이 지어낸 표식이고, 화면에 그게 떠야 통과다.
@@ -41,12 +44,14 @@ vi.mock("@/lib/api/content", () => ({
 import { startMission, startJoseph } from "@/lib/api/game";
 import { fetchScripturePassage } from "@/lib/api/content";
 
+import DanielPage from "./daniel/page";
 import DavidPage from "./david/page";
 import ElijahPage from "./elijah/page";
 import JesusPage from "./jesus/page";
 import JobPage from "./job/page";
 import JosephPage from "./joseph/page";
 import MosesPage from "./moses/page";
+import PeterPage from "./peter/page";
 import RuthPage from "./ruth/page";
 import SolomonPage from "./solomon/page";
 
@@ -74,7 +79,7 @@ const PASSAGE = {
 };
 
 /**
- * 8화면이 공유하는 최소 payload. 씬 타입은 어느 화면에서도 상호작용을 요구하지 않는
+ * 화면들이 공유하는 최소 payload. 씬 타입은 어느 화면에서도 상호작용을 요구하지 않는
  * `cinematic` 으로 두고, 경고(trigger_warning)는 달지 않는다 — 동의 게이트가 뜨면
  * 본문이 가려지는 것이 **정상 동작** 이라 그 상태에서 재면 아무것도 못 잰다.
  */
@@ -102,12 +107,14 @@ const WITHOUT_REF = scene({
 });
 
 const PAGES: Array<[string, () => React.ReactElement]> = [
+  ["daniel", () => <DanielPage />],
   ["david", () => <DavidPage />],
   ["elijah", () => <ElijahPage />],
   ["jesus", () => <JesusPage />],
   ["job", () => <JobPage />],
   ["joseph", () => <JosephPage />],
   ["moses", () => <MosesPage />],
+  ["peter", () => <PeterPage />],
   ["ruth", () => <RuthPage />],
   ["solomon", () => <SolomonPage />],
 ];
@@ -146,8 +153,8 @@ describe("미션 화면은 scriptureRef 를 실제로 연다", () => {
       renderPage(make());
 
       // 씬 제목으로 「화면이 떴다」를 확인한다. `static_text` 를 쓰면 안 된다 —
-      // 그 필드를 실제로 렌더하는 화면은 8개 중 elijah·job 둘뿐이고(나머지는 각자의
-      // 콘텐츠 모듈·자막을 쓴다), 나머지 6개에서는 「본문 블록이 없다」가 아니라
+      // 그 필드를 실제로 렌더하는 화면은 elijah·job 둘뿐이고(나머지는 각자의
+      // 콘텐츠 모듈·자막을 쓴다), 그 나머지에서는 「본문 블록이 없다」가 아니라
       // 「화면이 아직 안 떴다」를 재게 된다.
       expect(await screen.findByText("본문이 없는 씬")).toBeInTheDocument();
       expect(screen.queryByTestId("scene-passage")).toBeNull();

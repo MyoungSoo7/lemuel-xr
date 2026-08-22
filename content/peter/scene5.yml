@@ -376,7 +376,7 @@ bridge:
 theology_footer_refs:
   - scripture_refs:
       - ref: "요한복음 21:9-17"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_v17
   - disputed_points_refs:
       - "docs/MVP-PETER.md disputed_points 1번 (ἀγαπάω/φιλέω) — 그리스어를 자막에 노출하지 않는다"

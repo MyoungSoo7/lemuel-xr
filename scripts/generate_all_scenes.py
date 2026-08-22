@@ -190,6 +190,72 @@ SCENES: dict[str, dict[str, str]] = {
              "the shade of the gateway arch, a single worn sandal set on the paving before them, long "
              "warm light raking across the stones.",
     },
+    # 베드로 — 2026-08-22. 다섯 장의 색온도가 크게 갈린다(등불 실내 → 밤 불빛 →
+    # 밤 → 여명 → 아침). 그래서 1·5 의 불은 같은 소재(숯불)로 두되 광원 방향을
+    # 반대로 잡는다: 2 는 사람이 둘러선 안쪽을 비추고, 5 는 빈 바닷가를 향해 열려 있다.
+    # 그 대비가 이 미션의 축(같은 불 앞에서 부인했고, 같은 불 앞에서 이름이 불렸다)이다.
+    "peter": {
+        "1": "A stone upper room at night after a meal has ended, a long low table with emptied clay "
+             "cups and torn bread left on it, one small oil lamp burning at the table's end, deep warm "
+             "shadows gathering in the corners of the room.",
+        "2": "A high-walled courtyard of a large stone house at night, a charcoal fire burning low in an "
+             "open brazier at the centre of the packed earth, empty worn benches drawn up around it, "
+             "cold darkness pressing in beyond the ring of firelight.",
+        "3": "The same stone courtyard seen toward its open gateway in the last hour of night, the "
+             "charcoal fire reduced to embers behind, the archway standing open onto an empty dark "
+             "street, first faint grey showing low in the sky.",
+        "4": "The wooden deck of a small fishing boat on a wide still lake in the last dark before dawn, "
+             "a heavy wet net heaped and empty along the gunwale, oars shipped, flat grey water "
+             "stretching to a low shoreline barely separating from the sky.",
+        "5": "A quiet lake shore at sunrise, a charcoal fire already burning on the sand with fish laid "
+             "across it and flat loaves of bread set beside, a fishing boat drawn up empty at the "
+             "water's edge, low golden light coming in level across the water.",
+    },
+    # 다니엘 — 2026-08-22. 다섯 칸 전부 `scenarios/daniel.yml` 의 `extras.anchor` 와
+    # `environment.time_of_day` 에서 옮겼다: torch_lit_interior · interior_daylight_shafts ·
+    # day_cycle_timelapse · formal_court_session · 새벽.
+    #
+    # 두 가지를 일부러 안 그린다.
+    #
+    # ① **사자 굴을 그리지 않는다.** Scene 5 의 trigger_warning 이 경고하는 것이
+    #    바로 그 좁고 어두운 공간이고, 동의하지 않은 사람은 `daniel_scene5_alt_quiet_window`
+    #    로 빠진다. 그런데 배경은 동의 게이트보다 *먼저* 깔린다 — 굴을 그려 두면 건너뛰기를
+    #    고른 사람이 건너뛴 그 그림을 이미 본 상태가 된다. 그래서 yml 의 anchor 그대로
+    #    예루살렘을 향한 창문과 새벽만 그린다. 축약 경로와 정본 경로가 같은 배경을 쓴다.
+    #
+    # ② **조서의 글자를 그리지 않는다.** Scene 4 의 소재는 도장이 찍히는 자리인데,
+    #    STYLE 이 글자를 금지한다(david/5 의 의미 없는 자막 사고). 봉인은 그리되
+    #    양피지 면은 비워 둔다 — 읽히는 순간 그 문구를 저작자가 아니라 Imagen 이 쓴 게 된다.
+    #
+    # 2·3 은 yml 상 같은 방이다. 그래서 소재로 가른다: 2 는 차려진 왕의 상, 3 은 치우고
+    # 남은 채소와 물, 그리고 열흘이 지나간 흔적(빛줄기가 여러 겹으로 겹친다).
+    "daniel": {
+        "1": "A large open courtyard of a Neo-Babylonian palace in the evening, walls of deep blue "
+             "glazed brick banded with plain geometric ochre borders and nothing else, stepped "
+             "crenellations along the roofline, low torches burning in bronze brackets, a wide empty "
+             "paved floor, long torchlight shadows reaching across the stones. The walls carry no "
+             "murals, no figure carvings, no reliefs of any creature, and no inscribed marks.",
+        "2": "Interior of a Neo-Babylonian palace dining hall by day, plain blue glazed brick walls "
+             "with simple geometric banding and no decoration of any other kind, square cedar roof "
+             "beams, a long low table laid with heaped platters of rich royal food and bronze wine "
+             "vessels, reed mats set around it, one tall narrow slot window casting a single long "
+             "shaft of daylight across the table and floor, every seat empty. No wall paintings, no "
+             "hangings, no reliefs, no statues.",
+        "3": "The same Neo-Babylonian palace dining hall with the same plain blue glazed brick walls, "
+             "same cedar beams and same long low table, but the rich platters cleared away — only a "
+             "plain wooden bowl of raw vegetables and a simple clay jar of water left on the bare "
+             "table, many overlapping shafts of light and shadow layered across the floor as if ten "
+             "days had passed at once. No wall paintings, no hangings, no reliefs, no statues.",
+        "4": "A formal Achaemenid Persian throne hall of polished dark stone, tall slender fluted "
+             "columns, walls entirely plain and undecorated, an empty raised throne dais at the far "
+             "end, a broad unrolled parchment lying on a low table in the foreground with a clay seal "
+             "pressed at its edge, the parchment surface entirely blank, cold ceremonial light. "
+             "No carved figures, no reliefs of people or animals, no statues, no wall panels of any "
+             "figurative kind.",
+        "5": "A quiet stone upper room at first dawn, one open window facing out toward distant hills, "
+             "a worn woven mat laid on the floor before it, soft grey-gold light just beginning to "
+             "spill over the sill, the room still and completely empty.",
+    },
 }
 
 

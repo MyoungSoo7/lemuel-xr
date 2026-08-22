@@ -105,7 +105,7 @@ theology_footer_refs:
     anchor_block: nb_s5_scripture_centered
   - scripture_refs:
       - ref: "창세기 45:5"
-        translation: krv
+        translation: rev
         anchor_block: nb_s5_scripture_centered
   - faith_tone_branch:
       table: "users.faith_tone (strong | balanced | soft)"

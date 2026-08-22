@@ -1,0 +1,126 @@
+# Scene 2 — 산 위의 가르침 · 팔복 (90초)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 scenarios/jesus.yml scene 2 의 `lines[].text` ·
+#    `reflection_prompt` 원문이다. 새로 쓴 것은 XR 무대뿐이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+# ⚠️ 이 Scene 은 안전 축을 선언하지 않는다. 축은 위반이 일어나는 자리에만 둔다
+#    (jesus Scene 1·5·6·7). 여기에 목록을 복사하면 초록만 늘고 집행은 늘지 않는다.
+
+scene_id: jesus_scene2
+scene_name: beatitudes_on_the_mount
+mission_id: jesus
+version: 1.0.0
+duration_seconds_target: 90
+
+environment:
+  space_id: galilee_hillside_morning
+  background_model: env_galilee_slope_morning
+  lighting:
+    type: clear_morning_side_light
+    color_temperature_kelvin: 5200
+  ambient_sound:
+    - id: hillside_grass_wind
+      gain_db: -26
+      spatial: true
+    - id: crowd_seated_sparse
+      gain_db: -32
+      spatial: true
+  user_position: [0.0, 1.20, 0.0] # 앉은 눈높이 — 무리 가운데 앉아 있다
+  user_facing: [0.0, 0.1, 1.0]
+  camera_locomotion: disabled
+
+npcs:
+  - id: jesus_teaching
+    voice_id: jesus_v1
+    position: [0.0, 1.35, 2.4]
+    note: "거리 2.4m — 가깝지도 멀지도 않게. 얼굴 클로즈업 없음."
+
+narration_blocks:
+  - id: nb_s2_beatitude_1
+    speaker: scripture_caption
+    text_ko: "심령이 가난한 자는 복이 있나니 천국이 그들의 것임이요"
+    audio_clip_id: aud_s2_beatitude_1_ko
+    start_at_seconds: 6.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    scripture_ref: mt-5:3
+    source_of_record: "scenarios/jesus.yml :: scenes[id=2].extras.lines[0]"
+  - id: nb_s2_beatitude_2
+    speaker: scripture_caption
+    text_ko: "애통하는 자는 복이 있나니 그들이 위로를 받을 것임이요"
+    audio_clip_id: aud_s2_beatitude_2_ko
+    start_at_seconds: 22.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    scripture_ref: mt-5:4
+    source_of_record: "scenarios/jesus.yml :: scenes[id=2].extras.lines[1]"
+  - id: nb_s2_beatitude_3
+    speaker: scripture_caption
+    text_ko: "의에 주리고 목마른 자는 복이 있나니 그들이 배부를 것임이요"
+    audio_clip_id: aud_s2_beatitude_3_ko
+    start_at_seconds: 38.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    scripture_ref: mt-5:6
+    source_of_record: "scenarios/jesus.yml :: scenes[id=2].extras.lines[2]"
+  - id: nb_s2_reflection
+    speaker: system
+    text_ko: "여기서 '복'은 성취가 아니라 *비어 있음* 에서 시작됩니다. 오늘 당신의 비어 있는 자리 하나를 떠올려 보세요 — 채우라는 압박 없이, 그저 인정만."
+    audio_clip_id: aud_s2_reflection_ko
+    start_at_seconds: 58.0
+    duration_seconds: 20.0
+    hidden_until_event: null
+    source_of_record: "scenarios/jesus.yml :: scenes[id=2].extras.reflection_prompt"
+    note: "'채우라는 압박 없이, 그저 인정만' — 이 절을 삭제하면 팔복이 자기계발 과제가 된다. 축약 금지."
+
+interactions:
+  - id: ix_s2_recall_empty_place
+    type: silent_recall
+    target_assets: []
+    gesture: none
+    presentation:
+      no_text_input: true # 떠올리기만 — 입력받지 않는다. 보관 책임을 만들지 않는다.
+      no_progress_indicator: true
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 30
+        on_timeout: treat_as_complete
+
+branches: []
+
+safety_gates:
+  - id: beatitude_not_a_task
+    enforced_at: always
+    description: "팔복을 달성 목표·자기계발 과제로 제시하지 않는다. '가난해지세요'·'애통하세요' 류의 명령형 재서술 금지 — 팔복은 상태에 대한 선언이지 사용자에게 부과되는 조건이 아니다."
+    enforcement: reviewer_only
+    note: >-
+      집행 수단 없음. 명령형 재서술은 무한한 표층형을 가지므로 토큰으로 닫히지 않는다.
+      현재 근거로 남길 수 있는 사실만: 이 파일의 사용자 노출 문장은 전부 인용이거나
+      '떠올려 보세요' 한 건이고, 그 한 건에도 '압박 없이' 가 붙어 있다.
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: always
+    description: "전부 정적 본문 낭독 — opt-out 영향 없음."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: jesus_scene3
+transition:
+  type: fade_to_black
+  fade_out_seconds: 0.8
+  fade_in_seconds: 1.2
+
+theology_footer_refs:
+  - citation_id: JS2_candidate
+    source: "마태복음 5장 팔복 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "'심령이 가난한' 을 경제적 빈곤으로도, 순수 내면 상태로도 축소하지 않는 것이 이 Scene 의 인용 범위다."
+    anchor_block: nb_s2_beatitude_1
+  - disputed_points:
+      - "팔복의 수신자 범위(제자 한정 / 무리 전체)와 종말론적 시제(이미/아직)에 해석 차가 있다."
+    handling: "세 절만 인용하고 적용 범위를 규정하지 않는다. 규정하는 순간 그 해석이 미션의 신학 주장이 된다."

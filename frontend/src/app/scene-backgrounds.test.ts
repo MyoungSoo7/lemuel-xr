@@ -31,12 +31,14 @@ const PUBLIC_DIR = join(__dirname, "..", "..", "public");
   읽는다는 걸 확인한 뒤에 넣었다.
 */
 const CHARACTERS = [
+  "daniel",
   "david",
   "elijah",
   "jesus",
   "job",
   "joseph",
   "moses",
+  "peter",
   "ruth",
   "solomon",
 ];

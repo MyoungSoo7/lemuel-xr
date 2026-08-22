@@ -244,7 +244,7 @@ transition:
 theology_footer_refs:
   - scripture_refs:
       - ref: "누가복음 22:61-62"
-        translation: krv
+        translation: rev
         anchor_block: nb_s3_weeping
   - disputed_points: []
     handling: "본 Scene 은 통곡을 절망의 종착지로 묘사하지 않는다 — Scene 4·5 에서 회복이 이어짐을 전제하되, 이 Scene 자체에서 회복을 서두르거나 예고하는 대사를 삽입하지 않는다(R3)."

@@ -1,0 +1,250 @@
+# Scene 5 — 회복, 그러나 답 없이 (60초, outro / 설명이 아니라 만남에서 멈춘다)
+# Unity ScriptableObject 가 deserialize. 디바이스 무관.
+# 작성 가이드: lemuel-xr-theology-tone + lemuel-xr-mental-health-safety 사전 적용.
+#
+# ⚠️ 초안 — 사용자 노출 문장은 backend/src/main/resources/scenarios/job.yml scene 5 의
+#    `static_text` · `value_prompt` · `suffering_footer` · `crisis_reminder` 원문이다.
+#    lemuel-theology-reviewer + lemuel-mental-health-safety 사후검토 필요.
+#
+# ⚠️ 이 Scene 이 R3(회복 보장 금지) 축을 짊어진다. 욥기의 결말(42:10 갑절 회복)이
+#    이 미션에서 **의도적으로 배제**된 지점이기 때문이다. 위반이 일어날 자리에 게이트를 둔다.
+#    런타임 job.yml 의 restoration_note 가 같은 결정을 이미 문장으로 적어 두었다.
+# ⚠️ 토큰 출처: 아래 목록은 scenarios/job.yml 의 R3 게이트 35종 그대로다.
+#    저작층에서 새 표층형을 발명하지 않았다 — 발명하면 저작에만 있고 런타임 방어는 0이 된다.
+
+scene_id: job_scene5
+scene_name: restoration_without_answer
+mission_id: job
+version: 1.0.0
+duration_seconds_target: 60
+
+environment:
+  space_id: uz_ash_heap_late_light
+  background_model: env_uz_ashes_late_light
+  lighting:
+    type: low_warm_late_afternoon
+    color_temperature_kelvin: 3000
+    note: "밝아지되 *새 아침* 이 아니다. 하루가 끝나가는 빛이다 — 되돌려받은 것이 아니라 견뎌낸 것."
+  ambient_sound:
+    - id: settling_air_quiet
+      gain_db: -30
+      spatial: false
+  user_position: [0.0, 1.20, 0.0]
+  user_facing: [0.0, 0.0, 1.0]
+  camera_locomotion: disabled
+  restored_wealth_visuals: excluded # 되찾은 재산·자녀·가축을 그리지 않는다. 그리는 순간 결말이 보상 서사가 된다.
+
+npcs:
+  - id: job_self
+    voice_id: job_v1
+    position: [0.0, 1.20, 0.0]
+
+narration_blocks:
+  - id: nb_s5_meeting_not_explanation
+    speaker: narrator
+    text_ko: "욥은 결국 *설명* 을 듣지 못했습니다. 그러나 *만남* 을 얻었습니다."
+    audio_clip_id: aud_s5_meeting_ko
+    start_at_seconds: 3.0
+    duration_seconds: 9.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=5].extras.static_text"
+  - id: nb_s5_scripture_seeing
+    speaker: scripture_caption
+    text_ko: "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다 (욥 42:5)"
+    audio_clip_id: aud_s5_scripture_seeing_ko
+    start_at_seconds: 14.0
+    duration_seconds: 10.0
+    hidden_until_event: null
+    scripture_ref: job-42:5
+    note: "42:5 에서 멈춘다. 다음 절(42:10)로 넘어가지 않는 것이 이 미션의 결말 설계다."
+  - id: nb_s5_value_prompt
+    speaker: system
+    text_ko: "욥처럼 *답이 아닌 자리* 도 있습니다. 오늘 *솔직한 한 줄* 을 일기에 적어보세요. 부끄러운 것이 아닙니다."
+    audio_clip_id: aud_s5_value_prompt_ko
+    start_at_seconds: 28.0
+    duration_seconds: 12.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=5].value_prompt"
+    linked_value_ids: [5, 4, 1] # 욥(고통과 진리) · 시편(비탄) · 일기(솔직함)
+  - id: nb_s5_suffering_footer
+    speaker: system
+    text_ko: "이 묵상은 자발적인 고난의 의미를 다룹니다. 가정폭력·종교적 학대·정신적 학대 같은 피해 상황을 견디라는 강요가 아닙니다. 안전하지 않은 상황에 있다면 가까운 상담 자원에 연결되세요."
+    audio_clip_id: aud_s5_suffering_footer_ko
+    start_at_seconds: 42.0
+    duration_seconds: 14.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=5].extras.suffering_footer"
+    note: "R2 필수 footer(Theme 5). 이 문장은 축약·의역 금지 — 학대 상황 예시가 빠지면 '견디라' 로 읽힐 수 있다."
+  - id: nb_s5_next_suggestion
+    speaker: system
+    text_ko: "다음에 만나볼 이야기 — 엘리야: 죽기를 갈망한 후 천사가 음식과 잠을 주신 이야기"
+    audio_clip_id: aud_s5_next_suggestion_ko
+    start_at_seconds: 52.0
+    duration_seconds: 7.0
+    hidden_until_event: null
+    source_of_record: "scenarios/job.yml :: scenes[id=5].extras.next_scene_suggestion"
+
+interactions:
+  - id: ix_s5_close
+    type: dwell_presence
+    target_assets: []
+    gesture: none
+    presentation:
+      no_progress_indicator: true
+      no_completion_badge: true # 완주 뱃지·축하 연출 없음. 끝냈다고 회복된 것이 아니다.
+    validation_rules:
+      - rule: optional_no_pressure
+        timeout_seconds: 30
+        on_timeout: treat_as_complete
+
+branches:
+  - id: br_s5_recovery_key
+    triggered_by_event: [recovery_key_selected, branch_timeout]
+    decision_key: recovery_key
+    default_path: static_curation # 사전 큐레이션 5종 + 미선택 경로. LLM 생성 없음.
+    llm_optin_only: false
+    llm_disabled_reason: "런타임 job.yml 헤더의 결정 — 모든 응답은 정적 큐레이션이다."
+    routes:
+      - when: { recovery_key: SAD }
+        recovery_message_key: job.recovery.lament_permitted
+      - when: { recovery_key: CONFUSED }
+        recovery_message_key: job.recovery.question_book
+      - when: { recovery_key: LONELY }
+        recovery_message_key: job.recovery.silent_presence
+      - when: { recovery_key: ANGRY }
+        recovery_message_key: job.recovery.honest_cry
+      - when: { recovery_key: EXHAUSTED }
+        recovery_message_key: job.recovery.seven_days_silence
+      - when: { recovery_key: null }
+        recovery_message_key: job.recovery.silent_presence
+        note: >-
+          미선택·타임아웃 폴백. 감정을 고르지 않은 사용자에게 고르라고 되묻지 않는다 —
+          고르지 못하는 상태가 이 미션이 다루는 상태다. 폴백 메시지는 '함께 있음' 쪽으로 둔다.
+    source_of_record: "scenarios/job.yml :: scenes[id=5].extras.recovery_keys"
+    note: "recovery_message_key 는 키만 싣는다. 문구 실체는 런타임 메시지 번들이 갖는다 — 저작층이 별도 문구를 갖는 순간 둘이 갈라진다."
+
+crisis_reminder:
+  persistent: true
+  dismissible: true
+  text_ko: "지금 이 순간이 무겁다면, {{crisis_resources.default}}."
+  source_of_record: "scenarios/job.yml :: scenes[id=5].extras.crisis_reminder"
+  note: >-
+    런타임이 이미 내보내는 값을 그대로 옮긴 것이다. 이 저작 파일이 새 문구를 발명하지 않는다.
+    번호는 리터럴로 적지 않는다 — {{crisis_resources.default}} 는 CrisisTokenResolver 가 해석한다.
+
+recovery_metric_dimensions:
+  - id: lament_permitted
+    description: "비탄을 표현해도 된다는 인식 — 이 미션이 실제로 겨냥하는 변화."
+  - id: false_comfort_recognized
+    description: "'네 탓이다'·'곧 회복된다' 류를 위로가 아닌 것으로 식별."
+  - id: _measurement_status
+    description: "측정 도구·기준선 미확보. 위 두 지표는 *이름* 만 선언한 상태이며 수치를 주장하지 않는다."
+
+safety_gates:
+  - id: R3_no_restoration_guarantee
+    enforced_at: always
+    description: "회복 보장 서사 금지 — 욥 42:10 의 '갑절 회복' 을 결말로 쓰지 않는다. 회복의 크기를 믿음의 크기로 환산하는 서술도 금지. 결말은 의도적으로 *답 없는 만남* 에서 멈춘다."
+    source_of_record: "scenarios/job.yml :: scenes[id=5].extras.restoration_note"
+    # ⚠️ 주장 범위: 표층형 35종 lint 다. 유의어 재작성("결국 다 제자리로 돌아옵니다")은 못 막는다.
+    #    초록은 「선언된 표층형이 없다」까지이며 'R3 위반 0건' 이 아니다.
+    #    구조적 방어는 별도다 — restored_wealth_visuals: excluded 와 42:5 에서 끊는 본문 인용.
+    lint_forbidden_tokens:
+      - "갑절로 갚"
+      - "갑절로 돌려"
+      - "갑절로 채워"
+      - "갑절로 회복"
+      - "갑절로 주십"
+      - "배로 갚"
+      - "배로 돌려"
+      - "배로 돌아오"
+      - "갑절로 돌아오"
+      - "곱절로 돌아오"
+      - "배로 채워"
+      - "배로 회복"
+      - "곱절로 갚"
+      - "곱절로 돌려"
+      - "곱절로 채워"
+      - "잃은 것보다 더 크게"
+      - "잃은 것보다 더 많이"
+      - "잃은 것의 갑절"
+      - "잃은 것을 다 돌려"
+      - "빼앗긴 것을 다 돌려"
+      - "믿음의 크기만큼"
+      - "믿음의 크기가 곧"
+      - "믿음의 크기대로"
+      - "회복의 크기는"
+      - "믿는 만큼 받"
+      - "믿는 만큼 회복"
+      - "믿는 만큼 채워"
+      - "믿음만큼 회복"
+      - "믿음만큼 받"
+      - "믿음이 크면 클수록"
+      - "믿음이 클수록"
+      - "반드시 회복시켜"
+      - "반드시 회복됩"
+      - "반드시 회복하게"
+      - "언젠가 다 돌려"
+  - id: restoration_epilogue_excluded
+    enforced_at: always
+    description: "욥 42:10~17(재산·자녀 회복 단락)은 이 미션 범위 밖. 본문 인용은 42:5 에서 끊고, 환경에서도 되찾은 재산을 그리지 않는다(restored_wealth_visuals: excluded)."
+  - id: suffering_footer_required
+    enforced_at: always
+    description: "고난 미션 필수 footer — 학대·폭력 상황을 견디라는 뜻이 아님을 명시. nb_s5_suffering_footer 가 이 요구를 만족하며 축약·삭제 불가."
+    enforcement: reviewer_only
+    note: >-
+      이 게이트의 id 에 축 접두(R2_)를 붙이지 않는다. 이건 *존재 요구* 이지 토큰 lint 가
+      아니기 때문이다. 축 접두를 붙이면 게이트 검사가 토큰 목록을 요구하는데, 여기에
+      아래 R2 토큰을 한 번 더 복사해 넣으면 '같은 lint 를 두 번 선언해 초록 두 개'
+      가 된다. 접두를 떼고 집행 수단이 사람 검토라는 것을 적어 둔다.
+  - id: R2_no_suffering_gaslighting
+    enforced_at: always
+    description: "결말부에서도 고난 의미화·정당화 금지. Scene 3 과 같은 축이며, 이 Scene 의 사용자 노출 텍스트(특히 suffering footer)에 같은 표층형 lint 를 실제로 건다."
+    # ⚠️ 주장 범위: 표층형 13종. Scene 3 의 R2 선언과 동일 목록이며,
+    #    적용 대상이 다르다(Scene 3 텍스트 / 이 Scene 텍스트). 유의어 재작성은 못 막는다.
+    lint_forbidden_tokens:
+      - "고난에는 뜻이"
+      - "고난에도 뜻이"
+      - "고난은 믿음의 증거"
+      - "고난은 시험입니"
+      - "고난은 훈련입니"
+      - "이 고난은 뜻이"
+      - "이 고난은 의미가"
+      - "이 고난은 이유가"
+      - "이유 없는 고난은 없"
+      - "연단하시려고"
+      - "당신을 시험하시는 중"
+      - "당신을 시험하시려"
+      - "믿음이 부족"
+  - id: no_completion_reward
+    enforced_at: always
+    description: "완주 뱃지·점수·축하 연출 금지. 끝냈다는 것이 회복했다는 뜻이 되지 않게 한다."
+  - id: R1_voice_self_harm_listener
+    enforced_at: always
+    action: pause_fade_black_show_crisis_card
+    crisis_resource_ref: crisis_resources.default
+  - id: R5_ai_optout_respected
+    enforced_at: br_s5_recovery_key
+    description: "LLM 경로 없음(llm_optin_only: false + llm_disabled_reason). opt-out 사용자도 동일 서사 완결."
+  - id: footer_persistent
+    enforced_at: always
+    text_ko: "AI 보조 — 본문은 성경 참조 — storyteller 역할 | 위기 시 {{crisis_resources.default}}"
+
+next_scene_id: null
+transition:
+  type: fade_to_black
+  fade_out_seconds: 1.5
+  fade_in_seconds: 0.0
+
+theology_footer_refs:
+  - citation_id: J5_candidate
+    source: "욥기 42:5~6 주해 — 확정 서지 미확보(드릴다운 필요)"
+    note: "'눈으로 뵈옵나이다' 는 설명을 얻었다는 뜻이 아니라 대면했다는 뜻이다. 이 구분이 미션 결말의 신학적 축이다."
+    anchor_block: nb_s5_scripture_seeing
+  - disputed_points:
+      - "욥 42:6 '스스로 거두어들이고 티끌과 재 가운데에서 회개하나이다' 의 번역·해석에 이견이 있다(회개인가, 비탄을 거두는 것인가, 위로받는 것인가)."
+    handling: "미션은 42:6 을 무대에 올리지 않는다. 어느 해석을 택해도 그것이 미션의 신학 주장이 되므로, 42:5 에서 끊는다."
+  - disputed_points:
+      - "42:10 이후의 회복 단락을 결말에서 배제한 것 자체가 해석적 선택이다 — 본문에는 있다."
+    handling: >-
+      배제 사실과 이유(회복 보장 서사가 정신건강상 해로울 수 있다)를 숨기지 않고 적는다.
+      '성경에 없다' 가 아니라 '이 미션이 다루지 않는다' 이다. 이 구분을 흐리지 않는다.
