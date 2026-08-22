@@ -151,7 +151,9 @@ class GoldenSetTokenLintCrossCheckTest : IntegrationTestBase() {
          *  - suffering-prosperity-inverse: 회복의 크기는 (기존 R2_R3 토큰)
          *
          * ⚠️ 한계 — 동의어 재작성(synonym rewriting)은 8/8 미포착(application.yml:181-187).
-         * 부분문자열 lint 의 구조적 한계이며 v2 L3 분류기가 맡는다.
+         * 부분문자열 lint 의 구조적 한계이며, 그 위층은 `CoercionStructureClassifier`(L3a)가 맡는다
+         * — 어휘가 아니라 두 어휘군을 잇는 통사 관계를 보므로 한쪽만 바꾼 유의어에는 견딘다.
+         * 다만 L3a 도 양쪽을 동시에 갈아 쓰면 통과한다(`CoercionClassifierKnownGapTest`).
          */
         val CAUGHT_BY_TOKEN_LINT = listOf(
             "gnostic-body-prison",

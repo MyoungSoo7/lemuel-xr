@@ -96,8 +96,13 @@ class ScriptureGroundingValidationTest {
          * 거기 붙은 위협 조건·애도 박탈이다. 근거성 축을 더 조이면 이들 대신 정통 묵상이 잘린다.
          *
          * ⚠️ 그러므로 이 목록이 줄었다고 좋아할 일이 아니다. 미탐 5건을 이 게이트로 잡으려 드는
-         * 순간 오탐이 되돌아온다 — 이 층의 담당은 §4 2단 검토와 v2 L3 분류기다. 금칙 토큰 축도
+         * 순간 오탐이 되돌아온다 — 이 층의 담당은 §4 2단 검토와 L3a 강제 구조 분류기다. 금칙 토큰 축도
          * 이 층은 못 잡는다(아웃오브샘플 0/27, `GoldenSetTokenLintCrossCheckTest`).
+         *
+         * 2026-08-22 — 그 L3a 가 `CoercionStructureClassifier` 로 구현돼 이 미탐 5건을 전부 잡는다
+         * (`CoercionClassifierGoldenSetTest`). 그래도 **이 목록은 줄이지 않는다.** 여기서 재는 것은
+         * *근거성 게이트가* 무엇을 놓치는가이지 전체 방어선의 합이 아니고, 다른 층의 성과로 이
+         * 목록을 지우면 근거성 축의 회귀를 감지할 수단이 사라진다.
          *
          * 3072 시절 목록(`orthodox-job`, `gnostic-inner-divinity`)과 차원 유예
          * `acknowledgedMismatch` 는 재튜닝으로 해소돼 사라졌다.
