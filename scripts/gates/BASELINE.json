@@ -279,7 +279,7 @@
     "scripture-ref:all": {
       "rc": 0,
       "tally": [
-        13,
+        14,
         0,
         0
       ],
@@ -288,22 +288,16 @@
     "scripture-text:all": {
       "rc": 0,
       "tally": [
-        311,
+        339,
         0,
-        5
+        0
       ],
-      "items": [
-        "gen-18:13:BLOCKED 개역개정 기준 해시 없음 — 대조 불가",
-        "gen-18:14:BLOCKED 개역개정 기준 해시 없음 — 대조 불가",
-        "gen-18:15:BLOCKED 개역개정 기준 해시 없음 — 대조 불가",
-        "gen-21:2:BLOCKED 개역개정 기준 해시 없음 — 대조 불가",
-        "gen-21:5:BLOCKED 개역개정 기준 해시 없음 — 대조 불가"
-      ]
+      "items": []
     },
     "mission-passage:all": {
       "rc": 0,
       "tally": [
-        15,
+        16,
         0,
         0
       ],
@@ -317,7 +311,7 @@
         2
       ],
       "items": [
-        "divine-title:exposed:BLOCKED — 노출 텍스트에서 하나님을 '신' 으로 부르는 자리 14건 (시나리오 8 + 프론트 2 + 시드 4). 호칭 규약이 아직 없어 옳고 그름을 판정하지 않는다",
+        "divine-title:exposed:BLOCKED — 노출 텍스트에서 하나님을 '신' 으로 부르는 자리 15건 (시나리오 9 + 프론트 2 + 시드 4). 호칭 규약이 아직 없어 옳고 그름을 판정하지 않는다",
         "divine-title:mirrors:BLOCKED — 같은 문장을 흉내 내는 테스트 픽스처 4건. 정본을 고치면 따라 고쳐야 하는 자리다"
       ]
     },
