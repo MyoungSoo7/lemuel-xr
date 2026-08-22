@@ -48,6 +48,7 @@ import DanielPage from "./daniel/page";
 import DavidPage from "./david/page";
 import ElijahPage from "./elijah/page";
 import EstherPage from "./esther/page";
+import JacobPage from "./jacob/page";
 import JesusPage from "./jesus/page";
 import JobPage from "./job/page";
 import JosephPage from "./joseph/page";
@@ -112,6 +113,7 @@ const PAGES: Array<[string, () => React.ReactElement]> = [
   ["david", () => <DavidPage />],
   ["elijah", () => <ElijahPage />],
   ["esther", () => <EstherPage />],
+  ["jacob", () => <JacobPage />],
   ["jesus", () => <JesusPage />],
   ["job", () => <JobPage />],
   ["joseph", () => <JosephPage />],

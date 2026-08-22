@@ -79,7 +79,8 @@ export type MissionCharacter =
   // 들어가면서 `ScenarioYamlLoader.loadAll()` 이 abraham.yml 을 싣는다.
   // 이 union 자체는 게이트가 아니다(화면이 컴파일되게 하는 자리다). 게이트는
   // `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
-  | "abraham";
+  | "abraham"
+  | "jacob";
 
 export async function startMission(
   character: MissionCharacter,

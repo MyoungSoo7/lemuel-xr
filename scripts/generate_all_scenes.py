@@ -306,6 +306,47 @@ SCENES: dict[str, dict[str, str]] = {
              "every seat empty. Plain undecorated architecture — no friezes, no murals, no hangings, "
              "no reliefs of people or animals, no statues, no lettering.",
     },
+    # 야곱 — 「내가 상처를 준 쪽일 때」.
+    #
+    # 이 다섯 장에는 다른 인물보다 **한 겹 더 되풀이한 금지**가 있다: Scene 4 다.
+    # 얍복은 씨름 장면이고, 저작이 그 상대의 정체를 미확정으로 열어 둔 채 닫았다
+    # (JACOB-RUNTIME-SIGNOFF.md 의 미확정 신학 #1). 그림이 날개 달린 형상이나
+    # 빛나는 사람 하나를 그려 넣는 순간, 문서가 열어 둔 그 판단을 배경 이미지가
+    # 대신 내려 버린다. 그래서 4번 프롬프트는 STYLE 의 "no people" 위에
+    # 천사·날개·빛나는 형상·실루엣·두 사람의 그림자까지 이름을 하나씩 불러 막는다.
+    # 저작이 씬 안에서 상대를 「어떤 사람」으로만 부르는 것과 같은 이유다.
+    "jacob": {
+        "1": "The dim interior of a large nomadic goat-hair tent at dusk, heavy dark woven panels "
+             "sagging overhead, a low pallet of folded blankets against the far wall, a shallow "
+             "bronze dish of stewed meat still steaming on a flat stone beside it, two rough goat "
+             "hides left draped over a wooden stool in the foreground, one small oil lamp guttering "
+             "so most of the tent stays in shadow, the air close and warm. The space is completely "
+             "empty of persons. No lettering.",
+        "2": "The same goat-hair tent interior moments later, the low pallet now disarranged and the "
+             "bronze dish overturned on the ground with its contents spilled and cooling, the tent "
+             "flap thrown wide open onto a darkening hillside beyond, cold blue evening air pushing "
+             "in against the last warm lamplight, long shadows thrown across the empty floor. No "
+             "people, no silhouettes, no figures anywhere. No lettering.",
+        "3": "A wide encampment on open pastureland at dusk twenty years later, low dark tents "
+             "pitched in scattered clusters, the ground churned with countless overlapping hoof "
+             "tracks running away toward a distant river ford, several ropes and empty wooden pack "
+             "frames set down ready on the near grass, the far hills already blue with evening while "
+             "the near camp still holds gold light. The camp is deserted — no people, no animals in "
+             "view, only the tracks they left. No lettering.",
+        "4": "A narrow river ford at the bottom of a dark ravine in the deepest part of the night, "
+             "shallow water running black over pale stones, the sandy bank on the near side deeply "
+             "churned and scuffed in a single trampled patch, steep rock walls rising into darkness "
+             "on both sides, one thin band of grey pre-dawn light just touching the very top of the "
+             "far ridge. Absolutely nothing living is in the frame — no people, no figures, no "
+             "silhouettes, no shadows of people, no angels, no wings, no glowing being, no radiant "
+             "humanoid shape, no light in the form of a person, no two forms grappling. Only the "
+             "water, the stones, the marked sand and the ravine. No lettering.",
+        "5": "A broad open plain in clear early morning light, two sets of wide track marks curving "
+             "in from opposite horizons and meeting in the middle of the frame, a line of woven "
+             "baskets and bundled cloth goods set out neatly on the ground at the meeting place as a "
+             "gift left waiting, dew still on the grass, the hills soft and warm in the low sun, "
+             "vast quiet space. The plain is empty of people and animals. No lettering.",
+    },
 }
 
 
