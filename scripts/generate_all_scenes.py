@@ -256,6 +256,56 @@ SCENES: dict[str, dict[str, str]] = {
              "a worn woven mat laid on the floor before it, soft grey-gold light just beginning to "
              "spill over the sill, the room still and completely empty.",
     },
+    # 에스더 — 2026-08-22. 다섯 칸 전부 `scenarios/esther.yml` 의 `extras.anchor` 와
+    # `environment.time_of_day` 에서 옮겼다: cold_formal_daylight · overcast_midday_muted ·
+    # dim_contemplative_window_light · single_low_lamp_dim · royal_daylight_shift_to_banquet_warm.
+    #
+    # 세 가지를 일부러 안 그린다.
+    #
+    # ① **조서의 내용을 그리지 않는다.** Scene 1 의 trigger_warning(level: high) 이 경고하는
+    #    것이 바로 그 조서 낭독이고, 동의하지 않은 사람은 Scene 2 로 건너뛴다. 그런데 배경은
+    #    동의 게이트보다 *먼저* 깔린다 — 다니엘 ①과 같은 이유로, 조서는 「봉인된 두루마리」
+    #    까지만 그리고 펼친 면·글자·죽음의 이미지는 그리지 않는다.
+    #
+    # ② **수산 궁의 인물 프리즈를 그리지 않는다.** 아케메네스 수산 궁의 실물 대표 유물이
+    #    유약벽돌 「불사 부대」 궁수 행렬 프리즈라, 그냥 두면 Imagen 이 벽마다 사람을 붙인다
+    #    (다니엘 4 에서 실측한 것과 같은 실패). 그래서 문명을 명시하되 벽화·걸개·부조·조상을
+    #    프롬프트마다 따로 금지한다. 기둥 주두의 인면·수면 장식도 같이 막는다.
+    #
+    # ③ **세 선택지를 그림으로 서열화하지 않는다.** Scene 3 은 이 미션의 유일한 분기이고
+    #    `EstherDisclosureNeutralityTest` 가 세 카드에 등급이 없음을 강제한다. 배경에 문·길·
+    #    계단을 셋 놓으면 크기와 빛으로 무게가 생긴다. 그래서 Scene 3 은 갈림 없이 창 하나만
+    #    둔다 — 고르는 자리는 화면이 만들고 배경은 비워 둔다.
+    "esther": {
+        "1": "A formal Achaemenid Persian audience hall in Susa by day, floor and walls of pale "
+             "polished stone, tall slender fluted columns with plain undecorated capitals, an empty "
+             "raised throne dais at the far end, a tightly rolled parchment scroll bound and sealed "
+             "with a clay seal lying closed on a low table in the foreground, cold formal daylight "
+             "falling in flat even sheets. The walls are entirely plain — no glazed brick friezes, "
+             "no processions, no murals, no hangings, no reliefs of people or animals, no statues, "
+             "no carved figures on the column capitals, no inscribed marks.",
+        "2": "A high stone palace parapet under an overcast midday sky, looking down over a wide "
+             "empty paved square before a great city gate of pale brick, a coarse dark sackcloth "
+             "garment left crumpled on the pavement below with grey ash scattered around it, muted "
+             "colourless light, no shadows. Plain undecorated walls — no friezes, no murals, no "
+             "hangings, no reliefs, no statues, no lettering.",
+        "3": "A small inner chamber of a Persian palace, plain pale plastered walls, a single narrow "
+             "window set low so the daylight comes in shallow and dim across the floor, one plain "
+             "cushion and a folded woven mat on the bare stone, the room quiet and completely empty. "
+             "One window only and one open floor — no doorways, no branching passages, no stairs. "
+             "No murals, no hangings, no reliefs, no statues, no lettering.",
+        "4": "The same small Persian palace chamber at night, now lit only by one small clay oil lamp "
+             "burning low on the floor, a plain bowl of food and a clay water jar set aside untouched "
+             "and pushed away from the mat, three faint overlapping rings of lamplight layered on the "
+             "wall as if three nights had passed at once, deep warm darkness beyond. No murals, no "
+             "hangings, no reliefs, no statues, no lettering.",
+        "5": "The inner court of a Persian palace in full royal daylight, pale stone paving, an empty "
+             "throne dais at the far end with a slender golden sceptre resting extended across its "
+             "arm, and beyond an open archway a low banquet table laid with bronze cups and dishes in "
+             "warm lamplight, the light shifting from cold white in the court to gold in the hall, "
+             "every seat empty. Plain undecorated architecture — no friezes, no murals, no hangings, "
+             "no reliefs of people or animals, no statues, no lettering.",
+    },
 }
 
 

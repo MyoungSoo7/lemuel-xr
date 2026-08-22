@@ -70,7 +70,8 @@ export type MissionCharacter =
   | "job"
   | "ruth"
   | "peter"
-  | "daniel";
+  | "daniel"
+  | "esther";
 
 export async function startMission(
   character: MissionCharacter,
