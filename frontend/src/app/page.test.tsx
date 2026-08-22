@@ -108,6 +108,17 @@ describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
       .filter((h): h is string => !!h)
       .sort();
 
+    // 중복부터 이름을 대고 잡는다. 아래 `toEqual` 도 중복을 잡기는 하지만, 실패 메시지가
+    // 40줄짜리 배열 두 개의 diff 라 무엇이 겹쳤는지 읽히지 않는다. 실제로 그렇게 났다 —
+    // #103 과 #104 가 「홈에 아브라함 입구가 없다」를 서로 모른 채 같은 날 각자 고쳤고,
+    // 서로 다른 줄에 넣어서 git 이 충돌로 보지 않았다. 두 PR 의 CI 는 각자의 시점에
+    // 초록이었는데 합쳐진 main 은 카드가 둘이고 React key 도 겹친 상태였다.
+    const duplicated = linked.filter((h, i) => linked.indexOf(h) !== i);
+    expect(
+      duplicated,
+      `홈 카드가 두 번 실린 인물: ${duplicated.join(", ")}`,
+    ).toEqual([]);
+
     // 양방향으로 맞춘다. 빠진 쪽은 「들어갈 입구가 없는 화면」이고, 남는 쪽은
     // 「눌리는데 없는 화면으로 가는 404」다 — 둘 다 사용자에게 보이는 결함이다.
     expect(linked).toEqual(authored);

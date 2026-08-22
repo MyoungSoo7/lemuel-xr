@@ -112,11 +112,14 @@ const DIRECT_MISSIONS: Array<{
   // 주소를 직접 쳐야만 들어갈 수 있었다. 아래 추천 그리드의 ACTIVE 와 **둘 다** 넣어야
   // 한다 — 한쪽만 넣으면 반쪽 입구다. scripts/track_b_readiness.py 의 `입구` 단계가
   // 이 어긋남을 잰다.
+  // 아브라함 항목이 한동안 **두 개** 였다. #103 과 #104 가 같은 결함(입구 없음)을 서로
+  // 모른 채 같은 날 고쳤고, 서로 다른 줄에 넣어서 git 이 충돌로 보지 않고 둘 다 남겼다.
+  // 남긴 쪽은 #104 — tagline 이 scenarios/abraham.yml 의 `title` 과 같은 문안이다.
   {
     href: "/abraham",
     name: "Abraham",
     korean: "아브라함",
-    tagline: "별을 세던 밤과 사백 년 — 기다림은 아무 일도 없는 시간이 아니다",
+    tagline: "다 알지 못한 채 가는 걸음 — 기다림에 이유를 붙이지 않는다",
     active: true,
   },
   {
@@ -124,13 +127,6 @@ const DIRECT_MISSIONS: Array<{
     name: "Jacob",
     korean: "야곱",
     tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
-    active: true,
-  },
-  {
-    href: "/abraham",
-    name: "Abraham",
-    korean: "아브라함",
-    tagline: "다 알지 못한 채 가는 걸음 — 기다림에 이유를 붙이지 않는다",
     active: true,
   },
 ];
@@ -309,7 +305,6 @@ export default function HomePage() {
                       "esther",
                       "abraham",
                       "jacob",
-                      "abraham",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
