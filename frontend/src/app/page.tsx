@@ -100,6 +100,13 @@ const DIRECT_MISSIONS: Array<{
     tagline: "어디까지 맞추고 어디서 멈추는가 — 정체성은 물러남이 아니다",
     active: true,
   },
+  {
+    href: "/esther",
+    name: "Esther",
+    korean: "에스더",
+    tagline: "드러낼 것인가, 언제 어떻게 드러낼 것인가 — 말하지 않기로 하는 것도 온전한 선택이다",
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -273,6 +280,7 @@ export default function HomePage() {
                       "ruth",
                       "peter",
                       "daniel",
+                      "esther",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`
