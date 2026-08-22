@@ -1,0 +1,427 @@
+# 아브라함 — 「다 알지 못한 채 가는 걸음」
+#
+# 핵심 메시지: **기다림은 설명되지 않았고, 본문은 그것을 지우지 않았다.**
+#   창세기 15:16 이 사백 년의 이유를 말하지만 그 이유는 *아모리 족속* 에 관한 것이지
+#   아브람에 관한 것이 아니다. 이 미션의 축은 그 비대칭을 그대로 두는 것이다 —
+#   이유가 있었다는 사실이 「그러니 네 기다림에도 이유가 있다」로 넘어오지 않게 한다.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️ 이 파일은 `Character` enum 에 ABRAHAM 이 들어오는 순간 **실제로 로드된다.**
+#   ScenarioYamlLoader.loadAll() 은 `Character.entries` 를 순회한다 — 디렉터리가 아니다.
+#   그래서 enum 한 줄이 곧 사용자 노출이다. 근거·범위·남은 빚은
+#   docs/ABRAHAM-RUNTIME-SIGNOFF.md 에 있고 RuntimeExposureSignoffTest 의
+#   «룻 이후 열리는 인물은 노출 대장 없이 열리지 않는다» 가 집행한다.
+#   · 전문 신학 검토 없음 · 전문 정신건강 검토 없음. 그 사실은 대장에 남아 있다.
+#   · content/abraham/README.md 머리의 초안 고지는 「인간 안전검토자 사인오프 전
+#     프로덕션 반영 금지」를 걸어 두었고, **그 사인오프는 없다.** 다니엘·베드로와 같은
+#     종류의 미해소 부채다 — 지우지 않고 대장에 적었다. 초록이 아니라 등재다.
+#   · AR 은 닫혀 있다(VR 전용). `scripts/gen_ar_manifests.py` 의 AR_MISSIONS 에
+#     abraham 이 들어간 적이 없다.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 상류 문서 (이 파일은 이들의 하류다 — 자구를 여기서 발명하지 않는다)
+#   설계        docs/MVP-ABRAHAM.md
+#   런타임대본  docs/MVP-ABRAHAM-CONTENT.md
+#   저작        content/abraham/scene1~5.yml · content/abraham/README.md
+#   성구 시드   V20260822120000__seed_newchar_passages_gae.sql
+#               V20260822160000__seed_abraham_range_quoted_verses.sql (범위 인용 5행)
+#
+# 이 파일의 자막은 **저작 트리의 text_ko 를 옮긴 것**이고, 그 자구는 개역개정이다.
+# 옮기는 것 외의 작문을 하지 않았다 — 새 문장을 쓰면 그것은 아무도 검토하지 않은 본문이 된다.
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준).
+#
+# 배제 (이 파일에서 직접 집행되는 것 — 저작 README 의 3건을 그대로 승계)
+#   · 이삭을 제물로 드리라는 시험 사건(창세기 21장 직후에 이어지는 장, 그리고 이를
+#     재인용하는 신약 두 본문) — **미션 전체에서 전면 배제.** 아동 위해 이미지이며
+#     제품 안전선 판단이다(신학 판단이 아니다). 이 미션은 창 21:7 에서 끝난다.
+#   · 여종 서사(창 16, 창 21:8-21) — 학대·유기 narrative. 본편에 쓰지 않는다.
+#   · 아내를 누이라 속인 사건(창 12:10-20) — 본편에 쓰지 않는다.
+#   배제된 자구를 여기에 옮겨 적지 않는다 — extras 는 payload 로 통째 복사되므로
+#   잘라낸 문장을 적으면 잘라낸 그 문장이 화면으로 나간다.
+#
+# 안전선
+#   R1 자해 발화 리스너 5/5 Scene 상시. Scene 3(상속자 없음 고백)·4·5 에 위기 자원을 함께 노출한다.
+#   R2 **창 18:14 의 «기한» 은 사라에게 주어진 기한이다.** 2인칭으로 옮기지 않는다.
+#      Scene 4 의 마지막 자막 한 줄이 그 범위를 명시적으로 못 박는다.
+#   R2 **창 15:16 의 이유는 아모리 족속에 관한 것이다.** Scene 3 이 같은 방식으로 못 박는다.
+#   R3 Scene 3 의 세 카드에 정답이 없다. 「셀 수 없음」은 실패가 아니라 의도된 결말이다.
+#   R4 Scene 5 진입 전 동의 카드 1장(노년 출산 서사). 마지막 Scene 이라 다음 씬이 없으므로
+#      건너뛰기 목적지는 같은 Scene 안의 축약 블록(`abraham_scene5_alt_laughter_only`)이다.
+#      엔진 계약: 정수면 Scene 점프, 문자열이면 같은 Scene 의 conditional_blocks id
+#      (SceneSkipResolver · ScenarioYamlLoaderTest 의 R4 무결성 루프).
+#      ⚠️ 저작(content/abraham/scene5.yml)은 이 값을 정수 `5` 로 적어 두었다. 그대로 옮기면
+#      **자기 자신으로 점프**한다 — 마지막 Scene 이라 그 계약이 성립하지 않는다.
+#      의도(21:6 자막 한 장만 남기고 마무리로 직행)는 저작의 skip_state_note 에 명시돼
+#      있으므로, 그 의도를 문자열 목적지로 옮겼다. 이 이탈은 docs/MVP-ABRAHAM-CONTENT.md 에 적었다.
+#   R5 기본 경로는 LLM 호출 0회로 완주된다. 묵상만 opt-in 이며 기본값은 off.
+#
+# ⚠️ 위기 연락처를 이 파일에 숫자로 적지 말 것.
+#   `{{crisis_resources.default}}` 토큰만 쓴다 — ScenePayloadAssembler → CrisisTokenResolver
+#   가 정본으로 치환하고 ScenarioHotlineRatchetTest 가 이를 강제한다.
+
+character: abraham
+title: 다 알지 못한 채 가는 걸음
+
+target_user: 언제 끝날지 모르는 기다림 한가운데에서, 그 기다림의 의미를 설명해 주는 말에 지친 사람
+
+ai_assist_footer: AI 보조 — 본문은 성경 참조 — storyteller 역할. 위기 시 {{crisis_resources.default}}.
+
+# ── 금칙 토큰: 이 파일에 사본을 두지 않는다 ──────────────────────────────────
+# 이 미션의 금칙 토큰 정본은 content/abraham/scene1~5.yml 의 `R2_R3_lint_forbidden`
+# 게이트 **안** 이다(저작 README: seed §7-1(a) 정본, 최상위 미러를 두지 않는다).
+# 그 결정을 여기서 되돌리지 않는다. 런타임 차단은 application.yml 의
+# safety.forbidden-tokens.list 가 세 출구 전부(responseText · scenePayload · valuePrompt)에서
+# 하고, 저작 목록이 그 전역 목록의 부분집합인지는 아래 verified_by 가 매 빌드 확인한다.
+safety_gates:
+  - id: R2_R3_forbidden_tokens_lint
+    scenes: [1, 2, 3, 4, 5]
+    axis: 지연 정당화 금지 · 기다림 성과 압박 금지 · 기한의 2인칭 전이 금지
+    enforcement: structural
+    structural_check: >-
+      금칙 토큰 목록을 이 파일에 복제하지 않고 저작 정본(content/abraham/scene1~5.yml)의
+      R2_R3_lint_forbidden 안에 둔다. 런타임 집행은 application.yml 의 전역 목록이 하며,
+      저작 목록이 그 전역 목록의 부분집합임을 아래 verified_by 가 매 빌드 확인한다.
+    verified_by: 저작 게이트의 금칙 토큰이 런타임 목록에 전부 반영돼 있다
+
+  - id: content_exclusion_isaac_binding
+    scenes: [1, 2, 3, 4, 5]
+    axis: 이삭을 제물로 드리라는 시험 사건 전면 배제 — 이 미션은 창 21:7 에서 끝난다
+    enforcement: reviewer_only
+    reviewer_only_reason: >-
+      배제를 기계로 재려면 배제된 절의 자구나 절 번호 상한을 어딘가에 적어야 하는데,
+      이 배제의 대상은 **한 장 전체와 그것을 재인용하는 신약 두 본문**이라 다니엘의
+      「6:23 상한」 같은 단일 경계로 환원되지 않는다. 절 번호를 나열하면 그 나열 자체가
+      payload 로 나가고, 자구를 적으면 잘라낸 문장이 화면으로 나간다. 그래서 여기서는
+      선언만 하고, 실제 판정은 사람 검토에 남긴다 — 없는 기계 검사를 있다고 적지 않는다.
+
+scenes:
+  # ── Scene 1 ────────────────────────────────────────────────────────────────
+  # 부르심과 떠남의 사실 서술만. 분기 없음.
+  - id: 1
+    title: 떠남
+    type: cinematic
+    duration_sec: 60
+    scripture_ref: gen-12:1
+    next: 2
+    exposure_grade: B
+    extras:
+      anchor: 하란을 떠나는 길. 먼지 낀 새벽, 짐을 꾸리는 소리.
+      additional_refs: ["gen-12:2", "gen-12:4"]
+      environment:
+        camera_rig: short_scripted_walk_low_speed
+        time_of_day: warm_dawn_departure
+        ambient: [짐 꾸리는 소리, 열린 길의 낮은 바람, 멀어지는 집안 목소리]
+        ui_overlays: [ai_assist_footer, exit_button]
+      npcs:
+        - { name_ko: 사래, framing: abstract_silhouette_low_detail }
+        - { name_ko: 롯, framing: abstract_silhouette_low_detail }
+      npc_note: >-
+        실사 얼굴 형상을 쓰지 않는다. 동행 둘 다 저디테일 실루엣이며 대사가 없다.
+        사용자는 아브람 본인(개명 전, 창 17:5 이전)이고 음성은 내면 독백만 쓴다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 여호와의 음성
+          text_ko: "여호와께서 아브람에게 이르시되 너는 너의 고향과 친척과 아버지의 집을 떠나 내가 네게 보여 줄 땅으로 가라 (창 12:1)"
+        - speaker_ko: 여호와의 음성
+          text_ko: "내가 너로 큰 민족을 이루고 네게 복을 주어 네 이름을 창대하게 하리니 너는 복이 될지라 (창 12:2)"
+        - speaker_ko: 해설
+          text_ko: "이에 아브람이 여호와의 말씀을 따라갔고 롯도 그와 함께 갔으며 아브람이 하란을 떠날 때에 칠십오 세였더라 (창 12:4)"
+      age_note: >-
+        칠십오 세는 정보로만 제시한다. 격려·비교 수치로 쓰지 않는다 —
+        「그 나이에도 떠났는데」는 이 미션이 막으려는 바로 그 프레이밍이다.
+      interactions:
+        - id: carry_bundle_and_walk
+          type: grab_and_carry_then_walk
+          presentation: { walk_speed_multiplier: 0.5, fade_during_walk: true, no_completion_reward: true }
+          timeout_sec: 25
+          on_timeout: auto_advance
+      branches: []
+
+  # ── Scene 2 ────────────────────────────────────────────────────────────────
+  # 이 미션에서 **본문 인용이 없는 유일한 Scene.** 정황 요약 두 줄뿐이다.
+  - id: 2
+    title: 장막
+    type: cinematic
+    duration_sec: 45
+    scripture_ref: gen-12:4
+    next: 3
+    exposure_grade: B
+    extras:
+      anchor: 가나안 언덕의 야영지. 늦은 오후의 호박색 빛.
+      environment:
+        camera_rig: fixed_standing_at_campsite
+        time_of_day: late_afternoon_amber
+        ambient: [장막 천이 바람에 눌리는 소리, 멀리 양떼]
+        ui_overlays: [ai_assist_footer, exit_button]
+      npcs: []
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      # 이 두 줄은 성경 인용이 아니라 정황 요약이다. 저작이 그렇게 표시해 두었고
+      # (README: "본문 인용 없는 유일한 Scene"), 그 표시를 여기서 지우지 않는다.
+      captions:
+        - speaker_ko: 해설
+          text_ko: "장막을 걷고, 다시 세웠다. 이곳에서 저곳으로 — 여러 번."
+        - speaker_ko: 해설
+          text_ko: "가나안 땅에 이르렀지만, 그 땅은 아직 그의 것이 아니었다. 그는 거기서 나그네로 살았다."
+      caption_provenance: 정황 요약 — 성경 인용 아님. 저작 content/abraham/scene2.yml 의 표시를 승계한다.
+      interactions:
+        - id: tent_peg_pull_and_drive
+          type: grab_and_manipulate
+          presentation: { no_completion_reward: true }
+          note: 말뚝을 뽑고 다시 박는 동작이 반복 그 자체다. 성공·실패 판정을 두지 않는다.
+      branches: []
+
+  # ── Scene 3 ────────────────────────────────────────────────────────────────
+  # 이 미션의 유일한 사용자 선택. 그리고 사백 년이 나오는 자리다.
+  - id: 3
+    title: 별, 그리고 사백 년
+    type: interaction
+    interaction: pick_one
+    duration_sec: 105
+    scripture_ref: gen-15:5
+    next: 4
+    exposure_grade: A
+    extras:
+      anchor: 달 없는 밤. 열린 들판과 별.
+      additional_refs: ["gen-15:2", "gen-15:3", "gen-15:6", "gen-15:13", "gen-15:16"]
+      environment:
+        camera_rig: fixed_standing_open_field
+        time_of_day: clear_night_starfield_no_moon
+        ambient: [밤벌레, 아주 낮은 바람]
+        ui_overlays: [ai_assist_footer, exit_button, crisis_reminder]
+      npcs: []
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 아브람
+          text_ko: "나는 자식이 없사오니 나의 상속자는 이 다메섹 사람 엘리에셀이니이다 (창 15:2)"
+        - speaker_ko: 아브람
+          text_ko: "주께서 내게 씨를 주지 아니하셨으니 내 집에서 길린 자가 내 상속자가 될 것이니이다 (창 15:3)"
+        - speaker_ko: 여호와의 음성
+          text_ko: "그를 이끌고 밖으로 나가 이르시되 하늘을 우러러 뭇별을 셀 수 있나 보라 또 그에게 이르시되 네 자손이 이와 같으리라 (창 15:5)"
+        - speaker_ko: 해설
+          text_ko: "아브람이 여호와를 믿으니 여호와께서 이를 그의 의로 여기시고 (창 15:6)"
+        - speaker_ko: 여호와의 음성
+          text_ko: "여호와께서 아브람에게 이르시되 너는 반드시 알라 네 자손이 이방에서 객이 되어 그들을 섬기겠고 그들은 사백 년 동안 네 자손을 괴롭히리니 (창 15:13)"
+        - speaker_ko: 해설
+          text_ko: "네 자손은 사대 만에 이 땅으로 돌아오리니 이는 아모리 족속의 죄악이 아직 가득 차지 아니함이니라 하시더니 (창 15:16)"
+        - speaker_ko: 해설
+          text_ko: "이 이유는 아브람에 관한 것이 아니었다."
+      # 마지막 한 줄이 이 Scene 의 안전 장치다. 15:16 이 이유를 말한 대상은 아모리
+      # 족속이지 아브람이 아니다. 그 비대칭을 명시하지 않으면 「사백 년에도 이유가
+      # 있었으니 네 기다림에도 이유가 있다」로 읽힌다 — 이 미션이 막는 바로 그 전이다.
+      reason_scope_lock: 창 15:16 의 이유는 아모리 족속에 관한 것이다. 2인칭으로 옮기지 않는다.
+      dwell_limit:
+        target_caption_ref: gen-15:13
+        max_seconds: 12
+        note: >-
+          사백 년 자막에 화면을 오래 머무르게 하지 않는다. 압제의 길이를 응시하게 만드는
+          연출은 이 Scene 의 목적이 아니다.
+      crisis_reminder:
+        text_ko: "지금 힘드시면 {{crisis_resources.default}}."
+        position: footer_above_captions
+      interactions:
+        - id: count_the_stars
+          type: gaze_count_then_overflow
+          presentation:
+            overflow_state_label_ko: 셀 수 없음
+            overflow_is_intended_outcome: true
+            no_completion_reward: true
+          note: >-
+            「셀 수 없음」은 의도된 결말이다 — 실패로 표시하지 않고 점수·성취로 기록하지 않는다.
+      # 카드 셋은 「어떻게 기다릴까」가 아니라 「지금 이 자리를 뭐라고 부를까」를 고른다.
+      options:
+        - id: voice_the_lack
+          ref: 창 15:2
+          label_ko: 나는 자식이 없습니다
+        - id: hold_the_promise
+          ref: 창 15:6
+          label_ko: 그래도 그 약속을 붙듭니다
+        - id: sit_with_unknowing
+          ref: 창 15:16
+          label_ko: 왜인지 모른 채로 있겠습니다
+      options_note: >-
+        셋 다 본문에 있는 반응이고 틀린 카드가 없다. 점수·순위·정답을 매기지 않으며,
+        고른 값이 이야기의 진행을 바꾸지도 않는다 — 세 라벨과 무응답 전부 Scene 4 로 간다.
+        이 값이 쓰이는 자리는 Scene 5 의 마감 문구 하나뿐이고, 고르지 않는 것도 정상 경로다.
+        무응답(20초)은 wait_label: null 로 진행하며 Scene 5 에 전용 폴백 문구가 있다.
+      decision_key: wait_label
+      branches: []
+
+  # ── Scene 4 ────────────────────────────────────────────────────────────────
+  # 이 미션 단일 최대 R2 위험 지점(창 18:14). 사용자 조작 0 — 목격만 한다.
+  - id: 4
+    title: 웃음
+    type: cinematic
+    duration_sec: 75
+    scripture_ref: gen-17:17
+    next: 5
+    exposure_grade: A
+    extras:
+      anchor: 마므레의 장막 어귀. 정오의 강한 볕.
+      additional_refs:
+        ["gen-17:1", "gen-17:5", "gen-18:12", "gen-18:13", "gen-18:14", "gen-18:15"]
+      environment:
+        camera_rig: fixed_seated_at_tent_entrance
+        time_of_day: harsh_noon_desert_light
+        ambient: [정오의 정적, 장막 천]
+        ui_overlays: [ai_assist_footer, exit_button, crisis_reminder]
+      npcs:
+        - { name_ko: 사라, framing: abstract_silhouette_low_detail }
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 여호와의 음성
+          text_ko: "아브람이 구십구 세 때에 여호와께서 아브람에게 나타나서 그에게 이르시되 나는 전능한 하나님이라 너는 내 앞에서 행하여 완전하라 (창 17:1)"
+        - speaker_ko: 여호와의 음성
+          text_ko: "이제 후로는 네 이름을 아브람이라 하지 아니하고 아브라함이라 하리니 이는 내가 너를 여러 민족의 아버지가 되게 함이니라 (창 17:5)"
+        - speaker_ko: 아브라함의 속말
+          text_ko: "아브라함이 엎드려 웃으며 마음속으로 이르되 백 세 된 사람이 어찌 자식을 낳을까 사라는 구십 세니 어찌 출산하리요 하고 (창 17:17)"
+        - speaker_ko: 해설
+          text_ko: "사라가 속으로 웃고 이르되 내가 노쇠하였고 내 주인도 늙었으니 내게 무슨 즐거움이 있으리요 (창 18:12)"
+        - speaker_ko: 해설
+          text_ko: "여호와께서 아브라함에게 이르시되 사라가 왜 웃으며 이르기를 내가 늙었거늘 어떻게 아들을 낳으리요 하느냐 (창 18:13)"
+        - speaker_ko: 해설
+          text_ko: "여호와께 능하지 못한 일이 있겠느냐 기한이 이를 때에 내가 네게로 돌아오리니 사라에게 아들이 있으리라 (창 18:14)"
+        - speaker_ko: 해설
+          text_ko: "사라가 두려워서 부인하여 이르되 내가 웃지 아니하였나이다 이르시되 아니라 네가 웃었느니라 (창 18:15)"
+        - speaker_ko: 해설
+          text_ko: "이 기한은 사라에게 주어진 기한이다."
+      # 마지막 한 줄이 이 Scene 의 안전 장치다. 18:14 의 「기한」을 사용자 자신의 기한으로
+      # 옮기는 순간 이 자막은 「네 기한도 온다」가 된다 — 아무도 약속한 적 없는 말이다.
+      # 그래서 범위를 자막으로 못 박는다. 이 줄을 지우려면 그 결과를 먼저 적어라.
+      gen_18_14_scope_lock: 창 18:14 의 기한은 사라에게 주어진 것이다. 2인칭으로 옮기지 않는다.
+      two_laughters_note: >-
+        두 웃음을 비대칭으로 다루지 않는다. 본문은 아브라함의 웃음(17:17)에 책망을 붙이지
+        않았고 사라의 웃음(18:12-15)에는 문답이 붙는다 — 그 차이를 「의심에 대한 책망」으로
+        해석해 연출하지 않는다. 자막은 본문 순서 그대로 두고 해석을 얹지 않는다.
+      real_name_exclusion: 사용자 실명·프로필을 개명 연출에 쓰지 않는다. 개명은 고정 텍스트 전환뿐이다.
+      crisis_reminder:
+        text_ko: "지금 힘드시면 {{crisis_resources.default}}."
+        position: footer_above_captions
+      interactions:
+        - id: witness_only
+          type: auto_proceed
+          presentation: { no_completion_reward: true }
+          note: 사용자 조작이 없다. 이 Scene 에서 고를 것은 없다.
+      branches: []
+
+  # ── Scene 5 ────────────────────────────────────────────────────────────────
+  # 마지막 Scene. R4 동의 카드 1장이 앞에 서고, 건너뛰기 목적지는 같은 Scene 의 축약 블록이다.
+  - id: 5
+    title: 이삭
+    type: outro
+    duration_sec: 75
+    scripture_ref: gen-21:6
+    next: null
+    exposure_grade: A
+    extras:
+      anchor: 장막 안. 천 사이로 들어오는 부드러운 빛.
+      additional_refs: ["gen-21:1", "gen-21:2", "gen-21:5", "gen-21:7"]
+      environment:
+        camera_rig: fixed_seated_tent_interior
+        time_of_day: soft_daylight_through_tent_weave
+        ambient: [아주 낮은 숨소리, 천 사이 바람]
+        ui_overlays: [ai_assist_footer, exit_button, crisis_reminder]
+      npcs:
+        - { name_ko: 사라, framing: abstract_silhouette_low_detail }
+      trigger_warning:
+        level: low_mid
+        content:
+          - childbirth
+          - aging
+        consent_card_id: abraham_scene5_birth_warning
+        covers_scenes: [5]
+        # 문자열 목적지 — 다음 씬이 없는 마지막 Scene 의 축약 경로다. 같은 Scene 에
+        # 머물며 아래 conditional_blocks 의 같은 id 를 쓴다(SceneSkipResolver 의 계약).
+        # 저작은 이 값을 정수 5 로 적어 두었는데, 그건 자기 자신으로의 점프라 성립하지
+        # 않는다 — 저작의 skip_state_note 가 말한 의도(21:6 한 장만)를 목적지로 옮겼다.
+        skip_alternative_scene_id: abraham_scene5_alt_laughter_only
+        voice_intensity_options: [subtitle_only, low, default]
+        consent_card_ko: |-
+          다음 장면에는 오랜 기다림 끝의 출산 이야기가 나옵니다.
+          · 약 1분입니다. 지금 보지 않으셔도 이야기는 온전히 끝맺어집니다.
+          · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+          [계속한다]  [건너뛰기 — 웃음 자막 한 장과 마무리로 이동]
+          음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+          지금 힘드시면: {{crisis_resources.default}}
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: true }
+      captions:
+        - speaker_ko: 해설
+          text_ko: "여호와께서 말씀하신 대로 사라를 돌보셨고 여호와께서 말씀하신 대로 사라에게 행하셨으므로 (창 21:1)"
+        - speaker_ko: 해설
+          text_ko: "사라가 임신하고 하나님이 말씀하신 시기가 되어 노년의 아브라함에게 아들을 낳으니 (창 21:2)"
+        - speaker_ko: 해설
+          text_ko: "아브라함이 그의 아들 이삭이 그에게 태어날 때에 백 세라 (창 21:5)"
+        - speaker_ko: 사라
+          text_ko: "사라가 이르되 하나님이 나를 웃게 하시니 듣는 자가 다 나와 함께 웃으리로다 (창 21:6)"
+        - speaker_ko: 사라
+          text_ko: "또 이르되 사라가 자식들을 젖먹이겠다고 누가 아브라함에게 말하였으리요마는 아브라함의 노경에 내가 아들을 낳았도다 하니라 (창 21:7)"
+      # 건너뛰기를 고른 사용자가 실제로 받는 것. captions 를 통째로 갈아끼워 21:6 한 장만
+      # 남기고, 마감 한 줄과 종결 화면은 그대로 준다 — 건너뛰었다고 끝맺음을 덜 받지 않는다.
+      # 블록 계약(SceneSkipResolver): `id`·`reached_by`·`renders`·`note` 는 메타 키이고
+      # **나머지 키가 전부 payload override 로 덮인다.** 그래서 축약본 자막을 여기에
+      # 그대로 적으면 그것이 `extras.captions` 를 대체한다(룻 Scene 5 와 같은 모양).
+      # `renders` 에 적은 키는 축약 경로에서도 **반드시 남는다** 는 약속이고, payload 두 겹
+      # 어디에도 없으면 DecideSceneUseCase.altBlockPayload 가 E_VALIDATION 으로 던진다 —
+      # 약속한 마감을 못 주면 사용자가 이야기를 잃은 채 끝나기 때문이다.
+      conditional_blocks:
+        - id: abraham_scene5_alt_laughter_only
+          reached_by: [consent_skipped]
+          captions:
+            - speaker_ko: 사라
+              text_ko: "사라가 이르되 하나님이 나를 웃게 하시니 듣는 자가 다 나와 함께 웃으리로다 (창 21:6)"
+          # 자막에서 뺀 절이 성구 블록으로 되돌아오지 않게 참조도 함께 비운다.
+          # 이걸 빼먹으면 자막만 줄고 ScenePassage 가 21:1·21:2·21:5·21:7 을 그대로 편다 —
+          # 축약을 약속하고 축약하지 않는, 조용한 실패다.
+          additional_refs: []
+          renders: [branches, crisis_reminder, next_scene_suggestion]
+          note: >-
+            임신·출산·젖먹임 묘사가 들어간 자막 세 장(21:1-2 · 21:5 · 21:7)을 빼고 21:6 한 장만
+            남긴다. wait_label 이월과 마감 한 줄·위기 안내·종결 화면은 정본 경로와 동일하게
+            도달한다 — 건너뛰었다고 끝맺음을 덜 받지 않는다.
+      # 이 미션은 여기서 끝난다. 창 21:8 이후(여종 서사)와 그 다음 장(이삭 결박)은
+      # 자막·연출·안내 어디에도 없다. 배제된 자구를 여기에 옮겨 적지 않는다.
+      ends_at: gen-21:7
+      crisis_reminder:
+        text_ko: "지금 힘드시면 {{crisis_resources.default}}."
+        position: above_closing_text
+      closing_state_gate:
+        trigger_conditions: [recent_R1_interrupt_in_mission, consent_skipped]
+        on_trigger:
+          intensity_default_preset: subtitle_only
+          skip_button_visual_emphasis: true
+          crisis_card_position: above_closing_text
+        note: >-
+          elijah·solomon 의 F66 관례를 구조적 일관성을 위해 이식했다. 저작 seed 에는 없던
+          것이고, 그 사실을 저작 scene5.yml 이 명시해 두었다 — 여기서도 밝혀 둔다.
+      interactions:
+        - id: witness_only
+          type: auto_proceed
+          presentation: { no_completion_reward: true }
+      # 마감 한 줄. Scene 3 의 wait_label 을 그대로 이월받고, 라벨이 없어도 반드시 도달한다.
+      branches:
+        - id: br_s5_closing_message
+          decision_key: closing_key
+          default_path: static_curation
+          llm_optin_only: true
+          cache_matrix_note: "wait_label 3종 × faith_tone 3단 = 9 패턴 사전 큐레이션. 아래는 balanced 기본값."
+          routes:
+            - when: { wait_label: voice_the_lack }
+              static_text_ko: "아브람은 자기에게 없는 것을 그대로 말했다. 본문은 그 말을 지우지 않고 남겨 두었다."
+            - when: { wait_label: hold_the_promise }
+              static_text_ko: "아브람은 믿었고, 그 뒤로도 오래 기다렸다. 믿음은 기다림을 끝내 주지 않았다."
+            - when: { wait_label: sit_with_unknowing }
+              static_text_ko: "사백 년의 이유는 다른 곳에 있었다. 아브라함은 그 이유를 끝내 다 알지 못한 채로 살았다."
+            - when: { wait_label: null }
+              static_text_ko: "아브라함은 오래 기다렸다. 이 이야기는 그 기다림을 지우지 않고 그대로 두었다."
+              note: >-
+                라벨 없이 도달한 사용자 — Scene 3 에서 아무것도 고르지 않았거나 20초가 지난
+                경로다. 가장 취약한 자리이므로 문구 없이 끝나지 않게 폴백을 명시한다.
+      next_scene_suggestion:
+        presentation: { no_autoplay: true }
+
+  # ── 여기서 끝난다 ──────────────────────────────────────────────────────────

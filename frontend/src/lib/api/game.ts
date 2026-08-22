@@ -70,7 +70,13 @@ export type MissionCharacter =
   | "job"
   | "ruth"
   | "peter"
-  | "daniel";
+  | "daniel"
+  // 아브라함은 여기 있지만 **열려 있지 않다.** 노출을 정하는 것은 백엔드
+  // `Character` enum 이고(`ScenarioYamlLoader.loadAll()` 이 그것만 순회한다),
+  // 거기엔 아직 없다 — `/abraham` 을 열면 E_CHARACTER_UNKNOWN 이 난다.
+  // 이 union 은 화면이 컴파일되게 하는 자리이지 게이트가 아니다.
+  // 게이트는 `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
+  | "abraham";
 
 export async function startMission(
   character: MissionCharacter,

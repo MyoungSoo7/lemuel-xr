@@ -337,6 +337,26 @@ def walk_captions(node, speaker=None) -> list[tuple[str, str | None]]:
     return found
 
 
+# 한 자막이 절 둘을 가운뎃점으로 잇는 형태 — `<자구> (욥 3:11) · <자구> (욥 6:8)`.
+# `CAPTION_RE` 는 꼬리 참조 하나만 보고 그 앞을 전부 자구로 읽으므로, 이런 자막은
+# 뒤 절의 자구에 **앞 절과 그 참조 표기까지 붙은 문자열** 을 대조하게 되어 반드시
+# ALTERED 로 떨어진다. 자구가 틀려서가 아니라 자른 자리가 틀린 것이다
+# (`content/job/scene2.yml` 의 욥 3:11 · 6:8 자막이 그 경우였다).
+#
+# 그래서 자르는 자리를 자막이 표기한 대로 따라간다. **느슨해지지 않는 이유** 는
+# 쪼갠 조각이 *전부* 참조로 끝날 때만 쪼개기를 채택하기 때문이다 — 하나라도 아니면
+# 통짜로 되돌린다. 가운뎃점이 자구 안에 있는 자막은 그래서 영향을 받지 않고,
+# 채택된 경우에도 각 조각은 여전히 축자 대조를 받는다. 검사 대상이 줄지 않는다.
+def split_citations(text: str) -> list[str]:
+    whole = text.strip()
+    if "·" not in whole:
+        return [whole]
+    parts = [p.strip() for p in whole.split("·")]
+    if len(parts) < 2 or not all(CAPTION_RE.match(p) for p in parts):
+        return [whole]
+    return parts
+
+
 def parse_yml(raw: str) -> list[dict]:
     """yml 한 파일에서 E1 라벨·E2 인용을 뽑는다.
 
@@ -360,7 +380,8 @@ def parse_yml(raw: str) -> list[dict]:
             }
         )
     for text, speaker in walk_captions(yaml.safe_load(raw)):
-        m = CAPTION_RE.match(text.strip())
+      for segment in split_citations(text):
+        m = CAPTION_RE.match(segment)
         if not m:
             continue
         body = m.group("text").strip()
