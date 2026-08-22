@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
@@ -37,18 +37,61 @@ const classifyMock = vi.mocked(classifyEmotion);
  *      0~1 확률을 % 로 옮긴 값이어야 한다.
  */
 
-/** 인물 목록의 정본. `scripts/mission_passage_check.py` 의 `characters()` 와 같은 곳을 본다. */
-const SCENARIOS = join(
-  __dirname,
-  "..",
-  "..",
-  "..",
-  "backend",
-  "src",
-  "main",
-  "resources",
-  "scenarios",
+const BACKEND = join(__dirname, "..", "..", "..", "backend", "src", "main");
+const SCENARIOS = join(BACKEND, "resources", "scenarios");
+const CHARACTER_KT = join(
+  BACKEND,
+  "kotlin",
+  "github",
+  "lms",
+  "lemuel",
+  "xr",
+  "game",
+  "domain",
+  "Character.kt",
 );
+
+/**
+ * 인물 목록의 정본은 **`Character.kt` 의 enum** 이다 — 시나리오 yml 디렉터리가 아니다.
+ *
+ * 2026-08-22 까지 이 파일은 디렉터리를 정본으로 썼다. 아브라함이 「enum 은 열렸는데 홈에
+ * 입구가 없는」 상태로 나간 것을 잡으려던 것이고 그건 잘 잡혔지만, 정본을 잘못 짚고 있었다.
+ * `ScenarioYamlLoader.loadAll()` 은 디렉터리를 훑지 않고 `Character.entries` 를 순회한다.
+ * 즉 **yml 이 있어도 enum 에 없으면 사용자에게 그 인물은 존재하지 않는다.**
+ *
+ * 이 구별이 지금 실제로 필요하다. 라합은 런타임 대본(`scenarios/rahab.yml`)과 게이트가
+ * 다 올라와 있고 enum 한 줄만 사람 결정을 기다린다(`docs/RAHAB-RUNTIME-SIGNOFF.md` 의
+ * 결정 줄이 비어 있다). 디렉터리를 정본으로 두면 그 대기 상태가 「홈에 입구가 없는 결함」
+ * 으로 잘못 신고되고, 그걸 없애려면 준비된 파일을 지우거나 결정 전에 문을 열어야 한다 —
+ * 둘 다 틀린 방향이다.
+ *
+ * 뒤집힌 쪽(enum 에 있는데 yml 이 없는 것)은 `ScenarioYamlLoaderTest` 가 백엔드에서 막는다.
+ * 여기서도 한 번 더 대조한다 — 이 파일의 정본이 공허해지지 않게 하는 확인이다.
+ */
+function exposedCharacters(): string[] {
+  const src = readFileSync(CHARACTER_KT, "utf8");
+  const body = src.slice(src.indexOf("enum class Character"));
+  return [...body.matchAll(/^ {4}[A-Z_]+\("([a-z_]+)"\)/gm)].map((m) => m[1]);
+}
+
+/** yml 은 있는데 enum 에 없는 인물 — 저작은 끝났고 노출 결정만 남은 상태. */
+function stagedCharacters(): string[] {
+  const exposed = new Set(exposedCharacters());
+  return readdirSync(SCENARIOS)
+    .filter((f) => f.endsWith(".yml"))
+    .map((f) => f.replace(/\.yml$/, ""))
+    .filter((c) => !exposed.has(c))
+    .sort();
+}
+
+/**
+ * 「미구현 인물은 링크가 '#'」 검사에 쓸 이름. 손으로 적으면 그 인물이 열리는 날
+ * 검사가 조용히 거짓이 된다(룻이 그랬다 — 열린 뒤에도 미구현 예시로 남아 있었다).
+ * 그래서 대기 중인 인물에서 뽑고, 대기 중인 인물이 하나도 없으면 enum 에 없는 것이
+ * 확실한 이름으로 떨어뜨린다 — 그때도 이 검사는 「모르는 인물을 404 로 보내지 않는다」를
+ * 계속 잰다.
+ */
+const UNIMPLEMENTED = stagedCharacters()[0] ?? "no-such-character";
 
 function renderHome() {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -65,10 +108,9 @@ const RESULT: ClassifyResponse = {
   recommendations: {
     trackB: [
       { character: "elijah", rationale: "로뎀나무 아래의 탈진" },
-      // 2026-08-20 까지 이 자리는 ruth 였다. `/ruth` 화면이 생기면서 더 이상
-      // 미구현 예시가 아니게 돼 rahab 으로 바꿨다 — 게이트·자막 정본은 있는데
-      // `frontend/src/app/rahab/` 가 없는, 지금 가장 앞서 있는 화면 없는 인물이다.
-      { character: "rahab", rationale: "미구현 인물" },
+      // 이 자리는 ruth → rahab 순으로 손으로 고쳐 왔다. 이제 손으로 적지 않는다 —
+      // 위 UNIMPLEMENTED 주석 참조.
+      { character: UNIMPLEMENTED, rationale: "미구현 인물" },
     ],
     trackA: [
       { topicId: 3, title: "시편 — 탄식의 언어", rationale: "감정을 말로" },
@@ -88,15 +130,27 @@ describe("첫 화면 — 분류 없이도 들어갈 수 있는 길", () => {
     // 어느 목록에도 안 들어온 채 열렸을 때도** 초록이었다. 나열형 검사는 자기가
     // 아는 것만 세고, 모르는 인물이 빠진 것은 정의상 못 본다.
     //
-    // 그래서 `scripts/mission_passage_check.py` 의 `characters()` 와 같은 정본을
-    // 쓴다 — 시나리오 yml 디렉터리다. 미션이 저작돼 런타임에 열렸는데 홈에 입구가
-    // 없으면, 사용자는 주소를 직접 치지 않는 한 그 화면에 도달할 길이 없다.
-    // 실제로 아브라함이 그 상태였다(#100 에서 enum 은 열렸고 홈은 그대로였다).
-    const authored = readdirSync(SCENARIOS)
-      .filter((f) => f.endsWith(".yml"))
-      .map((f) => `/${f.replace(/\.yml$/, "")}`)
-      .sort();
+    // 그래서 `Character.kt` 의 enum 을 정본으로 쓴다(위 exposedCharacters 주석 참조).
+    // 인물이 런타임에 열렸는데 홈에 입구가 없으면, 사용자는 주소를 직접 치지 않는 한
+    // 그 화면에 도달할 길이 없다. 실제로 아브라함이 그 상태였다(#100 에서 enum 은
+    // 열렸고 홈은 그대로였다).
+    const exposed = exposedCharacters();
+    const authored = exposed.map((c) => `/${c}`).sort();
     expect(authored.length).toBeGreaterThan(0); // 경로가 틀리면 아래가 공허하게 통과한다
+
+    // enum 에 있는데 yml 이 없으면 로더가 warn 만 남기고 조용히 건너뛴다 — 홈에 입구는
+    // 있는데 눌러도 콘텐츠가 없는 인물이 된다. 백엔드에도 같은 검사가 있지만, 여기
+    // 정본이 실재하는 저작을 가리키는지 이 파일 안에서 확인해 둔다.
+    const yml = new Set(
+      readdirSync(SCENARIOS)
+        .filter((f) => f.endsWith(".yml"))
+        .map((f) => f.replace(/\.yml$/, "")),
+    );
+    const dangling = exposed.filter((c) => !yml.has(c));
+    expect(
+      dangling,
+      `enum 에는 열렸는데 시나리오 yml 이 없는 인물: ${dangling.join(", ")}`,
+    ).toEqual([]);
 
     renderHome();
     const missions = screen.getByRole("heading", {
@@ -286,10 +340,12 @@ describe("분류 결과", () => {
       "href",
       "/elijah",
     );
-    // 미구현 인물을 /rahab 으로 보내면 404 다. 막다른 길 대신 그 자리에 머문다.
-    const rahab = screen.getByRole("link", { name: /rahab/ });
-    expect(rahab).toHaveAttribute("href", "#");
-    expect(within(rahab).getByText("Phase 2")).toBeInTheDocument();
+    // 미구현 인물을 `/{이름}` 으로 보내면 404 다. 막다른 길 대신 그 자리에 머문다.
+    const pending = screen.getByRole("link", {
+      name: new RegExp(UNIMPLEMENTED),
+    });
+    expect(pending).toHaveAttribute("href", "#");
+    expect(within(pending).getByText("Phase 2")).toBeInTheDocument();
     expect(screen.getByText("로뎀나무 아래의 탈진")).toBeInTheDocument();
   });
 

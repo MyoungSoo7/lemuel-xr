@@ -210,6 +210,27 @@ const CONTENT_LABEL: Record<string, string> = {
   sibling_death_threat: "형제의 살해 위협",
   confrontation_as_offender: "내가 상처를 준 쪽으로서의 대면",
   unwanted_reunion: "원치 않는 재회",
+  /*
+    rahab.yml 다섯 Scene (2026-08-22 작성. **enum 은 아직 안 열렸다** —
+    `docs/RAHAB-RUNTIME-SIGNOFF.md` 의 결정 줄이 비어 있다). 열 태그 전부 이 인물이
+    처음 쓴다. 이 미션은 낭독 트랙이라 사용자 선택이 없고, **동의 카드가 유일한 통제**다.
+    그 카드에 영문 토큰이 뜨면 이 인물에게는 남는 보호가 사실상 없다.
+
+    라벨을 짧게 줄이지 않는다. `sex_work_stigma` 를 "성매매" 로 줄이면 고지가 예고하는
+    것(그 호칭과 낙인이 자막에 나온다)이 사라지고, 대신 이 미션이 하지 않는 일 —
+    행위의 재연 — 을 예고하는 것처럼 읽힌다. 카드 본문이 「그 호칭을 평가하지 않습니다」
+    라고 적는 것과 같은 이유다.
+  */
+  sex_work_stigma: "성매매 여성을 가리키는 호칭과 낙인",
+  collective_terror_response: "한 공동체 전체가 겪는 공포",
+  sexual_vulnerability_context: "성적으로 취약한 처지에 놓인 상황",
+  home_intrusion_search: "집으로 들이닥치는 수색",
+  family_annihilation_risk: "가족 전체가 죽을 위험",
+  conditional_survival_pact: "조건을 걸고 맺는 생존 약속",
+  blood_guilt_attribution: "죽음의 책임을 누구에게 돌리는 옛 표현",
+  height_suspension: "높은 곳에 매달림",
+  ethnic_labeling: "민족을 이유로 한 지칭",
+  pregnancy_childbirth: "임신과 출산",
 };
 
 const LEVEL_LABEL: Record<string, string> = {

@@ -35,6 +35,12 @@ const PUBLIC_DIR = join(__dirname, "..", "..", "public");
   실수가 아니다 — 한 장도 없어서 다섯 씬 전부 검게 나온다" 는 주석이 있었고,
   같은 날 다섯 장(1~5.webp)을 뽑아 눈으로 확인한 뒤 이 줄로 바꿨다.
 */
+/*
+  라합도 같은 길을 밟았다 — 여섯 장(1~5.webp + 4-alt.webp)을 뽑아 눈으로 확인한 뒤 넣었다.
+  다만 이 인물만 **변형 배경**이 하나 더 있다(아래 VARIANTS). 그것까지 여기서 재지 않으면
+  `docs/RAHAB-RUNTIME-SIGNOFF.md` 의 「배경 이미지 — 사람 검수 대기」 절이 말하는
+  「파일이 디스크에 있느냐까지는 기계가 잰다」가 그 인물에 대해서만 거짓이 된다.
+*/
 const CHARACTERS = [
   "abraham",
   "daniel",
@@ -47,13 +53,37 @@ const CHARACTERS = [
   "joseph",
   "moses",
   "peter",
+  "rahab",
   "ruth",
   "solomon",
 ];
 
-/** `url(/images/scenes/david/${scene.currentScene}.webp)` 에서 폴더와 확장자를 꺼낸다. */
+/*
+  변형 배경 — 씬 번호 뒤에 접미사가 붙는 파일. 지금은 라합 Scene 4 하나뿐이다:
+  §2-5 동의 카드가 「창과 줄을 보지 않는다」고 약속하는데 그 둘은 자막이 아니라
+  **배경에** 있어서, 축약 블록이 `background_variant: no_window_no_cord` 를 덮고
+  화면이 그 값으로 `4-alt.webp` 를 고른다(rahab/page.tsx).
+
+  `scenes` 는 손으로 적는다 — 어느 씬이 변형을 갖는지는 시나리오 yml 에 있고 이 검사는
+  프론트만 읽기 때문이다. 그래서 접미사 쪽만이라도 드리프트를 막는다: 아래 검사가
+  **페이지 소스에 그 접미사가 실제로 있는지** 를 먼저 단정한다. 페이지에서 변형을
+  없애면 이 표는 초록인 채로 남지 못한다.
+*/
+const VARIANTS: Record<string, { suffix: string; scenes: number[] }> = {
+  rahab: { suffix: "-alt", scenes: [4] },
+};
+
+/**
+ * `/images/scenes/david/${scene.currentScene}.webp` 에서 폴더와 확장자를 꺼낸다.
+ *
+ * 감싸는 `url(...)` 은 일부러 요구하지 않는다 — 라합은 변형 배경 때문에 경로를
+ * 먼저 변수(`background`)에 담고 `url(${background})` 로 쓴다. `url(` 을 붙여 두면
+ * 그 인물에서 이 정규식이 안 맞고, 위 「파싱 자체를 단정한다」 검사가 그걸 잡는다.
+ * 접미사가 붙은 변형 경로(`...}-alt.webp`)는 `\.` 요구 때문에 여기 안 걸린다 —
+ * 그쪽은 아래 VARIANTS 가 따로 잰다.
+ */
 const BACKGROUND =
-  /url\(\/images\/scenes\/([a-z]+)\/\$\{scene\.currentScene\}\.([a-z0-9]+)\)/;
+  /\/images\/scenes\/([a-z]+)\/\$\{scene\.currentScene\}\.([a-z0-9]+)/;
 /** `David — Scene {scene.currentScene}/6 · Mode: VR` 에서 총 씬 수를 꺼낸다. */
 const SCENE_COUNT = /Scene \{scene\.currentScene\}\/(\d+)/;
 
@@ -89,4 +119,23 @@ describe.each(CHARACTERS)("%s 씬 배경", (character) => {
 
     expect(missing, `없는 배경 파일: ${missing.join(", ")}`).toEqual([]);
   });
+
+  const variant = VARIANTS[character];
+  if (variant) {
+    it("변형 배경 파일도 실제로 있다", () => {
+      const ext = bg![2];
+      // 먼저 접미사가 페이지에 실재하는지 본다. 이게 없으면 아래 존재 검사는
+      // "아무도 안 읽는 파일이 디스크에 있다"만 재는 가짜 초록이 된다.
+      expect(
+        source.includes(`\${scene.currentScene}${variant.suffix}.${ext}`),
+        `${character}/page.tsx 가 변형 접미사 '${variant.suffix}' 를 더 이상 쓰지 않는다 — VARIANTS 를 지워야 한다`,
+      ).toBe(true);
+
+      const missing = variant.scenes
+        .map((n) => `images/scenes/${character}/${n}${variant.suffix}.${ext}`)
+        .filter((rel) => !existsSync(join(PUBLIC_DIR, rel)));
+
+      expect(missing, `없는 변형 배경 파일: ${missing.join(", ")}`).toEqual([]);
+    });
+  }
 });

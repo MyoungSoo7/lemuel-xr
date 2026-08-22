@@ -1,0 +1,746 @@
+# 라합 — 「먼저 있었던 일」
+#
+# 핵심 메시지: **본문이 말한 것까지만 말한다.**
+#   여호수아는 라합의 회개를 말하지 않는다. 회개·정화 서사는 4세기의 구성물이고
+#   (docs/THEOLOGY-REFERENCES.md §라합), 약 2:25 도 낙인이 씻겼다고 말하지 않는다.
+#   이 미션은 그 자리를 비워 둔 채로 끝난다 — 비워 둔 것이 결함이 아니라 축이다.
+#   에스더의 「개시의 자기 결정권」과도, 룻의 「낯선 자리에서의 소속」과도 갈라 둔 축이다.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# ⚠️ 이 파일은 `Character` enum 에 RAHAB("rahab") 이 들어가는 순간 **실제로 로드된다.**
+#   ScenarioYamlLoader.loadAll() 은 `Character.entries` 를 순회한다 — 디렉터리가 아니다.
+#   그래서 enum 한 줄이 곧 사용자 노출이다. 이 파일이 리포에 있다는 것만으로는
+#   아무도 이것을 보지 않는다.
+#   근거·범위·남은 빚은 docs/RAHAB-RUNTIME-SIGNOFF.md 에 있고
+#   RuntimeExposureSignoffTest 의 «룻 이후 열리는 인물은 노출 대장 없이 열리지 않는다» 가 집행한다.
+#   · 전문 신학 검토 없음 · 전문 정신건강 검토 없음. 그 사실은 대장에 남아 있다.
+#   · AR 은 닫혀 있다(VR 전용). `scripts/gen_ar_manifests.py` 의 AR_MISSIONS 에
+#     rahab 이 들어간 적이 없다.
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# 상류 문서 (이 파일은 이들의 하류다 — 자구를 여기서 발명하지 않는다)
+#   설계        docs/MVP-RAHAB.md
+#   자구 정본   docs/VERSES-RAHAB-GAE.md
+#   잠금 문안   docs/RAHAB-LOCKED-STRINGS.md   (동의 카드 6장 · 비성경 내레이션 3줄 · F-6.5)
+#   저작        content/rahab/scene1~5.yml
+#   저작 게이트 scripts/gates/rahab.yml
+#   성구 시드   backend/src/main/resources/db/migration/V20260822200000__seed_rahab_passages_gae.sql
+#
+# 이 파일의 자막 24행은 **저작 트리의 text_ko 를 한 글자도 바꾸지 않고 옮긴 것**이다.
+# 그 사실은 산문 주장이 아니라 기계 검사다 — RahabWithheldNarrativeTest 가 매 빌드
+# content/rahab/scene*.yml 과 축자 대조한다. 동의 카드 6장의 문안도 LOCKED 정본
+# 그대로다. **새로 쓴 문장은 0건이다.**
+#
+# 신학 기준: 대한예수교장로회 합신 / 웨스트민스터 표준 / 개혁주의 (프로젝트 단일 기준).
+#
+# 배제 (이 파일에서 직접 집행되는 것)
+#   · 여리고 함락(헤렘) 전 구간 — 수 6:1-21 · 6:24 · 6:26. 자구를 여기 옮겨 적지 않는다.
+#     배제 자구는 docs/verses-rahab.txt 의 `## EXCLUDED` 칸에만 있다.
+#   · 히 11:31 — 후반절이 §4 가 배제한 전멸이고 앞부분만 끊으면 주절 없는 종속절이 된다.
+#     전문도 절단도 불가하므로 자막으로 쓰지 않는다(VERSES-RAHAB-GAE.md).
+#   · 마 1:5 의 보아스-룻-오벳-이새 — 그 계보는 Theme 19(룻)의 자리다.
+#   · 라합이 한 말의 진실성 평가(수 2:4-5) — 신약 세 곳 어디도 그것을 평가하지 않는다.
+#     이 파일도 평가하지 않는다.
+#
+# 안전선
+#   R1 자해 발화 리스너 5/5 Scene 상시. 위기 카드는 종결 화면에 두고, 한 번 걸리면
+#      미션 범위로 래치된다(post_crisis_latch_scope: mission). 값 3키가 다섯 Scene 동일하다.
+#   R2 고난 귀속 금지 — 「그래서 쓰임받았」·「다 뜻이 있어」류.
+#   R3 회복 압박 금지 — 「이제 그만 일어나」·「결국 보상받았」류.
+#   T1 **이 인물의 최우선 축.** 본문에 없는 회개·정화 서사 삽입 금지.
+#      2026-08-18 에 저작의 수 6:27 자막이 「라합은 과거를 씻고」로 시작하고 있었다.
+#      전문 인용이라고 적힌 카드에 본문에 없는 절이 붙어 있었고, 잡은 것은 산문 검토가
+#      아니라 금칙 토큰이었다.
+#   R4 동의 카드가 **여섯** 이다 — 코퍼스 최다. 한 Scene 을 두 장이 덮는 자리가 둘(4·5),
+#      한 장이 두 Scene 을 덮는 자리가 하나(1→5).
+#   R5 기본 경로는 LLM 호출 0회로 완주된다(static_curation).
+#
+# ── 엔진과 저작이 갈라지는 자리 (숨기지 않는다) ──────────────────────────────
+#   (1) **Scene 2 의 목적지 타입.** 저작은 이 자리에 경로 id 문자열 `"s2_skip"` 을 적고,
+#       정수를 쓰지 말라고 못 박았다(content/rahab/scene2.yml 주석 — 정수는 「대신 무엇이
+#       재생되는가」를 지목하지 못한다). 그런데 그 경로가 하는 일은 **Scene 2 를 통째로
+#       건너뛰고 Scene 3 으로 가는 것**이고, 저작 자신이 정의 블록을 scene3.yml 에 두었다.
+#       엔진의 문자열 목적지는 「같은 씬에 머물며 payload 를 덮는다」이므로 이 뜻을 낼 수
+#       없다. 그래서 여기서는 **정수 3** 을 쓴다. 목적지·재생 결과 둘 다 저작과 같고
+#       (Scene 2 미재생 → Scene 3), 저작이 정수를 금한 이유였던 「대신 무엇이 재생되는가」는
+#       브리지 내레이션이 지목한다. 저작 문안이 요구한 좌표 — 「Scene 3 첫 자막 앞」 —
+#       도 그대로 성립한다: 엔진의 `skip_bridge_narration_ko` 는 **목적지 씬 상단**에 뜬다.
+#   (2) **Scene 4 를 덮는 카드가 둘인데 엔진의 카드 슬롯은 하나다.** 저작은 이미 이 한계를
+#       알고 두 카드 문안 **각각에 합집합 델타를 적어 두었다**(consent_overblock_note).
+#       그래서 여기서는 두 LOCKED 문안을 **자구 그대로 이어 붙인다** — 새 문장을 쓰지 않고,
+#       어느 쪽을 읽어도 실제로 일어나는 일이 카드에 적혀 있다. 프론트의 `cardDoors()` 는
+#       첫 괄호 줄에서 문 둘을 만들므로 §2-4 의 문이 쓰이고, §2-5 의 괄호 줄은 산문에서
+#       걷힌다. Scene 5 도 카드 둘(1의 stigma + 자기 lineage_birth)이지만 저작이 문안
+#       중복을 금했으므로(scene5.yml note) 이어 붙이지 않는다 — 대신 (4) 를 쓴다.
+#   (3) **Scene 4 의 에셋 비표시가 payload 키로 나간다.** 저작의 약속은 「창문과 줄을 화면에
+#       띄우지 않는다」인데 자막 런타임에는 에셋 토글이 없다. 축약 블록이
+#       `background_variant: no_window_no_cord` 를 덮고 화면이 그 값으로 다른 배경을 고른다.
+#       `renders` 에 그 키를 약속해 두었으므로, 키가 사라지면 DecideSceneUseCase 가
+#       런타임에 던진다 — 약속만 남고 집행이 사라지는 형태를 막는다.
+#   (4) **Scene 5 의 `covered_by_scene: 1`.** 저작은 Scene 1 의 stigma 카드가 Scene 5 도
+#       덮는다고 적었다(covers_scenes: [1, 5]). 이것을 적지 않으면 Scene 1 에서 호칭을
+#       거절한 사용자가 Scene 5 에서 **자기 카드를 다시 받고**, 그것을 수락하는 순간
+#       거절했던 호칭 자막(6:17b · 6:22 · 6:25 · 약 2:25)을 그대로 만난다. 실제 누출이다.
+#       `covered_by_scene` 이 있으면 SceneSkipResolver.carriedSkip 이 세션에 남은 Scene 1
+#       결정을 읽어 도착 시점에 축약 경로를 적용한다.
+#   (5) **「본문이 아닙니다」 표지가 문자열 안에 있다.** 저작은 이 표지를 별도 필드
+#       (`marker_ko`)로 두었는데 엔진의 브리지·자막에는 표지 필드가 없다. 지어내지 않고
+#       **표지를 문자열의 첫 줄로 옮겼다** — 화면에 반드시 함께 뜬다는 저작의 요구가
+#       필드 유무와 무관하게 성립한다. 정본/비정본의 **타이포그래피** 구분은 여전히
+#       재는 수단이 없다(저작 DP-R17).
+#   (6) **절 참조를 자막 문자열에 붙이지 않는다.** 야곱은 「(창 27:19)」를 text_ko 안에
+#       넣었다. 라합은 넣지 않고 `verse_ref` 를 별도 키로 둔다. 두 가지 이유다 —
+#       ① 자구 대조가 축자여야 하고(RahabWithheldNarrativeTest), ② 저작의 「중」 표기가
+#       **근거 없는 미해소 항목**이라(24행 중 11행) 그것을 화면 문자열에 굳혀 넣으면
+#       사용자에게 「뺀 것이 있다」고 잘못 알린다. 그 빚은 대장에 등재돼 있다.
+#
+# ⚠️ 위기 연락처를 이 파일에 숫자로 적지 말 것.
+#   `{{crisis_resources.default}}` 토큰만 쓴다 — ScenePayloadAssembler → CrisisTokenResolver
+#   가 정본으로 치환하고 ScenarioHotlineRatchetTest 가 이를 강제한다.
+
+character: rahab
+title: 먼저 있었던 일
+
+target_user: 남들이 붙인 호칭으로 자기를 부르게 된 사람. 침묵을 조건으로 안전을 얻어 본 적이 있는 사람
+
+ai_assist_footer: AI 보조 — 본문은 성경 참조 — storyteller 역할. 위기 시 {{crisis_resources.default}}.
+
+# ── 금칙 토큰: 이 파일에 사본을 두지 않는다 ──────────────────────────────────
+# 이 미션의 금칙 토큰 정본은 content/rahab/scene1~5.yml 의 lint_forbidden_tokens 안이다
+# (R2_R3 축과 T1 축 두 갈래, 합 25종). 여기에 여섯 번째 사본을 만들지 않는다 —
+# 갈라질 것이 확실하다. 런타임 차단은 application.yml 의 safety.forbidden-tokens.list 가
+# 하고(세 출구 전부: responseText · scenePayload · valuePrompt), 저작 목록이 그 전역
+# 목록의 부분집합인지는 아래 verified_by 가 매 빌드 확인한다.
+safety_gates:
+  - id: R2_R3_forbidden_tokens_lint
+    scenes: [1, 2, 3, 4, 5]
+    axis: 고난 귀속 금지 · 회복 압박 금지 · 목적론적 의미부여 금지
+    enforcement: structural
+    structural_check: >-
+      금칙 토큰을 이 파일에 복제하지 않고 저작 정본(content/rahab/scene1~5.yml 의
+      lint_forbidden_tokens)에 둔다. 런타임 집행은 application.yml 의 전역 목록이 하며,
+      저작 목록이 그 전역 목록의 부분집합임을 아래 verified_by 가 매 빌드 확인한다.
+    verified_by: 저작 게이트의 금칙 토큰이 런타임 목록에 전부 반영돼 있다
+
+  - id: T1_no_repentance_narrative_lint
+    scenes: [1, 2, 5]
+    axis: T1 본문에 없는 회개·정화 서사 삽입 금지 — 여호수아는 라합의 회개를 말하지 않는다
+    enforcement: structural
+    structural_check: >-
+      계열 7·8·9(낙인 소거 · 본문 밖 서사 · 공로화 인과)의 표층형을 저작 정본에 두고
+      런타임 전역 목록이 집행한다. 이 축의 초록은 「선언된 표층형이 없다」까지이고
+      「본문 밖 서사가 없다」가 아니다 — 문장 단위 신학 검토가 1차, 토큰이 2차다.
+      그 1차(전문 신학 검토)는 **없다**. 대장에 등재돼 있다.
+    verified_by: 저작 게이트의 금칙 토큰이 런타임 목록에 전부 반영돼 있다
+
+  - id: R4_consent_delta_is_real
+    scenes: [1, 3, 4, 5]
+    axis: 카드가 없애 주겠다고 한 자막이 실제로 빠진다 — 빈 안전 통제 금지
+    enforcement: structural
+    structural_check: >-
+      네 축약 블록(s1_no_epithet · s3_omit_2_13_2_14 · s4_declined ·
+      s5_close_on_6_23_6_27)이 각각 저작의 `omitted_on_route` 가 지정한 자막을 정확히
+      빼고 나머지를 그대로 남긴다. 거절 델타가 공집합인 카드는 보호를 얻었다는 착각만
+      준다 — 그래서 「블록이 있다」가 아니라 「무엇이 빠졌는가」를 잰다.
+    verified_by: 건너뛴 사람에게서 빠지는 자막이 저작이 지정한 그 줄들이다
+
+  - id: content_fidelity_rahab
+    scenes: [1, 2, 3, 4, 5]
+    axis: 자막 24행이 저작 정본의 투영이다 — 런타임에서 자구를 발명하지 않는다
+    enforcement: structural
+    structural_check: >-
+      다섯 Scene 의 자막을 content/rahab/scene*.yml 의 `captions[].text_ko` 와 순서까지
+      포함해 축자 대조한다. 배제된 자구를 기대값으로 적지 않는다 — 배제 목록을 기대값에
+      적으면 그 문장이 리포로 돌아오고, extras 는 payload 로 통째 복사되므로 화면으로
+      나갈 길이 생긴다. 그래서 「없어야 할 것」이 아니라 「저작과 같은가」로 판정한다.
+    verified_by: 라합 런타임 자막이 저작 정본의 자구와 한 글자도 다르지 않다
+
+  - id: staging_invariants_rahab
+    scenes: [1, 2, 3, 4, 5]
+    axis: 사용자를 라합의 몸·정탐꾼의 자리·「기생의 집」의 손님 자리에 두지 않는다
+    enforcement: structural
+    structural_check: >-
+      불변식 3종과 R1 래치 3키(post_crisis_render_policy · post_crisis_latch_scope ·
+      crisis_card_position)가 다섯 Scene 에 **값까지 같게** 있는지 본다. 한 Scene 만
+      풀리면 그 Scene 에서 통제가 사라지고, 나머지 넷이 초록이라 조용하다.
+    verified_by: 다섯 Scene 의 위기 래칭과 연출 불변식이 값까지 같다
+
+scenes:
+  # ── Scene 1 ────────────────────────────────────────────────────────────────
+  # 미션은 라합이 이미 말하고 있는 자리에서 시작한다. 사용자에게 선택지가 없다 —
+  # 본문에서 손이 하는 일은 전부 라합의 행위이고, 사용자에게 넘기면 가로챈다(저작 §3-1).
+  - id: 1
+    title: 우리가 듣자 곧
+    type: cinematic
+    duration_sec: 70
+    scripture_ref: jos-2:11
+    next: 2
+    exposure_grade: C
+    trigger_warning:
+      level: mid
+      content:
+        - sex_work_stigma
+        - collective_terror_response
+      consent_card_id: rahab_stigma
+      # 저작 그대로 [1, 5] 다. 문자열 목적지라 「목적지가 covers 안에 있으면 안 된다」
+      # 규칙(정수 전용)에 걸리지 않는다 — 이 경로는 씬을 옮기지 않고 자막만 뺀다.
+      covers_scenes: [1, 5]
+      skip_alternative_scene_id: "s1_no_epithet"
+      # docs/RAHAB-LOCKED-STRINGS.md §2-1 — LOCKED. 재작성 금지.
+      consent_card_ko: |-
+        이 이야기에는 한 여인이 나옵니다. 성경 본문은 그를 '기생'이라고 부릅니다.
+        그 호칭은 인용되는 자막에 다섯 번 나옵니다.
+        · 이 미션은 그 호칭을 평가하지 않습니다. 좋다고도 나쁘다고도 말하지 않습니다.
+        · 그 여인이 겪은 일을 재연하는 장면은 없습니다.
+        · 건너뛰시면 호칭이 든 자막이 나오지 않습니다. 마지막 장면에서 그가 어떤
+          사람들 가운데 살게 되었는지를 말하는 줄도 함께 빠집니다.
+        · 그 두 자리에는 성경 본문이 아닌 안내 문장이 대신 뜹니다. 「본문이 아닙니다」
+          표지가 함께 붙습니다.
+        · 전체 7분입니다. 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        · 지금 보지 않으셔도 이야기는 온전히 끝맺어집니다.
+        계속하시겠어요?
+        [계속한다]  [호칭이 든 자막은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        이 앱은 당신을 이 호칭으로 규정하지 않습니다. 성경 본문에 있는 낱말이라 인용할
+        뿐입니다. 지금 힘들다면 {{crisis_resources.default}}
+      # 저작 `rahab_nar_s1_address`(LOCKED §3). 표지를 첫 줄로 옮겼다 — 머리 주석 (5).
+      # 수 2:1 이 빠지면 「두 사람」의 선행사가 화면에서 사라진다. 이 줄은 **지시 대상만**
+      # 공급하고 건너뛴 절의 사건(정탐 파송·유숙)은 공급하지 않는다.
+      skip_bridge_narration_ko: |-
+        본문이 아닙니다
+        라합이 여기서 말을 건네는 상대는 성 밖에서 온 두 사람입니다.
+    extras:
+      anchor: 여리고 성벽 위의 집. 실내. 문은 닫혀 있다. 저녁.
+      additional_refs: ["jos-2:1", "jos-2:9"]
+      user_presence: 실내 가장자리 고정, 서서, 라합과 같은 축선 밖
+      # ⚠️ 이 두 블록은 다섯 Scene 에 **글자 그대로 다섯 벌** 있다. YAML 앵커로 묶지
+      #    않은 것은 의도다 — 앵커로 묶으면 갈라질 수 없어서 검사가 할 일이 없어지고,
+      #    나중에 누가 한 Scene 만 풀어 쓰는 순간 그 Scene 에서 통제가 조용히 사라진다.
+      #    다섯 벌을 그대로 두고 «다섯 Scene 의 위기 래칭과 연출 불변식이 값까지 같다» 가
+      #    매 빌드 대조한다.
+      staging_invariants:
+        - 불변식 1 — 사용자를 라합의 몸 안에 두지 않는다. 시점을 라합의 신체 위치에 놓지 않는다.
+        - 불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다.
+        - 불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다(수 2:1 의 유숙).
+      crisis_latch:
+        post_crisis_render_policy: suppress_all_captions_except_crisis_card
+        post_crisis_latch_scope: mission
+        crisis_card_position: terminal_screen
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      # 저작 정본 content/rahab/scene{1..5}.yml 의 `crisis_reminder.text_ko` 를 그대로
+      # 옮긴 것이다(다섯 Scene 동일 · always_visible: true). 번호는 여기 없다 —
+      # ScenePayloadAssembler 가 CrisisTokenResolver 로 치환해 내려준다.
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      environment:
+        camera_rig: fixed_at_room_edge_offaxis
+        time_of_day: evening_interior_lamplight
+        ambient: [멀리서 오는 바람, 등불 심지]
+        lighting_note: 조도 하한을 지킨다 — 어둠으로 위협을 만들지 않는다.
+        ui_overlays:
+          [ai_assist_footer, crisis_reminder, exit_button, suffering_disclaimer]
+      npcs:
+        - { name_ko: 라합, framing: full_body_far }
+        - { name_ko: 두 사람, framing: full_body_far }
+      npc_note: >-
+        「두 사람」의 얼굴을 만들지 않는다. 사용자를 그 자리에 세우지 않는다(불변식 2).
+        인물은 전신 프레임으로만 등장하고 얼굴 클로즈업이 없다 — 호칭이 가리키는 일의
+        경위·묘사·재연을 어떤 층위에도 두지 않는다는 저작 5항의 화면 층 표현이다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: false }
+      pacing_note: >-
+        되감기를 허용하지 않는다. 룻은 허용했으나 라합은 허용하지 않는다(저작 §3-2) —
+        사용자 행위는 속도·동의/거절·이탈 셋뿐이고 속도는 앞으로만 간다.
+      captions: &s1_captions
+        - verse_ref: 수 2:1
+          text_ko: "눈의 아들 여호수아가 싯딤에서 두 사람을 정탐꾼으로 보내며 이르되 가서 그 땅과 여리고를 엿보라 하매 그들이 가서 라합이라 하는 기생의 집에 들어가"
+        - speaker_ko: 라합
+          verse_ref: 수 2:9
+          text_ko: "여호와께서 이 땅을 너희에게 주신 줄을 내가 아노라 우리가 너희를 심히 두려워하고 이 땅 주민들이 다 너희 앞에서 간담이 녹나니"
+        - speaker_ko: 라합
+          verse_ref: 수 2:11
+          text_ko: "우리가 듣자 곧 마음이 녹았고 너희로 말미암아 사람이 정신을 잃었나니 너희의 하나님 여호와는 위로는 하늘에서도 아래로는 땅에서도 하나님이시니라"
+      # 「호칭이 든 자막은 건너뛴다」의 실제 델타. 저작 scene1.yml 의 `omitted_on_route:
+      # s1_no_epithet` 가 붙은 행은 수 2:1 하나이고, 그것만 빠진다. 장면은 이어진다 —
+      # 카드가 「Scene 을 건너뛴다」고 말한 적이 없기 때문이다(저작 skip_alternative_note).
+      conditional_blocks:
+        - id: "s1_no_epithet"
+          reached_by: consent_skip
+          renders: [captions]
+          # 자막에서 뺀 절이 성구 블록으로 되돌아오지 않게 참조도 함께 좁힌다.
+          # 화면은 `scripture_ref` **와 `additional_refs` 를 둘 다** 연다
+          # (`ScenePassage` — mission-passage.test.tsx 셋째 케이스). 이 줄이 없으면
+          # 자막에서 지운 수 2:1(「기생」 호칭)이 바로 아래 성구 블록에 전절로 뜬다 —
+          # 축약을 약속하고 축약하지 않는, 조용한 실패다(abraham.yml 이 먼저 밟았다).
+          additional_refs: ["jos-2:9"]
+          captions:
+            - speaker_ko: 라합
+              verse_ref: 수 2:9
+              text_ko: "여호와께서 이 땅을 너희에게 주신 줄을 내가 아노라 우리가 너희를 심히 두려워하고 이 땅 주민들이 다 너희 앞에서 간담이 녹나니"
+            - speaker_ko: 라합
+              verse_ref: 수 2:11
+              text_ko: "우리가 듣자 곧 마음이 녹았고 너희로 말미암아 사람이 정신을 잃었나니 너희의 하나님 여호와는 위로는 하늘에서도 아래로는 땅에서도 하나님이시니라"
+          note: >-
+            수 2:1 만 빠진다. 그 절이 유일하게 「기생」 호칭을 담은 이 Scene 의 행이고,
+            선행사를 잃은 「두 사람」은 브리지 내레이션이 지시 대상만 공급해 메운다.
+      interactions: []
+      interaction_note: >-
+        인터랙션 0종(의도). 라합 본문에서 손이 하는 일은 전부 라합의 행위다 —
+        사용자에게 넘기면 본문이 라합에게 돌린 행위를 사용자가 가로챈다(저작 §3-1).
+      branches: []
+
+  # ── Scene 2 ────────────────────────────────────────────────────────────────
+  # 수색은 요구하는 말과 성문이 닫히는 데까지다. 문은 프레임 밖에 있고, 문 두드림·수색
+  # 음향 에셋을 두지 않는다 — 폭력을 시각화하지 않고 소리로도 만들지 않는다.
+  - id: 2
+    title: 전갈이 왔다
+    type: cinematic
+    duration_sec: 80
+    scripture_ref: jos-2:3
+    next: 3
+    exposure_grade: C
+    trigger_warning:
+      level: mid
+      content:
+        - sexual_vulnerability_context
+        - home_intrusion_search
+      consent_card_id: rahab_coercion
+      covers_scenes: [2]
+      # 저작은 여기에 "s2_skip" 을 적었다. 그 경로가 하는 일은 Scene 2 전체를 건너뛰고
+      # Scene 3 으로 가는 것이고(저작이 정의 블록을 scene3.yml 에 둔 이유), 엔진의 문자열
+      # 목적지는 그 뜻을 낼 수 없다. 머리 주석 (1) 참조.
+      skip_alternative_scene_id: 3
+      # docs/RAHAB-LOCKED-STRINGS.md §2-2 — LOCKED. 재작성 금지.
+      consent_card_ko: |-
+        다음 장면에는 권력을 가진 사람이 한 여인의 집으로 사람을 보내, 집 안에 있는
+        이들을 끌어내라고 요구하는 대목이 나옵니다.
+        · 폭력이 일어나는 장면은 없습니다. 요구하는 말과, 뒤이어 성문이 닫히는 데까지입니다.
+        · 건너뛰시면 이 장면 전체가 나오지 않고 다음 장면으로 넘어갑니다.
+        · 다음 장면 첫머리에는 성경 본문이 아닌 안내 문장이 한 줄 뜹니다. 「본문이
+          아닙니다」 표지가 함께 붙습니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        계속하시겠어요?
+        [계속한다]  [이 장면은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        당신에게 일어난 일은 당신의 잘못이 아닙니다. 지금 힘들다면 {{crisis_resources.default}}
+      # 저작 `rahab_nar_s3_bridge`(LOCKED §3). 표지를 첫 줄로 옮겼다 — 머리 주석 (5).
+      # LOCKED 정본이 좌표를 「Scene 3 첫 자막(수 2:8) 앞」으로 문안과 같은 행에 잠갔고,
+      # 엔진의 브리지는 목적지 씬 상단에 뜬다 — 같은 자리다.
+      skip_bridge_narration_ko: |-
+        본문이 아닙니다
+        한 장면을 건너뛰었습니다. 라합이 여기서 말을 건네는 상대는 성 밖에서 온 두 사람입니다.
+    extras:
+      anchor: 같은 실내. 문은 닫혀 있고 프레임 밖에 있다. 밤.
+      additional_refs: ["jos-2:2", "jos-2:4", "jos-2:5", "jos-2:6", "jos-2:7"]
+      user_presence: 같은 자리 고정, 문을 등진 방향
+      staging_invariants:
+        - 불변식 1 — 사용자를 라합의 몸 안에 두지 않는다. 시점을 라합의 신체 위치에 놓지 않는다.
+        - 불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다.
+        - 불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다(수 2:1 의 유숙).
+      crisis_latch:
+        post_crisis_render_policy: suppress_all_captions_except_crisis_card
+        post_crisis_latch_scope: mission
+        crisis_card_position: terminal_screen
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      environment:
+        camera_rig: fixed_back_to_door_offaxis
+        time_of_day: night_interior_lamplight
+        ambient: [실내 정적, 멀리 지나가는 발소리]
+        forbidden_audio: [문 두드리는 소리, 수색 소리, 급작 음량 변화]
+        ui_overlays:
+          [ai_assist_footer, crisis_reminder, exit_button, suffering_disclaimer]
+      npcs:
+        - { name_ko: 라합, framing: full_body_far }
+        - { name_ko: 여리고 왕의 사람, framing: offscreen_voice_only }
+      npc_note: >-
+        왕의 사람을 문 밖에 둔다. 화면에 들이지 않는다 — 수색의 시각화를 만들지 않는다.
+        사용자 위치는 Scene 1 에서 움직이지 않고, 사용자 입력 없이 옮기지 않는다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: false }
+      captions: &s2_captions
+        - speaker_ko: 어떤 사람
+          verse_ref: 수 2:2
+          text_ko: "보소서 이 밤에 이스라엘 자손 중의 몇 사람이 이 땅을 정탐하러 이리로 들어왔나이다"
+        - speaker_ko: 여리고 왕
+          verse_ref: 수 2:3
+          text_ko: "네게로 와서 네 집에 들어간 그 사람들을 끌어내라 그들은 이 온 땅을 정탐하러 왔느니라"
+        - speaker_ko: 라합
+          verse_ref: 수 2:4
+          text_ko: "과연 그 사람들이 내게 왔었으나 그들이 어디에서 왔는지 나는 알지 못하였고"
+        - speaker_ko: 라합
+          verse_ref: 수 2:5
+          text_ko: "그 사람들이 어두워 성문을 닫을 때쯤 되어 나갔으니 어디로 갔는지 내가 알지 못하나 급히 따라가라 그리하면 그들을 따라잡으리라"
+        - verse_ref: 수 2:6
+          text_ko: "그가 이미 그들을 이끌고 지붕에 올라가서 그 지붕에 벌여 놓은 삼대에 숨겼더라"
+        - verse_ref: 수 2:7
+          text_ko: "그 사람들은 요단 나루터까지 그들을 쫓아갔고 그들을 뒤쫓는 자들이 나가자 곧 성문을 닫았더라"
+      untold_note: >-
+        라합이 한 말의 진실성을 이 파일은 평가하지 않는다. 본문도 평가하지 않고,
+        라합을 언급하는 신약 세 곳 어디도 그것을 평가하지 않는다(저작 §5-e).
+      interactions: []
+      interaction_note: 인터랙션 0종(저작 §3-1).
+      branches: []
+
+  # ── Scene 3 ────────────────────────────────────────────────────────────────
+  # 침묵을 조건으로 안전을 얻는 계약이 자막에 그대로 나온다. 이 자리에서 R3(회복 압박)의
+  # 표층형이 가장 잘 붙는다 — 계약 문장 뒤에 오면 조건부 생존을 회복 서사로 덮는다.
+  - id: 3
+    title: 지붕에서 한 말
+    type: cinematic
+    duration_sec: 95
+    scripture_ref: jos-2:8
+    next: 4
+    exposure_grade: C
+    trigger_warning:
+      level: low_mid
+      content:
+        - family_annihilation_risk
+        - conditional_survival_pact
+      consent_card_id: rahab_family_risk
+      covers_scenes: [3]
+      skip_alternative_scene_id: "s3_omit_2_13_2_14"
+      # docs/RAHAB-LOCKED-STRINGS.md §2-3 — LOCKED. 재작성 금지.
+      consent_card_ko: |-
+        다음 장면에는 한 사람이 자기 부모와 형제를 살려 달라고 청하는 대목이 나옵니다.
+        상대는 자기들의 목숨으로 대신하겠다고 답합니다.
+        · 누가 죽는 장면은 없습니다. 말로 오가는 약속입니다.
+        · 건너뛰시면 청하는 줄과 답하는 줄이 나오지 않습니다. 장면은 이어집니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        계속하시겠어요?
+        [계속한다]  [약속하는 두 줄은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        이 장면에는 목숨을 걸고 맺는 약속이 나옵니다. 침묵을 조건으로 안전을 얻어 본 적이
+        있다면 건너뛰셔도 됩니다. {{crisis_resources.default}}
+    extras:
+      anchor: 집 지붕. 밤. 삼대는 프레임 밖에 있다.
+      additional_refs: ["jos-2:12", "jos-2:13", "jos-2:14"]
+      user_presence: 지붕, 선 채로, 대화 바깥 거리
+      staging_invariants:
+        - 불변식 1 — 사용자를 라합의 몸 안에 두지 않는다. 시점을 라합의 신체 위치에 놓지 않는다.
+        - 불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다.
+        - 불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다(수 2:1 의 유숙).
+      crisis_latch:
+        post_crisis_render_policy: suppress_all_captions_except_crisis_card
+        post_crisis_latch_scope: mission
+        crisis_card_position: terminal_screen
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      environment:
+        camera_rig: standing_outside_conversation_radius
+        time_of_day: night_sky_faint
+        ambient: [밤바람]
+        ui_overlays:
+          [ai_assist_footer, crisis_reminder, exit_button, suffering_disclaimer]
+      npcs:
+        - { name_ko: 라합, framing: full_body_far }
+        - { name_ko: 두 사람, framing: full_body_far }
+      npc_note: >-
+        대화 바깥 거리에 둔다. 사용자 자세를 눕는 자세로 바꾸지 않고, 올려다보는 각도를
+        쓰지 않는다. 삼대와 정탐꾼은 프레임 밖이다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: false }
+      captions: &s3_captions
+        - verse_ref: 수 2:8
+          text_ko: "또 그들이 눕기 전에 라합이 지붕에 올라가서"
+        - speaker_ko: 라합
+          verse_ref: 수 2:12
+          text_ko: "그러므로 이제 청하노니 내가 너희를 선대하였은즉 너희도 내 아버지의 집을 선대하도록 여호와로 내게 맹세하고 내게 증표를 내라"
+        - speaker_ko: 라합
+          verse_ref: 수 2:13
+          text_ko: "그리고 나의 부모와 나의 남녀 형제와 그들에게 속한 모든 사람을 살려 주어 우리 목숨을 죽음에서 건져내라"
+        - speaker_ko: 정탐꾼
+          verse_ref: 수 2:14
+          text_ko: "네가 우리의 이 일을 누설하지 아니하면 우리의 목숨으로 너희를 대신할 것이요 여호와께서 우리에게 이 땅을 주실 때에는 인자하고 진실하게 너를 대우하리라"
+      conditional_blocks:
+        - id: "s3_omit_2_13_2_14"
+          reached_by: consent_skip
+          renders: [captions]
+          # 자막에서 뺀 2:13·2:14 가 성구 블록으로 되돌아오지 않게 함께 좁힌다(S1 주석).
+          additional_refs: ["jos-2:12"]
+          captions:
+            - verse_ref: 수 2:8
+              text_ko: "또 그들이 눕기 전에 라합이 지붕에 올라가서"
+            - speaker_ko: 라합
+              verse_ref: 수 2:12
+              text_ko: "그러므로 이제 청하노니 내가 너희를 선대하였은즉 너희도 내 아버지의 집을 선대하도록 여호와로 내게 맹세하고 내게 증표를 내라"
+          note: >-
+            청하는 줄(2:13)과 답하는 줄(2:14)만 빠진다. 카드가 「장면은 이어집니다」라고
+            했으므로 씬을 옮기지 않고 자막만 뺀다 — 그리고 실제로 다음 Scene 으로 이어진다.
+      interactions: []
+      interaction_note: >-
+        인터랙션 0종. 저작 rev.2 가 수 2:13 위에 1종을 얹으려다 철회한 자리다 —
+        동기가 설계가 아니라 판정 대상 만들기였다(저작 §3-1).
+      branches: []
+
+  # ── Scene 4 ────────────────────────────────────────────────────────────────
+  # 카드 두 장이 한 Scene 을 덮는 첫 자리다. 엔진의 거절 조건은 Scene 범위 이진이라
+  # 어느 한 장만 거절해도 두 장의 델타가 함께 적용된다 — 과차단이지만 정직한 대가이고,
+  # 저작이 카드 문안 둘 다에 합집합을 적어 그 사실을 미리 말해 두었다.
+  - id: 4
+    title: 창문과 붉은 줄
+    type: cinematic
+    duration_sec: 80
+    scripture_ref: jos-2:15
+    next: 5
+    exposure_grade: C
+    trigger_warning:
+      level: mid
+      content:
+        - blood_guilt_attribution
+        - height_suspension
+        - family_annihilation_risk
+      consent_card_id: rahab_blood_guilt
+      covers_scenes: [4]
+      skip_alternative_scene_id: "s4_declined"
+      # docs/RAHAB-LOCKED-STRINGS.md §2-4 + §2-5 를 자구 그대로 이어 붙였다 — 새 문장 0건.
+      # 엔진의 카드 슬롯이 하나라 둘을 다 보여 주려면 이 방법뿐이고, 저작이 두 문안에
+      # 각각 합집합 델타를 적어 두었으므로 어느 쪽을 읽어도 실제 동작과 어긋나지 않는다.
+      # 프론트의 문 파싱은 첫 괄호 줄(§2-4)에서 문 둘을 만들고, §2-5 의 괄호 줄은
+      # 산문에서 걷힌다. 머리 주석 (2) 참조.
+      consent_card_ko: |-
+        다음 장면에는 고대의 계약 문구가 나옵니다. 집 밖으로 나가면 그 피가 그의 머리로
+        돌아간다는 말입니다.
+        · 누구에게 책임이 있는지를 정하던 옛 표현이며, 이 미션은 그 말을 오늘의 당신에게
+          적용하지 않습니다.
+        · 건너뛰시면 그 두 줄이 나오지 않습니다. 같은 장면의 창문과 줄도 화면에 띄우지
+          않습니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        계속하시겠어요?
+        [계속한다]  [계약 문구 두 줄은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        이 장면의 자막은 고대의 계약 문구입니다. 누가 다치든 그것이 당신 책임이라는 뜻이
+        아닙니다. 지금 안전하지 않은 곳에 있다면 {{crisis_resources.default}}
+
+        다음 장면에는 사람이 창문에서 줄에 매달려 성벽 아래로 내려가는 대목이 나옵니다.
+        · 내려가는 동작은 어느 쪽을 고르셔도 화면에 나오지 않습니다.
+        · 건너뛰시면 창문과 줄이 화면에 나오지 않습니다. 같은 장면의 계약 문구 두 줄도
+          함께 빠집니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        계속하시겠어요?
+        [계속한다]  [창문과 줄은 화면에 띄우지 않는다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        이 장면에는 줄을 타고 성벽을 내려가는 대목이 나옵니다. 자막은 성경 본문 그대로지만,
+        창문과 줄은 화면에 띄우지 않도록 고르실 수 있습니다. 지금 힘들다면
+        {{crisis_resources.default}}
+    extras:
+      anchor: 창문 안쪽. 성벽 위의 집. 밤.
+      additional_refs: ["jos-2:18", "jos-2:19", "jos-2:21"]
+      user_presence: 창문 안쪽, 줄에 손이 닿지 않는 곳
+      staging_invariants:
+        - 불변식 1 — 사용자를 라합의 몸 안에 두지 않는다. 시점을 라합의 신체 위치에 놓지 않는다.
+        - 불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다.
+        - 불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다(수 2:1 의 유숙).
+      crisis_latch:
+        post_crisis_render_policy: suppress_all_captions_except_crisis_card
+        post_crisis_latch_scope: mission
+        crisis_card_position: terminal_screen
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      # 축약 경로에서 덮인다. 화면이 이 값으로 배경을 고른다 — 자막 런타임에 에셋
+      # 토글이 없어서 저작의 「창문과 줄을 화면에 띄우지 않는다」를 payload 키로 옮겼다.
+      background_variant: window_and_cord
+      environment:
+        camera_rig: inside_window_out_of_reach
+        time_of_day: night_interior_lamplight
+        ambient: [밤바람]
+        ui_overlays:
+          [ai_assist_footer, crisis_reminder, exit_button, suffering_disclaimer]
+      npcs:
+        - { name_ko: 라합, framing: full_body_far }
+        - { name_ko: 두 사람, framing: full_body_far }
+      npc_note: >-
+        줄을 매는 손은 라합의 손이다 — 수 2:21 이 라합에게 돌린 행위이고, 사용자에게
+        넘기면 그 행위를 가로챈다. 성벽 바깥 조망을 금하고(높이를 시각적 위협으로 쓰지
+        않는다) 하강 동작은 **어느 경로에서도** 화면에 나오지 않는다. 클로즈업 없음.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: false }
+      captions: &s4_captions
+        - verse_ref: 수 2:15
+          text_ko: "라합이 그들을 창문에서 줄로 달아 내리니 그의 집이 성벽 위에 있으므로 그가 성벽 위에 거주하였음이라"
+        - speaker_ko: 정탐꾼
+          verse_ref: 수 2:18
+          text_ko: "우리가 이 땅에 들어올 때에 우리를 달아 내린 창문에 이 붉은 줄을 매고 네 부모와 형제와 네 아버지의 가족을 다 네 집에 모으라"
+        - speaker_ko: 정탐꾼
+          verse_ref: 수 2:19
+          text_ko: "누구든지 네 집 문을 나가서 거리로 가면 그의 피가 그의 머리로 돌아갈 것이요 우리는 허물이 없으리라 그러나 누구든지 너와 함께 집에 있는 자에게 손을 대면 그의 피는 우리의 머리로 돌아오려니와"
+        - speaker_ko: 라합
+          verse_ref: 수 2:21
+          text_ko: "너희의 말대로 할 것이라 하고 그들을 보내어 가게 하고 붉은 줄을 창문에 매니라"
+      attribution_note: >-
+        2:18·2:19 의 화자 표기가 배제된 앞 절에 기대고 있다. 배제 절의 **내용을 되살리지
+        않고** 표기 필드로만 푼다. 절 번호도 적지 않는다 — 배제 절의 참조 문자열이 렌더
+        leaf 에 나오는 것 자체가 저작 게이트 G9 의 대상이다.
+      conditional_blocks:
+        - id: "s4_declined"
+          reached_by: consent_skip
+          renders: [captions, background_variant]
+          background_variant: no_window_no_cord
+          # 자막에서 뺀 계약 문구 두 줄(2:18·2:19)이 성구 블록으로 되돌아오지 않게
+          # 함께 좁힌다(S1 주석). 2:19 는 「피가 그의 머리로 돌아갈 것이요」를 담은 절이다.
+          additional_refs: ["jos-2:21"]
+          captions:
+            - verse_ref: 수 2:15
+              text_ko: "라합이 그들을 창문에서 줄로 달아 내리니 그의 집이 성벽 위에 있으므로 그가 성벽 위에 거주하였음이라"
+            - speaker_ko: 라합
+              verse_ref: 수 2:21
+              text_ko: "너희의 말대로 할 것이라 하고 그들을 보내어 가게 하고 붉은 줄을 창문에 매니라"
+          note: >-
+            계약 문구 두 줄(2:18·2:19)이 빠지고 배경에서 창문·줄이 내려간다. 두 카드의
+            합집합이며, 두 카드 문안이 이미 이 합집합을 적어 두었다. 남는 두 자막은
+            본문에서 창문과 줄을 **말한다** — 카드가 약속한 것은 화면에 띄우지 않는
+            것이지 본문을 지우는 것이 아니다.
+      interactions: []
+      interaction_note: >-
+        인터랙션 0종. 창문에 줄을 매는 것은 수 2:21 이 라합에게 돌린 행위다.
+      branches: []
+
+  # ── Scene 5 ────────────────────────────────────────────────────────────────
+  # 마지막은 여호와가 주어인 절로 닫는다(저작 헌장 §3-c). 세 경로의 마감 줄이 같은 것은
+  # 실수가 아니라 요구다. 이 Scene 도 카드 둘이 덮는다 — 자기 카드(lineage_birth)와
+  # Scene 1 의 stigma 카드. 후자는 `covered_by_scene: 1` 로 들고 온다(머리 주석 4).
+  - id: 5
+    title: 진영 밖에서 이스라엘 중으로
+    type: outro
+    duration_sec: 95
+    scripture_ref: jos-6:23
+    next: null
+    exposure_grade: C
+    linked_values: [6, 1] # 마음(두려움) · 일기(오늘 들은 것)
+    value_prompt: 오늘 한 가지만 — 남들이 나를 부르는 이름 말고, 내가 오늘 들은 것을 한 줄로 적어 보는 것. 그 줄이 누구에게도 가지 않아도 됩니다.
+    trigger_warning:
+      level: low_mid
+      content:
+        - sex_work_stigma
+        - ethnic_labeling
+        - pregnancy_childbirth
+      consent_card_id: rahab_lineage_birth
+      covers_scenes: [5]
+      # Scene 1 의 stigma 카드가 이 Scene 도 덮는다(저작 covers_scenes: [1, 5]).
+      # 이 한 줄이 없으면 Scene 1 에서 호칭을 거절한 사용자가 여기서 카드를 다시 받고,
+      # 수락하는 순간 거절했던 호칭 자막을 그대로 만난다. 머리 주석 (4) 참조.
+      covered_by_scene: 1
+      skip_alternative_scene_id: "s5_close_on_6_23_6_27"
+      # docs/RAHAB-LOCKED-STRINGS.md §2-6 — LOCKED. 재작성 금지.
+      # stigma 카드(§2-1)의 문안은 Scene 1 에 있고 여기에 두 번 적지 않는다 —
+      # 자구 정본을 두 곳에 두면 한쪽만 고쳐질 자리를 만든다(저작 scene5.yml note).
+      consent_card_ko: |-
+        마지막 장면에는 한 사람이 아이를 낳았다는 계보 문장이 한 줄 나옵니다.
+        · 출산 장면은 나오지 않습니다. 이름을 잇는 한 줄입니다.
+        · 이 미션은 아이가 태어난 것을 보상이나 회복의 증거로 말하지 않습니다.
+        · 건너뛰시면 그 한 줄이 나오지 않습니다. 이 장면에서 호칭이 든 줄들도 함께
+          빠집니다. 이야기는 그대로 끝맺어집니다.
+        · 그 자리에는 성경 본문이 아닌 안내 문장이 대신 뜹니다. 「본문이 아닙니다」
+          표지가 함께 붙습니다.
+        · 어느 지점에서든 멈추거나 나갈 수 있습니다.
+        계속하시겠어요?
+        [계속한다]  [계보 문장은 건너뛴다]
+        음성/자막 강도: [ 자막만 ] [ 약 ] [ 기본 ]
+        이 장면은 출산을 언급합니다. 이 미션은 출산을 보상이나 회복의 증거로 말하지
+        않습니다. 지금 힘들다면 {{crisis_resources.default}}
+    extras:
+      anchor: 이스라엘의 진영 밖. 정지 시점. 낮.
+      # ⚠️ 수 6:17 은 여기에 **없다.** 자막은 후반절(6:17b)만 인용하는데, 참조 키는
+      # 절 단위라 `jos-6:17` 로 열면 화면에 전절이 뜬다 — 그 앞머리가
+      # 「이 성과 그 가운데에 있는 모든 것은 여호와께 온전히 바치되」, 곧
+      # `docs/SERIES-GRACE.md` §4 가 미션 밖으로 배제한 헤렘 명령이다
+      # (`docs/VERSES-RAHAB-GAE.md` 수 6 판정표: 전반절 배제 · 후반절 채택).
+      # 반절 키(`jos-6:17b`)는 `docs/SCRIPTURE-REF-CONVENTION.md` 가 형식불가로 막으므로
+      # **참조로는 열지 않고 자막 한 줄로만 남긴다.** 그래서 시드에도 이 절은 없다.
+      additional_refs:
+        ["jos-6:22", "jos-6:25", "jas-2:25", "matt-1:5", "jos-6:27"]
+      user_presence: 진영 밖 → 안, 걷지 않고 정지 시점
+      staging_invariants:
+        - 불변식 1 — 사용자를 라합의 몸 안에 두지 않는다. 시점을 라합의 신체 위치에 놓지 않는다.
+        - 불변식 2 — 사용자를 정탐꾼의 자리에 두지 않는다.
+        - 불변식 3 — 사용자를 「기생의 집」의 손님 자리에 두지 않는다(수 2:1 의 유숙).
+      crisis_latch:
+        post_crisis_render_policy: suppress_all_captions_except_crisis_card
+        post_crisis_latch_scope: mission
+        crisis_card_position: terminal_screen
+      crisis_reminder: "지금 힘드시면: {{crisis_resources.default}}"
+      environment:
+        camera_rig: static_outside_camp
+        time_of_day: daylight_flat
+        ambient: [멀리서 오는 바람]
+        forbidden_audio: [공성음, 함락음, 비명]
+        ui_overlays:
+          [ai_assist_footer, crisis_reminder, exit_button, suffering_disclaimer]
+      npcs:
+        - { name_ko: 라합, framing: full_body_far }
+        - { name_ko: 그의 가족, framing: full_body_far }
+      npc_note: >-
+        군중으로 그리지 않는다. 불타는 성을 그리지 않는다. 종결 자막은 정지 화면에 둔다 —
+        여리고 함락은 이 미션의 범위 밖이고(저작 §4), 배경으로도 들이지 않는다.
+      caption_pacing:
+        { auto_advance: false, advance: user, rewind_allowed: false }
+      captions: &s5_captions
+        - speaker_ko: 여호수아
+          verse_ref: 수 6:17b
+          text_ko: "기생 라합과 그 집에 동거하는 자는 모두 살려 주라 이는 우리가 보낸 사자들을 그가 숨겨 주었음이니라"
+        - speaker_ko: 여호수아
+          verse_ref: 수 6:22
+          text_ko: "그 기생의 집에 들어가서 너희가 그 여인에게 맹세한 대로 그와 그에게 속한 모든 것을 이끌어 내라"
+        - verse_ref: 수 6:23
+          text_ko: "정탐한 젊은이들이 들어가서 라합과 그의 부모와 그의 형제와 그에게 속한 모든 것을 이끌어 내고 또 그의 친족도 다 이끌어 내어 그들을 이스라엘의 진영 밖에 두고"
+        - verse_ref: 약 2:25
+          text_ko: "또 이와 같이 기생 라합이 사자들을 접대하여 다른 길로 나가게 할 때에 행함으로 의롭다 하심을 받은 것이 아니냐"
+        - verse_ref: 수 6:25
+          text_ko: "여호수아가 기생 라합과 그의 아버지의 가족과 그에게 속한 모든 것을 살렸으므로 그가 오늘까지 이스라엘 중에 거주하였으니 이는 여호수아가 여리고를 정탐하려고 보낸 사자들을 숨겼음이었더라"
+        - verse_ref: 마 1:5
+          text_ko: "살몬은 라합에게서 보아스를 낳고"
+        - verse_ref: 수 6:27
+          text_ko: "여호와께서 여호수아와 함께 하시니 여호수아의 소문이 그 온 땅에 퍼지니라"
+      closing_note: >-
+        약 2:25 는 「행함으로 의롭다 하심」을 말하지 낙인이 씻겼다고 말하지 않는다.
+        마 1:5 는 이름을 잇는 한 줄이고 보상의 증거가 아니다. 수 6:27 로 닫는 근거는
+        낱말 반복이 아니라 헌장 §3-c 다 — 마지막 Scene 을 신의 행위로 닫는다.
+      # 「계보 문장은 건너뛴다」 또는 Scene 1 의 「호칭이 든 자막은 건너뛴다」에서 온다.
+      # 두 카드가 같은 경로를 쓰는 것은 저작의 결정이다(scene5.yml 머리 주석).
+      conditional_blocks:
+        - id: "s5_close_on_6_23_6_27"
+          reached_by: consent_skip
+          renders: [captions, closing_screen]
+          # 이 Scene 에서 이 줄이 가장 중요하다. 좁히지 않으면 호칭을 거절한 사용자가
+          # **자막에서 지운 네 절(6:22 · 6:25 · 약 2:25)과 계보 한 줄(마 1:5)을**
+          # 바로 아래 성구 블록에서 전절로 다시 만난다 — 머리 주석 (4) 가 막았다고
+          # 적은 그 누출이 자막이 아니라 성구 블록으로 되돌아오는 형태다(S1 주석).
+          additional_refs: ["jos-6:27"]
+          captions:
+            - verse_ref: 수 6:23
+              text_ko: "정탐한 젊은이들이 들어가서 라합과 그의 부모와 그의 형제와 그에게 속한 모든 것을 이끌어 내고 또 그의 친족도 다 이끌어 내어 그들을 이스라엘의 진영 밖에 두고"
+            # 저작 `rahab_nar_s5_close`(LOCKED §3). 좌표도 저작 그대로 —
+            # 「수 6:23 자막 직후 · 수 6:27 앞」. 표지를 화자 칸으로 옮겼다(머리 주석 5).
+            - speaker_ko: 본문이 아닙니다
+              text_ko: "지금 보신 자막에는 라합이 그 뒤에 어디에서 누구와 함께 살게 되었는지를 말하는 줄들이 없습니다. 그 줄들이 빠진 것은 이 미션이 보여 드리는 범위 때문이지, 이야기가 거기서 끝나서가 아닙니다. 이 미션은 방금 보신 줄을 라합의 마지막 자리로 말하지 않습니다."
+            - verse_ref: 수 6:27
+              text_ko: "여호와께서 여호수아와 함께 하시니 여호수아의 소문이 그 온 땅에 퍼지니라"
+          note: >-
+            호칭이 든 네 줄(6:17b · 6:22 · 6:25 · 약 2:25)과 계보 한 줄(마 1:5)이 빠진다.
+            거절 경로에서 축이 뒤집히는 것 — 「진영 밖에서 이스라엘 중으로」의 뒷마디가
+            통째로 빠져 진영 밖이 마지막 자리처럼 읽히는 것 — 을 막으려고 저작이 그
+            자리에 내레이션 한 줄을 잠갔다. 막았다는 것을 재는 수단은 없다.
+            마감 줄과 종결 화면은 `renders` 가 약속한 대로 그대로 남는다 —
+            건너뛴 사용자의 결말이 깎이면 그것 자체가 압박이다.
+      # 동의 상태를 읽지 못한 경우 **거절 경로와 같은 것**을 보여 준다. 모르는 상태에서
+      # 더 보여 주는 쪽으로 기울면 묻지 않고 노출한 것이 된다(저작 fallback_note).
+      # 엔진에서 이것은 자동으로 성립한다 — 결정이 기록되지 않으면 카드가 다시 뜨고,
+      # 카드 없이 지나갈 길이 없다.
+      unknown_consent_note: >-
+        저작은 `consent_state: null` 경로를 따로 두어 거절 경로와 같은 자막 집합을
+        지정했다. 엔진에는 그 세 번째 경로가 없다 — 동의를 읽지 못하면 카드가 다시
+        뜨기 때문이다. 결과는 같다: 묻지 않고 노출되는 길이 없다.
+      closing_screen:
+        presentation_mode: still_frame
+        environment_disabled: true
+        npc_disabled: true
+        mission_title_ko: 먼저 있었던 일
+        closing_line_ko: 여호와께서 여호수아와 함께 하시니
+        # docs/RAHAB-LOCKED-STRINGS.md §1 (F-6.5) — LOCKED. 세 경로 공통.
+        closing_footer_ko: 이 미션은 라합이 겪은 일이 어떤 목적을 위해 주어졌다고 말하지 않습니다. 지금 힘들다면 {{crisis_resources.default}}
+      closing_symmetry_note: >-
+        마감 줄이 세 경로에서 같다. 저작 §3-c 의 요구이고, 건너뛴 사람의 결말을 깎지
+        않는다는 뜻이기도 하다. 여기에 경로별 등급·점수·배지를 붙이지 말 것 —
+        붙는 순간 「끝까지 본 사람이 더 받는다」가 되고, 그것이 이 미션이 금하는 압박이다.
+      dwell:
+        min_seconds: 3
+        on_timeout: auto_proceed_after_seconds_15
+        note_ko: 머무는 시간에 정답이 없습니다. 먼저 나가셔도 됩니다.
+      interactions: []
+      branches: []

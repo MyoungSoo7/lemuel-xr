@@ -391,6 +391,60 @@ SCENES: dict[str, dict[str, str]] = {
              "jar and a shallow bowl beside it, the air warm and hushed and unhurried. The tent is "
              "empty of persons — no infant, no baby, no child, no figures, no silhouettes. No lettering.",
     },
+    # 라합 — 여섯 장이다(1..5 + `4-alt`). 화면이 `background_variant` 값으로 4 와 4-alt 를
+    # 고르므로(frontend/src/app/rahab/page.tsx) alt 가 없으면 그 경로만 배경이 통째로 404 다.
+    #
+    # 이 인물에는 다른 인물에 없는 배경 통제가 여섯 겹 더 걸려 있다
+    # (docs/MVP-RAHAB-CONTENT.md §6 · docs/RAHAB-RUNTIME-SIGNOFF.md):
+    #   · 사람·얼굴·글자 없음(STYLE 공통) · 군중 없음
+    #   · **불타는 성 없음** — 수 6:24 의 소각은 이 미션이 그리지 않는다
+    #   · **성벽 바깥 조망 없음** — 시점을 정탐꾼의 자리(성 밖에서 성을 보는 자리)에 두지 않는다
+    #   · **하강 묘사 없음** — 수 2:15 의 내려보냄은 라합의 행위지 사용자의 행위가 아니다
+    #   · **클로즈업 없음** — 전신·공간 프레임만
+    # `4-alt` 에는 **창문도 줄도 없다.** 그 변형을 고른 사람이 보지 않기로 한 것이 그 둘이다 —
+    # 창을 남기고 줄만 빼면 통제가 절반만 걸린다.
+    "rahab": {
+        "1": "The dim interior of a low mud-brick room built into the thickness of a city wall at "
+             "dusk, rough plastered walls curving away, a single small clay lamp burning on a ledge, "
+             "a coarse woven mat and two stacked clay jars against the far wall, the packed earth "
+             "floor swept bare, warm lamplight failing into deep shadow at the room's edges, the air "
+             "close and still. Interior only — no window onto anything beyond the wall, no view out, "
+             "no city, no fire. Completely empty of persons. No lettering.",
+        "2": "The same wall-built room at night from the same fixed position at its edge, a heavy "
+             "plank door at the near end standing shut with cold blue light leaking in a hard line "
+             "under it, the lamp on the ledge burned low, a stool overturned on the earth floor, "
+             "shadows thrown long and hard across the plaster. The door stays closed — nothing "
+             "beyond it is visible, no street, no crowd, no torches. No people, no silhouettes, no "
+             "figures anywhere. No lettering.",
+        "3": "A flat mud-plaster rooftop at night seen from its inner edge, dense rows of cut flax "
+             "stalks laid out to dry across the whole surface in overlapping bundles, a low parapet "
+             "of mud brick running along the far side, the night sky open and quiet above with a "
+             "scatter of stars, everything lit only by starlight and one faint glow rising from the "
+             "stairwell opening. The parapet blocks the view — nothing outside the wall is visible, "
+             "no plain, no camp, no distant fires. The roof is deserted. No lettering.",
+        "4": "The interior of the wall-built room in the last grey light before dawn, a narrow "
+             "square window set deep in the thick plastered wall, a length of scarlet cord knotted "
+             "and hanging motionless straight down the inside face of the wall beside it, coils of "
+             "the same cord left slack on the floor, the room otherwise bare and still. The window "
+             "opening is filled edge to edge with flat featureless white fog — a solid blank pane of "
+             "even pale grey with no horizon line, no sky band, no ground, no hills, no city, no "
+             "distance, nothing whatsoever visible through it, as if the opening were painted over. "
+             "The cord hangs still against the inside wall and does not pass through the opening; "
+             "nothing is descending. Wide interior framing, no close-up. No people, no hands, no "
+             "figures. No lettering.",
+        "4-alt": "The interior of the same low wall-built room in the last grey light before dawn, "
+                 "seen from its edge — bare plastered walls unbroken on every side, a swept packed "
+                 "earth floor, a folded coarse blanket and one shallow clay bowl set against the far "
+                 "wall, a single lamp long since gone out on its ledge, quiet even grey light with "
+                 "no clear source. There is no window and no opening of any kind in any wall, and no "
+                 "cord, rope, thread or hanging line anywhere in the image. Empty of persons. No lettering.",
+        "5": "Open stony ground just outside the edge of a large quiet encampment at full daylight, "
+             "the nearest goat-hair tents standing in an even row along the far side of a shallow "
+             "bare strip of ground, a worn footpath crossing that strip and continuing in among the "
+             "tents, low scrub and pale dust in the near foreground, clear steady midday light with "
+             "no smoke and no haze. Nothing is burning anywhere in the frame and no walled city is "
+             "in view. The camp and the path are empty — no people, no crowds, no animals. No lettering.",
+    },
 }
 
 

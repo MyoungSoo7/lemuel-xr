@@ -81,7 +81,18 @@ export type MissionCharacter =
   // `docs/ABRAHAM-RUNTIME-SIGNOFF.md` + `RuntimeExposureSignoffTest` 다.
   | "abraham"
   // 야곱은 2026-08-22 에 #101 로 열렸다 — `Character` enum 의 `JACOB("jacob")`.
-  | "jacob";
+  | "jacob"
+  /*
+    ⚠️ 라합은 **아직 열려 있지 않다.** `Character` enum 에 `RAHAB("rahab")` 이 없으므로
+    `/api/game/rahab/start` 는 지금 E_CHARACTER_UNKNOWN 으로 떨어진다.
+
+    그럼에도 이 줄을 먼저 두는 이유는 이 union 이 **게이트가 아니기 때문**이다 — 화면이
+    컴파일되게 하는 자리다. 노출 게이트는 `docs/RAHAB-RUNTIME-SIGNOFF.md` 의 결정 줄과
+    `RuntimeExposureSignoffTest` 이고, 그 줄은 지금 비어 있다. 여기에 이름이 있는 것을
+    「열렸다」로 읽지 않는다. 홈 카드 목록도 enum 을 정본으로 보므로(`page.test.tsx`)
+    라합은 홈에 뜨지 않는다.
+  */
+  | "rahab";
 
 export async function startMission(
   character: MissionCharacter,
