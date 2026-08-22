@@ -6,13 +6,20 @@
   "contentWarning": "이 데이터셋의 meditationText 절반 이상은 *의도적으로 만든 이단·가스라이팅 표본* 이다(영지주의·뉴에이지·고난정당화·번영신학). 사용자에게 노출하거나 LLM 프롬프트의 예시로 쓰면 안 된다 — 채점 입력으로만 쓴다. 이 경고를 manifest 에 둔 이유: 프로덕션 jar 에는 fixtures 만 들어가고 README 는 빠진다(backend/build.gradle.kts processResources 가 `include(\"v*/**\")`). jar 안에서 이 파일을 처음 여는 사람에게는 여기가 유일한 맥락이다.",
   "tunedAgainst": {
     "embeddingModel": "gemini-embedding-001",
-    "dimensions": 3072,
-    "tunedAt": "2026-07-19",
-    "note": "아래 pinnedPolicy 는 signed_off 픽스처 5개(n=5)에 맞춰 튜닝한 값이다. 임베딩 모델이 바뀌면 재튜닝 대상."
+    "dimensions": 1536,
+    "tunedAt": "2026-08-22",
+    "note": "런타임과 같은 공간(1536 = MRL 절단 + L2 정규화)에서 signed_off 62건으로 재튜닝했다. 2026-08-12 #37(167cea5) 이후 어긋나 있던 차원 유예(acknowledgedMismatch)는 이 재튜닝으로 해소돼 삭제했다 — GoldenSetTuningContractTest 가 '차원이 맞으면 유예 블록은 null 이어야 한다' 를 강제하므로 지우지 않으면 빨간불이다. 임계치는 홀드아웃 분할(클래스별 반분)의 fit 쪽에서만 골랐고, 근거는 eval/grounding/v1/reports/2026-08-22-1536-sweep.md.",
+    "retunedFrom": {
+      "dimensions": 3072,
+      "tunedAt": "2026-07-19",
+      "policy": { "similarityThreshold": 0.62, "maxUnsupportedRate": 0.3 },
+      "why": "signed_off 5~11건 시절 값. orthodox 표본이 4건뿐이라 오탐이 보이지 않았고, 62건으로 채우자 orthodox 12건 중 8건이 오탐(정확도 0.33, P3 0.190)이라는 사실이 드러났다."
+    }
   },
   "pinnedPolicy": {
-    "similarityThreshold": 0.62,
-    "maxUnsupportedRate": 0.3
+    "similarityThreshold": 0.7,
+    "maxUnsupportedRate": 0.7,
+    "note": "2026-08-22 재고정. fit(32건)에서 P3≤5% 를 만족하는 셀 중 recall 최대로 고른 값이고, holdout(30건)에서 P3=0.071 · precision 0.929 · recall 0.812 로 재현됐다. ⚠️ holdout P3 가 승격계약 §2 의 상한 5% 를 여전히 넘으므로 이 값은 '통과한 임계치' 가 아니라 '덜 틀린 임계치' 다 — grounding.eval.enabled 를 켤 근거가 아니다."
   },
   "classes": [
     {
@@ -50,13 +57,25 @@
     "signed_off": "사람이 최종 확정한 라벨. 회귀 게이트와 승격조건 지표는 이 표본만으로 계산한다.",
     "draft": "라벨 후보. 리포트에 별도 집계로만 나오고 게이트 판정에는 절대 들어가지 않는다. CONTENT-EVALUATION-GATES.md 2단(신학·정신건강 병렬 독립 검토) + 사람 사인오프를 거쳐야 signed_off 로 승격된다."
   },
+  "signOff": {
+    "standard": "대한민국 장로교 합동·합신 교단의 신학 기준 — 웨스트민스터 신앙고백서(WCF) + 대·소요리문답을 표준 문서로 한다. §1.5 임상 축은 그 기준에서 나온 기독교 심리상담 기준이며, 세속 임상 문헌은 도구로만 쓴다. 단 위기 대응(109 연계·자해 안전망)은 어느 기준으로도 완화되지 않는다. 규약 원문은 lemuel-xr CLAUDE.md §1 / §1.5.",
+    "authorityHandle": "@MyoungSoo7",
+    "authority": "@MyoungSoo7 단독. 2026-08-22 확정. 이 프로젝트가 상업용이 아니라 *대회 출품용*이라 외부 신학·임상 자문을 기다리지 않는다. 상업화 시 재검토 대상 — 라벨 작성자와 사인오프 주체가 같으면 §4 3단이 상정한 독립성이 없다.",
+    "delegation": {
+      "date": "2026-08-22",
+      "delegatedTo": "claude",
+      "scope": "draft 35건 전부의 3단 사인오프 — 근거 작성과 review.status 변경 모두 포함.",
+      "record": "권한자가 2026-08-22 텔레그램으로 위임했다. 아래 rules 1번의 예외이므로 숨기지 않고 여기에 적는다. 각 픽스처의 review.labeledBy 에도 '위임 사인오프' 라고 표기해 두었으므로, 상업화 단계에서 무엇을 사람 손으로 다시 해야 하는지가 grep 한 번으로 드러난다.",
+      "notDelegated": "라벨의 *근거*는 위임 대상이 아니다. 모든 판정문은 WCF 장·절 / 대소요리문답 문항 / 성경 구절로 닫혀 있어야 하며, '정통이 아닌 것 같다' 는 근거가 아니다. 총회 결의는 원문을 확인하지 못했으므로 인용하지 않았다 — 표준 문서만으로 닫히는 근거만 썼다."
+    }
+  },
   "targets": {
     "minSignedOff": 60,
     "minPerClassSignedOff": 8,
-    "note": "현재 signed_off 표본은 목표에 크게 못 미친다. 이 수치로 계산한 precision/recall 은 방향 지표일 뿐 승격 근거로 쓸 수 없다 — 리포트가 표본 수를 항상 함께 출력하는 이유."
+    "note": "2026-08-22 충족(62건, 최소 클래스 8건). 이 수치로 계산한 precision/recall 은 방향 지표일 뿐 승격 근거로 쓸 수 없다 — 리포트가 표본 수를 항상 함께 출력하는 이유."
   },
   "rules": [
-    "라벨은 사람이 확정한다. LLM 판정으로 라벨을 만들지 않는다 — 승격계약 §1.1(판정은 결정론적, LLM 재판정으로 뒤집을 수 없다)이 깨진다.",
+    "라벨은 사람이 확정한다. LLM 판정으로 라벨을 만들지 않는다 — 승격계약 §1.1(판정은 결정론적, LLM 재판정으로 뒤집을 수 없다)이 깨진다. ⚠️ 2026-08-22 대회 빌드에서 사인오프 권한자가 이 권한을 claude 에 위임했다(signOff.delegation). 규칙을 삭제하지 않고 예외를 명시해 남긴다 — 규칙을 지웠으면 나중에 무엇이 깨졌는지 못 찾는다.",
     "프로덕션에서 게이트를 통과한 생성문을 자동으로 편입하지 않는다. 자기 채점이 되어 지표가 무의미해진다.",
     "성경 본문(passages.text)은 이미 사람이 원문 대조를 마친 구절만 재사용한다. 새 구절 도입 시 개역개정 원문 대조(대한성서공회)를 거쳐야 한다.",
     "임계치를 바꿀 때는 그 근거가 된 스윕 리포트 경로를 커밋 메시지에 남긴다."

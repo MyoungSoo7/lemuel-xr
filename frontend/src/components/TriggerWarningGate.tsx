@@ -195,6 +195,11 @@ const CONTENT_LABEL: Record<string, string> = {
   religious_persecution: "신앙을 이유로 한 박해",
   death_threat: "죽음의 위협",
   confinement: "갇힌 공간",
+  // esther.yml Scene 1 (2026-08-22). `child_endangerment` 는 위에 이미 있고, 아래 둘이 새로 온다.
+  // 이 카드는 level 이 `high` 라 라벨 누락이 특히 눈에 띈다 — 가장 무거운 고지에서
+  // 영문 토큰이 뜨면 고지가 아니라 잡음이 된다.
+  genocide_threat: "한 민족 전체를 없애려는 위협",
+  ethnic_persecution: "민족을 이유로 한 박해",
 };
 
 const LEVEL_LABEL: Record<string, string> = {

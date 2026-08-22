@@ -1,0 +1,20 @@
+{
+  "id": "structural-inconclusive-mixed",
+  "class": "structural-inconclusive",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "INCONCLUSIVE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "여러 종류의 공백이 섞인 생성문. 개별 문자는 각각 앞의 표본이 덮고, 이 표본은 혼합 시 트림이 부분적으로만 도는 경우를 덮는다. SentenceSplitter 가 빈 목록을 내므로 임베딩 이전에 INCONCLUSIVE 로 확정되는 구조적 케이스다."
+  },
+  "meditationText": " \t　 \r\n \n",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

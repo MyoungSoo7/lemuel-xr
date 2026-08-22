@@ -47,6 +47,7 @@ import { fetchScripturePassage } from "@/lib/api/content";
 import DanielPage from "./daniel/page";
 import DavidPage from "./david/page";
 import ElijahPage from "./elijah/page";
+import EstherPage from "./esther/page";
 import JesusPage from "./jesus/page";
 import JobPage from "./job/page";
 import JosephPage from "./joseph/page";
@@ -110,6 +111,7 @@ const PAGES: Array<[string, () => React.ReactElement]> = [
   ["daniel", () => <DanielPage />],
   ["david", () => <DavidPage />],
   ["elijah", () => <ElijahPage />],
+  ["esther", () => <EstherPage />],
   ["jesus", () => <JesusPage />],
   ["job", () => <JobPage />],
   ["joseph", () => <JosephPage />],

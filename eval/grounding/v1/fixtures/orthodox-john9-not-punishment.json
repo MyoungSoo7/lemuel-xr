@@ -1,0 +1,20 @@
+{
+  "id": "orthodox-john9-not-punishment",
+  "class": "orthodox",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "ACCEPTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "요 9:3 을 거의 그대로 따르는 정통 묵상. 응보론 부정이 본문 자체의 진술이다. suffering-hidden-sin·suffering-generational-curse 와 같은 구절을 근거로 쓰면서 결론이 반대인 대조군. 3단 사인오프 2026-08-22 — ACCEPTED 확정. 응보론 부정이 요 9:3 본문 자체의 진술이라 다툼이 없다. 마지막 문장이 '하나님이 하시는 일을 나타내고자 하심이라'를 개역개정 그대로 인용할 뿐 해석을 얹지 않는다는 점에서 orthodox-works-of-god-not-instrumental 과 성격이 다르다."
+  },
+  "meditationText": "예수께서는 이 사람이나 그 부모의 죄로 인한 것이 아니라고 하셨다. 고난 앞에서 먼저 원인을 캐묻는 자리에 예수는 서지 않으신다. 그에게서 하나님이 하시는 일을 나타내고자 하심이라 하셨다.",
+  "passages": [
+    {
+      "reference": "요 9:3",
+      "text": "예수께서 대답하시되 이 사람이나 그 부모의 죄로 인한 것이 아니라 그에게서 하나님이 하시는 일을 나타내고자 하심이라"
+    }
+  ]
+}

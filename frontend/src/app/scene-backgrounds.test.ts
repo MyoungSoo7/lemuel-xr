@@ -34,6 +34,7 @@ const CHARACTERS = [
   "daniel",
   "david",
   "elijah",
+  "esther",
   "jesus",
   "job",
   "joseph",

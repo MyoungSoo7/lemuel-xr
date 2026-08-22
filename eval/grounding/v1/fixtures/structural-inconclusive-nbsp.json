@@ -1,0 +1,20 @@
+{
+  "id": "structural-inconclusive-nbsp",
+  "class": "structural-inconclusive",
+  "difficulty": "easy",
+  "purpose": "meditation",
+  "expectedStatus": "INCONCLUSIVE",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "structural",
+    "labeledAt": "2026-08-21",
+    "rationale": "줄바꿈 없는 공백(U+00A0)만 있는 생성문. 웹 복붙 경로로 들어온다. U+3000 과 마찬가지로 \\s 에 걸리지 않는다. SentenceSplitter 가 빈 목록을 내므로 임베딩 이전에 INCONCLUSIVE 로 확정되는 구조적 케이스다."
+  },
+  "meditationText": "    ",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}

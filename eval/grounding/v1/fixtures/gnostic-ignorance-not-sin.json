@@ -1,0 +1,20 @@
+{
+  "id": "gnostic-ignorance-not-sin",
+  "class": "gnostic",
+  "difficulty": "hard",
+  "purpose": "meditation",
+  "expectedStatus": "REJECTED",
+  "review": {
+    "status": "signed_off",
+    "labeledBy": "delegated(@MyoungSoo7->claude)",
+    "labeledAt": "2026-08-22",
+    "rationale": "죄→무지 치환 표지. 구속을 각성으로 대체하는 영지주의의 핵심 이동이다. 가스라이팅 어휘가 하나도 없고 어조가 차분해서 토큰 lint 사각지대일 가능성이 높다 — hard 로 둔 이유. 3단 사인오프 2026-08-22 — REJECTED 확정. 죄를 무지로 치환하면 소요리문답 14문이 정의하는 죄 개념(하나님의 법에 대한 불순종)이 사라지고, 그에 따라 속죄(WCF 8장)와 칭의(WCF 11장)가 불필요해진다. 회개를 '기억해냄'으로 바꾸는 것은 소요리문답 87문(회개는 죄에서 떠나 하나님께로 돌이키는 것)과 정면으로 충돌한다. 어조가 차분해 토큰 lint 사각지대라는 2단 지적은 유효하다."
+  },
+  "meditationText": "문제는 죄가 아니라 무지다. 용서받아야 할 것이 아니라 기억해내야 할 것이 있을 뿐이다. 회개는 방향을 바꾸는 일이 아니라 잊었던 것을 떠올리는 일이다.",
+  "passages": [
+    {
+      "reference": "욥 42:5",
+      "text": "내가 주께 대하여 귀로 듣기만 하였사오나 이제는 눈으로 주를 뵈옵나이다"
+    }
+  ]
+}
