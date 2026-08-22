@@ -3336,7 +3336,7 @@ rev.16 이 그 대상을 올려 18개 전부가 판정됐고, **그 순간 `d-ym
   (`converges_to` 가 문서에만 있고 엔진에 없던 선례).
   ⚠️ **rev.9 정정 — 두 곳이 틀렸다.** ①rev.8 은 런타임 트리를 최상위 `scenarios/` 라고
   적었으나 그런 디렉터리는 없다. ②"동의 스키마 전체에 소비처가 없다"는 kotlin 기준으로는
-  참이지만 **런타임 트리에는 `consent_card_id` 가 7회 실재한다**(`backend/src/main/resources/scenarios/job.yml:146` ·
+  참이지만 **런타임 트리에는 `consent_card_id` 가 7회 실재한다**(`backend/src/main/resources/scenarios/job.yml:148` ·
   `backend/src/main/resources/scenarios/joseph.yml:106` ·
   `backend/src/main/resources/scenarios/david.yml:117` ·
   `backend/src/main/resources/scenarios/jesus.yml:107` ·
