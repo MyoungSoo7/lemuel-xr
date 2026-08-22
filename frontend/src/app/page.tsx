@@ -104,7 +104,15 @@ const DIRECT_MISSIONS: Array<{
     href: "/esther",
     name: "Esther",
     korean: "에스더",
-    tagline: "드러낼 것인가, 언제 어떻게 드러낼 것인가 — 말하지 않기로 하는 것도 온전한 선택이다",
+    tagline:
+      "드러낼 것인가, 언제 어떻게 드러낼 것인가 — 말하지 않기로 하는 것도 온전한 선택이다",
+    active: true,
+  },
+  {
+    href: "/jacob",
+    name: "Jacob",
+    korean: "야곱",
+    tagline: "내가 상처를 준 쪽일 때 — 화해는 요구되지 않는다",
     active: true,
   },
 ];
@@ -281,6 +289,7 @@ export default function HomePage() {
                       "peter",
                       "daniel",
                       "esther",
+                      "jacob",
                     ]);
                     const href = ACTIVE.has(c.character)
                       ? `/${c.character}`

@@ -53,6 +53,21 @@ import github.lms.lemuel.xr.common.ErrorCode
  * 배제했고, 그 배제도 `enforcement: reviewer_only` 다 — 없는 기계 검사를 있다고 적지 않았다.
  * 저작이 건 인간 안전검토자 사인오프는 앞의 둘과 같이 **없다** — 등재한 채로 연다.
  *
+ * 2026-08-22 JACOB 추가 — 같은 조건으로 연다. 근거·범위·남은 빚은
+ * `docs/JACOB-RUNTIME-SIGNOFF.md`. 이 인물의 축은 **화해는 요구되지 않는다** 이고,
+ * 앞의 다섯과 결정적으로 다른 점은 사용자가 앉는 자리다 — 상처를 받은 쪽이 아니라
+ * **상처를 준 쪽** 이다. 그 자리에서 화해를 숙제로 주지 않는 것이 R3 로 집행된다.
+ * 구조는 다니엘과 같이 R4 동의 트리거가 2개다(Scene 1 가족 기만 / Scene 5 재회 대면).
+ * 다만 저작이 앞 카드에 「Scene 1~4 를 함께 덮는다」고 적어 둔 것을 그대로 옮기지 못했다 —
+ * 엔진은 건너뛰기 목적지가 `covers_scenes` 안에 있으면 반려하므로 [1,2,3,4] 로 적으면
+ * 목적지가 5뿐이고, 그러면 카드가 없애 주겠다고 한 적 없는 얍복(3·4)까지 사라진다.
+ * 그래서 `covers_scenes: [1]` · 목적지 2로 뒀다. 저작의 축약 라우트가 스스로 Scene 2 로
+ * 이어지게 설계돼 있어(`carries_to_scene2`) 라우팅은 오히려 저작과 맞는다.
+ * 카드의 셋째 문(「나는 이 자리에 서 있지 않다」)은 프론트가 문을 정확히 둘만 만들기
+ * 때문에 카드가 아니라 **모든 Scene 상시 이탈 버튼** 으로 옮겼다 — 저작이 그 문에 건
+ * `available_at: [scene1..scene5]` 가 오히려 이 모양에서 성립한다.
+ * 저작이 건 인간 안전검토자 사인오프는 앞의 넷과 같이 **없다** — 등재한 채로 연다.
+ *
  * 주의: 값을 추가하면 resources/scenarios/{dbValue}.yml 이 *반드시* 함께 있어야 한다.
  * ScenarioYamlLoader 는 파일이 없으면 warn 로그만 남기고 조용히 건너뛴다 —
  * ScenarioYamlLoaderTest 의 `모든 Character 에 시나리오 yml 존재` 가 그 구멍을 막는다.
@@ -69,7 +84,8 @@ enum class Character(val dbValue: String) {
     PETER("peter"),
     DANIEL("daniel"),
     ESTHER("esther"),
-    ABRAHAM("abraham");
+    ABRAHAM("abraham"),
+    JACOB("jacob");
 
     companion object {
         /** path 변수에서 받은 문자열 → enum. 알 수 없으면 E_CHARACTER_UNKNOWN. */
