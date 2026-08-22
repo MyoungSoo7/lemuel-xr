@@ -200,6 +200,12 @@ const CONTENT_LABEL: Record<string, string> = {
   // 영문 토큰이 뜨면 고지가 아니라 잡음이 된다.
   genocide_threat: "한 민족 전체를 없애려는 위협",
   ethnic_persecution: "민족을 이유로 한 박해",
+  // jacob.yml Scene 1·5 (2026-08-22). 넷 중 `betrayal` 만 위에 이미 있다.
+  // 이 인물은 사용자를 **상처를 준 쪽** 에 세우는 유일한 미션이라, 고지가 정확히
+  // 무엇을 예고하는지가 특히 중요하다 — 영문 토큰으로 뜨면 그 예고가 잡음이 된다.
+  family_deception: "가족 안의 기만",
+  confrontation: "대면",
+  unwanted_reunion: "원치 않는 재회",
 };
 
 const LEVEL_LABEL: Record<string, string> = {

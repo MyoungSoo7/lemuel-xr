@@ -196,9 +196,33 @@ class RuntimeExposureSignoffTest {
             .isEmpty()
     }
 
-    /** enum 에 없는 시나리오 yml 이 또 생기면, 그것도 같은 게이트를 거쳐야 한다는 사실을 드러낸다. */
+    /**
+     * enum 에 없는 시나리오 yml 은 **대장을 이미 갖고 있어야 한다.**
+     *
+     * ──────────────────── 2026-08-22 — 이름 목록에서 조건으로 바꿨다 ────────────────────
+     *
+     * 원래 이 검사는 `isSubsetOf("ruth")` 였다. 룻이 실제로 그 상태(파일은 있고 enum 은
+     * 없음)로 오래 있었기 때문에 이름을 박아 둔 것이다. 그런데 그 형태는 **아직 안 열린
+     * 인물의 파일을 미리 올리는 것 자체를 금지**한다 — 즉 노출과 콘텐츠를 한 커밋에
+     * 넣도록 강제한다. 그건 이 파일이 막으려던 것과 정확히 반대 방향이다.
+     * 아브라함 대장이 적어 둔 절차가 그 반대였다: 「그 전까지는 파일만 다 만들어 두고
+     * enum 한 줄을 일부러 비워 두었다」. 사람이 결정 줄을 채우기 전에 콘텐츠를
+     * 리뷰할 수 있어야 그 결정에 근거가 생긴다.
+     *
+     * 그래서 재는 것을 이름에서 **조건** 으로 바꾼다 — 미배선 시나리오는 대장 파일이
+     * 있어야 하고, 그 대장에 «노출 결정» 줄이 (체크 여부와 무관하게) 살아 있어야 한다.
+     * 야곱이 이 상태의 첫 사례다(2026-08-22): `scenarios/jacob.yml` 은 디스크에 있고
+     * `Character` 에는 `JACOB` 이 없으며 `docs/JACOB-RUNTIME-SIGNOFF.md` 의 결정 줄은
+     * **비어 있다.**
+     *
+     * 느슨해진 것이 아니다. 전에는 「이름이 ruth 인가」만 봤고 지금은 **모든** 미배선
+     * 시나리오에 대장을 요구한다. 룻도 그 조건을 만족해서 통과하는 것이지 이름으로
+     * 통과하는 게 아니다. 그리고 enum 에 들어가는 순간부터는 위
+     * «룻 이후 열리는 인물은 …» 이 **체크된** 결정 줄을 요구한다 — 두 검사가
+     * 「올려 두는 것」과 「여는 것」을 나눠 막는다.
+     */
     @Test
-    fun `enum 에 없는 시나리오는 룻 하나뿐이다`() {
+    fun `enum 에 없는 시나리오는 대장을 먼저 갖는다`() {
         val dir = repoRoot().resolve("backend/src/main/resources/scenarios")
         val onDisk = Files.list(dir).use { s ->
             s.map { it.fileName.toString() }
@@ -209,16 +233,24 @@ class RuntimeExposureSignoffTest {
         }
         val exposed = Character.entries.map { it.dbValue }.toSet()
 
-        // subset 이지 정확히 일치가 아니다 — 룻이 열리면 이 목록은 비게 되고, 그건 정상이다.
-        // 여기서 막을 것은 *새로운* 미배선 시나리오다.
-        assertThat(onDisk.filterNot { it in exposed })
+        // 대장이 없거나, 있어도 «노출 결정» 줄 자체가 없는 미배선 시나리오.
+        // 체크 여부는 여기서 보지 않는다 — 아직 안 열렸으므로 안 채워져 있는 게 정상이다.
+        val unledgered = onDisk.filterNot { it in exposed }.filter { character ->
+            val ledger = repoRoot().resolve("docs/${character.uppercase()}-RUNTIME-SIGNOFF.md")
+            !Files.exists(ledger) ||
+                !Files.readString(ledger, StandardCharsets.UTF_8).contains("] 노출 결정 — 결정자:")
+        }
+
+        assertThat(unledgered)
             .describedAs(
-                "enum 에 없는 시나리오 yml 이 늘었다. 파일만 두면 로드되지 않아 안전해 보이지만, " +
-                    "그건 아직 안 열렸다는 뜻일 뿐이다 — 열 때는 " +
-                    "docs/{인물}-RUNTIME-SIGNOFF.md 를 만들어라 (RUTH 형식). " +
-                    "그 요구는 위 «룻 이후 열리는 인물은 …» 이 집행한다",
+                "대장 없는 시나리오 yml 이 있다: %s. 파일만 두면 로드되지 않아 안전해 보이지만, " +
+                    "그건 아직 안 열렸다는 뜻일 뿐이다 — 올려 둘 때 이미 " +
+                    "docs/{인물}-RUNTIME-SIGNOFF.md 를 만들어라 (RUTH 형식). 결정 줄은 " +
+                    "비워 둔 채여도 된다. 채우는 것은 여는 사람의 몫이고, 그 요구는 " +
+                    "위 «룻 이후 열리는 인물은 …» 이 집행한다",
+                unledgered,
             )
-            .isSubsetOf("ruth")
+            .isEmpty()
     }
 
     private fun isExposed(): Boolean = Character.entries.any { it.dbValue == "ruth" }

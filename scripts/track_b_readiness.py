@@ -46,6 +46,33 @@
     (백엔드가 프론트보다 앞서는 건 정상 방향이다). 다만 **보이게** 둔다. 안 보여서
     룻이 반년 가까이 그 상태로 있었다.
 
+화면이 있어도 *누를 데* 가 없으면 못 논다 (2026-08-22 교정):
+    2026-08-20 에 `화면` 단계를 넣고 나서도 한 칸이 더 비어 있었다. 아브라함은
+    `Character` enum·`abraham.yml`·`frontend/src/app/abraham/page.tsx` 가 전부 있어서
+    여기서 **놀 수 있음으로 세어졌지만**, 홈(`frontend/src/app/page.tsx`)의 인물 목록
+    두 개(`DIRECT_MISSIONS` · 추천 그리드의 `ACTIVE`)에 아브라함이 없었다. 주소를
+    직접 쳐야만 들어갈 수 있었고, 추천 그리드에서는 `href="#"` 인 `Phase 2` 카드로
+    보였다. 룻과 같은 종류의 구멍이 한 계단 앞으로 옮겨 온 것뿐이다.
+
+    그래서 `입구` 를 마지막 단계로 넣는다. 그 두 목록은 손으로 적는 하드코딩이라
+    새 인물이 열릴 때마다 조용히 어긋난다 — 어긋난 걸 여기서 센다.
+    `enum + scenario + 화면` 은 있는데 입구가 없는 인물은 `입구 없음` 으로 따로 센다.
+    역전은 아니다(뒤 단계가 비어 있는 건 미완이지 위험이 아니다). 다만 보이게 둔다.
+
+화면이 먼저고 enum 이 나중인 것은 역전이 아닐 수 있다 (2026-08-22 추가):
+    `docs/{인물}-RUNTIME-SIGNOFF.md` 의 노출 결정 줄을 **비워 둔 채** 나머지 계층을
+    전부 올리는 것이 아브라함(#99→#100)에서 쓴 절차다. 노출은 `Character` enum 한 줄이고,
+    그 한 줄만 사람의 서명을 기다린다. 이때 화면은 있고 enum 은 없는 모양이 되는데,
+    그건 사고가 아니라 *의도된 대기* 다 — 그리고 화면을 먼저 붙이는 이유는 위와 같다.
+    화면이 없으면 프론트 검사기 두 개가 그 인물을 건너뛰기 때문이다.
+
+    그래서 다음 셋을 **동시에** 만족할 때만 역전에서 빼고 `노출 대기` 로 센다:
+      ① 빠진 앞 단계가 `런타임(enum)` **하나뿐** 이다.
+      ② 홈에 입구가 없다 — 눌러서 500 을 받을 경로가 열려 있지 않다.
+      ③ 노출 대장이 있고, 그 결정 줄이 **아직 체크되지 않았다**(`- [ ] 노출 결정 …`).
+    대장이 없으면 역전 그대로다. 대장이 이미 서명됐는데 enum 이 없으면 그것도 역전으로
+    둔다 — 사람이 열라고 했는데 안 열린 것은 대기가 아니라 누락이다.
+
 이 초록이 말하지 않는 것:
     ① 산출물의 품질 — 파일이 있는지만 본다. 안에 뭐가 적혔는지는 안 읽는다.
     ② 사람 사인오프 — `docs/CONTENT-WORKFLOW.md` 는 신학·심리 검토자의 승인을
@@ -74,6 +101,7 @@ STAGES = [
     ("scenario", "시나리오"),
     ("enum", "런타임"),
     ("screen", "화면"),
+    ("home_link", "입구"),
 ]
 
 # 미션 화면을 가려내는 기준. 라우트 디렉터리 이름이 곧 인물 이름이다(`/ruth`).
@@ -131,7 +159,46 @@ def mission_screens() -> set[str]:
     }
 
 
-def collect() -> dict[str, dict[str, bool]]:
+HOME_PAGE = "frontend/src/app/page.tsx"
+
+
+def home_entries() -> tuple[set[str], set[str]]:
+    """홈 화면이 실제로 *누르게 해 주는* 인물 — (직접 진입 카드, 추천 그리드).
+
+    둘 다 손으로 적는 목록이다. 한쪽에만 있으면 반쪽 입구다(추천 그리드에만 있으면
+    분류를 통과해야 보이고, `DIRECT_MISSIONS` 에만 있으면 추천 카드가 `href="#"` 이다).
+    그래서 합집합이 아니라 **교집합**을 입구로 센다. 어긋난 쪽은 따로 찍는다.
+
+    목록을 못 찾으면 빈 집합이 아니라 예외로 올린다 — 정규식이 낡아서 0개를 읽은 것을
+    '전원 입구 없음' 으로 세면 판정이 아니라 사고다. (mission_screens 와 같은 규율.)
+    """
+    src = (ROOT / HOME_PAGE).read_text(encoding="utf-8")
+    direct = set(re.findall(r'href:\s*"/([a-z_]+)"', src))
+    m = re.search(r"const ACTIVE = new Set\(\[(.*?)\]\)", src, re.S)
+    if m is None:
+        raise KeyError(f"홈 화면에서 추천 그리드의 ACTIVE 목록을 찾지 못했다: {HOME_PAGE}")
+    active = set(re.findall(r'"([a-z_]+)"', m.group(1)))
+    if not direct or not active:
+        raise KeyError(f"홈 화면의 인물 목록이 비었다 — 정규식이 낡았을 수 있다: {HOME_PAGE}")
+    return direct, active
+
+
+def exposure_withheld(character: str) -> bool:
+    """노출 대장은 있는데 결정 줄이 **아직 비어 있는가**.
+
+    `RuntimeExposureSignoffTest` 가 읽는 그 줄이다. 여기서는 체크박스만 본다 —
+    결정자·날짜의 형식 검사는 그 테스트의 몫이고, 두 곳에서 같은 정규식을 각자
+    관리하면 곧 갈라진다.
+    """
+    ledger = ROOT / f"docs/{character.upper()}-RUNTIME-SIGNOFF.md"
+    if not ledger.is_file():
+        return False
+    return re.search(
+        r"^- \[ ] 노출 결정 — 결정자:", ledger.read_text(encoding="utf-8"), re.M
+    ) is not None
+
+
+def collect() -> tuple[dict[str, dict[str, bool]], dict[str, set[str]]]:
     stages: dict[str, set[str]] = {
         "design": {
             p.stem.removeprefix("MVP-").lower()
@@ -149,12 +216,22 @@ def collect() -> dict[str, dict[str, bool]]:
         "screen": mission_screens(),
     }
     universe = sorted(set().union(*stages.values()))
-    return {c: {k: c in v for k, v in stages.items()} for c in universe}
+
+    # 입구는 **인물 목록을 다 모은 뒤에** 거른다. 홈에는 `/values` `/topics` 처럼 인물이
+    # 아닌 링크도 있어서, 그대로 세면 없는 인물 둘을 만들어 낸다(mission_screens 의
+    # 하드코딩 금지와 같은 이유로 이름을 박지 않고 *산출물이 있는가* 로 가른다).
+    direct, active = home_entries()
+    stages["home_link"] = (direct & active) & set(universe)
+    notes = {
+        "인물 아닌 홈 링크": (direct | active) - set(universe),
+        "반쪽 입구": (direct ^ active) & set(universe),
+    }
+    return {c: {k: c in v for k, v in stages.items()} for c in universe}, notes
 
 
 def main() -> int:
     try:
-        table = collect()
+        table, notes = collect()
         controls = self_controls()
     except (OSError, KeyError, ImportError) as exc:
         print(f"[BLOCKED] 인물 목록을 만들지 못했다 — {exc}")
@@ -177,6 +254,8 @@ def main() -> int:
     inverted: dict[str, list[str]] = {}
     playable: list[str] = []
     api_only: list[str] = []
+    no_entrance: list[str] = []
+    withheld: list[str] = []
     stalled: list[str] = []
 
     for name, has in sorted(table.items()):
@@ -188,11 +267,26 @@ def main() -> int:
         # 뒤 단계가 하나라도 있으면, 그보다 앞의 빠진 단계는 전부 역전이다.
         last = max((i for i, k in enumerate(keys) if has[k]), default=-1)
         missing = [k for k in keys[:last] if not has[k]]
-        if missing:
+        # 예외는 하나뿐이다 — 노출 한 줄만 사람 서명을 기다리는 *의도된 대기*.
+        # 셋을 동시에 만족해야 한다(빠진 게 enum 하나 · 홈 입구 없음 · 대장 미서명).
+        awaiting = (
+            missing == ["enum"]
+            and has["screen"]
+            and not has["home_link"]
+            and exposure_withheld(name)
+        )
+        if awaiting:
+            withheld.append(name)
+        elif missing:
             inverted[name] = missing
         if has["enum"] and has["scenario"]:
-            (playable if has["screen"] else api_only).append(name)
-        elif has["authoring"]:
+            if not has["screen"]:
+                api_only.append(name)
+            elif not has["home_link"]:
+                no_entrance.append(name)
+            else:
+                playable.append(name)
+        elif has["authoring"] and not awaiting:
             stalled.append(name)
 
     print()
@@ -205,7 +299,25 @@ def main() -> int:
             "    ↑ 웹 입구가 없다. check_frontend_trigger_warning.py 와 "
             "mission-tap-targets.spec.ts 가 이 인물을 건너뛴다."
         )
+    print(f"입구 없음 {len(no_entrance)}: {', '.join(no_entrance) or '없음'}")
+    if no_entrance:
+        # 아브라함이 그랬다. 백엔드도 화면도 다 있는데 홈의 손목록 두 개에 없어서
+        # 주소를 직접 쳐야만 들어갔다. 열어 놓고 안 열린 것과 같다.
+        print(
+            f"    ↑ 백엔드·화면은 다 있는데 홈({HOME_PAGE})의 "
+            "DIRECT_MISSIONS · ACTIVE 에 없다. 주소를 직접 쳐야 들어간다."
+        )
+    print(f"노출 대기 {len(withheld)}: {', '.join(withheld) or '없음'}")
+    if withheld:
+        # 역전이 아니다 — 아브라함 절차대로 노출 한 줄만 사람 서명을 기다리는 상태다.
+        print(
+            "    ↑ 화면까지 다 붙었고 `Character` enum 한 줄만 비어 있다. "
+            "docs/{인물}-RUNTIME-SIGNOFF.md 의 결정 줄이 서명을 기다린다."
+        )
     print(f"저작은 끝났으나 못 놂 {len(stalled)}: {', '.join(stalled) or '없음'}")
+    for label, names in notes.items():
+        if names:
+            print(f"{label} {len(names)}: {', '.join(sorted(names))}")
     print()
 
     for name, has in sorted(table.items()):
@@ -220,11 +332,14 @@ def main() -> int:
             if has["enum"]:
                 where = "런타임에 올라와 있는데"
             else:
-                # 화면은 있는데 백엔드 enum 이 없는 경우. 지금은 해당 인물이 없지만
-                # 생기면 사용자가 미션을 눌러 500 을 받는 경로다 — 위 문구로 뭉뚱그리면
-                # 무엇이 앞서 있는지가 사라진다.
+                # 화면은 있는데 백엔드 enum 이 없는 경우. 서명을 기다리는 *의도된 대기*
+                # (위 `노출 대기`)는 여기 오지 않는다. 여기 오는 건 대장이 없거나 이미
+                # 서명됐는데 안 열린 경우다 — 위 문구로 뭉뚱그리면 무엇이 앞서 있는지가
+                # 사라진다.
                 where = "화면이 붙어 있는데"
             print(f"  [FAIL   ] {name} — {where} 앞 단계가 없다: {gone} ({own})")
+        elif name in withheld:
+            print(f"  [PASS   ] {name} — 노출 대기(대장의 결정 줄이 비어 있다)")
         else:
             print(f"  [PASS   ] {name}")
 
